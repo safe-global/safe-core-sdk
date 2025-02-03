@@ -127,6 +127,15 @@ export type ProposeTransactionProps = {
   origin?: string
 }
 
+export type GetMultisigTransactionsOptions = {
+  executed?: boolean
+  nonce?: string
+  /** Which field to use when ordering the results. It can be: `nonce`, `created`, `modified` (default: `-created`) */
+  ordering?: string
+  // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_multisig_transactions_list
+  [key: string]: string | number | boolean | undefined
+} & ListOptions
+
 export type PendingTransactionsOptions = {
   currentNonce?: number
   hasConfirmations?: boolean

@@ -5,6 +5,7 @@ import {
   AllTransactionsListResponse,
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
+  GetMultisigTransactionsOptions,
   GetSafeDelegateProps,
   GetSafeMessageListProps,
   GetSafeOperationListProps,
@@ -534,17 +535,33 @@ class SafeApiKit {
    * Returns the history of multi-signature transactions of a Safe account.
    *
    * @param safeAddress - The Safe address
+   * @param options - Optional parameters to filter or modify the response
    * @returns The history of multi-signature transactions
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
    */
-  async getMultisigTransactions(safeAddress: string): Promise<SafeMultisigTransactionListResponse> {
+  async getMultisigTransactions(
+    safeAddress: string,
+    options?: GetMultisigTransactionsOptions
+  ): Promise<SafeMultisigTransactionListResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
+
     const { address } = this.#getEip3770Address(safeAddress)
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/`)
+
+    // Handle any additional query parameters
+    Object.entries(options || {}).forEach(([key, value]) => {
+      // Skip undefined values
+      if (value === undefined) return
+
+      // Add options as query parameters
+      url.searchParams.set(key, value.toString())
+    })
+
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/`,
+      url: url.toString(),
       method: HttpMethod.Get
     })
   }
@@ -637,6 +654,7 @@ class SafeApiKit {
    * @returns The list of transactions waiting for the confirmation of the Safe owners
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
+   * @throws "Ordering field is not valid"
    */
   async getAllTransactions(
     safeAddress: string,

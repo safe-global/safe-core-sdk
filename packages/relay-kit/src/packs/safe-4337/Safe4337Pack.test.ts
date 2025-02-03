@@ -2,8 +2,7 @@ import crypto from 'crypto'
 import dotenv from 'dotenv'
 import * as viem from 'viem'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
-import { WebAuthnCredentials } from '@safe-global/protocol-kit/tests/e2e/utils/webauthnShim'
-import { createMockPasskey } from '@safe-global/protocol-kit/tests/e2e/utils/passkeys'
+import { WebAuthnCredentials, createMockPasskey } from '@safe-global/protocol-kit/test-utils'
 import {
   getSafeModuleSetupDeployment,
   getSafe4337ModuleDeployment
@@ -12,9 +11,12 @@ import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
 import { Safe4337Pack } from './Safe4337Pack'
 import SafeOperationBase from './SafeOperationBase'
 import * as constants from './constants'
-import * as fixtures from './testing-utils/fixtures'
-import { createSafe4337Pack, generateTransferCallData } from './testing-utils/helpers'
 import * as utils from './utils'
+import {
+  fixtures,
+  createSafe4337Pack,
+  generateTransferCallData
+} from '@safe-global/relay-kit/test-utils'
 
 dotenv.config()
 

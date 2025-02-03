@@ -1,5 +1,5 @@
 import { PimlicoFeeEstimator } from './PimlicoFeeEstimator'
-import * as fixtures from '../../testing-utils/fixtures'
+import { fixtures } from '@safe-global/relay-kit/test-utils'
 import { PIMLICO_CUSTOM_RPC_4337_CALLS } from './types'
 import { RPC_4337_CALLS } from '../../constants'
 

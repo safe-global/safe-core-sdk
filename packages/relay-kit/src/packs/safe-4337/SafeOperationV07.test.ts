@@ -1,7 +1,7 @@
 import { Hex, concat, encodePacked } from 'viem'
 import { EthSafeSignature } from '@safe-global/protocol-kit'
 import SafeOperationV07 from './SafeOperationV07'
-import * as fixtures from './testing-utils/fixtures'
+import { fixtures } from '@safe-global/relay-kit/test-utils'
 
 describe('SafeOperationV07', () => {
   it('should create a SafeOperation from an UserOperation', () => {

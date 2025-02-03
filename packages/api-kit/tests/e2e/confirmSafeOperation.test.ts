@@ -1,23 +1,11 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import sinon from 'sinon'
-import {
-  BundlerClient,
-  Safe4337InitOptions,
-  Safe4337Pack,
-  SafeOperationBase
-} from '@safe-global/relay-kit'
-import { generateTransferCallData } from '@safe-global/relay-kit/packs/safe-4337/testing-utils/helpers'
+import { Safe4337InitOptions, Safe4337Pack, SafeOperationBase } from '@safe-global/relay-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { SafeOperation } from '@safe-global/types-kit'
-// Needs to be imported from dist folder in order to mock the createBundlerClient function
-import * as safe4337Utils from '@safe-global/relay-kit/dist/src/packs/safe-4337/utils'
+import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
 import { getApiKit, getEip1193Provider } from '../utils/setupKits'
-import {
-  ENTRYPOINT_ADDRESS_V06,
-  RPC_4337_CALLS
-} from '@safe-global/relay-kit/packs/safe-4337/constants'
 
 chai.use(chaiAsPromised)
 
@@ -25,7 +13,7 @@ const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c
 const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44' // 0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 4337 enabled 1/2 Safe (v1.4.1) owned by PRIVATE_KEY_1 + PRIVATE_KEY_2
 const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
-const BUNDLER_URL = `https://bundler.url`
+const BUNDLER_URL = 'https://api.pimlico.io/v2/sepolia/rpc?apikey=pim_Vjs7ohRqWdvsjUegngf9Bg'
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 
 let safeApiKit: SafeApiKit
@@ -36,8 +24,8 @@ let safeOpHash: string
 describe('confirmSafeOperation', () => {
   const transferUSDC = {
     to: PAYMASTER_TOKEN_ADDRESS,
-    data: generateTransferCallData(SAFE_ADDRESS, 100_000n),
-    value: Date.now().toString(), // Make sure that the transaction hash is unique
+    data: generateTransferCallData(SAFE_ADDRESS, 100_000n) + Date.now().toString(), // Make sure that the transaction hash is unique
+    value: '0',
     operation: 0
   }
 
@@ -76,31 +64,13 @@ describe('confirmSafeOperation', () => {
     return signedSafeOperation
   }
 
-  const requestStub = sinon.stub()
-
   before(async () => {
-    sinon.stub(safe4337Utils, 'createBundlerClient').returns({
-      request: requestStub
-    } as unknown as BundlerClient)
-
-    requestStub.withArgs({ method: RPC_4337_CALLS.CHAIN_ID }).resolves('0xaa36a7')
-    requestStub
-      .withArgs({ method: RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS })
-      .resolves([ENTRYPOINT_ADDRESS_V06])
-    requestStub
-      .withArgs({ method: 'pimlico_getUserOperationGasPrice' })
-      .resolves({ fast: { maxFeePerGas: '0x3b9aca00', maxPriorityFeePerGas: '0x3b9aca00' } })
-
     safe4337Pack = await getSafe4337Pack({ signer: PRIVATE_KEY_1 })
     safeApiKit = getApiKit(TX_SERVICE_URL)
 
     // Submit a new Safe operation to the transaction service
     safeOperation = await addSafeOperation()
     safeOpHash = safeOperation.getHash()
-  })
-
-  after(() => {
-    sinon.restore()
   })
 
   describe('should fail', () => {

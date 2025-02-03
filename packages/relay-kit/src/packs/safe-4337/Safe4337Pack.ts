@@ -1,5 +1,5 @@
-import semverSatisfies from 'semver/functions/satisfies'
 import { toHex } from 'viem'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import Safe, {
   EthSafeSignature,
   encodeMultiSendData,

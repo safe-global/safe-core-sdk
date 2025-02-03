@@ -2,8 +2,14 @@
   "name": "@safe-global/testing-kit",
   "version": "0.1.2",
   "description": "Helper package providing testing utilities",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/src/src/index.d.ts",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.mjs",
+  "exports": {
+    "types": "./dist/src/src/index.d.ts",
+    "require": "./dist/cjs/index.cjs",
+    "import": "./dist/esm/index.mjs"
+  },
   "keywords": [
     "Ethereum",
     "Wallet",
@@ -16,7 +22,10 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
-    "build": "yarn unbuild && hardhat compile && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "build": "yarn unbuild && hardhat compile && yarn build:esm && yarn build:cjs && yarn build:types",
+    "build:esm": "esbuild ./src/index --format=esm --bundle --packages=external --outdir=dist/esm --out-extension:.js=.mjs",
+    "build:cjs": "esbuild ./src/index --format=cjs --bundle --packages=external --outdir=dist/cjs --out-extension:.js=.cjs",
+    "build:types": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "deploy": "hardhat deploy",
     "compile": "hardhat compile",
     "test": "hardhat test"

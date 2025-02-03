@@ -81,7 +81,7 @@ import {
   getSafeContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import SafeProvider from './SafeProvider'
 import { asHash, asHex } from './utils/types'
 import { Hash, Hex, SendTransactionParameters } from 'viem'

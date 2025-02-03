@@ -1,6 +1,5 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import sinon from 'sinon'
 import { Safe4337InitOptions, Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
 import SafeApiKit from '@safe-global/api-kit/index'
@@ -69,10 +68,6 @@ describe('confirmSafeOperation', () => {
     // Submit a new Safe operation to the transaction service
     safeOperation = await addSafeOperation()
     safeOpHash = safeOperation.getHash()
-  })
-
-  after(() => {
-    sinon.restore()
   })
 
   describe('should fail', () => {

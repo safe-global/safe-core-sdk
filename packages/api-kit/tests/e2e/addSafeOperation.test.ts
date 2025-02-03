@@ -1,6 +1,5 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import sinon from 'sinon'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
@@ -46,10 +45,6 @@ describe('addSafeOperation', () => {
         paymasterAddress: PAYMASTER_ADDRESS
       }
     })
-  })
-
-  after(() => {
-    sinon.restore()
   })
 
   describe('should fail', () => {

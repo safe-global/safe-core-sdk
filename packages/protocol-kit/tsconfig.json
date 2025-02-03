@@ -8,6 +8,6 @@
     "composite": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "tests/**/*", "hardhat/**/*", "hardhat.config.ts"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["dist"]
 }

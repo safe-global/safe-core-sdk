@@ -1,8 +1,13 @@
 {
   "extends": "../../tsconfig.settings.json",
   "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@safe-global/protocol-kit/*": ["./src/*"]
+    },
     "composite": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "tests/**/*", "hardhat/**/*", "hardhat.config.ts"]
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["dist"]
 }

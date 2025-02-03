@@ -1,6 +1,6 @@
 import { BaseError, CallExecutionErrorType, RawContractErrorType } from 'viem'
 import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/types-kit'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import Safe from '@safe-global/protocol-kit/Safe'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {

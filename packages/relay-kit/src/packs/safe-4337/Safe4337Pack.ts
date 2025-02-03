@@ -1,4 +1,4 @@
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import Safe, {
   EthSafeSignature,
   SigningMethod,

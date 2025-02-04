@@ -94,6 +94,17 @@ describe('Safe4337Pack', () => {
         `Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: ${fixtures.SAFE_4337_MODULE_ADDRESS_V0_2_0}) to ensure compatibility.`
       )
     })
+
+    it('should throw an error if the 4337 Module is not enabled in the Safe account', async () => {
+      await expect(
+        createSafe4337Pack({
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE },
+          safeModulesVersion: '9.9.9'
+        })
+      ).rejects.toThrow(
+        'Safe4337Module and/or SafeModuleSetup not available for chain 11155111 and modules version 9.9.9'
+      )
+    })
   })
 
   describe('When using existing Safe Accounts with version 1.4.1 or greater', () => {
@@ -753,6 +764,18 @@ describe('Safe4337Pack', () => {
         ]
       })
     })
+  })
+
+  it('should use the default module version when safeModuleVersion is not provided', async () => {
+    const safe4337Pack = await createSafe4337Pack({
+      options: {
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+      }
+    })
+
+    expect(await safe4337Pack.protocolKit.getFallbackHandler()).toBe(
+      fixtures.SAFE_4337_MODULE_ADDRESS_V0_3_0
+    )
   })
 
   it('should allow to sign a SafeOperation', async () => {

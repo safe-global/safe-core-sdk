@@ -1,10 +1,8 @@
 import { EstimateGasData } from '@safe-global/types-kit'
 import {
   BundlerClient,
-  ERC20PaymasterOption,
   EstimateFeeFunctionProps,
   IFeeEstimator,
-  SponsoredPaymasterOption,
   UserOperationStringValues
 } from '@safe-global/relay-kit/packs/safe-4337/types'
 import {
@@ -36,16 +34,15 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
       const paymasterClient = createBundlerClient<PimlicoCustomRpcSchema>(
         paymasterOptions.paymasterUrl
       )
-      const context = (paymasterOptions as ERC20PaymasterOption).paymasterTokenAddress
-        ? {
-            token: (paymasterOptions as ERC20PaymasterOption).paymasterTokenAddress
-          }
-        : undefined
+      const context =
+        'paymasterTokenAddress' in paymasterOptions
+          ? {
+              token: paymasterOptions.paymasterTokenAddress
+            }
+          : undefined
       paymasterStubData = await paymasterClient.request({
         method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA,
-        params: (paymasterOptions as SponsoredPaymasterOption).sponsorshipPolicyId
-          ? [userOperationToHexValues(userOperation, entryPoint), entryPoint, chainId, context]
-          : [userOperationToHexValues(userOperation, entryPoint), entryPoint, chainId, context]
+        params: [userOperationToHexValues(userOperation, entryPoint), entryPoint, chainId, context]
       })
     }
 

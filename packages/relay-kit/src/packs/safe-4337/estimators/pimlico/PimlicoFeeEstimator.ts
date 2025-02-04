@@ -16,12 +16,11 @@ import { PIMLICO_CUSTOM_RPC_4337_CALLS, PimlicoCustomRpcSchema } from './types'
 
 /**
  * PimlicoFeeEstimator is a class that implements the IFeeEstimator interface. You can implement three optional methods that will be called during the estimation process:
- * - setupEstimation: Setup the userOperation before calling the eth_estimateUserOperation gas method.
- * - adjustEstimation: Adjust the userOperation values returned after calling the eth_adjustUserOperation method.
- * - getPaymasterEstimation: Obtain the paymaster data and the paymaster gas values.
+ * - preEstimateUserOperationGas: Setup the userOperation before calling the eth_estimateUserOperation gas method.
+ * - postEstimateUserOperationGas: Adjust the userOperation values returned after calling the eth_estimateUserOperation method.
  */
 export class PimlicoFeeEstimator implements IFeeEstimator {
-  async setupEstimation({
+  async preEstimateUserOperationGas({
     bundlerUrl,
     userOperation,
     entryPoint,
@@ -56,20 +55,12 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async adjustEstimation(_: EstimateFeeFunctionProps): Promise<EstimateGasData> {
-    return {}
-  }
-
-  async getPaymasterEstimation({
+  async postEstimateUserOperationGas({
     userOperation,
     entryPoint,
     paymasterOptions
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
-    if (!paymasterOptions)
-      throw new Error(
-        "Paymaster options can't be empty when trying to get the paymaster data and gas estimation"
-      )
+    if (!paymasterOptions) return {}
 
     const paymasterClient = createBundlerClient<PimlicoCustomRpcSchema>(
       paymasterOptions.paymasterUrl
@@ -111,9 +102,9 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
   }
 
   async #getUserOperationGasPrices(
-    bundlerClient: BundlerClient<PimlicoCustomRpcSchema>
+    client: BundlerClient<PimlicoCustomRpcSchema>
   ): Promise<Pick<EstimateGasData, 'maxFeePerGas' | 'maxPriorityFeePerGas'>> {
-    const feeData = await bundlerClient.request({
+    const feeData = await client.request({
       method: PIMLICO_CUSTOM_RPC_4337_CALLS.GET_USER_OPERATION_GAS_PRICE
     })
 

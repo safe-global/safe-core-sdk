@@ -27,8 +27,8 @@ describe('PimlicoFeeEstimator', () => {
     estimator = new PimlicoFeeEstimator()
   })
 
-  it('should enable to setup the gas estimation', async () => {
-    const sponsoredGasEstimation = await estimator.setupEstimation({
+  it('should enable to setup the user operation for gas estimation before calling eth_estimateUserOperationGas', async () => {
+    const sponsoredGasEstimation = await estimator.preEstimateUserOperationGas({
       bundlerUrl: fixtures.BUNDLER_URL,
       userOperation: fixtures.USER_OPERATION_V07,
       entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07
@@ -40,18 +40,8 @@ describe('PimlicoFeeEstimator', () => {
     })
   })
 
-  it('should enable to adjust the gas estimation', async () => {
-    const sponsoredGasEstimation = await estimator.adjustEstimation({
-      bundlerUrl: fixtures.BUNDLER_URL,
-      userOperation: fixtures.USER_OPERATION_V07,
-      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07
-    })
-
-    expect(sponsoredGasEstimation).toEqual({})
-  })
-
-  it('should get the paymaster estimation', async () => {
-    const paymasterGasEstimation = await estimator.getPaymasterEstimation({
+  it('should enable to adjust the gas estimation after calling eth_estimateUserOperationGas', async () => {
+    const paymasterGasEstimation = await estimator.postEstimateUserOperationGas({
       userOperation: fixtures.USER_OPERATION_V07,
       bundlerUrl: fixtures.BUNDLER_URL,
       paymasterOptions: {

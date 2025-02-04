@@ -153,9 +153,8 @@ export type EstimateFeeFunction = ({
 }: EstimateFeeFunctionProps) => Promise<EstimateGasData>
 
 export interface IFeeEstimator {
-  setupEstimation?: EstimateFeeFunction
-  adjustEstimation?: EstimateFeeFunction
-  getPaymasterEstimation?: EstimateFeeFunction
+  preEstimateUserOperationGas?: EstimateFeeFunction
+  postEstimateUserOperationGas?: EstimateFeeFunction
 }
 
 export type EstimateFeeProps = {

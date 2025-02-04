@@ -407,15 +407,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<SafeOperationBase> {
     const threshold = await this.protocolKit.getThreshold()
-    const setupEstimationData = await feeEstimator?.setupEstimation?.({
+    const preEstimationData = await feeEstimator?.preEstimateUserOperationGas?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.getUserOperation(),
       paymasterOptions: this.#paymasterOptions
     })
 
-    if (setupEstimationData) {
-      safeOperation.addEstimations(setupEstimationData)
+    if (preEstimationData) {
+      safeOperation.addEstimations(preEstimationData)
     }
 
     const estimateUserOperationGas = await this.#bundlerClient.request({
@@ -433,30 +433,18 @@ export class Safe4337Pack extends RelayKitBasePack<{
       safeOperation.addEstimations(estimateUserOperationGas)
     }
 
-    const adjustEstimationData = await feeEstimator?.adjustEstimation?.({
+    const postEstimationData = await feeEstimator?.postEstimateUserOperationGas?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      userOperation: safeOperation.getUserOperation()
+      userOperation: {
+        ...safeOperation.getUserOperation(),
+        signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
+      },
+      paymasterOptions: this.#paymasterOptions
     })
 
-    if (adjustEstimationData) {
-      safeOperation.addEstimations(adjustEstimationData)
-    }
-
-    if (this.#paymasterOptions) {
-      const paymasterEstimation = await feeEstimator?.getPaymasterEstimation?.({
-        userOperation: {
-          ...safeOperation.getUserOperation(),
-          signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
-        },
-        bundlerUrl: this.#BUNDLER_URL,
-        entryPoint: this.#ENTRYPOINT_ADDRESS,
-        paymasterOptions: this.#paymasterOptions
-      })
-
-      if (paymasterEstimation) {
-        safeOperation.addEstimations(paymasterEstimation)
-      }
+    if (postEstimationData) {
+      safeOperation.addEstimations(postEstimationData)
     }
 
     return safeOperation

@@ -975,4 +975,49 @@ describe('Safe4337Pack', () => {
 
     expect(supportedEntryPoints).toContain('0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789')
   })
+
+  describe('When using the onChainAnalytics feature', () => {
+    it("should enable to generate on chain analytics data for a Safe's transactions", async () => {
+      const safe4337Pack = await createSafe4337Pack({
+        onchainAnalytics: {
+          project: 'Test Relay kit',
+          platform: 'Web'
+        },
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+        }
+      })
+
+      expect(safe4337Pack.getOnchainIdentifier()).toBe(
+        '5afe006137303238633936636562316132623939353333646561393063346135'
+      )
+    })
+
+    it('should include th onchain identifier at the end of the callData property', async () => {
+      const safe4337Pack = await createSafe4337Pack({
+        onchainAnalytics: {
+          project: 'Test Relay kit',
+          platform: 'Web'
+        },
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+        }
+      })
+
+      const transferUSDC = {
+        to: fixtures.PAYMASTER_TOKEN_ADDRESS,
+        data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
+        value: '0',
+        operation: 0
+      }
+
+      const safeOperation = await safe4337Pack.createTransaction({
+        transactions: [transferUSDC]
+      })
+
+      expect(safeOperation.userOperation.callData).toContain(
+        '5afe006137303238633936636562316132623939353333646561393063346135'
+      )
+    })
+  })
 })

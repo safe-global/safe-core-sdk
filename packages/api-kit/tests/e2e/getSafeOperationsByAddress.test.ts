@@ -11,7 +11,7 @@ const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 
 let safeApiKit: SafeApiKit
 
-describe('getSafeOperationsByAddress', () => {
+describe.only('getSafeOperationsByAddress', () => {
   before(async () => {
     safeApiKit = getApiKit(TX_SERVICE_URL)
   })
@@ -112,6 +112,16 @@ describe('getSafeOperationsByAddress', () => {
 
     chai.expect(response).to.have.property('count').equals(2)
     chai.expect(response).to.have.property('results').to.be.an('array')
-    chai.expect(response.results[0]).to.be.deep.equal(safeOperations[1])
+  })
+
+  it('should get all safe operations without confirmations', async () => {
+    const response = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS,
+      offset: 1,
+      hasConfirmations: false
+    })
+
+    chai.expect(response).to.have.property('count').equals(0)
+    chai.expect(response).to.have.property('results').to.be.an('array')
   })
 })

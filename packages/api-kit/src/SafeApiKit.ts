@@ -844,7 +844,7 @@ class SafeApiKit {
     }
 
     if (hasConfirmations != null) {
-      url.searchParams.set('hasConfirmations', hasConfirmations.toString())
+      url.searchParams.set('has_confirmations', hasConfirmations.toString())
     }
 
     if (executed != null) {

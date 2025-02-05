@@ -1,4 +1,4 @@
-import { toHex } from 'viem'
+import { getAddress, toHex } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies.js'
 import Safe, {
   EthSafeSignature,
@@ -286,8 +286,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
         const passkeySigner = (await safeProvider.getExternalSigner()) as PasskeyClient
 
-        if (!options.owners.includes(safeWebAuthnSharedSignerAddress)) {
-          options.owners.push(safeWebAuthnSharedSignerAddress)
+        const checkSummedOwners = options.owners.map((owner) => getAddress(owner))
+        const checkSummedSignerAddress = getAddress(safeWebAuthnSharedSignerAddress)
+
+        if (!checkSummedOwners.includes(checkSummedSignerAddress)) {
+          options.owners.push(checkSummedSignerAddress)
         }
 
         const sharedSignerTransaction = {

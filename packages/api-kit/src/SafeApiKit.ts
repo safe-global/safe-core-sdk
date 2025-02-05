@@ -554,10 +554,10 @@ class SafeApiKit {
     // Handle any additional query parameters
     Object.entries(options || {}).forEach(([key, value]) => {
       // Skip undefined values
-      if (value === undefined) return
-
-      // Add options as query parameters
-      url.searchParams.set(key, value.toString())
+      if (value !== undefined) {
+        // Add options as query parameters
+        url.searchParams.set(key, value.toString())
+      }
     })
 
     return sendRequest({

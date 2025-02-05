@@ -5,7 +5,9 @@ import {
   UserOperation,
   SafeOperationResponse,
   ListResponse,
-  SignatureType
+  SignatureType,
+  DataDecoded,
+  UserOperationResponse
 } from '@safe-global/types-kit'
 
 export type ListOptions = {
@@ -65,7 +67,9 @@ export type SafeCreationInfoResponse = {
   readonly factoryAddress: string
   readonly singleton: string
   readonly setupData: string
-  readonly dataDecoded?: string
+  readonly saltNonce: string | null
+  readonly dataDecoded?: DataDecoded
+  readonly userOperation: UserOperationResponse | null
 }
 
 export type GetSafeDelegateProps = {
@@ -155,9 +159,9 @@ export type SafeModuleTransaction = {
   readonly module: string
   readonly to: string
   readonly value: string
-  readonly data: string
+  readonly data: string | null
   readonly operation: number
-  readonly dataDecoded?: string
+  readonly dataDecoded?: DataDecoded
 }
 
 export type SafeModuleTransactionListResponse = ListResponse<SafeModuleTransaction>

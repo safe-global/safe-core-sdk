@@ -817,6 +817,8 @@ class SafeApiKit {
    */
   async getSafeOperationsByAddress({
     safeAddress,
+    executed,
+    hasConfirmations,
     ordering,
     limit,
     offset
@@ -839,6 +841,14 @@ class SafeApiKit {
 
     if (offset != null) {
       url.searchParams.set('offset', offset.toString())
+    }
+
+    if (hasConfirmations != null) {
+      url.searchParams.set('hasConfirmations', hasConfirmations.toString())
+    }
+
+    if (executed != null) {
+      url.searchParams.set('executed', executed.toString())
     }
 
     return sendRequest({

@@ -17,9 +17,9 @@ const playgroundApiKitPaths = {
   'execute-transaction': 'api-kit/execute-transaction'
 }
 const playgroundRelayKitPaths = {
-  'api-kit-interoperability': 'relay-kit/api-kit-interoperability',
-  'relay-paid-transaction': 'relay-kit/paid-transaction',
-  'relay-sponsored-transaction': 'relay-kit/sponsored-transaction',
+  'gelato-paid-transaction': 'relay-kit/gelato-paid-transaction',
+  'gelato-sponsored-transaction': 'relay-kit/gelato-sponsored-transaction',
+  'userop-api-kit-interoperability': 'relay-kit/userop-api-kit-interoperability',
   userop: 'relay-kit/userop',
   'userop-counterfactual': 'relay-kit/userop-counterfactual',
   'userop-erc20-paymaster': 'relay-kit/userop-erc20-paymaster',

@@ -17,8 +17,8 @@ const usdcAmount = 10_000n // 0.01 USDC
 
 // Paymaster URL
 const PIMLICO_API_KEY = ''
-const PAYMASTER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}` // PIMLICO
-const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${PIMLICO_API_KEY}`
+const PAYMASTER_URL = `https://api.pimlico.io/v2/sepolia/rpc?add_balance_override&apikey=${PIMLICO_API_KEY}` // PIMLICO
+const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?add_balance_override&apikey=${PIMLICO_API_KEY}`
 
 async function send(): Promise<SafeClientResult> {
   const owner1 = privateKeyToAddress(OWNER_1_PRIVATE_KEY)

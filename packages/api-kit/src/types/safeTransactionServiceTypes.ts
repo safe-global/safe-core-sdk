@@ -266,6 +266,8 @@ export type GetSafeOperationListProps = {
   safeAddress: string
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string
+  executed?: boolean
+  hasConfirmations?: boolean
 } & ListOptions
 
 export type GetSafeOperationListResponse = ListResponse<SafeOperationResponse>

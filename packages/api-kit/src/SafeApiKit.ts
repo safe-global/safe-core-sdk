@@ -817,6 +817,8 @@ class SafeApiKit {
    */
   async getSafeOperationsByAddress({
     safeAddress,
+    executed,
+    hasConfirmations,
     ordering,
     limit,
     offset
@@ -841,9 +843,33 @@ class SafeApiKit {
       url.searchParams.set('offset', offset.toString())
     }
 
+    if (hasConfirmations != null) {
+      url.searchParams.set('has_confirmations', hasConfirmations.toString())
+    }
+
+    if (executed != null) {
+      url.searchParams.set('executed', executed.toString())
+    }
+
     return sendRequest({
       url: url.toString(),
       method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Get the SafeOperations that are pending to send to the bundler
+   * @param getSafeOperationsProps - The parameters to filter the list of SafeOperations
+   * @throws "Safe address must not be empty"
+   * @throws "Invalid Ethereum address {safeAddress}"
+   * @returns The pending SafeOperations
+   */
+  async getPendingSafeOperations(
+    props: Omit<GetSafeOperationListProps, 'executed'>
+  ): Promise<GetSafeOperationListResponse> {
+    return this.getSafeOperationsByAddress({
+      ...props,
+      executed: false
     })
   }
 

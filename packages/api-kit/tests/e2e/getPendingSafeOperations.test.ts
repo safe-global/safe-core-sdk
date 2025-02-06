@@ -10,7 +10,7 @@ const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 
 let safeApiKit: SafeApiKit
 
-describe.only('getPendingSafeOperations', () => {
+describe('getPendingSafeOperations', () => {
   before(async () => {
     safeApiKit = getApiKit(TX_SERVICE_URL)
   })

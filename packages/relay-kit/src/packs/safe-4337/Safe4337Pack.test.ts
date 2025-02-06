@@ -9,7 +9,7 @@ import {
 } from '@safe-global/safe-modules-deployments'
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
 import { Safe4337Pack } from './Safe4337Pack'
-import SafeOperationBase from './SafeOperationBase'
+import SafeOperation from './SafeOperation'
 import * as constants from './constants'
 import * as utils from './utils'
 import {
@@ -382,7 +382,7 @@ describe('Safe4337Pack', () => {
         transactions
       })
 
-      expect(safeOperation).toBeInstanceOf(SafeOperationBase)
+      expect(safeOperation).toBeInstanceOf(SafeOperation)
       expect(safeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE,
         entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,
@@ -418,7 +418,7 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      expect(safeOperation).toBeInstanceOf(SafeOperationBase)
+      expect(safeOperation).toBeInstanceOf(SafeOperation)
       expect(safeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE,
         entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,
@@ -480,7 +480,7 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      expect(sponsoredSafeOperation).toBeInstanceOf(SafeOperationBase)
+      expect(sponsoredSafeOperation).toBeInstanceOf(SafeOperation)
       expect(sponsoredSafeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE,
         entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,
@@ -541,7 +541,7 @@ describe('Safe4337Pack', () => {
 
       const batch = [transferUSDC, approveTransaction]
 
-      expect(sponsoredSafeOperation).toBeInstanceOf(SafeOperationBase)
+      expect(sponsoredSafeOperation).toBeInstanceOf(SafeOperation)
       expect(sponsoredSafeOperation.getSafeOperation()).toMatchObject({
         safe: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE,
         entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,

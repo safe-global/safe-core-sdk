@@ -2,17 +2,17 @@ import { Hex, encodePacked } from 'viem'
 import { EthSafeSignature } from '@safe-global/protocol-kit'
 import { fixtures } from '@safe-global/relay-kit/test-utils'
 import SafeOperationV06 from './SafeOperationV06'
-import SafeOperationBase from './SafeOperationBase'
+import SafeOperation from './SafeOperation'
 
 describe('SafeOperationV06', () => {
-  it('should be an instance of SafeOperationBase', () => {
+  it('should be an instance of SafeOperation', () => {
     const safeOperation = new SafeOperationV06(fixtures.USER_OPERATION_V06, {
       chainId: BigInt(fixtures.CHAIN_ID),
       moduleAddress: fixtures.SAFE_4337_MODULE_ADDRESS_V0_2_0,
       entryPoint: fixtures.ENTRYPOINT_ADDRESS_V06
     })
 
-    expect(safeOperation).toBeInstanceOf(SafeOperationBase)
+    expect(safeOperation).toBeInstanceOf(SafeOperation)
     expect(safeOperation).toBeInstanceOf(SafeOperationV06)
   })
 

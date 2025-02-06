@@ -12,7 +12,7 @@ import {
   EIP712_SAFE_OPERATION_TYPE_V07
 } from '@safe-global/relay-kit/packs/safe-4337/constants'
 
-abstract class SafeOperationBase {
+abstract class SafeOperation {
   userOperation: UserOperation
   options: SafeOperationOptions
   signatures: Map<string, SafeSignature> = new Map()
@@ -69,4 +69,4 @@ abstract class SafeOperationBase {
     | typeof EIP712_SAFE_OPERATION_TYPE_V07
 }
 
-export default SafeOperationBase
+export default SafeOperation

@@ -5,10 +5,10 @@ import {
   SafeOperationOptions
 } from '@safe-global/types-kit'
 import { concat, Hex, isAddress, pad, toHex } from 'viem'
-import SafeOperationBase from '@safe-global/relay-kit/packs/safe-4337/SafeOperationBase'
+import SafeOperation from '@safe-global/relay-kit/packs/safe-4337/SafeOperation'
 import { EIP712_SAFE_OPERATION_TYPE_V07 } from '@safe-global/relay-kit/packs/safe-4337/constants'
 
-class SafeOperationV07 extends SafeOperationBase {
+class SafeOperationV07 extends SafeOperation {
   userOperation!: UserOperationV07
 
   constructor(userOperation: UserOperationV07, options: SafeOperationOptions) {

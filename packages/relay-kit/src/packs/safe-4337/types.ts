@@ -11,7 +11,7 @@ import {
   SafeVersion,
   UserOperation
 } from '@safe-global/types-kit'
-import SafeOperationBase from '@safe-global/relay-kit/packs/safe-4337/SafeOperationBase'
+import SafeOperation from '@safe-global/relay-kit/packs/safe-4337/SafeOperation'
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
 
 type ExistingSafeOptions = {
@@ -81,7 +81,7 @@ export type Safe4337CreateTransactionProps = {
 }
 
 export type Safe4337ExecutableProps = {
-  executable: SafeOperationBase | SafeOperationResponse
+  executable: SafeOperation | SafeOperationResponse
 }
 
 export type EstimateSponsoredGasData = (
@@ -158,7 +158,7 @@ export interface IFeeEstimator {
 }
 
 export type EstimateFeeProps = {
-  safeOperation: SafeOperationBase
+  safeOperation: SafeOperation
   feeEstimator?: IFeeEstimator
 }
 

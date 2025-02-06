@@ -3,7 +3,6 @@ import chaiAsPromised from 'chai-as-promised'
 import { Safe4337InitOptions, Safe4337Pack, SafeOperationBase } from '@safe-global/relay-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
-import { SafeOperation } from '@safe-global/types-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
 import { getApiKit, getEip1193Provider } from '../utils/setupKits'
 
@@ -18,7 +17,7 @@ const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 
 let safeApiKit: SafeApiKit
 let safe4337Pack: Safe4337Pack
-let safeOperation: SafeOperation
+let safeOperation: SafeOperationBase
 let safeOpHash: string
 
 describe('confirmSafeOperation', () => {
@@ -38,11 +37,9 @@ describe('confirmSafeOperation', () => {
       safeModulesVersion: '0.2.0'
     })
 
-  const createSignature = async (safeOperation: SafeOperation, signer: string) => {
+  const createSignature = async (safeOperation: SafeOperationBase, signer: string) => {
     const safe4337Pack = await getSafe4337Pack({ signer })
-    const signedSafeOperation = await safe4337Pack.signSafeOperation(
-      safeOperation as SafeOperationBase
-    )
+    const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
     const signerAddress = await safe4337Pack.protocolKit.getSafeProvider().getSignerAddress()
     return signedSafeOperation.getSignature(signerAddress!)
   }
@@ -51,7 +48,7 @@ describe('confirmSafeOperation', () => {
    * Add a new Safe operation to the transaction service.
    * @returns Resolves with the signed Safe operation
    */
-  const addSafeOperation = async (): Promise<SafeOperation> => {
+  const addSafeOperation = async (): Promise<SafeOperationBase> => {
     const safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC]
     })

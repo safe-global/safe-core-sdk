@@ -34,12 +34,11 @@ import {
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
 import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
+import { SafeOperationBase } from '@safe-global/relay-kit'
 import {
   Eip3770Address,
-  isSafeOperation,
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse,
-  SafeOperation,
   SafeOperationConfirmationListResponse,
   SafeOperationResponse,
   UserOperationV06
@@ -875,11 +874,11 @@ class SafeApiKit {
    * @throws "Invalid module address {moduleAddress}"
    * @throws "Signature must not be empty"
    */
-  async addSafeOperation(safeOperation: AddSafeOperationProps | SafeOperation): Promise<void> {
+  async addSafeOperation(safeOperation: AddSafeOperationProps | SafeOperationBase): Promise<void> {
     let safeAddress: string, moduleAddress: string
     let addSafeOperationProps: AddSafeOperationProps
 
-    if (isSafeOperation(safeOperation)) {
+    if (safeOperation instanceof SafeOperationBase) {
       addSafeOperationProps = await getAddSafeOperationProps(safeOperation)
     } else {
       addSafeOperationProps = safeOperation

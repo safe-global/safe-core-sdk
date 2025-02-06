@@ -355,28 +355,6 @@ export type SafeOperationOptions = {
   validUntil?: number
 }
 
-export interface SafeOperation {
-  userOperation: UserOperation
-  options: SafeOperationOptions
-
-  readonly signatures: Map<string, SafeSignature>
-  getSignature(signer: string): SafeSignature | undefined
-  addSignature(signature: SafeSignature): void
-  encodedSignatures(): string
-  addEstimations(estimations: EstimateGasData): void
-  getSafeOperation(): SafeUserOperation
-  getUserOperation(): UserOperation
-  getHash(): string
-}
-
-export const isSafeOperation = (response: unknown): response is SafeOperation => {
-  const safeOperation = response as SafeOperation
-
-  return (
-    'userOperation' in safeOperation && 'options' in safeOperation && 'signatures' in safeOperation
-  )
-}
-
 export type SafeOperationConfirmation = {
   readonly created: string
   readonly modified: string
@@ -413,12 +391,6 @@ export type SafeOperationResponse = {
   readonly confirmations?: Array<SafeOperationConfirmation>
   readonly preparedSignature?: string
   readonly userOperation?: UserOperationResponse
-}
-
-export const isSafeOperationResponse = (response: unknown): response is SafeOperationResponse => {
-  const safeOperationResponse = response as SafeOperationResponse
-
-  return 'userOperation' in safeOperationResponse && 'safeOperationHash' in safeOperationResponse
 }
 
 export type SafeOperationConfirmationListResponse = ListResponse<SafeOperationConfirmation>

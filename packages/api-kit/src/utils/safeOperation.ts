@@ -1,6 +1,6 @@
-import { SafeOperation } from '@safe-global/types-kit'
+import { SafeOperationBase } from '@safe-global/relay-kit'
 
-export const getAddSafeOperationProps = async (safeOperation: SafeOperation) => {
+export const getAddSafeOperationProps = async (safeOperation: SafeOperationBase) => {
   const userOperation = safeOperation.getUserOperation()
   userOperation.signature = safeOperation.encodedSignatures() // Without validity dates
 

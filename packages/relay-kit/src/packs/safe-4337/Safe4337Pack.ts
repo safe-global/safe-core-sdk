@@ -10,7 +10,6 @@ import Safe, {
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
-  isSafeOperationResponse,
   OperationType,
   SafeOperationConfirmation,
   SafeOperationResponse,
@@ -557,10 +556,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
   ): Promise<SafeOperationBase> {
     let safeOp: SafeOperationBase
 
-    if (isSafeOperationResponse(safeOperation)) {
-      safeOp = this.#toSafeOperation(safeOperation)
-    } else {
+    if (safeOperation instanceof SafeOperationBase) {
       safeOp = safeOperation
+    } else {
+      safeOp = this.#toSafeOperation(safeOperation)
     }
 
     const safeProvider = this.protocolKit.getSafeProvider()
@@ -651,10 +650,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
   async executeTransaction({ executable }: Safe4337ExecutableProps): Promise<string> {
     let safeOperation: SafeOperationBase
 
-    if (isSafeOperationResponse(executable)) {
-      safeOperation = this.#toSafeOperation(executable)
-    } else {
+    if (executable instanceof SafeOperationBase) {
       safeOperation = executable
+    } else {
+      safeOperation = this.#toSafeOperation(executable)
     }
 
     return this.#bundlerClient.request({

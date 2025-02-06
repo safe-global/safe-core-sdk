@@ -6,7 +6,7 @@ import {
   SafeTransactionData,
   SigningMethod
 } from '@safe-global/types-kit'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
 import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'

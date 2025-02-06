@@ -9,7 +9,7 @@ import {
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { ExternalSigner } from '@safe-global/protocol-kit'
 import { getBlock, waitForTransactionReceipt } from 'viem/actions'
-import { MetaTransactionData } from 'packages/types-kit/dist/src'
+import { MetaTransactionData } from '@safe-global/types-kit'
 import * as chains from 'viem/chains'
 
 export const generateTransferCallData = (to: string, value: bigint) => {

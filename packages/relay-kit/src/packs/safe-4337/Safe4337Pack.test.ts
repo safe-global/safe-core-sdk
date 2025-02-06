@@ -95,7 +95,7 @@ describe('Safe4337Pack', () => {
       )
     })
 
-    it('should throw an error if the 4337 Module is not enabled in the Safe account', async () => {
+    it('should throw an error if the Safe Modules do not match the supported version', async () => {
       await expect(
         createSafe4337Pack({
           options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE },

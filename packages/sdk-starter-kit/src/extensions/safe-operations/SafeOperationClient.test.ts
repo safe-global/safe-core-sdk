@@ -193,7 +193,7 @@ describe('SafeOperationClient', () => {
 
   describe('getPendingSafeOperations', () => {
     it('should return the pending Safe operations for the Safe address', async () => {
-      apiKit.getSafeOperationsByAddress = jest.fn().mockResolvedValue(PENDING_SAFE_OPERATIONS)
+      apiKit.getPendingSafeOperations = jest.fn().mockResolvedValue(PENDING_SAFE_OPERATIONS)
 
       const result = await safeOperationClient.getPendingSafeOperations()
 

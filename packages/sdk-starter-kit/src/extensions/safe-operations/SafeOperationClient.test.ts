@@ -198,7 +198,10 @@ describe('SafeOperationClient', () => {
       const result = await safeOperationClient.getPendingSafeOperations()
 
       expect(protocolKit.getAddress).toHaveBeenCalled()
-      expect(apiKit.getSafeOperationsByAddress).toHaveBeenCalledWith({ safeAddress: SAFE_ADDRESS })
+      expect(apiKit.getSafeOperationsByAddress).toHaveBeenCalledWith({
+        safeAddress: SAFE_ADDRESS,
+        executed: false
+      })
       expect(result).toBe(PENDING_SAFE_OPERATIONS)
     })
   })

@@ -865,7 +865,7 @@ class SafeApiKit {
    * @returns The pending SafeOperations
    */
   async getPendingSafeOperations(
-    props: GetSafeOperationListProps
+    props: Omit<GetSafeOperationListProps, 'executed'>
   ): Promise<GetSafeOperationListResponse> {
     return this.getSafeOperationsByAddress({
       ...props,

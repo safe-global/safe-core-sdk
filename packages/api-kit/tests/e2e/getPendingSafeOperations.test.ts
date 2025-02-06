@@ -36,8 +36,7 @@ describe('getPendingSafeOperations', () => {
 
     // Prepared 2 executed SafeOperations in the E2E Safe account
     const pendingSafeOperations = await safeApiKit.getPendingSafeOperations({
-      safeAddress: SAFE_ADDRESS,
-      executed: false
+      safeAddress: SAFE_ADDRESS
     })
 
     const executedSafeOperations = await safeApiKit.getSafeOperationsByAddress({

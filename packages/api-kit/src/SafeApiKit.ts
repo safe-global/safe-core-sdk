@@ -858,6 +858,22 @@ class SafeApiKit {
   }
 
   /**
+   * Get the SafeOperations that are pending to send to the bundler
+   * @param getSafeOperationsProps - The parameters to filter the list of SafeOperations
+   * @throws "Safe address must not be empty"
+   * @throws "Invalid Ethereum address {safeAddress}"
+   * @returns The pending SafeOperations
+   */
+  async getPendingSafeOperations(
+    props: GetSafeOperationListProps
+  ): Promise<GetSafeOperationListResponse> {
+    return this.getSafeOperationsByAddress({
+      ...props,
+      executed: false
+    })
+  }
+
+  /**
    * Get a SafeOperation by its hash.
    * @param safeOperationHash The SafeOperation hash
    * @throws "SafeOperation hash must not be empty"

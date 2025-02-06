@@ -10,7 +10,7 @@ import { Safe4337Pack } from '@safe-global/relay-kit'
 import { ExternalSigner } from '@safe-global/protocol-kit'
 import { getBlock, waitForTransactionReceipt } from 'viem/actions'
 import { MetaTransactionData } from 'packages/types-kit/dist/src'
-import { sepolia } from 'viem/chains'
+import * as chains from 'viem/chains'
 
 export const generateTransferCallData = (to: string, value: bigint) => {
   const functionAbi = parseAbi(['function transfer(address _to, uint256 _value) returns (bool)'])
@@ -67,6 +67,18 @@ export async function transfer(
   return await publicClient.waitForTransactionReceipt({ hash })
 }
 
+function getChain(chainId: number): any {
+  for (const chain of Object.values(chains)) {
+    if ('id' in chain) {
+      if (chain.id === chainId) {
+        return chain
+      }
+    }
+  }
+
+  throw new Error(`Chain with id ${chainId} not found`)
+}
+
 export async function setup4337Playground(
   safe4337Pack: Safe4337Pack,
   {
@@ -83,10 +95,11 @@ export async function setup4337Playground(
   }
 ): Promise<{ transactions: MetaTransactionData[]; timestamp: bigint }> {
   const senderAddress = await safe4337Pack.protocolKit.getAddress()
+  const chainId = await safe4337Pack.getChainId()
 
   // Log supported entry points and Safe state
   console.log('Supported Entry Points', await safe4337Pack.getSupportedEntryPoints())
-  console.log('Chain id', await safe4337Pack.getChainId())
+  console.log('Chain id', chainId)
   console.log('Safe Address: ', senderAddress)
   console.log('Safe Owners:', await safe4337Pack.protocolKit.getOwners())
   console.log('is Safe Account deployed: ', await safe4337Pack.protocolKit.isSafeDeployed())
@@ -106,7 +119,7 @@ export async function setup4337Playground(
     const hash = await externalSigner?.sendTransaction({
       to: senderAddress,
       value: nativeTokenAmount,
-      chain: sepolia
+      chain: getChain(Number(chainId))
     })
 
     await waitForTransactionReceipt(externalProvider, { hash })

@@ -463,12 +463,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
     transactions,
     options = {}
   }: Safe4337CreateTransactionProps): Promise<SafeOperation> {
-    const { amountToApprove, validUntil, validAfter, feeEstimator } = options
+    const { amountToApprove, validUntil, validAfter, feeEstimator, customNonce } = options
 
     const userOperation = await createUserOperation(this.protocolKit, transactions, {
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       paymasterOptions: this.#paymasterOptions,
-      amountToApprove
+      amountToApprove,
+      customNonce
     })
 
     if (this.#onchainIdentifier) {

@@ -41,7 +41,7 @@ async function main() {
     options: {
       validAfter: Number(timestamp - 60_000n),
       validUntil: Number(timestamp + 60_000n),
-      customNonce: encodeNonce({ key: BigInt(Date.now()), sequence: 0n }) // Custom nonce to avoid nonce collision
+      customNonce: encodeNonce({ key: BigInt(Date.now()), sequence: 0n })
     }
   })
 
@@ -50,7 +50,7 @@ async function main() {
     options: {
       validAfter: Number(timestamp - 60_000n),
       validUntil: Number(timestamp + 60_000n),
-      customNonce: encodeNonce({ key: BigInt(Date.now()), sequence: 0n }) // Custom nonce to avoid nonce collision
+      customNonce: encodeNonce({ key: BigInt(Date.now()), sequence: 0n })
     }
   })
 

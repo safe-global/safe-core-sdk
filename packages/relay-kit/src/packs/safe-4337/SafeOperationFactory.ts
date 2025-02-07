@@ -6,7 +6,7 @@ import {
 } from '@safe-global/types-kit'
 import SafeOperationV06 from '@safe-global/relay-kit/packs/safe-4337/SafeOperationV06'
 import SafeOperationV07 from '@safe-global/relay-kit/packs/safe-4337/SafeOperationV07'
-import SafeOperation from '@safe-global/relay-kit/packs/safe-4337/SafeOperation'
+import BaseSafeOperation from '@safe-global/relay-kit/packs/safe-4337/BaseSafeOperation'
 import { isEntryPointV6 } from '@safe-global/relay-kit/packs/safe-4337/utils'
 
 class SafeOperationFactory {
@@ -19,7 +19,7 @@ class SafeOperationFactory {
   static createSafeOperation(
     userOperation: UserOperation,
     options: SafeOperationOptions
-  ): SafeOperation {
+  ): BaseSafeOperation {
     if (isEntryPointV6(options.entryPoint)) {
       return new SafeOperationV06(userOperation as UserOperationV06, options)
     }

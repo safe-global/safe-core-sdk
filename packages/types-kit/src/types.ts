@@ -394,3 +394,18 @@ export type SafeOperationResponse = {
 }
 
 export type SafeOperationConfirmationListResponse = ListResponse<SafeOperationConfirmation>
+
+export interface SafeOperation {
+  userOperation: UserOperation
+  options: SafeOperationOptions
+  signatures: Map<string, SafeSignature>
+
+  addEstimations(estimations: EstimateGasData): void
+  getSafeOperation(): SafeUserOperation
+  getSignature(signer: string): SafeSignature | undefined
+  addSignature(signature: SafeSignature): void
+  encodedSignatures(): string
+  getUserOperation(): UserOperation
+  getHash(): string
+  getEIP712Type(): unknown
+}

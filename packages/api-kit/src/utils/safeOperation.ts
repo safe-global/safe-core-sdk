@@ -1,4 +1,5 @@
-import { SafeOperation } from '@safe-global/relay-kit'
+import { SafeOperation } from '@safe-global/types-kit'
+import { AddSafeOperationProps } from '../types/safeTransactionServiceTypes'
 
 export const getAddSafeOperationProps = async (safeOperation: SafeOperation) => {
   const userOperation = safeOperation.getUserOperation()
@@ -14,4 +15,10 @@ export const getAddSafeOperationProps = async (safeOperation: SafeOperation) => 
       validUntil: safeOperation.options.validUntil
     }
   }
+}
+
+export const isSafeOperation = (
+  obj: AddSafeOperationProps | SafeOperation
+): obj is SafeOperation => {
+  return 'signatures' in obj && 'getUserOperation' in obj && 'getHash' in obj
 }

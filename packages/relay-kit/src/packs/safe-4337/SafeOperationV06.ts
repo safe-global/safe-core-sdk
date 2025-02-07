@@ -4,10 +4,10 @@ import {
   SafeUserOperation,
   SafeOperationOptions
 } from '@safe-global/types-kit'
-import SafeOperation from '@safe-global/relay-kit/packs/safe-4337/SafeOperation'
+import BaseSafeOperation from '@safe-global/relay-kit/packs/safe-4337/BaseSafeOperation'
 import { EIP712_SAFE_OPERATION_TYPE_V06 } from '@safe-global/relay-kit/packs/safe-4337/constants'
 
-class SafeOperationV06 extends SafeOperation {
+class SafeOperationV06 extends BaseSafeOperation {
   userOperation!: UserOperationV06
 
   constructor(userOperation: UserOperationV06, options: SafeOperationOptions) {

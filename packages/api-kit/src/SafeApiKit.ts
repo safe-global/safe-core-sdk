@@ -34,18 +34,18 @@ import {
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
 import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
-import { SafeOperation } from '@safe-global/relay-kit'
 import {
   Eip3770Address,
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse,
+  SafeOperation,
   SafeOperationConfirmationListResponse,
   SafeOperationResponse,
   UserOperationV06
 } from '@safe-global/types-kit'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { isEmptyData } from './utils'
-import { getAddSafeOperationProps } from './utils/safeOperation'
+import { getAddSafeOperationProps, isSafeOperation } from './utils/safeOperation'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -904,7 +904,7 @@ class SafeApiKit {
     let safeAddress: string, moduleAddress: string
     let addSafeOperationProps: AddSafeOperationProps
 
-    if (safeOperation instanceof SafeOperation) {
+    if (isSafeOperation(safeOperation)) {
       addSafeOperationProps = await getAddSafeOperationProps(safeOperation)
     } else {
       addSafeOperationProps = safeOperation

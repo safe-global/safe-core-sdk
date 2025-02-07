@@ -2,7 +2,7 @@ import { Hex, encodePacked } from 'viem'
 import { EthSafeSignature } from '@safe-global/protocol-kit'
 import { fixtures } from '@safe-global/relay-kit/test-utils'
 import SafeOperationV06 from './SafeOperationV06'
-import SafeOperation from './SafeOperation'
+import BaseSafeOperation from './BaseSafeOperation'
 
 describe('SafeOperationV06', () => {
   it('should be an instance of SafeOperation', () => {
@@ -12,7 +12,7 @@ describe('SafeOperationV06', () => {
       entryPoint: fixtures.ENTRYPOINT_ADDRESS_V06
     })
 
-    expect(safeOperation).toBeInstanceOf(SafeOperation)
+    expect(safeOperation).toBeInstanceOf(BaseSafeOperation)
     expect(safeOperation).toBeInstanceOf(SafeOperationV06)
   })
 

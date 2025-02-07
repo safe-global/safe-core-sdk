@@ -1,6 +1,7 @@
 import { Hex, encodePacked, hashTypedData } from 'viem'
 import {
   EstimateGasData,
+  SafeOperation,
   SafeOperationOptions,
   SafeSignature,
   SafeUserOperation,
@@ -12,7 +13,7 @@ import {
   EIP712_SAFE_OPERATION_TYPE_V07
 } from '@safe-global/relay-kit/packs/safe-4337/constants'
 
-abstract class SafeOperation {
+abstract class BaseSafeOperation implements SafeOperation {
   userOperation: UserOperation
   options: SafeOperationOptions
   signatures: Map<string, SafeSignature> = new Map()
@@ -69,4 +70,4 @@ abstract class SafeOperation {
     | typeof EIP712_SAFE_OPERATION_TYPE_V07
 }
 
-export default SafeOperation
+export default BaseSafeOperation

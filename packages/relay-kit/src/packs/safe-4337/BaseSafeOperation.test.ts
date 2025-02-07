@@ -2,7 +2,7 @@ import { EthSafeSignature } from '@safe-global/protocol-kit'
 import SafeOperationV07 from './SafeOperationV07'
 import { fixtures } from '@safe-global/relay-kit/test-utils'
 
-describe('SafeOperation', () => {
+describe('BaseSafeOperation', () => {
   it('should add and get signatures', () => {
     const safeOperation = new SafeOperationV07(fixtures.USER_OPERATION_V07, {
       chainId: BigInt(fixtures.CHAIN_ID),

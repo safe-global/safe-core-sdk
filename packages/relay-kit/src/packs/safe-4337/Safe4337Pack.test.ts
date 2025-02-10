@@ -1020,6 +1020,14 @@ describe('Safe4337Pack', () => {
       expect(identifierWithoutToolVersion).toBe(
         '5afe006137303238633936636562316132623939353333646561393063'
       )
+
+      const relayKitCurrentVersion = utils.getRelayKitVersion()
+
+      // check the tool version hash
+      const toolversionHash = viem
+        .toHex(viem.keccak256(viem.toHex(relayKitCurrentVersion)).slice(-3))
+        .replace('0x', '')
+      expect(onchainIdentifier.endsWith(toolversionHash)).toBeTruthy()
     })
 
     it('should include th onchain identifier at the end of the callData property', async () => {

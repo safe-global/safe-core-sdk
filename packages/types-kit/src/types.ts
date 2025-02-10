@@ -223,6 +223,12 @@ export type DecodedParameters = {
   readonly name: string
   readonly type: string
   readonly value: string
+  readonly valueDecoded?: ValueDecoded[]
+}
+
+export type ValueDecoded = MetaTransactionData & {
+  readonly operation: OperationType
+  readonly dataDecoded?: DataDecoded
 }
 
 export type SafeMultisigTransactionResponse = {

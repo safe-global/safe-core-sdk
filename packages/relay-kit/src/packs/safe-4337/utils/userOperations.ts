@@ -114,11 +114,18 @@ export async function createUserOperation(
   {
     amountToApprove,
     entryPoint,
-    paymasterOptions
-  }: { entryPoint: string; amountToApprove?: bigint; paymasterOptions: PaymasterOptions }
+    paymasterOptions,
+    customNonce
+  }: {
+    entryPoint: string
+    amountToApprove?: bigint
+    paymasterOptions: PaymasterOptions
+    customNonce?: bigint
+  }
 ): Promise<UserOperation> {
   const safeAddress = await protocolKit.getAddress()
-  const nonce = await getSafeNonceFromEntrypoint(protocolKit, safeAddress, entryPoint)
+  const nonce =
+    customNonce || (await getSafeNonceFromEntrypoint(protocolKit, safeAddress, entryPoint))
   const isSafeDeployed = await protocolKit.isSafeDeployed()
   const paymasterAndData =
     paymasterOptions && 'paymasterAddress' in paymasterOptions

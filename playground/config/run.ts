@@ -25,7 +25,9 @@ const playgroundRelayKitPaths = {
   'userop-erc20-paymaster': 'relay-kit/userop-erc20-paymaster',
   'userop-erc20-paymaster-counterfactual': 'relay-kit/userop-erc20-paymaster-counterfactual',
   'userop-verifying-paymaster': 'relay-kit/userop-verifying-paymaster',
-  'userop-verifying-paymaster-counterfactual': 'relay-kit/userop-verifying-paymaster-counterfactual'
+  'userop-verifying-paymaster-counterfactual':
+    'relay-kit/userop-verifying-paymaster-counterfactual',
+  'userop-parallel-execution': 'relay-kit/userop-parallel-execution'
 }
 
 const playgroundStarterKitPaths = {

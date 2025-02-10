@@ -16,6 +16,8 @@ const {
 // faucet: https://dashboard.pimlico.io/test-erc20-faucet
 const pimlicoTokenAddress = '0xFC3e86566895Fb007c6A0d3809eb2827DF94F751'
 
+const NUMBER_OF_OPERATIONS = 2
+
 async function main() {
   // 1) Initialize pack
   const safe4337Pack = await Safe4337Pack.init({
@@ -35,46 +37,45 @@ async function main() {
     erc20TokenContractAddress: pimlicoTokenAddress
   })
 
-  // 3) Create SafeOperation
-  const safeOperation1 = await safe4337Pack.createTransaction({
-    transactions,
-    options: {
-      validAfter: Number(timestamp - 60_000n),
-      validUntil: Number(timestamp + 60_000n),
-      customNonce: encodeNonce({ key: BigInt(Date.now()), sequence: 0n })
-    }
-  })
+  // 3) Create Multiple SafeOperations
+  const safeOperations = []
 
-  const safeOperation2 = await safe4337Pack.createTransaction({
-    transactions,
-    options: {
-      validAfter: Number(timestamp - 60_000n),
-      validUntil: Number(timestamp + 60_000n),
-      customNonce: encodeNonce({ key: BigInt(Date.now()), sequence: 0n })
-    }
-  })
+  for (let i = 0; i < NUMBER_OF_OPERATIONS; i++) {
+    safeOperations.push(
+      safe4337Pack.createTransaction({
+        transactions,
+        options: {
+          validAfter: Number(timestamp - 60_000n),
+          validUntil: Number(timestamp + 60_000n),
+          customNonce: encodeNonce({
+            key: BigInt(Date.now()) + BigInt(i), // Ensure unique nonce
+            sequence: 0n
+          })
+        }
+      })
+    )
+  }
 
-  // 4) Sign SafeOperation
-  const signedSafeOperation1 = await safe4337Pack.signSafeOperation(safeOperation1)
-  const signedSafeOperation2 = await safe4337Pack.signSafeOperation(safeOperation2)
+  const createdSafeOperations = await Promise.all(safeOperations)
 
-  console.log('SafeOperation 1', signedSafeOperation1)
-  console.log('SafeOperation 2', signedSafeOperation2)
+  // 4) Sign all SafeOperations
+  const signingPromises = createdSafeOperations.map((op) => safe4337Pack.signSafeOperation(op))
+  const signedOperations = await Promise.all(signingPromises)
 
-  // 5) Execute SafeOperation
-  const [userOperationHash1, userOperationHash2] = await Promise.all([
-    safe4337Pack.executeTransaction({
-      executable: signedSafeOperation1
-    }),
-    safe4337Pack.executeTransaction({
-      executable: signedSafeOperation2
-    })
-  ])
+  // Log all operations
+  signedOperations.forEach((op, index) => console.log(`SafeOperation ${index + 1}`, op))
 
-  await Promise.all([
-    waitForOperationToFinish(userOperationHash1, CHAIN_ID, safe4337Pack),
-    waitForOperationToFinish(userOperationHash2, CHAIN_ID, safe4337Pack)
-  ])
+  // 5) Execute all operations in parallel
+  const executionPromises = signedOperations.map((op) =>
+    safe4337Pack.executeTransaction({ executable: op })
+  )
+
+  const userOperationHashes = await Promise.all(executionPromises)
+
+  // Wait for all operations to complete
+  await Promise.all(
+    userOperationHashes.map((hash) => waitForOperationToFinish(hash, CHAIN_ID, safe4337Pack))
+  )
 }
 
 main()

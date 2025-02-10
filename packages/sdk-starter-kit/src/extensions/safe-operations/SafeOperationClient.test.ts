@@ -1,6 +1,6 @@
 import Safe, * as protocolKitModule from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { Safe4337Pack, EthSafeOperation } from '@safe-global/relay-kit'
+import { Safe4337Pack, SafeOperationV06 } from '@safe-global/relay-kit'
 
 import { SafeOperationClient } from './SafeOperationClient'
 import { MESSAGES, SafeClientTxStatus } from '../../constants'
@@ -33,7 +33,7 @@ const SAFE_OPERATION_RESPONSE = {
     }
   ]
 }
-const SAFE_OPERATION = new EthSafeOperation(
+const SAFE_OPERATION = new SafeOperationV06(
   {
     sender: '0xSenderAddress',
     nonce: '0',
@@ -193,12 +193,14 @@ describe('SafeOperationClient', () => {
 
   describe('getPendingSafeOperations', () => {
     it('should return the pending Safe operations for the Safe address', async () => {
-      apiKit.getSafeOperationsByAddress = jest.fn().mockResolvedValue(PENDING_SAFE_OPERATIONS)
+      apiKit.getPendingSafeOperations = jest.fn().mockResolvedValue(PENDING_SAFE_OPERATIONS)
 
       const result = await safeOperationClient.getPendingSafeOperations()
 
       expect(protocolKit.getAddress).toHaveBeenCalled()
-      expect(apiKit.getSafeOperationsByAddress).toHaveBeenCalledWith({ safeAddress: SAFE_ADDRESS })
+      expect(apiKit.getPendingSafeOperations).toHaveBeenCalledWith({
+        safeAddress: SAFE_ADDRESS
+      })
       expect(result).toBe(PENDING_SAFE_OPERATIONS)
     })
   })

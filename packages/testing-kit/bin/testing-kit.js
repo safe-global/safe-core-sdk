@@ -37,6 +37,8 @@ if (!fs.existsSync(hardhatConfigPath)) {
 }
 
 try {
+  process.env.TS_NODE_PROJECT = `${projectRoot}/tsconfig.json`
+
   if (command === 'test' && directory) {
     execSync(`yarn ${command} ${path.join(projectRoot, directory)}`, { stdio: 'inherit' })
   } else {

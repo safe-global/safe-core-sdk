@@ -3,7 +3,7 @@ import {
   adjustVInSignature,
   isTxHashSignedWithPrefix
 } from '@safe-global/protocol-kit/utils/signatures'
-import { SigningMethod } from '@safe-global/protocol-kit/index'
+import { SigningMethod } from '@safe-global/types-kit'
 
 const safeTxHash = '0x4de27e660bd23052b71c854b0188ef1c5b325b10075c70f27afe2343e5c287f5'
 const signerAddress = '0xbc2BB26a6d821e69A38016f3858561a1D80d4182'

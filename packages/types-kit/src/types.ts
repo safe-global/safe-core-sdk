@@ -164,6 +164,16 @@ export interface EIP712TypedDataMessage {
   }
 }
 
+export enum SigningMethod {
+  ETH_SIGN = 'eth_sign',
+  ETH_SIGN_TYPED_DATA = 'eth_signTypedData',
+  ETH_SIGN_TYPED_DATA_V3 = 'eth_signTypedData_v3',
+  ETH_SIGN_TYPED_DATA_V4 = 'eth_signTypedData_v4',
+  SAFE_SIGNATURE = 'safe_sign'
+}
+
+export type SigningMethodType = SigningMethod | string
+
 export interface TypedDataDomain {
   name?: string
   version?: string
@@ -274,7 +284,7 @@ export interface MetaTransactionOptions {
   isSponsored?: boolean
 }
 
-export type UserOperation = {
+export type UserOperationV06 = {
   sender: string
   nonce: string
   initCode: string
@@ -287,6 +297,26 @@ export type UserOperation = {
   paymasterAndData: string
   signature: string
 }
+
+export type UserOperationV07 = {
+  sender: string
+  nonce: string
+  factory?: string
+  factoryData?: string
+  callData: string
+  callGasLimit: bigint
+  verificationGasLimit: bigint
+  preVerificationGas: bigint
+  maxFeePerGas: bigint
+  maxPriorityFeePerGas: bigint
+  paymaster?: string
+  paymasterData?: string
+  paymasterVerificationGasLimit?: bigint
+  paymasterPostOpGasLimit?: bigint
+  signature: string
+}
+
+export type UserOperation = UserOperationV06 | UserOperationV07
 
 export type SafeUserOperation = {
   safe: string
@@ -305,30 +335,24 @@ export type SafeUserOperation = {
 }
 
 export type EstimateGasData = {
-  maxFeePerGas?: bigint
-  maxPriorityFeePerGas?: bigint
-  preVerificationGas?: bigint
-  verificationGasLimit?: bigint
-  callGasLimit?: bigint
+  paymasterAndData?: string
+  paymaster?: string
+  paymasterData?: string
+  maxFeePerGas?: bigint | number | string
+  maxPriorityFeePerGas?: bigint | number | string
+  preVerificationGas?: bigint | number | string
+  verificationGasLimit?: bigint | number | string
+  callGasLimit?: bigint | number | string
+  paymasterVerificationGasLimit?: bigint | number | string
+  paymasterPostOpGasLimit?: bigint | number | string
 }
 
-export interface SafeOperation {
-  readonly chainId: bigint
-  readonly moduleAddress: string
-  readonly data: SafeUserOperation
-  readonly signatures: Map<string, SafeSignature>
-  getSignature(signer: string): SafeSignature | undefined
-  addSignature(signature: SafeSignature): void
-  encodedSignatures(): string
-  addEstimations(estimations: EstimateGasData): void
-  toUserOperation(): UserOperation
-  getHash(): string
-}
-
-export const isSafeOperation = (response: unknown): response is SafeOperation => {
-  const safeOperation = response as SafeOperation
-
-  return 'data' in safeOperation && 'signatures' in safeOperation
+export type SafeOperationOptions = {
+  moduleAddress: string
+  entryPoint: string
+  chainId: bigint
+  validAfter?: number
+  validUntil?: number
 }
 
 export type SafeOperationConfirmation = {
@@ -369,10 +393,19 @@ export type SafeOperationResponse = {
   readonly userOperation?: UserOperationResponse
 }
 
-export const isSafeOperationResponse = (response: unknown): response is SafeOperationResponse => {
-  const safeOperationResponse = response as SafeOperationResponse
-
-  return 'userOperation' in safeOperationResponse && 'safeOperationHash' in safeOperationResponse
-}
-
 export type SafeOperationConfirmationListResponse = ListResponse<SafeOperationConfirmation>
+
+export interface SafeOperation {
+  userOperation: UserOperation
+  options: SafeOperationOptions
+  signatures: Map<string, SafeSignature>
+
+  addEstimations(estimations: EstimateGasData): void
+  getSafeOperation(): SafeUserOperation
+  getSignature(signer: string): SafeSignature | undefined
+  addSignature(signature: SafeSignature): void
+  encodedSignatures(): string
+  getUserOperation(): UserOperation
+  getHash(): string
+  getEIP712Type(): unknown
+}

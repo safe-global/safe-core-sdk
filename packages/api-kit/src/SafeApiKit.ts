@@ -36,16 +36,16 @@ import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
   Eip3770Address,
-  isSafeOperation,
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse,
   SafeOperation,
   SafeOperationConfirmationListResponse,
-  SafeOperationResponse
+  SafeOperationResponse,
+  UserOperationV06
 } from '@safe-global/types-kit'
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { isEmptyData } from './utils'
-import { getAddSafeOperationProps } from './utils/safeOperation'
+import { getAddSafeOperationProps, isSafeOperation } from './utils/safeOperation'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -944,21 +944,23 @@ class SafeApiKit {
     const getISOString = (date: number | undefined) =>
       !date ? null : new Date(date * 1000).toISOString()
 
+    const userOperationV06 = userOperation as UserOperationV06
+
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
       method: HttpMethod.Post,
       body: {
+        initCode: isEmptyData(userOperationV06.initCode) ? null : userOperationV06.initCode,
         nonce: userOperation.nonce,
-        initCode: isEmptyData(userOperation.initCode) ? null : userOperation.initCode,
         callData: userOperation.callData,
         callGasLimit: userOperation.callGasLimit.toString(),
         verificationGasLimit: userOperation.verificationGasLimit.toString(),
         preVerificationGas: userOperation.preVerificationGas.toString(),
         maxFeePerGas: userOperation.maxFeePerGas.toString(),
         maxPriorityFeePerGas: userOperation.maxPriorityFeePerGas.toString(),
-        paymasterAndData: isEmptyData(userOperation.paymasterAndData)
+        paymasterAndData: isEmptyData(userOperationV06.paymasterAndData)
           ? null
-          : userOperation.paymasterAndData,
+          : userOperationV06.paymasterAndData,
         entryPoint,
         validAfter: getISOString(options?.validAfter),
         validUntil: getISOString(options?.validUntil),

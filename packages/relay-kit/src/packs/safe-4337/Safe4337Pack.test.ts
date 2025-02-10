@@ -4,12 +4,12 @@ import * as viem from 'viem'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { WebAuthnCredentials, createMockPasskey } from '@safe-global/protocol-kit/test-utils'
 import {
-  getAddModulesLibDeployment,
+  getSafeModuleSetupDeployment,
   getSafe4337ModuleDeployment
 } from '@safe-global/safe-modules-deployments'
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
 import { Safe4337Pack } from './Safe4337Pack'
-import EthSafeOperation from './SafeOperation'
+import BaseSafeOperation from './BaseSafeOperation'
 import * as constants from './constants'
 import * as utils from './utils'
 import {
@@ -21,7 +21,10 @@ import {
 dotenv.config()
 
 const requestResponseMap = {
-  [constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS]: fixtures.ENTRYPOINTS,
+  [constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS]: [
+    fixtures.ENTRYPOINT_ADDRESS_V06,
+    fixtures.ENTRYPOINT_ADDRESS_V07
+  ],
   [constants.RPC_4337_CALLS.CHAIN_ID]: fixtures.CHAIN_ID,
   [constants.RPC_4337_CALLS.SEND_USER_OPERATION]: fixtures.USER_OPERATION_HASH,
   [constants.RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS]: fixtures.GAS_ESTIMATION,
@@ -36,23 +39,23 @@ const requestMock = jest.fn(async ({ method }: { method: keyof typeof requestRes
 
 jest.mock('./utils', () => ({
   ...jest.requireActual('./utils'),
-  getEip4337BundlerProvider: jest.fn(() => ({ request: requestMock }))
+  createBundlerClient: jest.fn(() => ({ request: requestMock }))
 }))
 
 let safe4337ModuleAddress: viem.Hash
-let addModulesLibAddress: string
+let safeModulesSetupAddress: string
 
 describe('Safe4337Pack', () => {
   beforeAll(async () => {
     const network = parseInt(fixtures.CHAIN_ID).toString()
     safe4337ModuleAddress = getSafe4337ModuleDeployment({
       released: true,
-      version: '0.2.0',
+      version: '0.3.0',
       network
     })?.networkAddresses[network] as viem.Hash
-    addModulesLibAddress = getAddModulesLibDeployment({
+    safeModulesSetupAddress = getSafeModuleSetupDeployment({
       released: true,
-      version: '0.2.0',
+      version: '0.3.0',
       network
     })?.networkAddresses[network] as string
   })
@@ -73,30 +76,33 @@ describe('Safe4337Pack', () => {
     it('should throw an error if the 4337 Module is not enabled in the Safe account', async () => {
       await expect(
         createSafe4337Pack({
-          options: { safeAddress: fixtures.SAFE_ADDRESS_4337_MODULE_NOT_ENABLED }
+          options: { safeAddress: fixtures.SAFE_ADDRESS_4337_MODULE_NOT_ENABLED },
+          safeModulesVersion: '0.2.0'
         })
       ).rejects.toThrow(
-        'Incompatibility detected: The EIP-4337 module is not enabled in the provided Safe Account. Enable this module (address: 0xa581c4A4DB7175302464fF3C06380BC3270b4037) to add compatibility.'
+        `Incompatibility detected: The EIP-4337 module is not enabled in the provided Safe Account. Enable this module (address: ${fixtures.SAFE_4337_MODULE_ADDRESS_V0_2_0}) to add compatibility.`
       )
     })
 
     it('should throw an error if the 4337 fallbackhandler is not attached to the Safe account', async () => {
       await expect(
         createSafe4337Pack({
-          options: { safeAddress: fixtures.SAFE_ADDRESS_4337_FALLBACKHANDLER_NOT_ENABLED }
+          options: { safeAddress: fixtures.SAFE_ADDRESS_4337_FALLBACKHANDLER_NOT_ENABLED },
+          safeModulesVersion: '0.2.0'
         })
       ).rejects.toThrow(
-        'Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: 0xa581c4A4DB7175302464fF3C06380BC3270b4037) to ensure compatibility.'
+        `Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: ${fixtures.SAFE_4337_MODULE_ADDRESS_V0_2_0}) to ensure compatibility.`
       )
     })
 
     it('should throw an error if the Safe Modules do not match the supported version', async () => {
       await expect(
         createSafe4337Pack({
-          safeModulesVersion: fixtures.SAFE_MODULES_V0_3_0
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE },
+          safeModulesVersion: '9.9.9'
         })
       ).rejects.toThrow(
-        'Incompatibility detected: Safe modules version 0.3.0 is not supported. The SDK can use 0.2.0 only.'
+        'Safe4337Module and/or SafeModuleSetup not available for chain 11155111 and modules version 9.9.9'
       )
     })
   })
@@ -105,21 +111,21 @@ describe('Safe4337Pack', () => {
     it('should throw an error if the version of the entrypoint used is incompatible', async () => {
       await expect(
         createSafe4337Pack({
-          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 },
-          customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE },
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINT_ADDRESS_V06 }
         })
       ).rejects.toThrow(
-        `The selected entrypoint ${fixtures.ENTRYPOINTS[1]} is not compatible with version 0.2.0 of Safe modules`
+        `The selected entrypoint ${fixtures.ENTRYPOINT_ADDRESS_V06} is not compatible with version 0.3.0 of Safe modules`
       )
     })
 
     it('should throw an error if no supported entrypoints are available', async () => {
       const overridenMap = Object.assign({}, requestResponseMap, {
-        [constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS]: [fixtures.ENTRYPOINTS[1]]
+        [constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS]: [fixtures.ENTRYPOINT_ADDRESS_V06]
       })
 
       const mockedUtils = jest.requireMock('./utils')
-      mockedUtils.getEip4337BundlerProvider.mockImplementationOnce(() => ({
+      mockedUtils.createBundlerClient.mockImplementationOnce(() => ({
         request: jest.fn(
           async ({ method }: { method: keyof typeof overridenMap }) => overridenMap[method]
         )
@@ -127,30 +133,32 @@ describe('Safe4337Pack', () => {
 
       await expect(
         createSafe4337Pack({
-          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 }
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE }
         })
       ).rejects.toThrow(
-        `Incompatibility detected: None of the entrypoints provided by the bundler is compatible with the Safe modules version 0.2.0`
+        `Incompatibility detected: None of the entrypoints provided by the bundler is compatible with the Safe modules version 0.3.0`
       )
     })
 
     it('should be able to instantiate the pack using a existing Safe', async () => {
       const safe4337Pack = await createSafe4337Pack({
-        options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 }
+        options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE }
       })
 
       expect(safe4337Pack).toBeInstanceOf(Safe4337Pack)
       expect(safe4337Pack.protocolKit).toBeInstanceOf(Safe)
-      expect(await safe4337Pack.protocolKit.getAddress()).toBe(fixtures.SAFE_ADDRESS_v1_4_1)
+      expect(await safe4337Pack.protocolKit.getAddress()).toBe(
+        fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+      )
       expect(await safe4337Pack.getChainId()).toBe(fixtures.CHAIN_ID)
     })
 
     it('should have the 4337 module enabled', async () => {
       const safe4337Pack = await createSafe4337Pack({
-        options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1 }
+        options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE }
       })
 
-      expect(await safe4337Pack.protocolKit.getModules()).toEqual([safe4337ModuleAddress])
+      expect(await safe4337Pack.protocolKit.getModules()).toContain(safe4337ModuleAddress)
     })
 
     it('should detect if a custom 4337 module is not enabled in the Safe', async () => {
@@ -160,7 +168,7 @@ describe('Safe4337Pack', () => {
             safe4337ModuleAddress: '0xCustomModule'
           },
           options: {
-            safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+            safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
           }
         })
       ).rejects.toThrow(
@@ -171,7 +179,7 @@ describe('Safe4337Pack', () => {
     it('should use the 4337 module as the fallback handler', async () => {
       const safe4337Pack = await createSafe4337Pack({
         options: {
-          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
         }
       })
 
@@ -198,10 +206,10 @@ describe('Safe4337Pack', () => {
             owners: [fixtures.OWNER_1],
             threshold: 1
           },
-          customContracts: { entryPointAddress: fixtures.ENTRYPOINTS[1] }
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINT_ADDRESS_V06 }
         })
       ).rejects.toThrow(
-        `The selected entrypoint ${fixtures.ENTRYPOINTS[1]} is not compatible with version 0.2.0 of Safe modules`
+        `The selected entrypoint ${fixtures.ENTRYPOINT_ADDRESS_V06} is not compatible with version 0.3.0 of Safe modules`
       )
     })
 
@@ -252,7 +260,7 @@ describe('Safe4337Pack', () => {
           safeAccountConfig: {
             owners: [fixtures.OWNER_1, fixtures.OWNER_2],
             threshold: 1,
-            to: addModulesLibAddress,
+            to: safeModulesSetupAddress,
             data: viem.encodeFunctionData({
               abi: constants.ABI,
               functionName: 'enableModules',
@@ -277,6 +285,7 @@ describe('Safe4337Pack', () => {
           threshold: 1
         },
         paymasterOptions: {
+          paymasterUrl: fixtures.PAYMASTER_URL,
           paymasterAddress: fixtures.PAYMASTER_ADDRESS,
           paymasterTokenAddress: fixtures.PAYMASTER_TOKEN_ADDRESS
         }
@@ -297,7 +306,7 @@ describe('Safe4337Pack', () => {
       })
 
       const enable4337ModuleTransaction = {
-        to: addModulesLibAddress,
+        to: safeModulesSetupAddress,
         value: '0',
         data: enableModulesData,
         operation: OperationType.DelegateCall
@@ -354,13 +363,13 @@ describe('Safe4337Pack', () => {
     beforeAll(async () => {
       safe4337Pack = await createSafe4337Pack({
         options: {
-          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
         }
       })
 
       transferUSDC = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
-        data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1, 100_000n),
+        data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
         value: '0',
         operation: 0
       }
@@ -373,10 +382,10 @@ describe('Safe4337Pack', () => {
         transactions
       })
 
-      expect(safeOperation).toBeInstanceOf(EthSafeOperation)
-      expect(safeOperation.data).toMatchObject({
-        safe: fixtures.SAFE_ADDRESS_v1_4_1,
-        entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+      expect(safeOperation).toBeInstanceOf(BaseSafeOperation)
+      expect(safeOperation.getSafeOperation()).toMatchObject({
+        safe: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE,
+        entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,
         initCode: '0x',
         paymasterAndData: '0x',
         callData: viem.encodeFunctionData({
@@ -394,13 +403,13 @@ describe('Safe4337Pack', () => {
           ]
         }),
         nonce: '1',
-        callGasLimit: 150000n,
+        callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 105000n
+        verificationGasLimit: 100000n,
+        preVerificationGas: 100000n
       })
     })
 
@@ -409,10 +418,10 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      expect(safeOperation).toBeInstanceOf(EthSafeOperation)
-      expect(safeOperation.data).toMatchObject({
-        safe: fixtures.SAFE_ADDRESS_v1_4_1,
-        entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+      expect(safeOperation).toBeInstanceOf(BaseSafeOperation)
+      expect(safeOperation.getSafeOperation()).toMatchObject({
+        safe: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE,
+        entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,
         initCode: '0x',
         paymasterAndData: '0x',
         callData: viem.encodeFunctionData({
@@ -426,13 +435,13 @@ describe('Safe4337Pack', () => {
           ]
         }),
         nonce: '1',
-        callGasLimit: 150000n,
+        callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 105000n
+        verificationGasLimit: 100000n,
+        preVerificationGas: 100000n
       })
     })
 
@@ -451,15 +460,15 @@ describe('Safe4337Pack', () => {
       })
 
       expect(getInitCodeSpy).toHaveBeenCalled()
-      expect(safeOperation.data.initCode).toBe(
-        '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec671688f0b900000000000000000000000029fcb43b46531bca003ddc8fcb67ffe91900c7620000000000000000000000000000000000000000000000000000000000000060ad27de2a410652abce96ea0fdfc30c2f0fd35952b78f554667111999a28ff33800000000000000000000000000000000000000000000000000000000000001e4b63e800d000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000010000000000000000000000008ecd4ec46d4d2a6b64fe960b3d64e8b94b2234eb0000000000000000000000000000000000000000000000000000000000000140000000000000000000000000a581c4a4db7175302464ff3c06380bc3270b40370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ffac5578be8ac1b2b9d13b34caf4a074b96b8a1b00000000000000000000000000000000000000000000000000000000000000648d0dc49f00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001000000000000000000000000a581c4a4db7175302464ff3c06380bc3270b40370000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+      expect(safeOperation.getSafeOperation().initCode).toBe(
+        '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec671688f0b900000000000000000000000029fcb43b46531bca003ddc8fcb67ffe91900c7620000000000000000000000000000000000000000000000000000000000000060ad27de2a410652abce96ea0fdfc30c2f0fd35952b78f554667111999a28ff33800000000000000000000000000000000000000000000000000000000000001e4b63e800d000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000010000000000000000000000002dd68b007b46fbe91b9a7c3eda5a7a1063cb5b47000000000000000000000000000000000000000000000000000000000000014000000000000000000000000075cf11467937ce3f2f357ce24ffc3dbf8fd5c2260000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000ffac5578be8ac1b2b9d13b34caf4a074b96b8a1b00000000000000000000000000000000000000000000000000000000000000648d0dc49f0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000100000000000000000000000075cf11467937ce3f2f357ce24ffc3dbf8fd5c2260000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
       )
     })
 
     it('should allow to create a sponsored transaction', async () => {
       const safe4337Pack = await createSafe4337Pack({
         options: {
-          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
         },
         paymasterOptions: {
           isSponsored: true,
@@ -471,10 +480,10 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      expect(sponsoredSafeOperation).toBeInstanceOf(EthSafeOperation)
-      expect(sponsoredSafeOperation.data).toMatchObject({
-        safe: fixtures.SAFE_ADDRESS_v1_4_1,
-        entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+      expect(sponsoredSafeOperation).toBeInstanceOf(BaseSafeOperation)
+      expect(sponsoredSafeOperation.getSafeOperation()).toMatchObject({
+        safe: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE,
+        entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,
         initCode: '0x',
         paymasterAndData: '0x',
         callData: viem.encodeFunctionData({
@@ -488,40 +497,23 @@ describe('Safe4337Pack', () => {
           ]
         }),
         nonce: '1',
-        callGasLimit: 150000n,
+        callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 105000n
+        verificationGasLimit: 100000n,
+        preVerificationGas: 100000n
       })
-    })
-
-    it('createTransaction should throw an error if paymasterUrl is not present in sponsored transactions', async () => {
-      const safe4337Pack = await createSafe4337Pack({
-        options: {
-          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
-        },
-        // @ts-expect-error - An error will be thrown
-        paymasterOptions: {
-          isSponsored: true
-        }
-      })
-
-      await expect(
-        safe4337Pack.createTransaction({
-          transactions: [transferUSDC]
-        })
-      ).rejects.toThrow('No paymaster url provided for a sponsored transaction')
     })
 
     it('should add the approve transaction to the batch when amountToApprove is provided', async () => {
       const safe4337Pack = await createSafe4337Pack({
         options: {
-          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
         },
         paymasterOptions: {
+          paymasterUrl: fixtures.PAYMASTER_URL,
           paymasterTokenAddress: fixtures.PAYMASTER_TOKEN_ADDRESS,
           paymasterAddress: fixtures.PAYMASTER_ADDRESS
         }
@@ -549,12 +541,13 @@ describe('Safe4337Pack', () => {
 
       const batch = [transferUSDC, approveTransaction]
 
-      expect(sponsoredSafeOperation).toBeInstanceOf(EthSafeOperation)
-      expect(sponsoredSafeOperation.data).toMatchObject({
-        safe: fixtures.SAFE_ADDRESS_v1_4_1,
-        entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
+      expect(sponsoredSafeOperation).toBeInstanceOf(BaseSafeOperation)
+      expect(sponsoredSafeOperation.getSafeOperation()).toMatchObject({
+        safe: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE,
+        entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,
         initCode: '0x',
-        paymasterAndData: '0x0000000000325602a77416A16136FDafd04b299f',
+        paymasterAndData:
+          '0x0000000000325602a77416A16136FDafd04b299f0000000000000000000000000000000000000000000000000000000000000000',
         callData: viem.encodeFunctionData({
           abi: constants.ABI,
           functionName: 'executeUserOp',
@@ -570,13 +563,13 @@ describe('Safe4337Pack', () => {
           ]
         }),
         nonce: '1',
-        callGasLimit: 150000n,
+        callGasLimit: 100000n,
         validAfter: 0,
         validUntil: 0,
         maxFeePerGas: 100000n,
         maxPriorityFeePerGas: 200000n,
-        verificationGasLimit: 400000n,
-        preVerificationGas: 105000n
+        verificationGasLimit: 100000n,
+        preVerificationGas: 100000n
       })
     })
   })
@@ -643,7 +636,7 @@ describe('Safe4337Pack', () => {
       })
 
       const enable4337ModuleTransaction = {
-        to: addModulesLibAddress,
+        to: safeModulesSetupAddress,
         value: '0',
         data: enableModulesData,
         operation: OperationType.DelegateCall
@@ -721,11 +714,7 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      const safeOpHash = utils.calculateSafeUserOperationHash(
-        safeOperation.data,
-        BigInt(fixtures.CHAIN_ID),
-        fixtures.MODULE_ADDRESS
-      )
+      const safeOpHash = safeOperation.getHash()
 
       const passkeySignature = await safe4337Pack.protocolKit.signHash(safeOpHash)
 
@@ -751,6 +740,7 @@ describe('Safe4337Pack', () => {
 
       const safe4337Pack = await createSafe4337Pack({
         signer: passkey,
+        safeModulesVersion: '0.2.0',
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
         }
@@ -766,24 +756,39 @@ describe('Safe4337Pack', () => {
       expect(requestMock).toHaveBeenCalledWith({
         method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
         params: [
-          utils.userOperationToHexValues(safeOperation.toUserOperation()),
-          fixtures.ENTRYPOINTS[0]
+          utils.userOperationToHexValues(
+            safeOperation.getUserOperation(),
+            fixtures.ENTRYPOINT_ADDRESS_V06
+          ),
+          fixtures.ENTRYPOINT_ADDRESS_V06
         ]
       })
     })
   })
 
+  it('should use the default module version when safeModuleVersion is not provided', async () => {
+    const safe4337Pack = await createSafe4337Pack({
+      options: {
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+      }
+    })
+
+    expect(await safe4337Pack.protocolKit.getFallbackHandler()).toBe(
+      fixtures.SAFE_4337_MODULE_ADDRESS_V0_3_0
+    )
+  })
+
   it('should allow to sign a SafeOperation', async () => {
     const transferUSDC = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
-      data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1, 100_000n),
+      data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
       value: '0',
       operation: 0
     }
 
     const safe4337Pack = await createSafe4337Pack({
       options: {
-        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
       }
     })
 
@@ -796,7 +801,7 @@ describe('Safe4337Pack', () => {
         fixtures.OWNER_1.toLowerCase(),
         new protocolKit.EthSafeSignature(
           fixtures.OWNER_1,
-          '0xda808d1e84e6aac5eb50fda331469a108bfdce442fd41501fefaa5b5d648ade406d08a1ca2ca9a5f0ba1a079da001dbee6990189a2cdb054e6c388d5afbd2d9b20',
+          '0x341b48cbc73a74905d3e52f96329cd994043b8cc261d5f2d2fc87875c6a0e987241e09f0ceb7a061e6c058e65fd3e2f9d3b47f56cad00c4e02cf62fed012a8bb1c',
           false
         )
       )
@@ -806,7 +811,7 @@ describe('Safe4337Pack', () => {
   it('should allow to sign a SafeOperation using a SafeOperationResponse object from the api to add a signature', async () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
-        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
       }
     })
 
@@ -816,7 +821,7 @@ describe('Safe4337Pack', () => {
           fixtures.OWNER_1.toLowerCase(),
           new protocolKit.EthSafeSignature(
             fixtures.OWNER_1,
-            '0x975c7ddab3dc06240918a7bde0f543d1b082a8cadeca19d4bc13c30430367fac46c7ef923d9d0051423d1d59d106e5d199a734cd6a472276d54bb04ec7b3796520',
+            '0x6fa024afd110bee3832dd9507b5ce2bf1bb097363ba63b887b1a44f5a7b89e3b5d32ff9dbb5fee63f0bf44df1b427d7a7e69451b3c05d25fb49f77fe2fd044141b',
             false
           )
         )
@@ -834,14 +839,14 @@ describe('Safe4337Pack', () => {
   it('should allow to send an UserOperation to a bundler', async () => {
     const transferUSDC = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
-      data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1, 100_000n),
+      data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
       value: '0',
       operation: 0
     }
 
     const safe4337Pack = await createSafe4337Pack({
       options: {
-        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
       }
     })
     const readContractSpy = jest.spyOn(safe4337Pack.protocolKit.getSafeProvider(), 'readContract')
@@ -850,10 +855,10 @@ describe('Safe4337Pack', () => {
       transactions: [transferUSDC]
     })
     expect(readContractSpy).toHaveBeenCalledWith({
-      address: constants.ENTRYPOINT_ADDRESS_V06,
+      address: constants.ENTRYPOINT_ADDRESS_V07,
       abi: constants.ENTRYPOINT_ABI,
       functionName: 'getNonce',
-      args: [fixtures.SAFE_ADDRESS_v1_4_1, 0n]
+      args: [fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 0n]
     })
 
     safeOperation = await safe4337Pack.signSafeOperation(safeOperation)
@@ -863,16 +868,20 @@ describe('Safe4337Pack', () => {
     expect(requestMock).toHaveBeenCalledWith({
       method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
       params: [
-        utils.userOperationToHexValues(safeOperation.toUserOperation()),
-        fixtures.ENTRYPOINTS[0]
+        utils.userOperationToHexValues(
+          safeOperation.getUserOperation(),
+          fixtures.ENTRYPOINT_ADDRESS_V07
+        ),
+        fixtures.ENTRYPOINT_ADDRESS_V07
       ]
     })
   })
 
   it('should allow to send a UserOperation to the bundler using a SafeOperationResponse object from the api', async () => {
     const safe4337Pack = await createSafe4337Pack({
+      safeModulesVersion: '0.2.0',
       options: {
-        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_2_0_MODULE
       }
     })
 
@@ -881,22 +890,25 @@ describe('Safe4337Pack', () => {
     expect(requestMock).toHaveBeenCalledWith({
       method: constants.RPC_4337_CALLS.SEND_USER_OPERATION,
       params: [
-        utils.userOperationToHexValues({
-          sender: '0xE322e721bCe76cE7FCf3A475f139A9314571ad3D',
-          nonce: '3',
-          initCode: '0x',
-          callData:
-            '0x7bb37428000000000000000000000000e322e721bce76ce7fcf3a475f139a9314571ad3d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-          callGasLimit: 122497n,
-          verificationGasLimit: 123498n,
-          preVerificationGas: 50705n,
-          maxFeePerGas: 105183831060n,
-          maxPriorityFeePerGas: 1380000000n,
-          paymasterAndData: '0x',
-          signature:
-            '0x000000000000000000000000cb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d'
-        }),
-        fixtures.ENTRYPOINTS[0]
+        utils.userOperationToHexValues(
+          {
+            sender: '0xE322e721bCe76cE7FCf3A475f139A9314571ad3D',
+            nonce: '3',
+            initCode: '0x',
+            callData:
+              '0x7bb37428000000000000000000000000e322e721bce76ce7fcf3a475f139a9314571ad3d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+            callGasLimit: 122497n,
+            verificationGasLimit: 123498n,
+            preVerificationGas: 50705n,
+            maxFeePerGas: 105183831060n,
+            maxPriorityFeePerGas: 1380000000n,
+            paymasterAndData: '0x',
+            signature:
+              '0x000000000000000000000000cb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d'
+          },
+          fixtures.ENTRYPOINT_ADDRESS_V06
+        ),
+        fixtures.ENTRYPOINT_ADDRESS_V06
       ]
     })
   })
@@ -904,7 +916,7 @@ describe('Safe4337Pack', () => {
   it('should return a UserOperation based on a userOpHash', async () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
-        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
       }
     })
 
@@ -940,7 +952,7 @@ describe('Safe4337Pack', () => {
   it('should return a UserOperation receipt based on a userOpHash', async () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
-        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
       }
     })
 
@@ -978,12 +990,57 @@ describe('Safe4337Pack', () => {
   it('should return an array of the entryPoint addresses supported by the client', async () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
-        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1
+        safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
       }
     })
 
     const supportedEntryPoints = await safe4337Pack.getSupportedEntryPoints()
 
     expect(supportedEntryPoints).toContain('0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789')
+  })
+
+  describe('When using the onChainAnalytics feature', () => {
+    it("should enable to generate on chain analytics data for a Safe's transactions", async () => {
+      const safe4337Pack = await createSafe4337Pack({
+        onchainAnalytics: {
+          project: 'Test Relay kit',
+          platform: 'Web'
+        },
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+        }
+      })
+
+      expect(safe4337Pack.getOnchainIdentifier()).toBe(
+        '5afe006137303238633936636562316132623939353333646561393063346135'
+      )
+    })
+
+    it('should include th onchain identifier at the end of the callData property', async () => {
+      const safe4337Pack = await createSafe4337Pack({
+        onchainAnalytics: {
+          project: 'Test Relay kit',
+          platform: 'Web'
+        },
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+        }
+      })
+
+      const transferUSDC = {
+        to: fixtures.PAYMASTER_TOKEN_ADDRESS,
+        data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
+        value: '0',
+        operation: 0
+      }
+
+      const safeOperation = await safe4337Pack.createTransaction({
+        transactions: [transferUSDC]
+      })
+
+      expect(safeOperation.userOperation.callData).toContain(
+        '5afe006137303238633936636562316132623939353333646561393063346135'
+      )
+    })
   })
 })

@@ -12,7 +12,6 @@ chai.use(chaiAsPromised)
 const SIGNER_PK = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 1/2 Safe (v1.4.1) with signer above being an owner + 4337 module enabled
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
-const PAYMASTER_ADDRESS = '0x0000000000325602a77416A16136FDafd04b299f'
 const BUNDLER_URL = 'https://api.pimlico.io/v2/sepolia/rpc?apikey=pim_Vjs7ohRqWdvsjUegngf9Bg'
 const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 
@@ -40,10 +39,7 @@ describe('addSafeOperation', () => {
       signer: protocolKit.getSafeProvider().signer,
       options: { safeAddress: SAFE_ADDRESS },
       bundlerUrl: BUNDLER_URL,
-      paymasterOptions: {
-        paymasterTokenAddress: PAYMASTER_TOKEN_ADDRESS,
-        paymasterAddress: PAYMASTER_ADDRESS
-      }
+      safeModulesVersion: '0.2.0'
     })
   })
 
@@ -142,7 +138,6 @@ describe('addSafeOperation', () => {
       transactions: [transferUSDC, transferUSDC]
     })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
-
     // Get the number of SafeOperations before adding a new one
     const safeOperationsBefore = await safeApiKit.getSafeOperationsByAddress({
       safeAddress: SAFE_ADDRESS

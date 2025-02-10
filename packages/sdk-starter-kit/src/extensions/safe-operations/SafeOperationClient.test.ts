@@ -1,6 +1,6 @@
 import Safe, * as protocolKitModule from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { Safe4337Pack, EthSafeOperation } from '@safe-global/relay-kit'
+import { Safe4337Pack, SafeOperationV06 } from '@safe-global/relay-kit'
 
 import { SafeOperationClient } from './SafeOperationClient'
 import { MESSAGES, SafeClientTxStatus } from '../../constants'
@@ -33,7 +33,7 @@ const SAFE_OPERATION_RESPONSE = {
     }
   ]
 }
-const SAFE_OPERATION = new EthSafeOperation(
+const SAFE_OPERATION = new SafeOperationV06(
   {
     sender: '0xSenderAddress',
     nonce: '0',

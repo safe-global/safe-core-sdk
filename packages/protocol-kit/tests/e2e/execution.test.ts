@@ -1,6 +1,6 @@
 import { getERC20Mintable, safeVersionDeployed, setupTests, itif } from '@safe-global/testing-kit'
-import Safe, { SigningMethod } from '@safe-global/protocol-kit/index'
-import { TransactionOptions, MetaTransactionData } from '@safe-global/types-kit'
+import Safe from '@safe-global/protocol-kit/index'
+import { TransactionOptions, MetaTransactionData, SigningMethod } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { waitSafeTxReceipt } from './utils/transactions'

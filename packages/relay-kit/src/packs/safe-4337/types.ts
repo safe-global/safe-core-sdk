@@ -11,8 +11,8 @@ import {
   SafeVersion,
   UserOperation
 } from '@safe-global/types-kit'
-import EthSafeOperation from './SafeOperation'
-import { RPC_4337_CALLS } from './constants'
+import BaseSafeOperation from '@safe-global/relay-kit/packs/safe-4337/BaseSafeOperation'
+import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
 
 type ExistingSafeOptions = {
   safeAddress: string
@@ -28,7 +28,6 @@ type PredictedSafeOptions = {
 
 export type SponsoredPaymasterOption = {
   isSponsored: true
-  paymasterUrl: string
   sponsorshipPolicyId?: string
 }
 
@@ -39,7 +38,9 @@ export type ERC20PaymasterOption = {
   amountToApprove?: bigint
 }
 
-export type PaymasterOptions = SponsoredPaymasterOption | ERC20PaymasterOption | undefined
+export type PaymasterOptions =
+  | ({ paymasterUrl: string } & (SponsoredPaymasterOption | ERC20PaymasterOption))
+  | undefined
 
 export type Safe4337InitOptions = {
   provider: SafeProviderConfig['provider']
@@ -49,7 +50,7 @@ export type Safe4337InitOptions = {
   customContracts?: {
     entryPointAddress?: string
     safe4337ModuleAddress?: string
-    addModulesLibAddress?: string
+    safeModulesSetupAddress?: string
     safeWebAuthnSharedSignerAddress?: string
   }
   options: ExistingSafeOptions | PredictedSafeOptions
@@ -80,12 +81,16 @@ export type Safe4337CreateTransactionProps = {
 }
 
 export type Safe4337ExecutableProps = {
-  executable: EthSafeOperation | SafeOperationResponse
+  executable: BaseSafeOperation | SafeOperationResponse
 }
 
-export type EstimateSponsoredGasData = {
-  paymasterAndData: string
-} & EstimateGasData
+export type EstimateSponsoredGasData = (
+  | {
+      paymasterAndData: string
+    }
+  | { paymaster: string; paymasterData: string }
+) &
+  EstimateGasData
 
 type Log = {
   logIndex: string
@@ -137,39 +142,27 @@ export type EstimateFeeFunctionProps = {
   userOperation: UserOperation
   bundlerUrl: string
   entryPoint: string
+  paymasterOptions?: PaymasterOptions
 }
 
 export type EstimateFeeFunction = ({
   userOperation,
   bundlerUrl,
-  entryPoint
+  entryPoint,
+  paymasterOptions
 }: EstimateFeeFunctionProps) => Promise<EstimateGasData>
 
-export type EstimateSponsoredFeeFunctionProps = {
-  userOperation: UserOperation
-  paymasterUrl: string
-  entryPoint: string
-  sponsorshipPolicyId?: string
-}
-
-export type EstimateSponsoredFeeFunction = ({
-  userOperation,
-  paymasterUrl,
-  entryPoint
-}: EstimateSponsoredFeeFunctionProps) => Promise<EstimateSponsoredGasData>
-
 export interface IFeeEstimator {
-  setupEstimation?: EstimateFeeFunction
-  adjustEstimation?: EstimateFeeFunction
-  getPaymasterEstimation?: EstimateSponsoredFeeFunction
+  preEstimateUserOperationGas?: EstimateFeeFunction
+  postEstimateUserOperationGas?: EstimateFeeFunction
 }
 
 export type EstimateFeeProps = {
-  safeOperation: EthSafeOperation
+  safeOperation: BaseSafeOperation
   feeEstimator?: IFeeEstimator
 }
 
-type UserOperationStringValues = Omit<
+export type UserOperationStringValues = Omit<
   UserOperation,
   | 'callGasLimit'
   | 'verificationGasLimit'
@@ -184,25 +177,35 @@ type UserOperationStringValues = Omit<
   maxPriorityFeePerGas: string
 }
 
-export type PimlicoCustomRpcSchema = [
+export type Safe4337RpcSchema = [
   {
-    Method: 'pimlico_getUserOperationGasPrice'
-    Parameters: never
-    ReturnType: {
-      slow: { maxFeePerGas: string; maxPriorityFeePerGas: string }
-      standard: { maxFeePerGas: string; maxPriorityFeePerGas: string }
-      fast: { maxFeePerGas: string; maxPriorityFeePerGas: string }
-    }
+    Method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA
+    Parameters: [UserOperationStringValues, string, string, { token: string }?]
+    ReturnType:
+      | {
+          paymasterAndData: string
+        }
+      | {
+          paymaster: string
+          paymasterData: string
+          paymasterVerificationGasLimit?: string
+          paymasterPostOpGasLimit?: string
+        }
   },
   {
-    Method: 'pm_sponsorUserOperation'
-    Parameters: [UserOperationStringValues, string, { sponsorshipPolicyId?: string }?]
-    ReturnType: {
-      paymasterAndData: string
-      callGasLimit: string
-      verificationGasLimit: string
-      preVerificationGas: string
-    }
+    Method: RPC_4337_CALLS.GET_PAYMASTER_DATA
+    Parameters: [UserOperationStringValues, string, string, { token: string }?]
+    ReturnType:
+      | {
+          paymasterAndData: string
+          preVerificationGas: string
+          verificationGasLimit: string
+          callGasLimit: string
+        }
+      | {
+          paymaster: string
+          paymasterData: string
+        }
   },
   {
     Method: RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS
@@ -212,7 +215,13 @@ export type PimlicoCustomRpcSchema = [
   {
     Method: RPC_4337_CALLS.ESTIMATE_USER_OPERATION_GAS
     Parameters: [UserOperationStringValues, string]
-    ReturnType: { callGasLimit: string; verificationGasLimit: string; preVerificationGas: string }
+    ReturnType: {
+      callGasLimit: string
+      verificationGasLimit: string
+      preVerificationGas: string
+      paymasterPostOpGasLimit?: string
+      paymasterVerificationGasLimit?: string
+    }
   },
   {
     Method: RPC_4337_CALLS.SEND_USER_OPERATION
@@ -237,9 +246,15 @@ export type PimlicoCustomRpcSchema = [
   }
 ]
 
-export type BundlerClient = PublicClient<
+export type RpcSchemaEntry = {
+  Method: string
+  Parameters: unknown[]
+  ReturnType: unknown
+}
+
+export type BundlerClient<ProviderCustomRpcSchema extends RpcSchemaEntry[] = []> = PublicClient<
   Transport,
   Chain | undefined,
   Account | undefined,
-  [...PimlicoCustomRpcSchema, ...PublicRpcSchema]
+  [...PublicRpcSchema, ...Safe4337RpcSchema, ...ProviderCustomRpcSchema]
 >

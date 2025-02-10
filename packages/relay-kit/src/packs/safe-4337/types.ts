@@ -77,6 +77,7 @@ export type Safe4337CreateTransactionProps = {
     validUntil?: number
     validAfter?: number
     feeEstimator?: IFeeEstimator
+    customNonce?: bigint
   }
 }
 

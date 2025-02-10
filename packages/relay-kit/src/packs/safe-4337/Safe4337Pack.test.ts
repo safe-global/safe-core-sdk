@@ -1011,8 +1011,14 @@ describe('Safe4337Pack', () => {
         }
       })
 
-      expect(safe4337Pack.getOnchainIdentifier()).toBe(
-        '5afe006137303238633936636562316132623939353333646561393063346135'
+      const onchainIdentifier = await safe4337Pack.getOnchainIdentifier()
+
+      expect(onchainIdentifier).toBeDefined()
+
+      const identifierWithoutToolVersion = onchainIdentifier.slice(0, -6)
+
+      expect(identifierWithoutToolVersion).toBe(
+        '5afe006137303238633936636562316132623939353333646561393063'
       )
     })
 
@@ -1038,8 +1044,15 @@ describe('Safe4337Pack', () => {
         transactions: [transferUSDC]
       })
 
-      expect(safeOperation.userOperation.callData).toContain(
-        '5afe006137303238633936636562316132623939353333646561393063346135'
+      const onchainIdentifier = await safe4337Pack.getOnchainIdentifier()
+
+      expect(onchainIdentifier).toBeDefined()
+      expect(safeOperation.userOperation.callData.endsWith(onchainIdentifier)).toBeTruthy()
+
+      const identifierWithoutToolVersion = onchainIdentifier.slice(0, -6)
+
+      expect(identifierWithoutToolVersion).toBe(
+        '5afe006137303238633936636562316132623939353333646561393063'
       )
     })
   })

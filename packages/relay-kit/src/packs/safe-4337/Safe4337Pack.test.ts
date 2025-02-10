@@ -1042,5 +1042,35 @@ describe('Safe4337Pack', () => {
         '5afe006137303238633936636562316132623939353333646561393063346135'
       )
     })
+
+    it('should allow to use custom nonces', async () => {
+      const transferUSDC = {
+        to: fixtures.PAYMASTER_TOKEN_ADDRESS,
+        data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
+        value: '0',
+        operation: 0
+      }
+
+      const safe4337Pack = await createSafe4337Pack({
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+        }
+      })
+
+      const customNonce = utils.encodeNonce({
+        key: BigInt(Date.now()),
+        sequence: 0n
+      })
+
+      let safeOperation = await safe4337Pack.createTransaction({
+        transactions: [transferUSDC],
+        options: { customNonce }
+      })
+
+      expect(safeOperation.getUserOperation()).toHaveProperty('nonce', customNonce.toString())
+      expect(safeOperation.getSafeOperation()).toHaveProperty('nonce', customNonce.toString())
+
+      safeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+    })
   })
 })

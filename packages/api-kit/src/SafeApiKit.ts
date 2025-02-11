@@ -36,6 +36,7 @@ import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests
 import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
+  DataDecoded,
   Eip3770Address,
   isSafeOperation,
   SafeMultisigConfirmationListResponse,
@@ -123,7 +124,7 @@ class SafeApiKit {
    * @throws "Not Found"
    * @throws "Ensure this field has at least 1 hexadecimal chars (not counting 0x)."
    */
-  async decodeData(data: string, to?: string): Promise<any> {
+  async decodeData(data: string, to?: string): Promise<DataDecoded> {
     if (data === '') {
       throw new Error('Invalid data')
     }
@@ -138,6 +139,221 @@ class SafeApiKit {
       url: `${this.#txServiceBaseUrl}/v1/data-decoder/`,
       method: HttpMethod.Post,
       body: dataDecoderRequest
+    })
+  }
+
+  /**
+   * Returns the list of delegates.
+   *
+   * @param getSafeDelegateProps - Properties to filter the returned list of delegates
+   * @returns The list of delegates
+   * @throws "Checksum address validation failed"
+   */
+  async getSafeDelegates({
+    safeAddress,
+    delegateAddress,
+    delegatorAddress,
+    label,
+    limit,
+    offset
+  }: GetSafeDelegateProps): Promise<SafeDelegateListResponse> {
+    const url = new URL(`${this.#txServiceBaseUrl}/v2/delegates`)
+
+    if (safeAddress) {
+      const { address: safe } = this.#getEip3770Address(safeAddress)
+      url.searchParams.set('safe', safe)
+    }
+    if (delegateAddress) {
+      const { address: delegate } = this.#getEip3770Address(delegateAddress)
+      url.searchParams.set('delegate', delegate)
+    }
+    if (delegatorAddress) {
+      const { address: delegator } = this.#getEip3770Address(delegatorAddress)
+      url.searchParams.set('delegator', delegator)
+    }
+    if (label) {
+      url.searchParams.set('label', label)
+    }
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
+    }
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
+    }
+
+    return sendRequest({
+      url: url.toString(),
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Adds a new delegate for a given Safe address.
+   *
+   * @param addSafeDelegateProps - The configuration of the new delegate
+   * @returns
+   * @throws "Invalid Safe delegate address"
+   * @throws "Invalid Safe delegator address"
+   * @throws "Invalid label"
+   * @throws "Checksum address validation failed"
+   * @throws "Address <delegate_address> is not checksumed"
+   * @throws "Safe=<safe_address> does not exist or it's still not indexed"
+   * @throws "Signing owner is not an owner of the Safe"
+   */
+  async addSafeDelegate({
+    safeAddress,
+    delegateAddress,
+    delegatorAddress,
+    label,
+    signer
+  }: AddSafeDelegateProps): Promise<SignedSafeDelegateResponse> {
+    if (delegateAddress === '') {
+      throw new Error('Invalid Safe delegate address')
+    }
+    if (delegatorAddress === '') {
+      throw new Error('Invalid Safe delegator address')
+    }
+    if (label === '') {
+      throw new Error('Invalid label')
+    }
+    const { address: delegate } = this.#getEip3770Address(delegateAddress)
+    const { address: delegator } = this.#getEip3770Address(delegatorAddress)
+    const signature = await signDelegate(signer, delegate, this.#chainId)
+
+    const body: any = {
+      safe: safeAddress ? this.#getEip3770Address(safeAddress).address : null,
+      delegate,
+      delegator,
+      label,
+      signature
+    }
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v2/delegates/`,
+      method: HttpMethod.Post,
+      body
+    })
+  }
+
+  /**
+   * Removes a delegate for a given Safe address.
+   *
+   * @param deleteSafeDelegateProps - The configuration for the delegate that will be removed
+   * @returns
+   * @throws "Invalid Safe delegate address"
+   * @throws "Invalid Safe delegator address"
+   * @throws "Checksum address validation failed"
+   * @throws "Signing owner is not an owner of the Safe"
+   * @throws "Not found"
+   */
+  async removeSafeDelegate({
+    delegateAddress,
+    delegatorAddress,
+    signer
+  }: DeleteSafeDelegateProps): Promise<void> {
+    if (delegateAddress === '') {
+      throw new Error('Invalid Safe delegate address')
+    }
+    if (delegatorAddress === '') {
+      throw new Error('Invalid Safe delegator address')
+    }
+    const { address: delegate } = this.#getEip3770Address(delegateAddress)
+    const { address: delegator } = this.#getEip3770Address(delegatorAddress)
+    const signature = await signDelegate(signer, delegate, this.#chainId)
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v2/delegates/${delegate}`,
+      method: HttpMethod.Delete,
+      body: {
+        delegator,
+        signature
+      }
+    })
+  }
+
+  /**
+   * Get a message by its safe message hash
+   * @param messageHash The Safe message hash
+   * @returns The message
+   */
+  async getMessage(messageHash: string): Promise<SafeMessage> {
+    if (!messageHash) {
+      throw new Error('Invalid messageHash')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/`,
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Get the list of messages associated to a Safe account
+   * @param safeAddress The safe address
+   * @param options The options to filter the list of messages
+   * @returns The paginated list of messages
+   */
+  async getMessages(
+    safeAddress: string,
+    { ordering, limit, offset }: GetSafeMessageListProps = {}
+  ): Promise<SafeMessageListResponse> {
+    if (!this.#isValidAddress(safeAddress)) {
+      throw new Error('Invalid safeAddress')
+    }
+
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
+
+    if (ordering) {
+      url.searchParams.set('ordering', ordering)
+    }
+
+    if (limit != null) {
+      url.searchParams.set('limit', limit.toString())
+    }
+
+    if (offset != null) {
+      url.searchParams.set('offset', offset.toString())
+    }
+
+    return sendRequest({
+      url: url.toString(),
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Creates a new message with an initial signature
+   * Add more signatures from other owners using addMessageSignature()
+   * @param safeAddress The safe address
+   * @param options The raw message to add, signature and safeAppId if any
+   */
+  async addMessage(safeAddress: string, addMessageProps: AddMessageProps): Promise<void> {
+    if (!this.#isValidAddress(safeAddress)) {
+      throw new Error('Invalid safeAddress')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
+      method: HttpMethod.Post,
+      body: addMessageProps
+    })
+  }
+
+  /**
+   * Add a signature to an existing message
+   * @param messageHash The safe message hash
+   * @param signature The signature
+   */
+  async addMessageSignature(messageHash: string, signature: string): Promise<void> {
+    if (!messageHash || !signature) {
+      throw new Error('Invalid messageHash or signature')
+    }
+
+    return sendRequest({
+      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/signatures/`,
+      method: HttpMethod.Post,
+      body: {
+        signature
+      }
     })
   }
 
@@ -267,134 +483,6 @@ class SafeApiKit {
       }
 
       return response as SafeInfoResponse
-    })
-  }
-
-  /**
-   * Returns the list of delegates.
-   *
-   * @param getSafeDelegateProps - Properties to filter the returned list of delegates
-   * @returns The list of delegates
-   * @throws "Checksum address validation failed"
-   */
-  async getSafeDelegates({
-    safeAddress,
-    delegateAddress,
-    delegatorAddress,
-    label,
-    limit,
-    offset
-  }: GetSafeDelegateProps): Promise<SafeDelegateListResponse> {
-    const url = new URL(`${this.#txServiceBaseUrl}/v2/delegates`)
-
-    if (safeAddress) {
-      const { address: safe } = this.#getEip3770Address(safeAddress)
-      url.searchParams.set('safe', safe)
-    }
-    if (delegateAddress) {
-      const { address: delegate } = this.#getEip3770Address(delegateAddress)
-      url.searchParams.set('delegate', delegate)
-    }
-    if (delegatorAddress) {
-      const { address: delegator } = this.#getEip3770Address(delegatorAddress)
-      url.searchParams.set('delegator', delegator)
-    }
-    if (label) {
-      url.searchParams.set('label', label)
-    }
-    if (limit != null) {
-      url.searchParams.set('limit', limit.toString())
-    }
-    if (offset != null) {
-      url.searchParams.set('offset', offset.toString())
-    }
-
-    return sendRequest({
-      url: url.toString(),
-      method: HttpMethod.Get
-    })
-  }
-
-  /**
-   * Adds a new delegate for a given Safe address.
-   *
-   * @param addSafeDelegateProps - The configuration of the new delegate
-   * @returns
-   * @throws "Invalid Safe delegate address"
-   * @throws "Invalid Safe delegator address"
-   * @throws "Invalid label"
-   * @throws "Checksum address validation failed"
-   * @throws "Address <delegate_address> is not checksumed"
-   * @throws "Safe=<safe_address> does not exist or it's still not indexed"
-   * @throws "Signing owner is not an owner of the Safe"
-   */
-  async addSafeDelegate({
-    safeAddress,
-    delegateAddress,
-    delegatorAddress,
-    label,
-    signer
-  }: AddSafeDelegateProps): Promise<SignedSafeDelegateResponse> {
-    if (delegateAddress === '') {
-      throw new Error('Invalid Safe delegate address')
-    }
-    if (delegatorAddress === '') {
-      throw new Error('Invalid Safe delegator address')
-    }
-    if (label === '') {
-      throw new Error('Invalid label')
-    }
-    const { address: delegate } = this.#getEip3770Address(delegateAddress)
-    const { address: delegator } = this.#getEip3770Address(delegatorAddress)
-    const signature = await signDelegate(signer, delegate, this.#chainId)
-
-    const body: any = {
-      safe: safeAddress ? this.#getEip3770Address(safeAddress).address : null,
-      delegate,
-      delegator,
-      label,
-      signature
-    }
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v2/delegates/`,
-      method: HttpMethod.Post,
-      body
-    })
-  }
-
-  /**
-   * Removes a delegate for a given Safe address.
-   *
-   * @param deleteSafeDelegateProps - The configuration for the delegate that will be removed
-   * @returns
-   * @throws "Invalid Safe delegate address"
-   * @throws "Invalid Safe delegator address"
-   * @throws "Checksum address validation failed"
-   * @throws "Signing owner is not an owner of the Safe"
-   * @throws "Not found"
-   */
-  async removeSafeDelegate({
-    delegateAddress,
-    delegatorAddress,
-    signer
-  }: DeleteSafeDelegateProps): Promise<void> {
-    if (delegateAddress === '') {
-      throw new Error('Invalid Safe delegate address')
-    }
-    if (delegatorAddress === '') {
-      throw new Error('Invalid Safe delegator address')
-    }
-    const { address: delegate } = this.#getEip3770Address(delegateAddress)
-    const { address: delegator } = this.#getEip3770Address(delegatorAddress)
-    const signature = await signDelegate(signer, delegate, this.#chainId)
-
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v2/delegates/${delegate}`,
-      method: HttpMethod.Delete,
-      body: {
-        delegator,
-        signature
-      }
     })
   }
 
@@ -736,93 +824,6 @@ class SafeApiKit {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/tokens/${address}/`,
       method: HttpMethod.Get
-    })
-  }
-
-  /**
-   * Get a message by its safe message hash
-   * @param messageHash The Safe message hash
-   * @returns The message
-   */
-  async getMessage(messageHash: string): Promise<SafeMessage> {
-    if (!messageHash) {
-      throw new Error('Invalid messageHash')
-    }
-
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/`,
-      method: HttpMethod.Get
-    })
-  }
-
-  /**
-   * Get the list of messages associated to a Safe account
-   * @param safeAddress The safe address
-   * @param options The options to filter the list of messages
-   * @returns The paginated list of messages
-   */
-  async getMessages(
-    safeAddress: string,
-    { ordering, limit, offset }: GetSafeMessageListProps = {}
-  ): Promise<SafeMessageListResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
-      throw new Error('Invalid safeAddress')
-    }
-
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
-
-    if (ordering) {
-      url.searchParams.set('ordering', ordering)
-    }
-
-    if (limit != null) {
-      url.searchParams.set('limit', limit.toString())
-    }
-
-    if (offset != null) {
-      url.searchParams.set('offset', offset.toString())
-    }
-
-    return sendRequest({
-      url: url.toString(),
-      method: HttpMethod.Get
-    })
-  }
-
-  /**
-   * Creates a new message with an initial signature
-   * Add more signatures from other owners using addMessageSignature()
-   * @param safeAddress The safe address
-   * @param options The raw message to add, signature and safeAppId if any
-   */
-  async addMessage(safeAddress: string, addMessageProps: AddMessageProps): Promise<void> {
-    if (!this.#isValidAddress(safeAddress)) {
-      throw new Error('Invalid safeAddress')
-    }
-
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
-      method: HttpMethod.Post,
-      body: addMessageProps
-    })
-  }
-
-  /**
-   * Add a signature to an existing message
-   * @param messageHash The safe message hash
-   * @param signature The signature
-   */
-  async addMessageSignature(messageHash: string, signature: string): Promise<void> {
-    if (!messageHash || !signature) {
-      throw new Error('Invalid messageHash or signature')
-    }
-
-    return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/signatures/`,
-      method: HttpMethod.Post,
-      body: {
-        signature
-      }
     })
   }
 

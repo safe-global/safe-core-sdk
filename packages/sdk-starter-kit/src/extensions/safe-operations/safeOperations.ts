@@ -56,6 +56,7 @@ export function safeOperations(
     const safe4337Pack = await Safe4337Pack.init({
       provider,
       signer,
+      safeModulesVersion: '0.2.0',
       bundlerUrl,
       options,
       paymasterOptions

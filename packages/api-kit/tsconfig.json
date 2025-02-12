@@ -7,5 +7,5 @@
     }
   },
   "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["dist", "local-declarations.d.ts"]
+  "exclude": ["dist"]
 }

@@ -5,6 +5,8 @@ import {
   AllTransactionsListResponse,
   AllTransactionsOptions,
   DeleteSafeDelegateProps,
+  GetIncomingTransactionsOptions,
+  GetModuleTransactionsOptions,
   GetMultisigTransactionsOptions,
   GetSafeDelegateProps,
   GetSafeMessageListProps,
@@ -28,6 +30,7 @@ import {
   SafeSingletonResponse,
   SignatureResponse,
   SignedSafeDelegateResponse,
+  TokenInfoListOptions,
   TokenInfoListResponse,
   TokenInfoResponse,
   TransferListResponse
@@ -584,17 +587,32 @@ class SafeApiKit {
    * Returns the history of incoming transactions of a Safe account.
    *
    * @param safeAddress - The Safe address
+   * @param options - Optional parameters to filter or modify the response
    * @returns The history of incoming transactions
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
    */
-  async getIncomingTransactions(safeAddress: string): Promise<TransferListResponse> {
+  async getIncomingTransactions(
+    safeAddress: string,
+    options?: GetIncomingTransactionsOptions
+  ): Promise<TransferListResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/incoming-transfers/`)
+
+    // Handle any additional query parameters
+    Object.entries(options || {}).forEach(([key, value]) => {
+      // Skip undefined values
+      if (value !== undefined) {
+        // Add options as query parameters
+        url.searchParams.set(key, value.toString())
+      }
+    })
+
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/incoming-transfers?executed=true`,
+      url: url.toString(),
       method: HttpMethod.Get
     })
   }
@@ -603,18 +621,32 @@ class SafeApiKit {
    * Returns the history of module transactions of a Safe account.
    *
    * @param safeAddress - The Safe address
+   * @param options - Optional parameters to filter or modify the response
    * @returns The history of module transactions
    * @throws "Invalid Safe address"
    * @throws "Invalid data"
    * @throws "Invalid ethereum address"
    */
-  async getModuleTransactions(safeAddress: string): Promise<SafeModuleTransactionListResponse> {
+  async getModuleTransactions(
+    safeAddress: string,
+    options?: GetModuleTransactionsOptions
+  ): Promise<SafeModuleTransactionListResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/module-transactions/`)
+
+    // Handle any additional query parameters
+    Object.entries(options || {}).forEach(([key, value]) => {
+      // Skip undefined values
+      if (value !== undefined) {
+        // Add options as query parameters
+        url.searchParams.set(key, value.toString())
+      }
+    })
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/module-transactions/`,
+      url: url.toString(),
       method: HttpMethod.Get
     })
   }
@@ -739,6 +771,7 @@ class SafeApiKit {
    * Returns a list of transactions for a Safe. The list has different structures depending on the transaction type
    *
    * @param safeAddress - The Safe address
+   * @param options - Optional parameters to filter or modify the response
    * @returns The list of transactions waiting for the confirmation of the Safe owners
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
@@ -754,14 +787,14 @@ class SafeApiKit {
     const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/all-transactions/`)
 
-    const trusted = options?.trusted?.toString() || 'true'
-    url.searchParams.set('trusted', trusted)
-
-    const queued = options?.queued?.toString() || 'true'
-    url.searchParams.set('queued', queued)
-
-    const executed = options?.executed?.toString() || 'false'
-    url.searchParams.set('executed', executed)
+    // Handle any additional query parameters
+    Object.entries(options || {}).forEach(([key, value]) => {
+      // Skip undefined values
+      if (value !== undefined) {
+        // Add options as query parameters
+        url.searchParams.set(key, value.toString())
+      }
+    })
 
     return sendRequest({
       url: url.toString(),
@@ -799,11 +832,23 @@ class SafeApiKit {
   /**
    * Returns the list of all the ERC20 tokens handled by the Safe.
    *
+   * @param options - Optional parameters to filter or modify the response
    * @returns The list of all the ERC20 tokens
    */
-  async getTokenList(): Promise<TokenInfoListResponse> {
+  async getTokenList(options?: TokenInfoListOptions): Promise<TokenInfoListResponse> {
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/tokens/`)
+
+    // Handle any additional query parameters
+    Object.entries(options || {}).forEach(([key, value]) => {
+      // Skip undefined values
+      if (value !== undefined) {
+        // Add options as query parameters
+        url.searchParams.set(key, value.toString())
+      }
+    })
+
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/tokens/`,
+      url: url.toString(),
       method: HttpMethod.Get
     })
   }

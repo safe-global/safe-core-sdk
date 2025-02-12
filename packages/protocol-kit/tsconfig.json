@@ -9,5 +9,5 @@
     "outDir": "dist"
   },
   "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist", "local-declarations.d.ts"]
 }

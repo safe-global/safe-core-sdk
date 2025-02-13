@@ -9,6 +9,7 @@ import {
   SafeClientResult,
   SendSafeOperationProps
 } from '@safe-global/sdk-starter-kit/types'
+import { DEFAULT_SAFE_MODULES_VERSION } from '@safe-global/sdk-starter-kit/constants'
 
 export type BundlerOptions = {
   bundlerUrl: string
@@ -56,6 +57,7 @@ export function safeOperations(
     const safe4337Pack = await Safe4337Pack.init({
       provider,
       signer,
+      safeModulesVersion: DEFAULT_SAFE_MODULES_VERSION,
       bundlerUrl,
       options,
       paymasterOptions

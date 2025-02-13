@@ -102,4 +102,36 @@ describe('getSafeOperationsByAddress', () => {
     chai.expect(response).to.have.property('results').to.be.an('array')
     chai.expect(response.results[0]).to.be.deep.equal(safeOperations[1])
   })
+
+  it('should get pending safe operations', async () => {
+    const allSafeOperations = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS
+    })
+
+    // Prepared 2 executed SafeOperations in the E2E Safe account
+    const pendingSafeOperations = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS,
+      executed: false
+    })
+
+    const executedSafeOperations = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS,
+      executed: true
+    })
+
+    chai.expect(executedSafeOperations.count).equals(2)
+    chai.expect(allSafeOperations.count - pendingSafeOperations.count).equals(2)
+  })
+
+  // FIXME add hasConfirmations filter again
+  // it('should get all safe operations without confirmations', async () => {
+  //   const response = await safeApiKit.getSafeOperationsByAddress({
+  //     safeAddress: SAFE_ADDRESS,
+  //     offset: 1,
+  //     hasConfirmations: false
+  //   })
+
+  //   chai.expect(response).to.have.property('count').equals(0)
+  //   chai.expect(response).to.have.property('results').to.be.an('array')
+  // })
 })

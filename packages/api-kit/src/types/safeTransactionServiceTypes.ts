@@ -291,12 +291,20 @@ export type GetSafeOperationListProps = {
   /** Address of the Safe to get SafeOperations for */
   safeAddress: string
   executed?: boolean
-  has_confirmations?: boolean
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/4337/safes_safe_operations_list
   [key: string]: string | number | boolean | undefined
 } & ListOptions
+
+export type GetPendingSafeOperationListProps = {
+  /** Address of the Safe to get SafeOperations for */
+  safeAddress: string
+  /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
+  ordering?: string
+  // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/4337/safes_safe_operations_list
+  [key: string]: string | number | boolean | undefined
+}
 
 export type GetSafeOperationListResponse = ListResponse<SafeOperationResponse>
 

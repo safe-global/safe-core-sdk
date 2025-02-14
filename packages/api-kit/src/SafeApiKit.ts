@@ -249,7 +249,7 @@ class SafeApiKit {
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
     const signature = await signDelegate(signer, delegate, this.#chainId)
 
-    const body: any = {
+    const body = {
       safe: safeAddress ? this.#getEip3770Address(safeAddress).address : null,
       delegate,
       delegator,

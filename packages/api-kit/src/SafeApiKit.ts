@@ -18,6 +18,7 @@ import {
   OwnerResponse,
   PendingTransactionsOptions,
   ProposeTransactionProps,
+  QueryParamsOptions,
   SafeCreationInfoResponse,
   SafeDelegateListResponse,
   SafeInfoResponse,
@@ -92,6 +93,17 @@ class SafeApiKit {
 
   #getEip3770Address(fullAddress: string): Eip3770Address {
     return validateEip3770Address(fullAddress, this.#chainId)
+  }
+
+  #addUrlQueryParams<T extends QueryParamsOptions>(url: URL, options: T): void {
+    // Handle any additional query parameters
+    Object.entries(options || {}).forEach(([key, value]) => {
+      // Skip undefined values
+      if (value !== undefined) {
+        // Add options as query parameters
+        url.searchParams.set(key, value.toString())
+      }
+    })
   }
 
   /**
@@ -603,14 +615,8 @@ class SafeApiKit {
     const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/incoming-transfers/`)
 
-    // Handle any additional query parameters
-    Object.entries(options || {}).forEach(([key, value]) => {
-      // Skip undefined values
-      if (value !== undefined) {
-        // Add options as query parameters
-        url.searchParams.set(key, value.toString())
-      }
-    })
+    // Handle additional query parameters
+    if (options !== undefined) this.#addUrlQueryParams<GetIncomingTransactionsOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -638,14 +644,9 @@ class SafeApiKit {
     const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/module-transactions/`)
 
-    // Handle any additional query parameters
-    Object.entries(options || {}).forEach(([key, value]) => {
-      // Skip undefined values
-      if (value !== undefined) {
-        // Add options as query parameters
-        url.searchParams.set(key, value.toString())
-      }
-    })
+    // Handle additional query parameters
+    if (options !== undefined) this.#addUrlQueryParams<GetModuleTransactionsOptions>(url, options)
+
     return sendRequest({
       url: url.toString(),
       method: HttpMethod.Get
@@ -672,14 +673,8 @@ class SafeApiKit {
     const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/`)
 
-    // Handle any additional query parameters
-    Object.entries(options || {}).forEach(([key, value]) => {
-      // Skip undefined values
-      if (value !== undefined) {
-        // Add options as query parameters
-        url.searchParams.set(key, value.toString())
-      }
-    })
+    // Handle additional query parameters
+    if (options !== undefined) this.#addUrlQueryParams<GetMultisigTransactionsOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -788,14 +783,8 @@ class SafeApiKit {
     const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/all-transactions/`)
 
-    // Handle any additional query parameters
-    Object.entries(options || {}).forEach(([key, value]) => {
-      // Skip undefined values
-      if (value !== undefined) {
-        // Add options as query parameters
-        url.searchParams.set(key, value.toString())
-      }
-    })
+    // Handle additional query parameters
+    if (options !== undefined) this.#addUrlQueryParams<AllTransactionsOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -839,14 +828,8 @@ class SafeApiKit {
   async getTokenList(options?: TokenInfoListOptions): Promise<TokenInfoListResponse> {
     const url = new URL(`${this.#txServiceBaseUrl}/v1/tokens/`)
 
-    // Handle any additional query parameters
-    Object.entries(options || {}).forEach(([key, value]) => {
-      // Skip undefined values
-      if (value !== undefined) {
-        // Add options as query parameters
-        url.searchParams.set(key, value.toString())
-      }
-    })
+    // Handle additional query parameters
+    if (options !== undefined) this.#addUrlQueryParams<TokenInfoListOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),

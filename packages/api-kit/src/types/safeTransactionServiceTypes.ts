@@ -18,6 +18,11 @@ export type ListOptions = {
   offset?: number
 }
 
+export type QueryParamsOptions = {
+  // Accept query params that are part of the swagger documentation. Check at https://safe-transaction-mainnet.safe.global/
+  [key: string]: string | number | boolean | undefined
+}
+
 export type SafeServiceInfoResponse = {
   readonly name: string
   readonly version: string
@@ -137,9 +142,9 @@ export type GetMultisigTransactionsOptions = {
   nonce?: string
   /** Which field to use when ordering the results. It can be: `nonce`, `created`, `modified` (default: `-created`) */
   ordering?: string
+} & ListOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_multisig_transactions_list
-  [key: string]: string | number | boolean | undefined
-} & ListOptions
+  QueryParamsOptions
 
 export type PendingTransactionsOptions = {
   currentNonce?: number
@@ -152,9 +157,9 @@ export type SafeMultisigTransactionListResponse = ListResponse<SafeMultisigTrans
 
 export type GetIncomingTransactionsOptions = {
   _from?: string
+} & ListOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_incoming_transfers_list
-  [key: string]: string | number | boolean | undefined
-} & ListOptions
+  QueryParamsOptions
 
 export type SafeModuleTransaction = {
   readonly created?: string
@@ -175,9 +180,9 @@ export type SafeModuleTransactionListResponse = ListResponse<SafeModuleTransacti
 
 export type GetModuleTransactionsOptions = {
   module?: string
+} & ListOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_module_transactions_list
-  [key: string]: string | number | boolean | undefined
-} & ListOptions
+  QueryParamsOptions
 
 export type TransferResponse = {
   readonly type: string
@@ -213,9 +218,9 @@ export type TokenInfoListOptions = {
   address?: string
   /** Which field to use when ordering the results. It can be: `name`, `symbol`, `address` (default: `-name`) */
   ordering?: string
+} & ListOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/tokens/tokens_list
-  [key: string]: string | number | boolean | undefined
-} & ListOptions
+  QueryParamsOptions
 
 export type SafeModuleTransactionWithTransfersResponse = SafeModuleTransaction & {
   readonly txType?: 'MODULE_TRANSACTION'
@@ -293,18 +298,18 @@ export type GetSafeOperationListProps = {
   executed?: boolean
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string
+} & ListOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/4337/safes_safe_operations_list
-  [key: string]: string | number | boolean | undefined
-} & ListOptions
+  QueryParamsOptions
 
 export type GetPendingSafeOperationListProps = {
   /** Address of the Safe to get SafeOperations for */
   safeAddress: string
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string
+} & ListOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/4337/safes_safe_operations_list
-  [key: string]: string | number | boolean | undefined
-}
+  QueryParamsOptions
 
 export type GetSafeOperationListResponse = ListResponse<SafeOperationResponse>
 

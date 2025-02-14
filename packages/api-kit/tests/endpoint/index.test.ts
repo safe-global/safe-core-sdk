@@ -517,6 +517,31 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getMultisigTransactions with default query params', async () => {
+      await chai
+        .expect(safeApiKit.getMultisigTransactions(safeAddress, { executed: true }))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/multisig-transactions/?executed=true`,
+        method: 'get'
+      })
+    })
+
+    it('getMultisigTransactions with custom query params', async () => {
+      await chai
+        .expect(
+          safeApiKit.getMultisigTransactions(safeAddress, {
+            has_confirmations: true,
+            nonce__gte: 1
+          })
+        )
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/multisig-transactions/?has_confirmations=true&nonce__gte=1`,
+        method: 'get'
+      })
+    })
+
     it('getPendingTransactions', async () => {
       const currentNonce = 1
       await chai

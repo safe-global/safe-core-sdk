@@ -323,7 +323,7 @@ class SafeApiKit {
    */
   async getMessages(
     safeAddress: string,
-    { ordering, limit, offset }: GetSafeMessageListProps = {}
+    options: GetSafeMessageListProps = {}
   ): Promise<SafeMessageListResponse> {
     if (!this.#isValidAddress(safeAddress)) {
       throw new Error('Invalid safeAddress')
@@ -331,17 +331,8 @@ class SafeApiKit {
 
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
 
-    if (ordering) {
-      url.searchParams.set('ordering', ordering)
-    }
-
-    if (limit != null) {
-      url.searchParams.set('limit', limit.toString())
-    }
-
-    if (offset != null) {
-      url.searchParams.set('offset', offset.toString())
-    }
+    // Handle additional query parameters
+    if (options !== undefined) this.#addUrlQueryParams<GetIncomingTransactionsOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),

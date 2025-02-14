@@ -477,6 +477,16 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getIncomingTransactions with default query params', async () => {
+      await chai
+        .expect(safeApiKit.getIncomingTransactions(safeAddress, { from: safeAddress }))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers/?_from=${safeAddress}`,
+        method: 'get'
+      })
+    })
+
     it('getModuleTransactions', async () => {
       await chai
         .expect(safeApiKit.getModuleTransactions(safeAddress))
@@ -531,7 +541,7 @@ describe('Endpoint tests', () => {
       await chai
         .expect(
           safeApiKit.getMultisigTransactions(safeAddress, {
-            has_confirmations: true,
+            hasConfirmations: true,
             nonce__gte: 1
           })
         )

@@ -123,15 +123,14 @@ describe('getSafeOperationsByAddress', () => {
     chai.expect(allSafeOperations.count - pendingSafeOperations.count).equals(2)
   })
 
-  // FIXME add hasConfirmations filter again
-  // it('should get all safe operations without confirmations', async () => {
-  //   const response = await safeApiKit.getSafeOperationsByAddress({
-  //     safeAddress: SAFE_ADDRESS,
-  //     offset: 1,
-  //     hasConfirmations: false
-  //   })
+  it('should get all safe operations without confirmations', async () => {
+    const response = await safeApiKit.getSafeOperationsByAddress({
+      safeAddress: SAFE_ADDRESS,
+      offset: 1,
+      hasConfirmations: false
+    })
 
-  //   chai.expect(response).to.have.property('count').equals(0)
-  //   chai.expect(response).to.have.property('results').to.be.an('array')
-  // })
+    chai.expect(response).to.have.property('count').equals(0)
+    chai.expect(response).to.have.property('results').to.be.an('array')
+  })
 })

@@ -53,6 +53,7 @@ import {
 import { TRANSACTION_SERVICE_URLS } from './utils/config'
 import { isEmptyData } from './utils'
 import { getAddSafeOperationProps, isSafeOperation } from './utils/safeOperation'
+import { QUERY_PARAMS_MAP } from './utils/queryParamsMap'
 
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
@@ -96,12 +97,15 @@ class SafeApiKit {
   }
 
   #addUrlQueryParams<T extends QueryParamsOptions>(url: URL, options: T): void {
+    const camelToSnake = (str: string) => str.replace(/([A-Z])/g, '_$1').toLowerCase()
+
     // Handle any additional query parameters
     Object.entries(options || {}).forEach(([key, value]) => {
       // Skip undefined values
       if (value !== undefined) {
+        const name = QUERY_PARAMS_MAP[key] ?? camelToSnake(key)
         // Add options as query parameters
-        url.searchParams.set(key, value.toString())
+        url.searchParams.set(name, value.toString())
       }
     })
   }
@@ -863,13 +867,10 @@ class SafeApiKit {
    * @throws "Invalid Ethereum address {safeAddress}"
    * @returns The SafeOperations sent from the given Safe's address
    */
-  async getSafeOperationsByAddress({
-    safeAddress,
-    executed,
-    ordering,
-    limit,
-    offset
-  }: GetSafeOperationListProps): Promise<GetSafeOperationListResponse> {
+  async getSafeOperationsByAddress(
+    props: GetSafeOperationListProps
+  ): Promise<GetSafeOperationListResponse> {
+    const { safeAddress, ...options } = props
     if (!safeAddress) {
       throw new Error('Safe address must not be empty')
     }
@@ -878,21 +879,8 @@ class SafeApiKit {
 
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/safe-operations/`)
 
-    if (ordering) {
-      url.searchParams.set('ordering', ordering)
-    }
-
-    if (limit != null) {
-      url.searchParams.set('limit', limit.toString())
-    }
-
-    if (offset != null) {
-      url.searchParams.set('offset', offset.toString())
-    }
-
-    if (executed != null) {
-      url.searchParams.set('executed', executed.toString())
-    }
+    // Handle additional query parameters
+    if (options !== undefined) this.#addUrlQueryParams<TokenInfoListOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),

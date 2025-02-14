@@ -462,7 +462,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getIncomingTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers/`,
         method: 'get'
       })
     })
@@ -472,7 +472,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getIncomingTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers/`,
         method: 'get'
       })
     })
@@ -544,7 +544,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getAllTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/`,
         method: 'get'
       })
     })
@@ -554,7 +554,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getAllTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/`,
         method: 'get'
       })
     })

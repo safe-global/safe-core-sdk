@@ -293,8 +293,6 @@ export type GetSafeMessageListProps = {
 } & ListOptions
 
 export type GetSafeOperationListProps = {
-  /** Address of the Safe to get SafeOperations for */
-  safeAddress: string
   hasConfirmations?: boolean
   executed?: boolean
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
@@ -304,8 +302,6 @@ export type GetSafeOperationListProps = {
   QueryParamsOptions
 
 export type GetPendingSafeOperationListProps = {
-  /** Address of the Safe to get SafeOperations for */
-  safeAddress: string
   hasConfirmations?: boolean
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string

@@ -695,7 +695,7 @@ describe('Endpoint tests', () => {
 
     it('getSafeOperationsByAddress', async () => {
       await chai
-        .expect(safeApiKit.getSafeOperationsByAddress({ safeAddress }))
+        .expect(safeApiKit.getSafeOperationsByAddress(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,

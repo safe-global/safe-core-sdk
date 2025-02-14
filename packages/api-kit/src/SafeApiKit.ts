@@ -96,6 +96,15 @@ class SafeApiKit {
     return validateEip3770Address(fullAddress, this.#chainId)
   }
 
+  /**
+   * Adds query parameters from an options object to a given URL.
+   * Converts parameter names to snake_case automatically. If a specific mapping exists in QUERY_PARAMS_MAP,
+   * it will be used instead of the converted name.
+   *
+   * @param {URL} url - The URL object to which query parameters will be added.
+   * @param {T} options - An object containing key-value pairs representing query parameters.
+   * @returns {void}
+   */
   #addUrlQueryParams<T extends QueryParamsOptions>(url: URL, options: T): void {
     const camelToSnake = (str: string) => str.replace(/([A-Z])/g, '_$1').toLowerCase()
 
@@ -690,20 +699,6 @@ class SafeApiKit {
    * Returns the list of multi-signature transactions that are waiting for the confirmation of the Safe owners.
    *
    * @param safeAddress - The Safe address
-   * @param currentNonce - Deprecated, use inside object property: Current nonce of the Safe.
-   * @returns The list of transactions waiting for the confirmation of the Safe owners
-   * @throws "Invalid Safe address"
-   * @throws "Invalid data"
-   * @throws "Invalid ethereum address"
-   */
-  async getPendingTransactions(
-    safeAddress: string,
-    currentNonce?: number
-  ): Promise<SafeMultisigTransactionListResponse>
-  /**
-   * Returns the list of multi-signature transactions that are waiting for the confirmation of the Safe owners.
-   *
-   * @param safeAddress - The Safe address
    * @param {PendingTransactionsOptions} options The options to filter the list of transactions
    * @returns The list of transactions waiting for the confirmation of the Safe owners
    * @throws "Invalid Safe address"
@@ -712,31 +707,12 @@ class SafeApiKit {
    */
   async getPendingTransactions(
     safeAddress: string,
-    { currentNonce, hasConfirmations, ordering, limit, offset }: PendingTransactionsOptions
-  ): Promise<SafeMultisigTransactionListResponse>
-  async getPendingTransactions(
-    safeAddress: string,
-    propsOrCurrentNonce: PendingTransactionsOptions | number = {}
+    options: PendingTransactionsOptions = {}
   ): Promise<SafeMultisigTransactionListResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-
-    // TODO: Remove @deprecated migration code
-    let currentNonce: number | undefined
-    let hasConfirmations: boolean | undefined
-    let ordering: string | undefined
-    let limit: number | undefined
-    let offset: number | undefined
-    if (typeof propsOrCurrentNonce === 'object') {
-      ;({ currentNonce, hasConfirmations, ordering, limit, offset } = propsOrCurrentNonce)
-    } else {
-      console.warn(
-        'Deprecated: Use `currentNonce` inside an object instead. See `PendingTransactionsOptions`.'
-      )
-      currentNonce = propsOrCurrentNonce
-    }
-    // END of @deprecated migration code
+    const { currentNonce, hasConfirmations, ordering, limit, offset } = options
 
     const { address } = this.#getEip3770Address(safeAddress)
     const nonce = currentNonce ? currentNonce : (await this.getSafeInfo(address)).nonce
@@ -862,15 +838,16 @@ class SafeApiKit {
 
   /**
    * Get the SafeOperations that were sent from a particular address.
-   * @param getSafeOperationsProps - The parameters to filter the list of SafeOperations
+   * @param safeAddress - The Safe address
+   * @param options - Optional parameters to filter or modify the response
    * @throws "Safe address must not be empty"
    * @throws "Invalid Ethereum address {safeAddress}"
    * @returns The SafeOperations sent from the given Safe's address
    */
   async getSafeOperationsByAddress(
-    props: GetSafeOperationListProps
+    safeAddress: string,
+    options?: GetSafeOperationListProps
   ): Promise<GetSafeOperationListResponse> {
-    const { safeAddress, ...options } = props
     if (!safeAddress) {
       throw new Error('Safe address must not be empty')
     }
@@ -890,16 +867,18 @@ class SafeApiKit {
 
   /**
    * Get the SafeOperations that are pending to send to the bundler
-   * @param getSafeOperationsProps - The parameters to filter the list of SafeOperations
+   * @param safeAddress - The Safe address
+   * @param options - Optional parameters to filter or modify the response
    * @throws "Safe address must not be empty"
    * @throws "Invalid Ethereum address {safeAddress}"
    * @returns The pending SafeOperations
    */
   async getPendingSafeOperations(
-    props: GetPendingSafeOperationListProps
+    safeAddress: string,
+    options?: GetPendingSafeOperationListProps
   ): Promise<GetSafeOperationListResponse> {
-    return this.getSafeOperationsByAddress({
-      ...props,
+    return this.getSafeOperationsByAddress(safeAddress, {
+      ...options,
       executed: false
     })
   }

@@ -105,7 +105,7 @@ class SafeApiKit {
    * @param {T} options - An object containing key-value pairs representing query parameters.
    * @returns {void}
    */
-  #addUrlQueryParams<T extends QueryParamsOptions>(url: URL, options: T): void {
+  #addUrlQueryParams<T extends QueryParamsOptions>(url: URL, options?: T): void {
     const camelToSnake = (str: string) => str.replace(/([A-Z])/g, '_$1').toLowerCase()
 
     // Handle any additional query parameters
@@ -331,8 +331,8 @@ class SafeApiKit {
 
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
 
-    // Handle additional query parameters
-    if (options !== undefined) this.#addUrlQueryParams<GetIncomingTransactionsOptions>(url, options)
+    // Check if options are given and add query parameters
+    this.#addUrlQueryParams<GetSafeMessageListProps>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -619,8 +619,8 @@ class SafeApiKit {
     const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/incoming-transfers/`)
 
-    // Handle additional query parameters
-    if (options !== undefined) this.#addUrlQueryParams<GetIncomingTransactionsOptions>(url, options)
+    // Check if options are given and add query parameters
+    this.#addUrlQueryParams<GetIncomingTransactionsOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -648,8 +648,8 @@ class SafeApiKit {
     const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/module-transactions/`)
 
-    // Handle additional query parameters
-    if (options !== undefined) this.#addUrlQueryParams<GetModuleTransactionsOptions>(url, options)
+    // Check if options are given and add query parameters
+    this.#addUrlQueryParams<GetModuleTransactionsOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -677,8 +677,8 @@ class SafeApiKit {
     const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/`)
 
-    // Handle additional query parameters
-    if (options !== undefined) this.#addUrlQueryParams<GetMultisigTransactionsOptions>(url, options)
+    // Check if options are given and add query parameters
+    this.#addUrlQueryParams<GetMultisigTransactionsOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -754,8 +754,8 @@ class SafeApiKit {
     const { address } = this.#getEip3770Address(safeAddress)
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/all-transactions/`)
 
-    // Handle additional query parameters
-    if (options !== undefined) this.#addUrlQueryParams<AllTransactionsOptions>(url, options)
+    // Check if options are given and add query parameters
+    this.#addUrlQueryParams<AllTransactionsOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -799,8 +799,8 @@ class SafeApiKit {
   async getTokenList(options?: TokenInfoListOptions): Promise<TokenInfoListResponse> {
     const url = new URL(`${this.#txServiceBaseUrl}/v1/tokens/`)
 
-    // Handle additional query parameters
-    if (options !== undefined) this.#addUrlQueryParams<TokenInfoListOptions>(url, options)
+    // Check if options are given and add query parameters
+    this.#addUrlQueryParams<TokenInfoListOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -847,8 +847,8 @@ class SafeApiKit {
 
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/safe-operations/`)
 
-    // Handle additional query parameters
-    if (options !== undefined) this.#addUrlQueryParams<TokenInfoListOptions>(url, options)
+    // Check if options are given and add query parameters
+    this.#addUrlQueryParams<TokenInfoListOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),

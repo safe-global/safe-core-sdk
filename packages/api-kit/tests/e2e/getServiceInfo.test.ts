@@ -9,8 +9,8 @@ describe('getServiceInfo', () => {
     safeApiKit = getApiKit()
   })
 
-  it('should return the Safe info', async () => {
-    const safeInfo = await safeApiKit.getServiceInfo()
-    expect(safeInfo.api_version).to.be.equal('v1')
+  it('should return the Safe service info', async () => {
+    const serviceInfo = await safeApiKit.getServiceInfo()
+    expect(serviceInfo.api_version).to.be.equal('v1')
   })
 })

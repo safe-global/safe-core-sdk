@@ -4,12 +4,10 @@ import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider } from './utils/setupProvider'
 import { SafeProvider } from '@safe-global/protocol-kit/index'
 import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
 import { createMockPasskey, getWebAuthnCredentials } from './utils/passkeys'
 import { publicActions, walletActions } from 'viem'
 
 chai.use(chaiAsPromised)
-chai.use(sinonChai)
 
 const webAuthnCredentials = getWebAuthnCredentials()
 

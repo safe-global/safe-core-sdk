@@ -39,11 +39,12 @@ export type SafeSingletonResponse = {
   deployer: string
   deployedBlockNumber: number
   lastIndexedBlockNumber: number
+  l2: boolean
 }
 
 export type SafeInfoResponse = {
   readonly address: string
-  readonly nonce: number
+  readonly nonce: string
   readonly threshold: number
   readonly owners: string[]
   readonly singleton: string
@@ -93,6 +94,7 @@ export type SafeDelegateResponse = {
   readonly delegate: string
   readonly delegator: string
   readonly label: string
+  readonly expiryDate: string
 }
 
 export type SignedSafeDelegateResponse = SafeDelegateResponse & {
@@ -134,20 +136,6 @@ export type PendingTransactionsOptions = {
 
 export type SafeMultisigTransactionListResponse = ListResponse<SafeMultisigTransactionResponse>
 
-export type TransferResponse = {
-  readonly type?: string
-  readonly executionDate: string
-  readonly blockNumber: number
-  readonly transactionHash: string
-  readonly to: string
-  readonly value: string
-  readonly tokenId: string
-  readonly tokenAddress?: string
-  readonly from: string
-}
-
-export type TransferListResponse = ListResponse<TransferResponse>
-
 export type SafeModuleTransaction = {
   readonly created?: string
   readonly executionDate: string
@@ -165,36 +153,42 @@ export type SafeModuleTransaction = {
 
 export type SafeModuleTransactionListResponse = ListResponse<SafeModuleTransaction>
 
-export type Erc20Info = {
-  readonly name: string
-  readonly symbol: string
-  readonly decimals: number
-  readonly logoUri: string
+export type TransferResponse = {
+  readonly type: string
+  readonly executionDate: string
+  readonly blockNumber: number
+  readonly transactionHash: string
+  readonly to: string
+  readonly value?: string
+  readonly tokenId?: string
+  readonly tokenAddress?: string
+  readonly transferId: string
+  readonly tokenInfo?: TokenInfoResponse
+  readonly from: string
 }
 
+export type TransferListResponse = ListResponse<TransferResponse>
+
 export type TokenInfoResponse = {
-  readonly type?: string
+  readonly type: string
   readonly address: string
   readonly name: string
   readonly symbol: string
-  readonly decimals: number
+  readonly decimals?: number
   readonly logoUri?: string
+  readonly trusted: boolean
 }
 
 export type TokenInfoListResponse = ListResponse<TokenInfoResponse>
 
-export type TransferWithTokenInfoResponse = TransferResponse & {
-  readonly tokenInfo: TokenInfoResponse
-}
-
 export type SafeModuleTransactionWithTransfersResponse = SafeModuleTransaction & {
   readonly txType?: 'MODULE_TRANSACTION'
-  readonly transfers: TransferWithTokenInfoResponse[]
+  readonly transfers: TransferResponse[]
 }
 
 export type SafeMultisigTransactionWithTransfersResponse = SafeMultisigTransactionResponse & {
   readonly txType?: 'MULTISIG_TRANSACTION'
-  readonly transfers: TransferWithTokenInfoResponse[]
+  readonly transfers: TransferResponse[]
 }
 
 export type EthereumTxResponse = {
@@ -208,7 +202,7 @@ export type EthereumTxResponse = {
 
 export type EthereumTxWithTransfersResponse = EthereumTxResponse & {
   readonly txType?: 'ETHEREUM_TRANSACTION'
-  readonly transfers: TransferWithTokenInfoResponse[]
+  readonly transfers: TransferResponse[]
 }
 
 export type AllTransactionsOptions = {
@@ -245,6 +239,7 @@ export type SafeMessage = {
   readonly safeAppId: null | string
   readonly confirmations: Array<SafeMessageConfirmation>
   readonly preparedSignature: string
+  readonly origin?: string
 }
 
 export type SafeMessageListResponse = ListResponse<SafeMessage>

@@ -5,7 +5,8 @@ import Safe, {
   encodeMultiSendData,
   getMultiSendContract,
   PasskeyClient,
-  SafeProvider
+  SafeProvider,
+  generateOnChainIdentifier
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
@@ -52,6 +53,7 @@ import {
 } from './utils'
 import { entryPointToSafeModules, EQ_OR_GT_0_3_0 } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
+import { getRelayKitVersion } from './utils/getRelayKitVersion'
 
 const MAX_ERC20_AMOUNT_TO_APPROVE =
   0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
@@ -87,6 +89,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
   #paymasterOptions?: PaymasterOptions
 
+  #onchainIdentifier: string = ''
+
   /**
    * Creates an instance of the Safe4337Pack.
    *
@@ -100,7 +104,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     paymasterOptions,
     entryPointAddress,
     safe4337ModuleAddress,
-    safeWebAuthnSharedSignerAddress
+    safeWebAuthnSharedSignerAddress,
+    onchainAnalytics
   }: Safe4337Options) {
     super(protocolKit)
 
@@ -111,6 +116,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
     this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = safeWebAuthnSharedSignerAddress || '0x'
+
+    if (onchainAnalytics?.project) {
+      const { project, platform } = onchainAnalytics
+      this.#onchainIdentifier = generateOnChainIdentifier({
+        project,
+        platform,
+        tool: 'relay-kit',
+        toolVersion: getRelayKitVersion()
+      })
+    }
   }
 
   /**
@@ -124,7 +139,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
    * @return {Promise<Safe4337Pack>} The Promise object that will be resolved into an instance of Safe4337Pack.
    */
   static async init(initOptions: Safe4337InitOptions): Promise<Safe4337Pack> {
-    const { provider, signer, options, bundlerUrl, customContracts, paymasterOptions } = initOptions
+    const {
+      provider,
+      signer,
+      options,
+      bundlerUrl,
+      customContracts,
+      paymasterOptions,
+      onchainAnalytics
+    } = initOptions
+
     let protocolKit: Safe
     const bundlerClient = getEip4337BundlerProvider(bundlerUrl)
     const chainId = await bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
@@ -329,7 +353,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
             payment: 0,
             paymentReceiver: zeroAddress
           }
-        }
+        },
+        onchainAnalytics
       })
     }
 
@@ -372,7 +397,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       bundlerUrl,
       entryPointAddress: selectedEntryPoint!,
       safe4337ModuleAddress,
-      safeWebAuthnSharedSignerAddress
+      safeWebAuthnSharedSignerAddress,
+      onchainAnalytics
     })
   }
 
@@ -514,7 +540,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const userOperation: UserOperation = {
       sender: safeAddress,
-      nonce: nonce,
+      nonce,
       initCode: '0x',
       callData,
       callGasLimit: 1n,
@@ -524,6 +550,10 @@ export class Safe4337Pack extends RelayKitBasePack<{
       maxPriorityFeePerGas: 1n,
       paymasterAndData,
       signature: '0x'
+    }
+
+    if (this.#onchainIdentifier) {
+      userOperation.callData += this.#onchainIdentifier
     }
 
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
@@ -560,7 +590,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const safeOperation = new EthSafeOperation(
       {
         sender: userOperation?.sender || '0x',
-        nonce: userOperation?.nonce?.toString() || '0',
+        nonce: userOperation?.nonce || '0',
         initCode: userOperation?.initCode || '',
         callData: userOperation?.callData || '',
         callGasLimit: BigInt(userOperation?.callGasLimit || 0n),
@@ -798,5 +828,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
         transaction.operation || OperationType.Call
       ]
     })
+  }
+
+  getOnchainIdentifier(): string {
+    return this.#onchainIdentifier
   }
 }

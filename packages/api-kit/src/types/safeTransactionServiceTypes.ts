@@ -156,7 +156,7 @@ export type PendingTransactionsOptions = {
 export type SafeMultisigTransactionListResponse = ListResponse<SafeMultisigTransactionResponse>
 
 export type GetIncomingTransactionsOptions = {
-  _from?: string
+  from?: string
 } & ListOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_incoming_transfers_list
   QueryParamsOptions

@@ -292,7 +292,7 @@ export type GetSafeMessageListProps = {
   ordering?: string
 } & ListOptions
 
-export type GetSafeOperationListProps = {
+export type GetSafeOperationListOptions = {
   hasConfirmations?: boolean
   executed?: boolean
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
@@ -301,7 +301,7 @@ export type GetSafeOperationListProps = {
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/4337/safes_safe_operations_list
   QueryParamsOptions
 
-export type GetPendingSafeOperationListProps = {
+export type GetPendingSafeOperationListOptions = {
   hasConfirmations?: boolean
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string

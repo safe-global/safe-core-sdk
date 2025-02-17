@@ -8,10 +8,10 @@ import {
   GetIncomingTransactionsOptions,
   GetModuleTransactionsOptions,
   GetMultisigTransactionsOptions,
-  GetPendingSafeOperationListProps,
+  GetPendingSafeOperationListOptions,
   GetSafeDelegateProps,
   GetSafeMessageListProps,
-  GetSafeOperationListProps,
+  GetSafeOperationListOptions,
   GetSafeOperationListResponse,
   ListOptions,
   ModulesResponse,
@@ -837,7 +837,7 @@ class SafeApiKit {
    */
   async getSafeOperationsByAddress(
     safeAddress: string,
-    options?: GetSafeOperationListProps
+    options?: GetSafeOperationListOptions
   ): Promise<GetSafeOperationListResponse> {
     if (!safeAddress) {
       throw new Error('Safe address must not be empty')
@@ -866,7 +866,7 @@ class SafeApiKit {
    */
   async getPendingSafeOperations(
     safeAddress: string,
-    options?: GetPendingSafeOperationListProps
+    options?: GetPendingSafeOperationListOptions
   ): Promise<GetSafeOperationListResponse> {
     return this.getSafeOperationsByAddress(safeAddress, {
       ...options,

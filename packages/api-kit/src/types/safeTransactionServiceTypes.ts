@@ -281,13 +281,13 @@ export type SafeMessage = {
 
 export type SafeMessageListResponse = ListResponse<SafeMessage>
 
-export type AddMessageProps = {
+export type AddMessageOptions = {
   message: string | EIP712TypedData
   safeAppId?: number
   signature: string
 }
 
-export type GetSafeMessageListProps = {
+export type GetSafeMessageListOptions = {
   /** Which field to use when ordering the results. It can be: `created`, `modified` (default: `-created`) */
   ordering?: string
 } & ListOptions

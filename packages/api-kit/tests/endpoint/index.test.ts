@@ -6,7 +6,7 @@ import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import { createWalletClient, http } from 'viem'
 import SafeApiKit, {
-  AddMessageProps,
+  AddMessageOptions,
   AddSafeDelegateProps,
   DeleteSafeDelegateProps,
   SafeMultisigTransactionEstimate
@@ -651,7 +651,7 @@ describe('Endpoint tests', () => {
     it('addMessage', async () => {
       const safeAddress = '0x6C465b1D7aBCcDC02Ed48bc32e289795603a5c79'
 
-      const body: AddMessageProps = {
+      const body: AddMessageOptions = {
         message: 'message',
         signature: '0x'
       }

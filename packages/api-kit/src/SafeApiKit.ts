@@ -1,5 +1,5 @@
 import {
-  AddMessageProps,
+  AddMessageOptions,
   AddSafeDelegateProps,
   AddSafeOperationProps,
   AllTransactionsListResponse,
@@ -10,7 +10,7 @@ import {
   GetMultisigTransactionsOptions,
   GetPendingSafeOperationListOptions,
   GetSafeDelegateProps,
-  GetSafeMessageListProps,
+  GetSafeMessageListOptions,
   GetSafeOperationListOptions,
   GetSafeOperationListResponse,
   ListOptions,
@@ -323,7 +323,7 @@ class SafeApiKit {
    */
   async getMessages(
     safeAddress: string,
-    options: GetSafeMessageListProps = {}
+    options: GetSafeMessageListOptions = {}
   ): Promise<SafeMessageListResponse> {
     if (!this.#isValidAddress(safeAddress)) {
       throw new Error('Invalid safeAddress')
@@ -332,7 +332,7 @@ class SafeApiKit {
     const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
 
     // Check if options are given and add query parameters
-    this.#addUrlQueryParams<GetSafeMessageListProps>(url, options)
+    this.#addUrlQueryParams<GetSafeMessageListOptions>(url, options)
 
     return sendRequest({
       url: url.toString(),
@@ -346,7 +346,7 @@ class SafeApiKit {
    * @param safeAddress The safe address
    * @param options The raw message to add, signature and safeAppId if any
    */
-  async addMessage(safeAddress: string, addMessageProps: AddMessageProps): Promise<void> {
+  async addMessage(safeAddress: string, addMessageOptions: AddMessageOptions): Promise<void> {
     if (!this.#isValidAddress(safeAddress)) {
       throw new Error('Invalid safeAddress')
     }
@@ -354,7 +354,7 @@ class SafeApiKit {
     return sendRequest({
       url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
       method: HttpMethod.Post,
-      body: addMessageProps
+      body: addMessageOptions
     })
   }
 

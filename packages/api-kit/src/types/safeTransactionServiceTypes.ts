@@ -1,11 +1,14 @@
-import { Account, Chain, Transport, TypedDataDomain, TypedDataParameter, WalletClient } from 'viem'
+import { Account, Chain, Transport, WalletClient } from 'viem'
 import {
+  EIP712TypedData,
   SafeMultisigTransactionResponse,
   SafeTransactionData,
   UserOperation,
   SafeOperationResponse,
   ListResponse,
-  SignatureType
+  SignatureType,
+  DataDecoded,
+  UserOperationResponse
 } from '@safe-global/types-kit'
 
 export type ListOptions = {
@@ -13,6 +16,11 @@ export type ListOptions = {
   limit?: number
   /** Initial index from which to return the results */
   offset?: number
+}
+
+export type QueryParamsOptions = {
+  // Accept query params that are part of the swagger documentation. Check at https://safe-transaction-mainnet.safe.global/
+  [key: string]: string | number | boolean | undefined
 }
 
 export type SafeServiceInfoResponse = {
@@ -65,7 +73,9 @@ export type SafeCreationInfoResponse = {
   readonly factoryAddress: string
   readonly singleton: string
   readonly setupData: string
-  readonly dataDecoded?: string
+  readonly saltNonce: string | null
+  readonly dataDecoded?: DataDecoded
+  readonly userOperation: UserOperationResponse | null
 }
 
 export type GetSafeDelegateProps = {
@@ -127,6 +137,15 @@ export type ProposeTransactionProps = {
   origin?: string
 }
 
+export type GetMultisigTransactionsOptions = {
+  executed?: boolean
+  nonce?: string
+  /** Which field to use when ordering the results. It can be: `nonce`, `created`, `modified` (default: `-created`) */
+  ordering?: string
+} & ListOptions &
+  // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_multisig_transactions_list
+  QueryParamsOptions
+
 export type PendingTransactionsOptions = {
   currentNonce?: number
   hasConfirmations?: boolean
@@ -135,6 +154,12 @@ export type PendingTransactionsOptions = {
 } & ListOptions
 
 export type SafeMultisigTransactionListResponse = ListResponse<SafeMultisigTransactionResponse>
+
+export type GetIncomingTransactionsOptions = {
+  from?: string
+} & ListOptions &
+  // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_incoming_transfers_list
+  QueryParamsOptions
 
 export type SafeModuleTransaction = {
   readonly created?: string
@@ -146,12 +171,18 @@ export type SafeModuleTransaction = {
   readonly module: string
   readonly to: string
   readonly value: string
-  readonly data: string
+  readonly data: string | null
   readonly operation: number
-  readonly dataDecoded?: string
+  readonly dataDecoded?: DataDecoded
 }
 
 export type SafeModuleTransactionListResponse = ListResponse<SafeModuleTransaction>
+
+export type GetModuleTransactionsOptions = {
+  module?: string
+} & ListOptions &
+  // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_module_transactions_list
+  QueryParamsOptions
 
 export type TransferResponse = {
   readonly type: string
@@ -181,6 +212,16 @@ export type TokenInfoResponse = {
 
 export type TokenInfoListResponse = ListResponse<TokenInfoResponse>
 
+export type TokenInfoListOptions = {
+  /** Search term that will match `name` or `symbol` */
+  search?: string
+  address?: string
+  /** Which field to use when ordering the results. It can be: `name`, `symbol`, `address` (default: `-name`) */
+  ordering?: string
+} & ListOptions &
+  // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/tokens/tokens_list
+  QueryParamsOptions
+
 export type SafeModuleTransactionWithTransfersResponse = SafeModuleTransaction & {
   readonly txType?: 'MODULE_TRANSACTION'
   readonly transfers: TransferResponse[]
@@ -205,11 +246,7 @@ export type EthereumTxWithTransfersResponse = EthereumTxResponse & {
   readonly transfers: TransferResponse[]
 }
 
-export type AllTransactionsOptions = {
-  executed?: boolean
-  queued?: boolean
-  trusted?: boolean
-}
+export type AllTransactionsOptions = ListOptions
 
 export type AllTransactionsListResponse = ListResponse<
   | SafeModuleTransactionWithTransfersResponse
@@ -244,31 +281,33 @@ export type SafeMessage = {
 
 export type SafeMessageListResponse = ListResponse<SafeMessage>
 
-export type AddMessageProps = {
+export type AddMessageOptions = {
   message: string | EIP712TypedData
   safeAppId?: number
   signature: string
 }
 
-export type GetSafeMessageListProps = {
+export type GetSafeMessageListOptions = {
   /** Which field to use when ordering the results. It can be: `created`, `modified` (default: `-created`) */
   ordering?: string
 } & ListOptions
 
-export type EIP712TypedData = {
-  domain: TypedDataDomain
-  types: TypedDataParameter
-  message: Record<string, unknown>
-}
-
-export type GetSafeOperationListProps = {
-  /** Address of the Safe to get SafeOperations for */
-  safeAddress: string
+export type GetSafeOperationListOptions = {
+  hasConfirmations?: boolean
+  executed?: boolean
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string
-  executed?: boolean
+} & ListOptions &
+  // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/4337/safes_safe_operations_list
+  QueryParamsOptions
+
+export type GetPendingSafeOperationListOptions = {
   hasConfirmations?: boolean
-} & ListOptions
+  /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
+  ordering?: string
+} & ListOptions &
+  // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/4337/safes_safe_operations_list
+  QueryParamsOptions
 
 export type GetSafeOperationListResponse = ListResponse<SafeOperationResponse>
 

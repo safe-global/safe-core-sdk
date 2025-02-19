@@ -22,7 +22,11 @@ import {
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { waitSafeTxReceipt } from './utils/transactions'
-import { createMockPasskey, getWebAuthnCredentials, deployPasskeysContract } from './utils/passkeys'
+import {
+  createMockPasskey,
+  getWebAuthnCredentials,
+  deployPasskeysContract
+} from '@safe-global/protocol-kit/test-utils'
 
 chai.use(chaiAsPromised)
 

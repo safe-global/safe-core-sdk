@@ -1,5 +1,4 @@
 import { privateKeyToAddress } from 'viem/accounts'
-import { sepolia } from 'viem/chains'
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { waitForOperationToFinish } from '../utils'
@@ -7,16 +6,14 @@ import { waitForOperationToFinish } from '../utils'
 // Variables
 const OWNER_1_PRIVATE_KEY = '0x'
 const OWNER_2_PRIVATE_KEY = '0x'
-const PIMLICO_API_KEY = ''
-const SAFE_ADDRESS = '' // Safe 2/N
+const SAFE_ADDRESS = '0x' // Safe 2/N
 
-const CHAIN_NAME = 'sepolia'
-const CHAIN_ID = sepolia.id
-const RPC_URL = sepolia.rpcUrls.default.http[0]
+const CHAIN_ID = '11155111'
+const RPC_URL = 'https://ethereum-sepolia-rpc.publicnode.com'
 
 // Constants
-const BUNDLER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}`
-const PAYMASTER_URL = `https://api.pimlico.io/v2/${CHAIN_NAME}/rpc?apikey=${PIMLICO_API_KEY}`
+const BUNDLER_URL = 'https://...'
+const PAYMASTER_URL = 'https://...'
 
 async function main() {
   const apiKit = new SafeApiKit({ chainId: BigInt(CHAIN_ID) })
@@ -25,8 +22,12 @@ async function main() {
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
     bundlerUrl: BUNDLER_URL,
+    safeModulesVersion: '0.2.0',
+    paymasterOptions: {
+      isSponsored: true,
+      paymasterUrl: PAYMASTER_URL
+    },
     options: {
-      owners: [OWNER_1_PRIVATE_KEY, OWNER_2_PRIVATE_KEY],
       safeAddress: SAFE_ADDRESS
     }
   })
@@ -60,6 +61,7 @@ async function main() {
     provider: RPC_URL,
     signer: OWNER_2_PRIVATE_KEY,
     bundlerUrl: BUNDLER_URL,
+    safeModulesVersion: '0.2.0',
     paymasterOptions: {
       isSponsored: true,
       paymasterUrl: PAYMASTER_URL
@@ -87,7 +89,7 @@ async function main() {
   })
   console.log('Executing the SafeOperation...')
 
-  await waitForOperationToFinish(userOperationHash, CHAIN_NAME, safe4337Pack)
+  await waitForOperationToFinish(userOperationHash, CHAIN_ID, safe4337Pack)
 }
 
 main()

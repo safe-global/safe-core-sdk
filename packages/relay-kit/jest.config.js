@@ -6,7 +6,7 @@ const config = {
   },
   moduleNameMapper: {
     '^@safe-global/protocol-kit/tests/(.*)$': '<rootDir>/../protocol-kit/tests/$1',
-    '^@safe-global/protocol-kit/(.*)$': '<rootDir>/../protocol-kit/src/$1',
+    '^@safe-global/relay-kit/test-utils$': '<rootDir>/test-utils',
     '^@safe-global/relay-kit/(.*)$': '<rootDir>/src/$1'
   },
   testTimeout: 20000

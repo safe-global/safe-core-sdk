@@ -2,8 +2,21 @@
   "name": "@safe-global/relay-kit",
   "version": "3.4.4",
   "description": "SDK for Safe Smart Accounts with support for ERC-4337 and Relay",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
+  "types": "dist/src/index.d.ts",
+  "main": "dist/cjs/src/index.js",
+  "module": "dist/esm/src/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "require": "./dist/cjs/src/index.cjs",
+      "import": "./dist/esm/src/index.mjs"
+    },
+    "./test-utils": {
+      "types": "./dist/test-utils/index.d.ts",
+      "require": "./dist/cjs/test-utils/index.cjs",
+      "import": "./dist/esm/test-utils/index.mjs"
+    }
+  },
   "keywords": [
     "Ethereum",
     "Wallet",
@@ -20,7 +33,10 @@
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist .nyc_output cache",
     "prebuild": "node -p \"'export const getRelayKitVersion = () => \\'' + require('./package.json').version.split('-')[0] + '\\''\" > src/packs/safe-4337/utils/getRelayKitVersion.ts",
-    "build": "yarn unbuild && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
+    "build": "yarn unbuild && yarn build:esm && yarn build:cjs && yarn build:types",
+    "build:esm": "esbuild ./src/index ./test-utils/index --format=esm --bundle --metafile=meta-esm.json --packages=external --outdir=dist/esm --out-extension:.js=.mjs",
+    "build:cjs": "esbuild ./src/index ./test-utils/index --format=cjs --bundle --metafile=meta-cjs.json --packages=external --outdir=dist/cjs --out-extension:.js=.cjs",
+    "build:types": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -43,6 +59,7 @@
     "@safe-global/protocol-kit": "^5.2.3",
     "@safe-global/safe-modules-deployments": "^2.2.5",
     "@safe-global/types-kit": "^1.0.3",
+    "semver": "^7.6.3",
     "viem": "^2.21.8"
   }
 }

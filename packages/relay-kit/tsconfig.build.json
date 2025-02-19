@@ -1,9 +1,12 @@
 {
-  "extends": "../../tsconfig.settings.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
     "composite": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test-d.ts"]
+  "include": ["src/**/*", "test-utils/**/*"],
+  "exclude": ["dist", "src/**/*.test.ts", "src/**/*.test-d.ts"]
 }

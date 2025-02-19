@@ -2,6 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getApiKit } from '../utils/setupKits'
+import { API_TESTING_SAFE } from '../helpers/safe'
 
 chai.use(chaiAsPromised)
 
@@ -28,5 +29,9 @@ describe('getTransaction', () => {
     const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
     const transaction = await safeApiKit.getTransaction(safeTxHash)
     chai.expect(transaction.safeTxHash).to.be.equal(safeTxHash)
+    chai.expect(transaction.safe).to.be.eq(API_TESTING_SAFE.address)
+    chai.expect(transaction.nonce).to.be.a('string')
+    chai.expect(transaction.safeTxGas).to.be.a('string')
+    chai.expect(transaction.baseGas).to.be.a('string')
   })
 })

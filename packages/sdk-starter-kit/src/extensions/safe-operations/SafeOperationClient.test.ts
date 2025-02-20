@@ -152,12 +152,14 @@ describe('SafeOperationClient', () => {
   })
 
   describe('confirmSafeOperation', () => {
-    it('should confirm the Safe operation and send it to the bundler when threshold is reached', async () => {
+    it('should send the Safe operation to the bundler without confirmation when threshold is already reached', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
 
       const safeOperationResult = await safeOperationClient.confirmSafeOperation({
         safeOperationHash: SAFE_OPERATION_HASH
       })
+
+      expect(apiKit.confirmSafeOperation).not.toHaveBeenCalledWith()
 
       expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({
         executable: SAFE_OPERATION_RESPONSE
@@ -173,6 +175,7 @@ describe('SafeOperationClient', () => {
         }
       })
     })
+
     it('should indicate more signatures are required when threshold is not reached', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(3)
 
@@ -180,12 +183,50 @@ describe('SafeOperationClient', () => {
         safeOperationHash: SAFE_OPERATION_HASH
       })
 
+      expect(apiKit.confirmSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION_HASH, undefined)
+
       expect(safeOperationResult).toEqual({
         safeAddress: SAFE_ADDRESS,
         description: MESSAGES[SafeClientTxStatus.SAFE_OPERATION_PENDING_SIGNATURES],
         status: SafeClientTxStatus.SAFE_OPERATION_PENDING_SIGNATURES,
         safeOperations: {
           safeOperationHash: SAFE_OPERATION_HASH
+        }
+      })
+    })
+
+    it('should confirm and execute when the confirmation ends with the threshold reached', async () => {
+      const CONFIRMED_SAFE_OPERATION_RESPONSE = {
+        ...SAFE_OPERATION_RESPONSE,
+        confirmations: [
+          ...SAFE_OPERATION_RESPONSE.confirmations,
+          {
+            signature: 'OxSignature'
+          }
+        ]
+      }
+      protocolKit.getThreshold = jest.fn().mockResolvedValue(3)
+      apiKit.getSafeOperation = jest
+        .fn()
+        .mockResolvedValueOnce(SAFE_OPERATION_RESPONSE)
+        .mockResolvedValueOnce(CONFIRMED_SAFE_OPERATION_RESPONSE)
+
+      const safeOperationResult = await safeOperationClient.confirmSafeOperation({
+        safeOperationHash: SAFE_OPERATION_HASH
+      })
+
+      expect(apiKit.confirmSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION_HASH, undefined)
+      expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({
+        executable: CONFIRMED_SAFE_OPERATION_RESPONSE
+      })
+
+      expect(safeOperationResult).toEqual({
+        safeAddress: SAFE_ADDRESS,
+        description: MESSAGES[SafeClientTxStatus.SAFE_OPERATION_EXECUTED],
+        status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
+        safeOperations: {
+          safeOperationHash: SAFE_OPERATION_HASH,
+          userOperationHash: USER_OPERATION_HASH
         }
       })
     })

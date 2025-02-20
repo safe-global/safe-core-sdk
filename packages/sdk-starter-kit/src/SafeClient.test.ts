@@ -185,7 +185,7 @@ describe('SafeClient', () => {
   })
 
   describe('confirm', () => {
-    it('should confirm the transaction using the Transaction service when not enough signatures', async () => {
+    it('should confirm the transaction using the Transaction service when not having enough signatures', async () => {
       const TRANSACTION_RESPONSE = {
         confirmations: [{ signature: '0x1' }],
         confirmationsRequired: 2
@@ -218,7 +218,7 @@ describe('SafeClient', () => {
       })
     })
 
-    it('should execute the transaction when enough signatures', async () => {
+    it('should execute the transaction when having enough signatures', async () => {
       const TRANSACTION_RESPONSE = {
         confirmations: [{ signature: '0x1' }, { signature: '0x2' }],
         confirmationsRequired: 2
@@ -228,6 +228,7 @@ describe('SafeClient', () => {
 
       const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
 
+      expect(apiKit.confirmTransaction).not.toHaveBeenCalled()
       expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
       expect(protocolKit.executeTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
       expect(result).toMatchObject({

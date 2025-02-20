@@ -22,7 +22,6 @@ async function main() {
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
     bundlerUrl: BUNDLER_URL,
-    safeModulesVersion: '0.2.0',
     paymasterOptions: {
       isSponsored: true,
       paymasterUrl: PAYMASTER_URL
@@ -61,7 +60,6 @@ async function main() {
     provider: RPC_URL,
     signer: OWNER_2_PRIVATE_KEY,
     bundlerUrl: BUNDLER_URL,
-    safeModulesVersion: '0.2.0',
     paymasterOptions: {
       isSponsored: true,
       paymasterUrl: PAYMASTER_URL

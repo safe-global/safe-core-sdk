@@ -753,7 +753,6 @@ describe('Safe4337Pack', () => {
 
       const safe4337Pack = await createSafe4337Pack({
         signer: passkey,
-        safeModulesVersion: '0.2.0',
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_4337_PASSKEY
         }
@@ -896,7 +895,6 @@ describe('Safe4337Pack', () => {
 
   it('should allow to send a UserOperation to the bundler using a SafeOperationResponse object from the api', async () => {
     const safe4337Pack = await createSafe4337Pack({
-      safeModulesVersion: '0.2.0',
       options: {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_2_0_MODULE
       }

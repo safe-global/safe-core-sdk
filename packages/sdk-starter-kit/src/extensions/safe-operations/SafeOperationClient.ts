@@ -9,6 +9,7 @@ import {
   SafeClientResult,
   SendSafeOperationProps
 } from '@safe-global/sdk-starter-kit/types'
+import { SafeOperationResponse } from '@safe-global/types-kit'
 
 /**
  * @class
@@ -94,17 +95,23 @@ export class SafeOperationClient {
   }: ConfirmSafeOperationProps): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()
+    let safeOperationResponse = await this.apiKit.getSafeOperation(safeOperationHash)
 
-    await this.apiKit.confirmSafeOperation(
-      safeOperationHash,
-      buildSignatureBytes([await this.protocolKit.signHash(safeOperationHash)])
-    )
+    let isReadyForBundler = await this.#hasEnoughConfirmations(safeOperationResponse, threshold)
 
-    const confirmedSafeOperation = await this.apiKit.getSafeOperation(safeOperationHash)
+    if (!isReadyForBundler) {
+      await this.apiKit.confirmSafeOperation(
+        safeOperationHash,
+        buildSignatureBytes([await this.protocolKit.signHash(safeOperationHash)])
+      )
 
-    if (confirmedSafeOperation?.confirmations?.length === threshold) {
+      safeOperationResponse = await this.apiKit.getSafeOperation(safeOperationHash)
+      isReadyForBundler = await this.#hasEnoughConfirmations(safeOperationResponse, threshold)
+    }
+
+    if (isReadyForBundler) {
       const userOperationHash = await this.safe4337Pack.executeTransaction({
-        executable: confirmedSafeOperation
+        executable: safeOperationResponse
       })
 
       await this.#waitForOperationToFinish({ userOperationHash })
@@ -136,6 +143,13 @@ export class SafeOperationClient {
     const safeAddress = await this.protocolKit.getAddress()
 
     return this.apiKit.getPendingSafeOperations(safeAddress, options)
+  }
+
+  async #hasEnoughConfirmations(
+    safeOperationResponse: SafeOperationResponse,
+    threshold: number
+  ): Promise<boolean> {
+    return safeOperationResponse ? safeOperationResponse.confirmations?.length === threshold : false
   }
 
   /**

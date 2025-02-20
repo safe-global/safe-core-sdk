@@ -232,11 +232,11 @@ export type SafeMultisigTransactionResponse = {
   readonly data?: string
   readonly operation: number
   readonly gasToken: string
-  readonly safeTxGas: string
-  readonly baseGas: string
+  readonly safeTxGas: number
+  readonly baseGas: number
   readonly gasPrice: string
   readonly refundReceiver?: string
-  readonly nonce: string
+  readonly nonce: number
   readonly executionDate: string
   readonly submissionDate: string
   readonly modified: string

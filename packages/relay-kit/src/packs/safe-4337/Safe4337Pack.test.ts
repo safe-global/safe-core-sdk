@@ -76,8 +76,7 @@ describe('Safe4337Pack', () => {
     it('should throw an error if the 4337 Module is not enabled in the Safe account', async () => {
       await expect(
         createSafe4337Pack({
-          options: { safeAddress: fixtures.SAFE_ADDRESS_4337_MODULE_NOT_ENABLED },
-          safeModulesVersion: '0.2.0'
+          options: { safeAddress: fixtures.SAFE_ADDRESS_4337_MODULE_NOT_ENABLED }
         })
       ).rejects.toThrow(
         `Incompatibility detected: The EIP-4337 module is not enabled in the provided Safe Account. Enable this module (address: ${fixtures.SAFE_4337_MODULE_ADDRESS_V0_2_0}) to add compatibility.`
@@ -87,8 +86,7 @@ describe('Safe4337Pack', () => {
     it('should throw an error if the 4337 fallbackhandler is not attached to the Safe account', async () => {
       await expect(
         createSafe4337Pack({
-          options: { safeAddress: fixtures.SAFE_ADDRESS_4337_FALLBACKHANDLER_NOT_ENABLED },
-          safeModulesVersion: '0.2.0'
+          options: { safeAddress: fixtures.SAFE_ADDRESS_4337_FALLBACKHANDLER_NOT_ENABLED }
         })
       ).rejects.toThrow(
         `Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: ${fixtures.SAFE_4337_MODULE_ADDRESS_V0_2_0}) to ensure compatibility.`
@@ -112,7 +110,8 @@ describe('Safe4337Pack', () => {
       await expect(
         createSafe4337Pack({
           options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE },
-          customContracts: { entryPointAddress: fixtures.ENTRYPOINT_ADDRESS_V06 }
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINT_ADDRESS_V06 },
+          safeModulesVersion: '0.3.0'
         })
       ).rejects.toThrow(
         `The selected entrypoint ${fixtures.ENTRYPOINT_ADDRESS_V06} is not compatible with version 0.3.0 of Safe modules`
@@ -133,7 +132,8 @@ describe('Safe4337Pack', () => {
 
       await expect(
         createSafe4337Pack({
-          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE }
+          options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE },
+          safeModulesVersion: '0.3.0'
         })
       ).rejects.toThrow(
         `Incompatibility detected: None of the entrypoints provided by the bundler is compatible with the Safe modules version 0.3.0`
@@ -142,7 +142,8 @@ describe('Safe4337Pack', () => {
 
     it('should be able to instantiate the pack using a existing Safe', async () => {
       const safe4337Pack = await createSafe4337Pack({
-        options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE }
+        options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE },
+        safeModulesVersion: '0.3.0'
       })
 
       expect(safe4337Pack).toBeInstanceOf(Safe4337Pack)
@@ -155,7 +156,8 @@ describe('Safe4337Pack', () => {
 
     it('should have the 4337 module enabled', async () => {
       const safe4337Pack = await createSafe4337Pack({
-        options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE }
+        options: { safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE },
+        safeModulesVersion: '0.3.0'
       })
 
       expect(await safe4337Pack.protocolKit.getModules()).toContain(safe4337ModuleAddress)
@@ -169,7 +171,8 @@ describe('Safe4337Pack', () => {
           },
           options: {
             safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-          }
+          },
+          safeModulesVersion: '0.3.0'
         })
       ).rejects.toThrow(
         'Incompatibility detected: The EIP-4337 module is not enabled in the provided Safe Account. Enable this module (address: 0xCustomModule) to add compatibility.'
@@ -180,7 +183,8 @@ describe('Safe4337Pack', () => {
       const safe4337Pack = await createSafe4337Pack({
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-        }
+        },
+        safeModulesVersion: '0.3.0'
       })
 
       expect(await safe4337Pack.protocolKit.getFallbackHandler()).toEqual(safe4337ModuleAddress)
@@ -193,7 +197,8 @@ describe('Safe4337Pack', () => {
         options: {
           owners: [fixtures.OWNER_1],
           threshold: 1
-        }
+        },
+        safeModulesVersion: '0.3.0'
       })
 
       expect(await safe4337Pack.protocolKit.getAddress()).toBe(fixtures.PREDICTED_SAFE_ADDRESS)
@@ -206,7 +211,8 @@ describe('Safe4337Pack', () => {
             owners: [fixtures.OWNER_1],
             threshold: 1
           },
-          customContracts: { entryPointAddress: fixtures.ENTRYPOINT_ADDRESS_V06 }
+          customContracts: { entryPointAddress: fixtures.ENTRYPOINT_ADDRESS_V06 },
+          safeModulesVersion: '0.3.0'
         })
       ).rejects.toThrow(
         `The selected entrypoint ${fixtures.ENTRYPOINT_ADDRESS_V06} is not compatible with version 0.3.0 of Safe modules`
@@ -241,7 +247,8 @@ describe('Safe4337Pack', () => {
         options: {
           owners: [fixtures.OWNER_1, fixtures.OWNER_2],
           threshold: 1
-        }
+        },
+        safeModulesVersion: '0.3.0'
       })
 
       expect(encodeFunctionDataSpy).toHaveBeenCalledWith({
@@ -284,6 +291,7 @@ describe('Safe4337Pack', () => {
           owners: [fixtures.OWNER_1],
           threshold: 1
         },
+        safeModulesVersion: '0.3.0',
         paymasterOptions: {
           paymasterUrl: fixtures.PAYMASTER_URL,
           paymasterAddress: fixtures.PAYMASTER_ADDRESS,
@@ -364,7 +372,8 @@ describe('Safe4337Pack', () => {
       safe4337Pack = await createSafe4337Pack({
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-        }
+        },
+        safeModulesVersion: '0.3.0'
       })
 
       transferUSDC = {
@@ -450,7 +459,8 @@ describe('Safe4337Pack', () => {
         options: {
           owners: [fixtures.OWNER_1],
           threshold: 1
-        }
+        },
+        safeModulesVersion: '0.3.0'
       })
 
       const getInitCodeSpy = jest.spyOn(safe4337Pack.protocolKit, 'getInitCode')
@@ -470,6 +480,7 @@ describe('Safe4337Pack', () => {
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
         },
+        safeModulesVersion: '0.3.0',
         paymasterOptions: {
           isSponsored: true,
           paymasterUrl: fixtures.PAYMASTER_URL
@@ -512,6 +523,7 @@ describe('Safe4337Pack', () => {
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
         },
+        safeModulesVersion: '0.3.0',
         paymasterOptions: {
           paymasterUrl: fixtures.PAYMASTER_URL,
           paymasterTokenAddress: fixtures.PAYMASTER_TOKEN_ADDRESS,
@@ -615,7 +627,8 @@ describe('Safe4337Pack', () => {
         options: {
           owners: [fixtures.OWNER_1],
           threshold: 1
-        }
+        },
+        safeModulesVersion: '0.3.0'
       })
 
       const passkeyOwnerConfiguration = {
@@ -770,7 +783,8 @@ describe('Safe4337Pack', () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-      }
+      },
+      safeModulesVersion: '0.3.0'
     })
 
     expect(await safe4337Pack.protocolKit.getFallbackHandler()).toBe(
@@ -789,7 +803,8 @@ describe('Safe4337Pack', () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-      }
+      },
+      safeModulesVersion: '0.3.0'
     })
 
     const safeOperation = await safe4337Pack.createTransaction({
@@ -812,7 +827,8 @@ describe('Safe4337Pack', () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-      }
+      },
+      safeModulesVersion: '0.3.0'
     })
 
     expect(await safe4337Pack.signSafeOperation(fixtures.SAFE_OPERATION_RESPONSE)).toMatchObject({
@@ -847,7 +863,8 @@ describe('Safe4337Pack', () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-      }
+      },
+      safeModulesVersion: '0.3.0'
     })
     const readContractSpy = jest.spyOn(safe4337Pack.protocolKit.getSafeProvider(), 'readContract')
 
@@ -917,7 +934,8 @@ describe('Safe4337Pack', () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-      }
+      },
+      safeModulesVersion: '0.3.0'
     })
 
     const { userOperation, entryPoint, transactionHash, blockHash, blockNumber } =
@@ -953,7 +971,8 @@ describe('Safe4337Pack', () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-      }
+      },
+      safeModulesVersion: '0.3.0'
     })
 
     const userOperationReceipt = await safe4337Pack.getUserOperationReceipt(
@@ -991,7 +1010,8 @@ describe('Safe4337Pack', () => {
     const safe4337Pack = await createSafe4337Pack({
       options: {
         safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-      }
+      },
+      safeModulesVersion: '0.3.0'
     })
 
     const supportedEntryPoints = await safe4337Pack.getSupportedEntryPoints()
@@ -1008,7 +1028,8 @@ describe('Safe4337Pack', () => {
         },
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-        }
+        },
+        safeModulesVersion: '0.3.0'
       })
 
       const onchainIdentifier = await safe4337Pack.getOnchainIdentifier()
@@ -1038,7 +1059,8 @@ describe('Safe4337Pack', () => {
         },
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-        }
+        },
+        safeModulesVersion: '0.3.0'
       })
 
       const transferUSDC = {
@@ -1075,7 +1097,8 @@ describe('Safe4337Pack', () => {
       const safe4337Pack = await createSafe4337Pack({
         options: {
           safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
-        }
+        },
+        safeModulesVersion: '0.3.0'
       })
 
       const customNonce = utils.encodeNonce({

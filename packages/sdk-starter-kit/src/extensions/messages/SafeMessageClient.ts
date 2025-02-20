@@ -1,9 +1,5 @@
 import Safe, { hashSafeMessage } from '@safe-global/protocol-kit'
-import SafeApiKit, {
-  EIP712TypedData as ApiKitEIP712TypedData,
-  ListOptions,
-  SafeMessageListResponse
-} from '@safe-global/api-kit'
+import SafeApiKit, { ListOptions, SafeMessageListResponse } from '@safe-global/api-kit'
 import { SafeMessage } from '@safe-global/types-kit'
 import { createSafeClientResult, sendTransaction } from '@safe-global/sdk-starter-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
@@ -151,7 +147,7 @@ export class SafeMessageClient {
 
     try {
       await this.apiKit.addMessage(safeAddress, {
-        message: safeMessage.data as string | ApiKitEIP712TypedData,
+        message: safeMessage.data,
         signature: signedMessage.encodedSignatures()
       })
     } catch (error) {

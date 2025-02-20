@@ -17,16 +17,17 @@ const playgroundApiKitPaths = {
   'execute-transaction': 'api-kit/execute-transaction'
 }
 const playgroundRelayKitPaths = {
-  'api-kit-interoperability': 'relay-kit/api-kit-interoperability',
-  'relay-paid-transaction': 'relay-kit/paid-transaction',
-  'relay-sponsored-transaction': 'relay-kit/sponsored-transaction',
-  'usdc-transfer-4337': 'relay-kit/usdc-transfer-4337',
-  'usdc-transfer-4337-erc20': 'relay-kit/usdc-transfer-4337-erc20',
-  'usdc-transfer-4337-sponsored': 'relay-kit/usdc-transfer-4337-sponsored',
-  'usdc-transfer-4337-counterfactual': 'relay-kit/usdc-transfer-4337-counterfactual',
-  'usdc-transfer-4337-erc20-counterfactual': 'relay-kit/usdc-transfer-4337-erc20-counterfactual',
-  'usdc-transfer-4337-sponsored-counterfactual':
-    'relay-kit/usdc-transfer-4337-sponsored-counterfactual'
+  'gelato-paid-transaction': 'relay-kit/gelato-paid-transaction',
+  'gelato-sponsored-transaction': 'relay-kit/gelato-sponsored-transaction',
+  'userop-api-kit-interoperability': 'relay-kit/userop-api-kit-interoperability',
+  userop: 'relay-kit/userop',
+  'userop-counterfactual': 'relay-kit/userop-counterfactual',
+  'userop-erc20-paymaster': 'relay-kit/userop-erc20-paymaster',
+  'userop-erc20-paymaster-counterfactual': 'relay-kit/userop-erc20-paymaster-counterfactual',
+  'userop-verifying-paymaster': 'relay-kit/userop-verifying-paymaster',
+  'userop-verifying-paymaster-counterfactual':
+    'relay-kit/userop-verifying-paymaster-counterfactual',
+  'userop-parallel-execution': 'relay-kit/userop-parallel-execution'
 }
 
 const playgroundStarterKitPaths = {

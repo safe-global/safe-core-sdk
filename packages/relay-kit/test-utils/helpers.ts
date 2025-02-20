@@ -1,6 +1,6 @@
 import { encodeFunctionData, parseAbi } from 'viem'
-import { Safe4337InitOptions } from '../types'
-import { Safe4337Pack } from '../Safe4337Pack'
+import { Safe4337InitOptions } from '../src/packs/safe-4337/types'
+import { Safe4337Pack } from '../src/packs/safe-4337/Safe4337Pack'
 import * as fixtures from './fixtures'
 
 export const generateTransferCallData = (to: string, value: bigint) => {
@@ -27,6 +27,7 @@ export const createSafe4337Pack = async (
   const safe4337Pack = await Safe4337Pack.init({
     provider: fixtures.RPC_URL,
     signer: process.env.PRIVATE_KEY,
+    safeModulesVersion: initOptions.safeModulesVersion,
     options: {
       safeAddress: ''
     },

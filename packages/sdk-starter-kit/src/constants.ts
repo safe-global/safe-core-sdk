@@ -1,5 +1,7 @@
 import { DeploymentType } from '@safe-global/protocol-kit'
 
+export const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
+
 export const DEFAULT_DEPLOYMENT_TYPE: DeploymentType = 'canonical'
 
 export enum SafeClientTxStatus {

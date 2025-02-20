@@ -2,10 +2,9 @@ import Safe, {
   EthSafeSignature,
   buildSignatureBytes,
   hashSafeMessage,
-  SigningMethod,
   buildContractSignature
 } from '@safe-global/protocol-kit'
-import { SafeMessage } from '@safe-global/types-kit'
+import { SafeMessage, SigningMethod } from '@safe-global/types-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'

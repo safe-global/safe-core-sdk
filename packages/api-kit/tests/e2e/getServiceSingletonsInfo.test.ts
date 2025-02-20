@@ -1,6 +1,6 @@
 import chai from 'chai'
 import SafeApiKit from '@safe-global/api-kit/index'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { getApiKit } from '../utils/setupKits'
 
 let safeApiKit: SafeApiKit

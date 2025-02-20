@@ -1,5 +1,3 @@
-import fetch from 'node-fetch'
-
 export enum HttpMethod {
   Get = 'get',
   Post = 'post',
@@ -13,6 +11,10 @@ interface HttpRequest {
 }
 
 export async function sendRequest<T>({ url, method, body }: HttpRequest): Promise<T> {
+  const fetch = await (typeof window === 'undefined'
+    ? import('node-fetch').then((m) => m.default)
+    : Promise.resolve(window.fetch))
+
   const response = await fetch(url, {
     method,
     headers: {

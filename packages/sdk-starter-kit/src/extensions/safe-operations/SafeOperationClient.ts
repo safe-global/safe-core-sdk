@@ -106,19 +106,15 @@ export class SafeOperationClient {
       })
     }
 
-    let isReadyForBundler = await this.#hasEnoughConfirmations(safeOperationResponse, threshold)
+    if (this.#needsConfirmation(safeOperationResponse, threshold)) {
+      const signature = buildSignatureBytes([await this.protocolKit.signHash(safeOperationHash)])
 
-    if (!isReadyForBundler) {
-      await this.apiKit.confirmSafeOperation(
-        safeOperationHash,
-        buildSignatureBytes([await this.protocolKit.signHash(safeOperationHash)])
-      )
+      await this.apiKit.confirmSafeOperation(safeOperationHash, signature)
 
       safeOperationResponse = await this.apiKit.getSafeOperation(safeOperationHash)
-      isReadyForBundler = await this.#hasEnoughConfirmations(safeOperationResponse, threshold)
     }
 
-    if (isReadyForBundler) {
+    if (!this.#needsConfirmation(safeOperationResponse, threshold)) {
       const userOperationHash = await this.safe4337Pack.executeTransaction({
         executable: safeOperationResponse
       })
@@ -154,11 +150,8 @@ export class SafeOperationClient {
     return this.apiKit.getPendingSafeOperations(safeAddress, options)
   }
 
-  async #hasEnoughConfirmations(
-    safeOperationResponse: SafeOperationResponse,
-    threshold: number
-  ): Promise<boolean> {
-    return safeOperationResponse ? safeOperationResponse.confirmations?.length === threshold : false
+  #needsConfirmation(safeOperationResponse: SafeOperationResponse, threshold: number): boolean {
+    return (safeOperationResponse.confirmations?.length || 0) < threshold
   }
 
   /**

@@ -106,19 +106,16 @@ export class SafeClient extends BaseClient {
       })
     }
 
-    let isReadyToExecute = await this.#hasEnoughConfirmations(transactionResponse)
-
-    if (!isReadyToExecute) {
+    if (this.#needsConfirmation(transactionResponse)) {
       const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
+      const signature = signedTransaction.encodedSignatures()
 
-      await this.apiKit.confirmTransaction(safeTxHash, signedTransaction.encodedSignatures())
+      await this.apiKit.confirmTransaction(safeTxHash, signature)
 
       transactionResponse = await this.apiKit.getTransaction(safeTxHash)
-
-      isReadyToExecute = await this.#hasEnoughConfirmations(transactionResponse)
     }
 
-    if (isReadyToExecute) {
+    if (!this.#needsConfirmation(transactionResponse)) {
       const executedTransactionResponse: TransactionResult =
         await this.protocolKit.executeTransaction(transactionResponse)
 
@@ -281,12 +278,10 @@ export class SafeClient extends BaseClient {
     })
   }
 
-  async #hasEnoughConfirmations(
-    transactionResponse: SafeMultisigTransactionResponse
-  ): Promise<boolean> {
-    return transactionResponse
-      ? transactionResponse.confirmations?.length === transactionResponse.confirmationsRequired
-      : false
+  #needsConfirmation(transactionResponse: SafeMultisigTransactionResponse): boolean {
+    return (
+      (transactionResponse.confirmations?.length || 0) < transactionResponse.confirmationsRequired
+    )
   }
 
   async #reconnectSafe(): Promise<void> {

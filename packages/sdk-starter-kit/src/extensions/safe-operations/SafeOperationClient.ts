@@ -97,6 +97,15 @@ export class SafeOperationClient {
     const threshold = await this.protocolKit.getThreshold()
     let safeOperationResponse = await this.apiKit.getSafeOperation(safeOperationHash)
 
+    if (safeOperationResponse.userOperation?.ethereumTxHash) {
+      return createSafeClientResult({
+        status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
+        safeAddress,
+        userOperationHash: safeOperationResponse.userOperation.userOperationHash,
+        safeOperationHash
+      })
+    }
+
     let isReadyForBundler = await this.#hasEnoughConfirmations(safeOperationResponse, threshold)
 
     if (!isReadyForBundler) {

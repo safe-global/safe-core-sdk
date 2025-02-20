@@ -185,7 +185,40 @@ describe('SafeClient', () => {
   })
 
   describe('confirm', () => {
-    it('should confirm the transaction when enough signatures', async () => {
+    it('should confirm the transaction using the Transaction service when not enough signatures', async () => {
+      const TRANSACTION_RESPONSE = {
+        confirmations: [{ signature: '0x1' }],
+        confirmationsRequired: 2
+      }
+
+      const CONFIRMED_TRANSACTION_RESPONSE = {
+        ...TRANSACTION_RESPONSE,
+        confirmations: [{ signature: '0x1' }, { signature: '0x2' }]
+      }
+
+      apiKit.getTransaction = jest
+        .fn()
+        .mockResolvedValueOnce(TRANSACTION_RESPONSE)
+        .mockResolvedValueOnce(CONFIRMED_TRANSACTION_RESPONSE)
+
+      const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
+
+      expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
+      expect(protocolKit.signTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
+      expect(apiKit.confirmTransaction).toHaveBeenCalledWith(SAFE_TX_HASH, undefined)
+      expect(protocolKit.executeTransaction).toHaveBeenCalledWith(CONFIRMED_TRANSACTION_RESPONSE)
+      expect(result).toMatchObject({
+        description: MESSAGES[SafeClientTxStatus.EXECUTED],
+        safeAddress: SAFE_ADDRESS,
+        status: SafeClientTxStatus.EXECUTED,
+        transactions: {
+          ethereumTxHash: ETHEREUM_TX_HASH,
+          safeTxHash: SAFE_TX_HASH
+        }
+      })
+    })
+
+    it('should execute the transaction when enough signatures', async () => {
       const TRANSACTION_RESPONSE = {
         confirmations: [{ signature: '0x1' }, { signature: '0x2' }],
         confirmationsRequired: 2
@@ -196,8 +229,6 @@ describe('SafeClient', () => {
       const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
 
       expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
-      expect(protocolKit.signTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
-      expect(apiKit.confirmTransaction).toHaveBeenCalledWith(SAFE_TX_HASH, undefined)
       expect(protocolKit.executeTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
       expect(result).toMatchObject({
         description: MESSAGES[SafeClientTxStatus.EXECUTED],

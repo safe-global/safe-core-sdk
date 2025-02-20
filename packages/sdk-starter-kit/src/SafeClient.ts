@@ -97,6 +97,15 @@ export class SafeClient extends BaseClient {
     const safeAddress = await this.protocolKit.getAddress()
     let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
 
+    if (transactionResponse.isExecuted) {
+      return createSafeClientResult({
+        status: SafeClientTxStatus.EXECUTED,
+        safeAddress,
+        txHash: transactionResponse.transactionHash || '',
+        safeTxHash
+      })
+    }
+
     let isReadyToExecute = await this.#hasEnoughConfirmations(transactionResponse)
 
     if (!isReadyToExecute) {

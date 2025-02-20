@@ -18,11 +18,9 @@
     "API"
   ],
   "scripts": {
-    "test:web3": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=web3 && nyc --reporter=lcov testing-kit test 'tests/endpoint/*.test.*'",
     "test:ethers": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=ethers && nyc --reporter=lcov testing-kit test 'tests/endpoint/*.test.*'",
     "test:viem": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=viem && nyc --reporter=lcov testing-kit test 'tests/endpoint/*.test.*'",
     "test": "yarn test:viem",
-    "test:ci:web3": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=web3 && nyc --reporter=lcov testing-kit test 'tests/e2e/*.test.*'",
     "test:ci:ethers": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=ethers && nyc --reporter=lcov testing-kit test 'tests/e2e/*.test.*'",
     "test:ci:viem": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=viem && nyc --reporter=lcov testing-kit test 'tests/e2e/*.test.*'",
     "test:ci": "yarn test:ci:viem",
@@ -63,8 +61,7 @@
     "semver": "^7.6.1",
     "sinon": "^19.0.2",
     "sinon-chai": "3.7.0",
-    "tsconfig-paths": "^4.2.0",
-    "web3": "^4.12.1"
+    "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
     "@safe-global/protocol-kit": "^5.2.4",

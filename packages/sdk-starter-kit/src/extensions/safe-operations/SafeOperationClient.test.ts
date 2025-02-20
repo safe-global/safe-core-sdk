@@ -152,7 +152,7 @@ describe('SafeOperationClient', () => {
   })
 
   describe('confirmSafeOperation', () => {
-    it('should send the Safe operation to the bundler without confirmation when threshold is already reached', async () => {
+    it('should send the User operation to the bundler without confirmation when threshold is already reached', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
 
       const safeOperationResult = await safeOperationClient.confirmSafeOperation({
@@ -176,7 +176,7 @@ describe('SafeOperationClient', () => {
       })
     })
 
-    it('should indicate more signatures are required when threshold is not reached', async () => {
+    it('should return more signatures are required when threshold is not reached after confirmation', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(3)
 
       const safeOperationResult = await safeOperationClient.confirmSafeOperation({
@@ -195,7 +195,7 @@ describe('SafeOperationClient', () => {
       })
     })
 
-    it('should confirm and execute when the confirmation ends with the threshold reached', async () => {
+    it('should send the User operation to the bundler alter reaching the threshold with the confirmation', async () => {
       const CONFIRMED_SAFE_OPERATION_RESPONSE = {
         ...SAFE_OPERATION_RESPONSE,
         confirmations: [

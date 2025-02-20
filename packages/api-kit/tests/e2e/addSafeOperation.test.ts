@@ -38,8 +38,7 @@ describe('addSafeOperation', () => {
       provider: protocolKit.getSafeProvider().provider,
       signer: protocolKit.getSafeProvider().signer,
       options: { safeAddress: SAFE_ADDRESS },
-      bundlerUrl: BUNDLER_URL,
-      safeModulesVersion: '0.2.0'
+      bundlerUrl: BUNDLER_URL
     })
   })
 

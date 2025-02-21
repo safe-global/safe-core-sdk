@@ -85,25 +85,25 @@ export type GetContractProps = {
 
 export type ContractNetworkConfig = {
   /** safeSingletonAddress - Address of the Safe Singleton contract deployed on a specific network */
-  safeSingletonAddress: string
+  safeSingletonAddress?: string
   /** safeProxyFactoryAddress - Address of the SafeProxyFactory contract deployed on a specific network */
-  safeProxyFactoryAddress: string
+  safeProxyFactoryAddress?: string
   /** multiSendAddress - Address of the MultiSend contract deployed on a specific network */
-  multiSendAddress: string
+  multiSendAddress?: string
   /** multiSendCallOnlyAddress - Address of the MultiSendCallOnly contract deployed on a specific network */
-  multiSendCallOnlyAddress: string
+  multiSendCallOnlyAddress?: string
   /** fallbackHandlerAddress - Address of the Fallback Handler contract deployed on a specific network */
-  fallbackHandlerAddress: string
+  fallbackHandlerAddress?: string
   /** signMessageLibAddress - Address of the SignMessageLib contract deployed on a specific network */
-  signMessageLibAddress: string
+  signMessageLibAddress?: string
   /** createCallAddress - Address of the CreateCall contract deployed on a specific network */
-  createCallAddress: string
+  createCallAddress?: string
   /** simulateTxAccessorAddress - Address of the SimulateTxAccessor contract deployed on a specific network */
-  simulateTxAccessorAddress: string
+  simulateTxAccessorAddress?: string
   /** safeWebAuthnSignerFactoryAddress - Address of the SafeWebAuthnSignerFactory contract deployed on a specific network */
-  safeWebAuthnSignerFactoryAddress: string
+  safeWebAuthnSignerFactoryAddress?: string
   /** safeWebAuthnSharedSignerAddress - Address of the SafeWebAuthnSharedSigner contract deployed on a specific network */
-  safeWebAuthnSharedSignerAddress: string
+  safeWebAuthnSharedSignerAddress?: string
 }
 
 export type ContractNetworksConfig = {

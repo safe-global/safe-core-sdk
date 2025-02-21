@@ -26,28 +26,18 @@ class SafeProxyFactoryContract_v1_0_0
    * @param chainId - The chain ID where the contract resides.
    * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
-   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.0.0 is used.
    * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
-    customContractAbi?: SafeProxyFactoryContract_v1_0_0_Abi,
     deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.0.0'
     const defaultAbi = safeProxyFactory_1_0_0_ContractArtifacts.abi
 
-    super(
-      chainId,
-      safeProvider,
-      defaultAbi,
-      safeVersion,
-      customContractAddress,
-      customContractAbi,
-      deploymentType
-    )
+    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, deploymentType)
   }
 
   /**

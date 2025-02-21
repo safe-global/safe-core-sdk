@@ -218,7 +218,7 @@ describe('SafeClient', () => {
       })
     })
 
-    it('should execute the transaction without confirmation if already having enough signatures', async () => {
+    it('should execute the transaction without confirmation if it already has enough signatures', async () => {
       const TRANSACTION_RESPONSE = {
         confirmations: [{ signature: '0x1' }, { signature: '0x2' }],
         confirmationsRequired: 2
@@ -242,7 +242,7 @@ describe('SafeClient', () => {
       })
     })
 
-    it('should return that more signatures are required when threshold is not reached after confirmation', async () => {
+    it('should return more signatures are required when threshold is not reached after confirmation', async () => {
       const TRANSACTION_RESPONSE = {
         confirmations: [{ signature: '0x1' }],
         confirmationsRequired: 2

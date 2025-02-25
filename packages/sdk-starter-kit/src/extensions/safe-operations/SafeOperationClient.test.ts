@@ -195,7 +195,7 @@ describe('SafeOperationClient', () => {
       })
     })
 
-    it('should send the User operation to the bundler alter reaching the threshold with the confirmation', async () => {
+    it('should send the User operation to the bundler after reaching the threshold with the confirmation', async () => {
       const CONFIRMED_SAFE_OPERATION_RESPONSE = {
         ...SAFE_OPERATION_RESPONSE,
         confirmations: [

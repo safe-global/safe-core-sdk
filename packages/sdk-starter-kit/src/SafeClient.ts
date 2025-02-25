@@ -1,6 +1,11 @@
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
-import { SafeTransaction, TransactionOptions, TransactionResult } from '@safe-global/types-kit'
+import {
+  SafeMultisigTransactionResponse,
+  SafeTransaction,
+  TransactionOptions,
+  TransactionResult
+} from '@safe-global/types-kit'
 
 import {
   createSafeClientResult,
@@ -89,18 +94,28 @@ export class SafeClient extends BaseClient {
    * @throws {Error} If the transaction confirmation fails.
    */
   async confirm({ safeTxHash }: ConfirmTransactionProps): Promise<SafeClientResult> {
-    let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
     const safeAddress = await this.protocolKit.getAddress()
-    const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
+    let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
 
-    await this.apiKit.confirmTransaction(safeTxHash, signedTransaction.encodedSignatures())
+    if (transactionResponse.isExecuted) {
+      return createSafeClientResult({
+        status: SafeClientTxStatus.EXECUTED,
+        safeAddress,
+        txHash: transactionResponse.transactionHash || '',
+        safeTxHash
+      })
+    }
 
-    transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+    if (this.#needsConfirmation(transactionResponse)) {
+      const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
+      const signature = signedTransaction.encodedSignatures()
 
-    if (
-      transactionResponse.confirmations &&
-      transactionResponse.confirmationsRequired === transactionResponse.confirmations.length
-    ) {
+      await this.apiKit.confirmTransaction(safeTxHash, signature)
+
+      transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+    }
+
+    if (!this.#needsConfirmation(transactionResponse)) {
       const executedTransactionResponse: TransactionResult =
         await this.protocolKit.executeTransaction(transactionResponse)
 
@@ -261,6 +276,12 @@ export class SafeClient extends BaseClient {
       status: SafeClientTxStatus.PENDING_SIGNATURES,
       safeTxHash
     })
+  }
+
+  #needsConfirmation(transactionResponse: SafeMultisigTransactionResponse): boolean {
+    return (
+      (transactionResponse.confirmations?.length || 0) < transactionResponse.confirmationsRequired
+    )
   }
 
   async #reconnectSafe(): Promise<void> {

@@ -1255,12 +1255,12 @@ class Safe {
       operation: serviceTransactionResponse.operation
     }
     const options = {
-      safeTxGas: serviceTransactionResponse.safeTxGas,
-      baseGas: serviceTransactionResponse.baseGas,
+      safeTxGas: serviceTransactionResponse.safeTxGas.toString(),
+      baseGas: serviceTransactionResponse.baseGas.toString(),
       gasPrice: serviceTransactionResponse.gasPrice,
       gasToken: serviceTransactionResponse.gasToken,
       refundReceiver: serviceTransactionResponse.refundReceiver,
-      nonce: Number(serviceTransactionResponse.nonce)
+      nonce: serviceTransactionResponse.nonce
     }
     const safeTransaction = await this.createTransaction({
       transactions: [safeTransactionData],

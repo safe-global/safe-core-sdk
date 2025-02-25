@@ -33,8 +33,7 @@ describe('confirmSafeOperation', () => {
       provider: options.provider || getEip1193Provider(),
       signer: options.signer || PRIVATE_KEY_1,
       options: { safeAddress: SAFE_ADDRESS },
-      bundlerUrl: BUNDLER_URL,
-      safeModulesVersion: '0.2.0'
+      bundlerUrl: BUNDLER_URL
     })
 
   const createSignature = async (safeOperation: SafeOperation, signer: string) => {

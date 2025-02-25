@@ -1,5 +1,4 @@
 import hre from 'hardhat'
-import Web3 from 'web3'
 import { ethers } from 'ethers'
 import { custom, createWalletClient, Account } from 'viem'
 
@@ -16,11 +15,6 @@ export function getEip1193Provider(): Eip1193Provider {
       })
 
       return { request: client.request } as Eip1193Provider
-
-    case 'web3':
-      const web3Provider = new Web3(hre.network.provider)
-
-      return web3Provider.currentProvider as Eip1193Provider
 
     case 'ethers':
       const browserProvider = new ethers.BrowserProvider(hre.network.provider)

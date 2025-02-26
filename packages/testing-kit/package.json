@@ -51,7 +51,7 @@
     "@safe-global/safe-passkey": "0.2.0-alpha.1",
     "@safe-global/types-kit": "^1.0.4",
     "@types/semver": "^7.5.8",
-    "hardhat": "^2.19.3",
+    "hardhat": "^2.22.19",
     "hardhat-deploy": "^0.12.4",
     "tsconfig-paths": "^4.2.0"
   },

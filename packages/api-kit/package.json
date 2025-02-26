@@ -54,7 +54,7 @@
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.10",
     "@types/node-fetch": "^2.6.12",
-    "@types/sinon": "^17.0.3",
+    "@types/sinon": "^17.0.4",
     "chai": "^4.5.0",
     "chai-as-promised": "^7.1.2",
     "ethers": "^6.13.5",

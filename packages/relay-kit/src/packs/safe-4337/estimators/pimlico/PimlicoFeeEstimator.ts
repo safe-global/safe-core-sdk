@@ -53,6 +53,7 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
   }
 
   async postEstimateUserOperationGas({
+    bundlerUrl,
     userOperation,
     entryPoint,
     paymasterOptions
@@ -83,7 +84,11 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
       return sponsoredData
     }
 
-    const chainId = await this.#getChainId(paymasterClient)
+    const bundlerClient = createBundlerClient(
+      bundlerUrl
+    )
+    
+    const chainId = await this.#getChainId(bundlerClient)
 
     const erc20PaymasterData = await paymasterClient.request({
       method: RPC_4337_CALLS.GET_PAYMASTER_DATA,

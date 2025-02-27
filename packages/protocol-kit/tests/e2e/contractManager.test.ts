@@ -1,17 +1,4 @@
-import {
-  safeVersionDeployed,
-  setupTests,
-  getCompatibilityFallbackHandler,
-  getCreateCall,
-  getFactory,
-  getMultiSend,
-  getMultiSendCallOnly,
-  getSafeSingleton,
-  getSignMessageLib,
-  getSimulateTxAccessor,
-  getSafeWebAuthnSharedSigner,
-  getSafeWebAuthnSignerFactory
-} from '@safe-global/testing-kit'
+import { safeVersionDeployed, setupTests } from '@safe-global/testing-kit'
 import Safe, { ContractNetworksConfig, PredictedSafeProps } from '@safe-global/protocol-kit/index'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import chai from 'chai'
@@ -75,25 +62,15 @@ describe('Safe contracts manager', () => {
       const customContractNetworks: ContractNetworksConfig = {
         [chainId.toString()]: {
           safeSingletonAddress: ZERO_ADDRESS,
-          safeSingletonAbi: (await getSafeSingleton()).abi,
           safeProxyFactoryAddress: ZERO_ADDRESS,
-          safeProxyFactoryAbi: (await getFactory()).abi,
           multiSendAddress: ZERO_ADDRESS,
-          multiSendAbi: (await getMultiSend()).abi,
           multiSendCallOnlyAddress: ZERO_ADDRESS,
-          multiSendCallOnlyAbi: (await getMultiSendCallOnly()).abi,
           fallbackHandlerAddress: ZERO_ADDRESS,
-          fallbackHandlerAbi: (await getCompatibilityFallbackHandler()).abi,
           signMessageLibAddress: ZERO_ADDRESS,
-          signMessageLibAbi: (await getSignMessageLib()).abi,
           createCallAddress: ZERO_ADDRESS,
-          createCallAbi: (await getCreateCall()).abi,
           simulateTxAccessorAddress: ZERO_ADDRESS,
-          simulateTxAccessorAbi: (await getSimulateTxAccessor()).abi,
           safeWebAuthnSignerFactoryAddress: ZERO_ADDRESS,
-          safeWebAuthnSignerFactoryAbi: (await getSafeWebAuthnSignerFactory()).abi,
-          safeWebAuthnSharedSignerAddress: ZERO_ADDRESS,
-          safeWebAuthnSharedSignerAbi: (await getSafeWebAuthnSharedSigner()).abi
+          safeWebAuthnSharedSignerAddress: ZERO_ADDRESS
         }
       }
 

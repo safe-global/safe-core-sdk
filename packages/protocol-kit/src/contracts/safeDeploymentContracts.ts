@@ -51,7 +51,6 @@ export async function getSafeContract({
     safeVersion,
     safeProvider,
     customSafeAddress ?? customContracts?.safeSingletonAddress,
-    customContracts?.safeSingletonAbi,
     isL1SafeSingleton,
     deploymentType
   )
@@ -73,7 +72,6 @@ export async function getSafeProxyFactoryContract({
     safeVersion,
     safeProvider,
     customContracts?.safeProxyFactoryAddress,
-    customContracts?.safeProxyFactoryAbi,
     deploymentType
   )
 
@@ -96,7 +94,6 @@ export async function getCompatibilityFallbackHandlerContract({
     safeVersion,
     safeProvider,
     customContracts?.fallbackHandlerAddress,
-    customContracts?.fallbackHandlerAbi,
     deploymentType
   )
 
@@ -119,7 +116,6 @@ export async function getMultiSendContract({
     safeVersion,
     safeProvider,
     customContracts?.multiSendAddress,
-    customContracts?.multiSendAbi,
     deploymentType
   )
 
@@ -140,7 +136,6 @@ export async function getMultiSendCallOnlyContract({
     safeVersion,
     safeProvider,
     customContracts?.multiSendCallOnlyAddress,
-    customContracts?.multiSendCallOnlyAbi,
     deploymentType
   )
 
@@ -163,7 +158,6 @@ export async function getSignMessageLibContract({
     safeVersion,
     safeProvider,
     customContracts?.signMessageLibAddress,
-    customContracts?.signMessageLibAbi,
     deploymentType
   )
 
@@ -186,7 +180,6 @@ export async function getCreateCallContract({
     safeVersion,
     safeProvider,
     customContracts?.createCallAddress,
-    customContracts?.createCallAbi,
     deploymentType
   )
 
@@ -207,7 +200,6 @@ export async function getSimulateTxAccessorContract({
     safeVersion,
     safeProvider,
     customContracts?.simulateTxAccessorAddress,
-    customContracts?.simulateTxAccessorAbi,
     deploymentType
   )
 
@@ -230,7 +222,6 @@ export async function getSafeWebAuthnSignerFactoryContract({
     safeVersion,
     safeProvider,
     customContracts?.safeWebAuthnSignerFactoryAddress,
-    customContracts?.safeWebAuthnSignerFactoryAbi,
     deploymentType
   )
 
@@ -253,7 +244,6 @@ export async function getSafeWebAuthnSharedSignerContract({
     safeVersion,
     safeProvider,
     customContracts?.safeWebAuthnSharedSignerAddress,
-    customContracts?.safeWebAuthnSharedSignerAbi,
     deploymentType
   )
 

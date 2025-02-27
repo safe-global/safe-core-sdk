@@ -1,32 +1,5 @@
-import { Abi } from 'viem'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
-import {
-  SafeVersion,
-  SafeContract_v1_3_0_Abi,
-  SafeContract_v1_4_1_Abi,
-  SafeContract_v1_2_0_Abi,
-  SafeContract_v1_1_1_Abi,
-  SafeContract_v1_0_0_Abi,
-  CompatibilityFallbackHandlerContract_v1_4_1_Abi,
-  CompatibilityFallbackHandlerContract_v1_3_0_Abi,
-  MultiSendContract_v1_4_1_Abi,
-  MultiSendContract_v1_3_0_Abi,
-  MultiSendContract_v1_1_1_Abi,
-  MultiSendCallOnlyContract_v1_4_1_Abi,
-  MultiSendCallOnlyContract_v1_3_0_Abi,
-  SafeProxyFactoryContract_v1_4_1_Abi,
-  SafeProxyFactoryContract_v1_3_0_Abi,
-  SafeProxyFactoryContract_v1_1_1_Abi,
-  SafeProxyFactoryContract_v1_0_0_Abi,
-  SignMessageLibContract_v1_4_1_Abi,
-  SignMessageLibContract_v1_3_0_Abi,
-  CreateCallContract_v1_4_1_Abi,
-  CreateCallContract_v1_3_0_Abi,
-  SimulateTxAccessorContract_v1_4_1_Abi,
-  SimulateTxAccessorContract_v1_3_0_Abi,
-  SafeWebAuthnSignerFactoryContract_v0_2_1_Abi,
-  SafeWebAuthnSharedSignerContract_v0_2_1_Abi
-} from '@safe-global/types-kit'
+import { SafeVersion } from '@safe-global/types-kit'
 import CreateCallContract_v1_3_0 from './CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCallContract_v1_4_1 from './CreateCall/v1.4.1/CreateCallContract_v1_4_1'
 import MultiSendContract_v1_1_1 from './MultiSend/v1.1.1/MultiSendContract_v1_1_1'
@@ -57,7 +30,6 @@ export async function getSafeContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   isL1SafeSingleton?: boolean,
   deploymentType?: DeploymentType
 ): Promise<
@@ -77,7 +49,6 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as SafeContract_v1_4_1_Abi,
         deploymentType
       )
       break
@@ -87,7 +58,6 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as SafeContract_v1_3_0_Abi,
         deploymentType
       )
       break
@@ -97,7 +67,6 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as SafeContract_v1_2_0_Abi,
         deploymentType
       )
       break
@@ -107,7 +76,6 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as SafeContract_v1_1_1_Abi,
         deploymentType
       )
       break
@@ -117,7 +85,6 @@ export async function getSafeContractInstance(
         safeProvider,
         isL1SafeSingleton,
         contractAddress,
-        customContractAbi as SafeContract_v1_0_0_Abi,
         deploymentType
       )
       break
@@ -134,7 +101,6 @@ export async function getCompatibilityFallbackHandlerContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<
   CompatibilityFallbackHandlerContract_v1_4_1 | CompatibilityFallbackHandlerContract_v1_3_0
@@ -148,7 +114,6 @@ export async function getCompatibilityFallbackHandlerContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as CompatibilityFallbackHandlerContract_v1_4_1_Abi,
         deploymentType
       )
       break
@@ -159,7 +124,6 @@ export async function getCompatibilityFallbackHandlerContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as CompatibilityFallbackHandlerContract_v1_3_0_Abi,
         deploymentType
       )
       break
@@ -176,7 +140,6 @@ export async function getMultiSendContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<MultiSendContract_v1_4_1 | MultiSendContract_v1_3_0 | MultiSendContract_v1_1_1> {
   const chainId = await safeProvider.getChainId()
@@ -188,7 +151,6 @@ export async function getMultiSendContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as MultiSendContract_v1_4_1_Abi,
         deploymentType
       )
       break
@@ -197,7 +159,6 @@ export async function getMultiSendContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as MultiSendContract_v1_3_0_Abi,
         deploymentType
       )
       break
@@ -208,7 +169,6 @@ export async function getMultiSendContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as MultiSendContract_v1_1_1_Abi,
         deploymentType
       )
       break
@@ -225,7 +185,6 @@ export async function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<MultiSendCallOnlyContract_v1_4_1 | MultiSendCallOnlyContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
@@ -237,7 +196,6 @@ export async function getMultiSendCallOnlyContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as MultiSendCallOnlyContract_v1_4_1_Abi,
         deploymentType
       )
       break
@@ -249,7 +207,6 @@ export async function getMultiSendCallOnlyContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as MultiSendCallOnlyContract_v1_3_0_Abi,
         deploymentType
       )
       break
@@ -266,7 +223,6 @@ export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<
   | SafeProxyFactoryContract_v1_4_1
@@ -283,7 +239,6 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SafeProxyFactoryContract_v1_4_1_Abi,
         deploymentType
       )
       break
@@ -292,7 +247,6 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SafeProxyFactoryContract_v1_3_0_Abi,
         deploymentType
       )
       break
@@ -302,7 +256,6 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SafeProxyFactoryContract_v1_1_1_Abi,
         deploymentType
       )
       break
@@ -311,7 +264,6 @@ export async function getSafeProxyFactoryContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SafeProxyFactoryContract_v1_0_0_Abi,
         deploymentType
       )
       break
@@ -328,7 +280,6 @@ export async function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<SignMessageLibContract_v1_4_1 | SignMessageLibContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
@@ -340,7 +291,6 @@ export async function getSignMessageLibContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SignMessageLibContract_v1_4_1_Abi,
         deploymentType
       )
       break
@@ -349,7 +299,6 @@ export async function getSignMessageLibContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SignMessageLibContract_v1_3_0_Abi,
         deploymentType
       )
       break
@@ -366,7 +315,6 @@ export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<CreateCallContract_v1_4_1 | CreateCallContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
@@ -378,7 +326,6 @@ export async function getCreateCallContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as CreateCallContract_v1_4_1_Abi,
         deploymentType
       )
       break
@@ -390,7 +337,6 @@ export async function getCreateCallContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as CreateCallContract_v1_3_0_Abi,
         deploymentType
       )
       break
@@ -407,7 +353,6 @@ export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<SimulateTxAccessorContract_v1_4_1 | SimulateTxAccessorContract_v1_3_0> {
   const chainId = await safeProvider.getChainId()
@@ -419,7 +364,6 @@ export async function getSimulateTxAccessorContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SimulateTxAccessorContract_v1_4_1_Abi,
         deploymentType
       )
       break
@@ -428,7 +372,6 @@ export async function getSimulateTxAccessorContractInstance(
         chainId,
         safeProvider,
         contractAddress,
-        customContractAbi as SimulateTxAccessorContract_v1_3_0_Abi,
         deploymentType
       )
       break
@@ -445,7 +388,6 @@ export async function getSafeWebAuthnSignerFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<SafeWebAuthnSignerFactoryContract_v0_2_1> {
   const chainId = await safeProvider.getChainId()
@@ -459,7 +401,6 @@ export async function getSafeWebAuthnSignerFactoryContractInstance(
           safeProvider,
           safeVersion,
           contractAddress,
-          customContractAbi as SafeWebAuthnSignerFactoryContract_v0_2_1_Abi,
           deploymentType
         )
 
@@ -476,7 +417,6 @@ export async function getSafeWebAuthnSharedSignerContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
   contractAddress?: string,
-  customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<SafeWebAuthnSharedSignerContract_v0_2_1> {
   const chainId = await safeProvider.getChainId()
@@ -489,7 +429,6 @@ export async function getSafeWebAuthnSharedSignerContractInstance(
         safeProvider,
         safeVersion,
         contractAddress,
-        customContractAbi as SafeWebAuthnSharedSignerContract_v0_2_1_Abi,
         deploymentType
       )
 

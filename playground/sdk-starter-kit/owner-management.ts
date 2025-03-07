@@ -1,11 +1,16 @@
+import * as dotenv from 'dotenv'
+import { Hex } from 'viem'
 import { createSafeClient } from '@safe-global/sdk-starter-kit'
+import { privateKeyToAddress } from 'viem/accounts'
 
-const OWNER_1_PRIVATE_KEY = ''
-const OWNER_2_PRIVATE_KEY = ''
-const OWNER_2_ADDRESS = ''
+dotenv.config({ path: './playground/sdk-starter-kit/.env' })
 
-const RPC_URL = 'https://sepolia.gateway.tenderly.co'
-const SAFE_ADDRESS = ''
+const {
+  OWNER_1_PRIVATE_KEY = '0x',
+  OWNER_2_PRIVATE_KEY = '0x',
+  SAFE_ADDRESS = '0x',
+  RPC_URL = ''
+} = process.env
 
 async function addOwner() {
   const safeClient = await createSafeClient({
@@ -14,8 +19,10 @@ async function addOwner() {
     safeAddress: SAFE_ADDRESS
   })
 
+  const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY as Hex)
+
   const transaction = await safeClient.createAddOwnerTransaction({
-    ownerAddress: OWNER_2_ADDRESS,
+    ownerAddress: owner2,
     threshold: 2
   })
 
@@ -37,8 +44,10 @@ async function removeOwner() {
     safeAddress: SAFE_ADDRESS
   })
 
+  const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY as Hex)
+
   const transaction = await safeClient1.createRemoveOwnerTransaction({
-    ownerAddress: OWNER_2_ADDRESS,
+    ownerAddress: owner2,
     threshold: 1
   })
   const sendResult = await safeClient1.send({ transactions: [transaction] })

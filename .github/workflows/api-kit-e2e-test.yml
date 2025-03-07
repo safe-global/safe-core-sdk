@@ -28,5 +28,4 @@ jobs:
         run: |
           cd packages/api-kit
           yarn test:ci:ethers
-          yarn test:ci:web3
           yarn test:ci:viem

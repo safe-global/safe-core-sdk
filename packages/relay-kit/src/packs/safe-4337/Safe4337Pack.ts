@@ -51,7 +51,7 @@ import {
   signSafeOp,
   userOperationToHexValues
 } from './utils'
-import { entryPointToSafeModules, EQ_OR_GT_0_3_0 } from './utils/entrypoint'
+import { entryPointToSafeModules, GT_0_3_0 } from './utils/entrypoint'
 import { PimlicoFeeEstimator } from './estimators/PimlicoFeeEstimator'
 import { getRelayKitVersion } from './utils/getRelayKitVersion'
 
@@ -158,9 +158,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     const safeModulesVersion = initOptions.safeModulesVersion || DEFAULT_SAFE_MODULES_VERSION
 
-    if (semverSatisfies(safeModulesVersion, EQ_OR_GT_0_3_0)) {
+    if (semverSatisfies(safeModulesVersion, GT_0_3_0)) {
       throw new Error(
-        `Incompatibility detected: Safe modules version ${safeModulesVersion} is not supported. The SDK can use 0.2.0 only.`
+        `Incompatibility detected: Safe modules version ${safeModulesVersion} is not supported. The SDK can use 0.3.0 at most.`
       )
     }
 

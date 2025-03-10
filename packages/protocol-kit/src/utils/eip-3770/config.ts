@@ -216,6 +216,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 10849n, shortName: 'lamina1' },
   { chainId: 11011n, shortName: 'shapesep' },
   { chainId: 11111n, shortName: 'WAGMI' },
+  { chainId: 11124n, shortName: 'abstract-sepolia' },
   { chainId: 11235n, shortName: 'islm' },
   { chainId: 11437n, shortName: 'shyftt' },
   { chainId: 11501n, shortName: 'bevm' },

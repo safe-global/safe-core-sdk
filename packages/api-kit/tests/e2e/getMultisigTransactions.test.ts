@@ -28,7 +28,7 @@ describe('getMultisigTransactions', () => {
   })
 
   it('should return an empty list if there are no multisig transactions', async () => {
-    const safeAddress = '0x3e04a375aC5847C690A7f2fF54b45c59f7eeD6f0' // Safe without multisig transactions
+    const safeAddress = '0x513697456eDb113aDCAA1bbDA5bE59D9D7A2efd1' // Safe without multisig transactions
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(safeAddress)
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(0)

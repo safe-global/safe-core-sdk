@@ -33,6 +33,7 @@ abstract class MultiSendCallOnlyBaseContract<
    * @param defaultAbi - The default ABI for the MultiSendCallOnly contract. It should be compatible with the specific version of the MultiSendCallOnly contract.
    * @param safeVersion - The version of the MultiSendCallOnly contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the MultiSendCallOnly deployments based on the chainId and safeVersion.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the MultiSendCallOnly deployments or the defaultAbi is used.
    * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
@@ -41,6 +42,7 @@ abstract class MultiSendCallOnlyBaseContract<
     defaultAbi: MultiSendCallOnlyContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
+    customContractAbi?: MultiSendCallOnlyContractAbiType,
     deploymentType?: DeploymentType
   ) {
     const contractName = 'multiSendCallOnlyVersion'
@@ -52,6 +54,7 @@ abstract class MultiSendCallOnlyBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
+      customContractAbi,
       deploymentType
     )
 

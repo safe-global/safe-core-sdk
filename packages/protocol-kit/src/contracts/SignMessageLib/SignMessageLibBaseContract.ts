@@ -33,6 +33,7 @@ abstract class SignMessageLibBaseContract<
    * @param defaultAbi - The default ABI for the SignMessageLib contract. It should be compatible with the specific version of the SignMessageLib contract.
    * @param safeVersion - The version of the SignMessageLib contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the SignMessageLib deployments based on the chainId and safeVersion.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the SignMessageLib deployments or the defaultAbi is used.
    * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
@@ -41,6 +42,7 @@ abstract class SignMessageLibBaseContract<
     defaultAbi: SignMessageLibContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
+    customContractAbi?: SignMessageLibContractAbiType,
     deploymentType?: DeploymentType
   ) {
     const contractName = 'signMessageLibVersion'
@@ -52,6 +54,7 @@ abstract class SignMessageLibBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
+      customContractAbi,
       deploymentType
     )
 

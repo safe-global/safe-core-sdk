@@ -64,6 +64,7 @@ class BaseContract<ContractAbiType extends Abi> {
    * @param defaultAbi - The default ABI for the contract. It should be compatible with the specific version of the contract.
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
    * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
@@ -73,6 +74,7 @@ class BaseContract<ContractAbiType extends Abi> {
     defaultAbi: ContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
+    customContractAbi?: ContractAbiType,
     deploymentType?: DeploymentType
   ) {
     const deployment = getContractDeployment(safeVersion, chainId, contractName)
@@ -94,6 +96,7 @@ class BaseContract<ContractAbiType extends Abi> {
     this.safeVersion = safeVersion
     this.contractAddress = resolvedAddress
     this.contractAbi =
+      customContractAbi ||
       (deployment?.abi as unknown as ContractAbiType) || // this cast is required because abi is set as any[] in safe-deployments
       defaultAbi // if no customAbi and no abi is present in the safe-deployments we use our hardcoded abi
 

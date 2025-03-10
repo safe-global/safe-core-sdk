@@ -35,6 +35,7 @@ abstract class SafeProxyFactoryBaseContract<
    * @param defaultAbi - The default ABI for the Safe contract. It should be compatible with the specific version of the contract.
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
    * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
@@ -43,6 +44,7 @@ abstract class SafeProxyFactoryBaseContract<
     defaultAbi: SafeProxyFactoryContractAbiType,
     safeVersion: SafeVersion,
     customContractAddress?: string,
+    customContractAbi?: SafeProxyFactoryContractAbiType,
     deploymentType?: DeploymentType
   ) {
     const contractName = 'safeProxyFactoryVersion'
@@ -54,6 +56,7 @@ abstract class SafeProxyFactoryBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
+      customContractAbi,
       deploymentType
     )
 

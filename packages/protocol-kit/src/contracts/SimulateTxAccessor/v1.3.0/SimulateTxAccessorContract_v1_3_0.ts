@@ -28,18 +28,28 @@ class SimulateTxAccessorContract_v1_3_0
    * @param chainId - The chain ID where the contract resides.
    * @param safeProvider - An instance of SafeProvider.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the SimulateTxAccessor deployments based on the chainId and safeVersion.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 1.3.0 is used.
    * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
     customContractAddress?: string,
+    customContractAbi?: SimulateTxAccessorContract_v1_3_0_Abi,
     deploymentType?: DeploymentType
   ) {
     const safeVersion = '1.3.0'
     const defaultAbi = simulateTxAccessor_1_3_0_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, deploymentType)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 
   /**

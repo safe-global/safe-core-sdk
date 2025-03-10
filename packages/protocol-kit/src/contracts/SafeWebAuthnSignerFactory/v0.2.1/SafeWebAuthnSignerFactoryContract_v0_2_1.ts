@@ -28,6 +28,7 @@ class SafeWebAuthnSignerFactoryContract_v0_2_1
    * @param safeProvider - An instance of SafeProvider.
    * @param safeVersion - The version of the Safe contract.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the default ABI for version 0.2.1 is used.
    * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
@@ -35,11 +36,20 @@ class SafeWebAuthnSignerFactoryContract_v0_2_1
     safeProvider: SafeProvider,
     safeVersion: SafeVersion,
     customContractAddress?: string,
+    customContractAbi?: SafeWebAuthnSignerFactoryContract_v0_2_1_Abi,
     deploymentType?: DeploymentType
   ) {
     const defaultAbi = SafeWebAuthnSignerFactory_0_2_1_ContractArtifacts.abi
 
-    super(chainId, safeProvider, defaultAbi, safeVersion, customContractAddress, deploymentType)
+    super(
+      chainId,
+      safeProvider,
+      defaultAbi,
+      safeVersion,
+      customContractAddress,
+      customContractAbi,
+      deploymentType
+    )
   }
 
   /**

@@ -38,6 +38,7 @@ abstract class SafeBaseContract<
    * @param safeVersion - The version of the Safe contract.
    * @param isL1SafeSingleton - A flag indicating if the contract is a L1 Safe Singleton.
    * @param customContractAddress - Optional custom address for the contract. If not provided, the address is derived from the Safe deployments based on the chainId and safeVersion.
+   * @param customContractAbi - Optional custom ABI for the contract. If not provided, the ABI is derived from the Safe deployments or the defaultAbi is used.
    * @param deploymentType - Optional deployment type for the contract. If not provided, the first deployment retrieved from the safe-deployments array will be used.
    */
   constructor(
@@ -47,6 +48,7 @@ abstract class SafeBaseContract<
     safeVersion: SafeVersion,
     isL1SafeSingleton = safeDeploymentsL1ChainIds.includes(chainId),
     customContractAddress?: string,
+    customContractAbi?: SafeContractAbiType,
     deploymentType?: DeploymentType
   ) {
     const isL1Contract =
@@ -61,6 +63,7 @@ abstract class SafeBaseContract<
       defaultAbi,
       safeVersion,
       customContractAddress,
+      customContractAbi,
       deploymentType
     )
 

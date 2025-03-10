@@ -35,14 +35,14 @@ describe('getPendingTransactions', () => {
   })
 
   it('should return the the transaction list', async () => {
-    const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with pending transaction
+    const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
     const transactionList = await safeApiKit.getPendingTransactions(safeAddress)
     chai.expect(transactionList.count).to.be.equal(10)
     chai.expect(transactionList.results.length).to.be.equal(10)
   })
 
   it('should return the the transaction list EIP-3770', async () => {
-    const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with pending transaction
+    const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const transactionList = await safeApiKit.getPendingTransactions(eip3770SafeAddress)
     chai.expect(transactionList.count).to.be.equal(10)
@@ -50,7 +50,7 @@ describe('getPendingTransactions', () => {
   })
 
   it('should return a maximum of 2 transactions with limit = 2', async () => {
-    const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with pending transaction
+    const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
     const transactionList = await safeApiKit.getPendingTransactions(safeAddress, {
       limit: 2
     })
@@ -61,7 +61,7 @@ describe('getPendingTransactions', () => {
   })
 
   it('should return all pending transactions excluding the first one with offset = 1', async () => {
-    const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with pending transaction
+    const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
     const transactionList = await safeApiKit.getPendingTransactions(safeAddress, {
       offset: 1
     })

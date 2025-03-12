@@ -1,4 +1,4 @@
-import { Abi } from 'abitype'
+import { Abi, Address } from 'abitype'
 import {
   ContractFunctionName,
   ContractFunctionArgs,
@@ -46,7 +46,7 @@ import { ExternalClient } from '../types'
  */
 class BaseContract<ContractAbiType extends Abi> {
   contractAbi: ContractAbiType
-  contractAddress: string
+  contractAddress: Address
   contractName: contractName
   safeVersion: SafeVersion
   safeProvider: SafeProvider
@@ -73,7 +73,7 @@ class BaseContract<ContractAbiType extends Abi> {
     safeProvider: SafeProvider,
     defaultAbi: ContractAbiType,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: ContractAbiType,
     deploymentType?: DeploymentType
   ) {
@@ -108,7 +108,7 @@ class BaseContract<ContractAbiType extends Abi> {
     networkAddresses: string | string[] | undefined,
     deployment: SingletonDeploymentV2 | Deployment | undefined,
     deploymentType?: DeploymentType
-  ): string | undefined {
+  ): Address | undefined {
     // If there are no addresses for the given chainId we return undefined
     if (!networkAddresses) {
       return undefined
@@ -122,20 +122,20 @@ class BaseContract<ContractAbiType extends Abi> {
 
       if (typeof networkAddresses === 'string') {
         return networkAddresses === customDeploymentTypeAddress
-          ? customDeploymentTypeAddress
+          ? (customDeploymentTypeAddress as Address)
           : undefined
       }
 
-      return networkAddresses.find((address) => address === customDeploymentTypeAddress)
+      return networkAddresses.find((address) => address === customDeploymentTypeAddress) as Address
     }
 
     // Deployment type is not selected and there is only one address for this contract in the given chain, we return it
     if (typeof networkAddresses === 'string') {
-      return networkAddresses
+      return networkAddresses as Address
     }
 
     // If there are multiple addresses available for this contract, we return the first one.
-    return networkAddresses[0]
+    return networkAddresses[0] as Address
   }
 
   async init() {

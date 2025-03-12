@@ -1,4 +1,4 @@
-import { Abi } from 'abitype'
+import { Abi, Address } from 'abitype'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
@@ -41,7 +41,7 @@ abstract class MultiSendBaseContract<
     safeProvider: SafeProvider,
     defaultAbi: MultiSendContractAbiType,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: MultiSendContractAbiType,
     deploymentType?: DeploymentType
   ) {

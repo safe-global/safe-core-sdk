@@ -1,4 +1,4 @@
-import { Abi } from 'viem'
+import { Abi, Address } from 'viem'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   SafeVersion,
@@ -56,7 +56,7 @@ import SafeProvider from '../SafeProvider'
 export async function getSafeContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   isL1SafeSingleton?: boolean,
   deploymentType?: DeploymentType
@@ -133,7 +133,7 @@ export async function getSafeContractInstance(
 export async function getCompatibilityFallbackHandlerContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<
@@ -175,7 +175,7 @@ export async function getCompatibilityFallbackHandlerContractInstance(
 export async function getMultiSendContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<MultiSendContract_v1_4_1 | MultiSendContract_v1_3_0 | MultiSendContract_v1_1_1> {
@@ -224,7 +224,7 @@ export async function getMultiSendContractInstance(
 export async function getMultiSendCallOnlyContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<MultiSendCallOnlyContract_v1_4_1 | MultiSendCallOnlyContract_v1_3_0> {
@@ -265,7 +265,7 @@ export async function getMultiSendCallOnlyContractInstance(
 export async function getSafeProxyFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<
@@ -327,7 +327,7 @@ export async function getSafeProxyFactoryContractInstance(
 export async function getSignMessageLibContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<SignMessageLibContract_v1_4_1 | SignMessageLibContract_v1_3_0> {
@@ -365,7 +365,7 @@ export async function getSignMessageLibContractInstance(
 export async function getCreateCallContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<CreateCallContract_v1_4_1 | CreateCallContract_v1_3_0> {
@@ -406,7 +406,7 @@ export async function getCreateCallContractInstance(
 export async function getSimulateTxAccessorContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<SimulateTxAccessorContract_v1_4_1 | SimulateTxAccessorContract_v1_3_0> {
@@ -444,7 +444,7 @@ export async function getSimulateTxAccessorContractInstance(
 export async function getSafeWebAuthnSignerFactoryContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<SafeWebAuthnSignerFactoryContract_v0_2_1> {
@@ -475,7 +475,7 @@ export async function getSafeWebAuthnSignerFactoryContractInstance(
 export async function getSafeWebAuthnSharedSignerContractInstance(
   safeVersion: SafeVersion,
   safeProvider: SafeProvider,
-  contractAddress?: string,
+  contractAddress?: Address,
   customContractAbi?: Abi,
   deploymentType?: DeploymentType
 ): Promise<SafeWebAuthnSharedSignerContract_v0_2_1> {

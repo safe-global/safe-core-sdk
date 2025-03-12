@@ -1,4 +1,4 @@
-import { Abi } from 'abitype'
+import { Abi, Address } from 'abitype'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { SafeVersion } from '@safe-global/types-kit'
@@ -47,7 +47,7 @@ abstract class SafeBaseContract<
     defaultAbi: SafeContractAbiType,
     safeVersion: SafeVersion,
     isL1SafeSingleton = safeDeploymentsL1ChainIds.includes(chainId),
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SafeContractAbiType,
     deploymentType?: DeploymentType
   ) {

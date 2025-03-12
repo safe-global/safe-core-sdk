@@ -1,3 +1,4 @@
+import { Address } from 'abitype'
 import MultiSendBaseContract from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
@@ -31,7 +32,7 @@ class MultiSendContract_v1_4_1
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: MultiSendContract_v1_4_1_Abi,
     deploymentType?: DeploymentType
   ) {

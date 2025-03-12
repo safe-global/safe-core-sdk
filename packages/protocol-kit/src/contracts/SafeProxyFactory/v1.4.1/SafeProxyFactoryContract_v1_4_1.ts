@@ -1,3 +1,4 @@
+import { Address } from 'abitype'
 import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
@@ -32,7 +33,7 @@ class SafeProxyFactoryContract_v1_4_1
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SafeProxyFactoryContract_v1_4_1_Abi,
     deploymentType?: DeploymentType
   ) {

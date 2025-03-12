@@ -43,7 +43,7 @@ class SafeContract_v1_0_0
     chainId: bigint,
     safeProvider: SafeProvider,
     isL1SafeSingleton?: boolean,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SafeContract_v1_0_0_Abi,
     deploymentType?: DeploymentType
   ) {

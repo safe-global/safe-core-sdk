@@ -15,11 +15,11 @@ import BaseSafeOperation from '@safe-global/relay-kit/packs/safe-4337/BaseSafeOp
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
 
 type ExistingSafeOptions = {
-  safeAddress: string
+  safeAddress: Address
 }
 
 type PredictedSafeOptions = {
-  owners: string[]
+  owners: Address[]
   threshold: number
   safeVersion?: SafeVersion
   saltNonce?: string
@@ -33,8 +33,8 @@ export type SponsoredPaymasterOption = {
 
 export type ERC20PaymasterOption = {
   isSponsored?: false
-  paymasterAddress: string
-  paymasterTokenAddress: string
+  paymasterAddress: Address
+  paymasterTokenAddress: Address
   amountToApprove?: bigint
 }
 
@@ -48,10 +48,10 @@ export type Safe4337InitOptions = {
   bundlerUrl: string
   safeModulesVersion?: string
   customContracts?: {
-    entryPointAddress?: string
-    safe4337ModuleAddress?: string
-    safeModulesSetupAddress?: string
-    safeWebAuthnSharedSignerAddress?: string
+    entryPointAddress?: Address
+    safe4337ModuleAddress?: Address
+    safeModulesSetupAddress?: Address
+    safeWebAuthnSharedSignerAddress?: Address
   }
   options: ExistingSafeOptions | PredictedSafeOptions
   paymasterOptions?: PaymasterOptions
@@ -64,9 +64,9 @@ export type Safe4337Options = {
   bundlerUrl: string
   paymasterOptions?: PaymasterOptions
   bundlerClient: BundlerClient
-  entryPointAddress: string
-  safe4337ModuleAddress: string
-  safeWebAuthnSharedSignerAddress?: string
+  entryPointAddress: Address
+  safe4337ModuleAddress: Address
+  safeWebAuthnSharedSignerAddress?: Address
   onchainAnalytics?: OnchainAnalyticsProps
 }
 
@@ -142,7 +142,7 @@ export type UserOperationWithPayload = {
 export type EstimateFeeFunctionProps = {
   userOperation: UserOperation
   bundlerUrl: string
-  entryPoint: string
+  entryPoint: Address
   paymasterOptions?: PaymasterOptions
 }
 

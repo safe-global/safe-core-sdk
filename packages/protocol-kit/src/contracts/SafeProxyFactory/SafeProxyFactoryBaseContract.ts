@@ -1,4 +1,4 @@
-import { Abi } from 'abitype'
+import { Abi, Address } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { SafeVersion } from '@safe-global/types-kit'
@@ -43,7 +43,7 @@ abstract class SafeProxyFactoryBaseContract<
     safeProvider: SafeProvider,
     defaultAbi: SafeProxyFactoryContractAbiType,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SafeProxyFactoryContractAbiType,
     deploymentType?: DeploymentType
   ) {

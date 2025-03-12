@@ -57,7 +57,8 @@ import {
   createClient,
   PublicRpcSchema,
   WalletRpcSchema,
-  rpcSchema
+  rpcSchema,
+  Address
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import {
@@ -185,7 +186,7 @@ class SafeProvider {
     // If we have a signer and its not a PK, it might be a delegate on the rpc levels and this should work with eth_requestAcc
     if (this.signer && typeof this.signer === 'string') {
       return createWalletClient({
-        account: this.signer,
+        account: this.signer as Address,
         chain,
         transport: custom(transport)
       })
@@ -224,19 +225,19 @@ class SafeProvider {
     return isAddress(address)
   }
 
-  async getEip3770Address(fullAddress: string): Promise<Eip3770Address> {
+  async getEip3770Address(fullAddress: Address): Promise<Eip3770Address> {
     const chainId = await this.getChainId()
     return validateEip3770Address(fullAddress, chainId)
   }
 
-  async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
+  async getBalance(address: Address, blockTag?: string | number): Promise<bigint> {
     return getBalance(this.#externalProvider, {
       address,
       ...asBlockId(blockTag)
     })
   }
 
-  async getNonce(address: string, blockTag?: string | number): Promise<number> {
+  async getNonce(address: Address, blockTag?: string | number): Promise<number> {
     return getTransactionCount(this.#externalProvider, {
       address,
       ...asBlockId(blockTag)
@@ -248,11 +249,11 @@ class SafeProvider {
     return BigInt(res)
   }
 
-  getChecksummedAddress(address: string): string {
+  getChecksummedAddress(address: Address): Address {
     return getAddress(address)
   }
 
-  async getContractCode(address: string, blockTag?: string | number): Promise<string> {
+  async getContractCode(address: Address, blockTag?: string | number): Promise<string> {
     const res = await getCode(this.#externalProvider, {
       address,
       ...asBlockId(blockTag)
@@ -261,7 +262,7 @@ class SafeProvider {
     return res ?? '0x'
   }
 
-  async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
+  async isContractDeployed(address: Address, blockTag?: string | number): Promise<boolean> {
     const contractCode = await getCode(this.#externalProvider, {
       address,
       ...asBlockId(blockTag)
@@ -270,7 +271,7 @@ class SafeProvider {
     return !!contractCode
   }
 
-  async getStorageAt(address: string, position: string): Promise<string> {
+  async getStorageAt(address: Address, position: string): Promise<string> {
     const content = await getStorageAt(this.#externalProvider, {
       address,
       slot: asHex(position)
@@ -285,7 +286,7 @@ class SafeProvider {
     })
   }
 
-  async getSignerAddress(): Promise<string | undefined> {
+  async getSignerAddress(): Promise<Address | undefined> {
     const externalSigner = await this.getExternalSigner()
     return externalSigner ? getAddress(externalSigner.account.address) : undefined
   }
@@ -323,7 +324,7 @@ class SafeProvider {
       const typedData = generateTypedData(safeEIP712Args)
       const { chainId, verifyingContract } = typedData.domain
       const chain = chainId ? Number(chainId) : undefined // ensure empty string becomes undefined
-      const domain = { verifyingContract: verifyingContract, chainId: chain }
+      const domain = { verifyingContract, chainId: chain }
 
       const signature = await signer.signTypedData({
         domain,

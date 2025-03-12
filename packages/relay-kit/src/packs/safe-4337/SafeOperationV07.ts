@@ -4,7 +4,7 @@ import {
   SafeUserOperation,
   SafeOperationOptions
 } from '@safe-global/types-kit'
-import { concat, Hex, isAddress, pad, toHex } from 'viem'
+import { Address, concat, Hex, isAddress, pad, toHex } from 'viem'
 import BaseSafeOperation from '@safe-global/relay-kit/packs/safe-4337/BaseSafeOperation'
 import { EIP712_SAFE_OPERATION_TYPE_V07 } from '@safe-global/relay-kit/packs/safe-4337/constants'
 
@@ -38,7 +38,8 @@ class SafeOperationV07 extends BaseSafeOperation {
     this.userOperation.paymasterVerificationGasLimit = estimations.paymasterVerificationGasLimit
       ? BigInt(estimations.paymasterVerificationGasLimit)
       : this.userOperation.paymasterVerificationGasLimit
-    this.userOperation.paymaster = estimations.paymaster || this.userOperation.paymaster
+    this.userOperation.paymaster =
+      (estimations.paymaster as Address) || this.userOperation.paymaster
     this.userOperation.paymasterData = estimations.paymasterData || this.userOperation.paymasterData
   }
 

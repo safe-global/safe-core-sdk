@@ -12,7 +12,8 @@ import {
   WalletClient,
   toEventHash,
   FormattedTransactionReceipt,
-  decodeEventLog
+  decodeEventLog,
+  Address
 } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
@@ -88,7 +89,7 @@ export interface encodeSetupCallDataProps {
 
 export function encodeCreateProxyWithNonce(
   safeProxyFactoryContract: SafeProxyFactoryContractType,
-  safeSingletonAddress: string,
+  safeSingletonAddress: Address,
   initializer: string,
   salt?: string
 ) {
@@ -222,14 +223,14 @@ const memoizedGetSafeContract = createMemoizedFunction(
  * Retrieves the version of the Safe contract associated with the given Safe address from the blockchain.
  *
  * @param {SafeProvider} safeProvider The provider to use when reading the contract.
- * @param {string} safeAddress The address of the Safe contract for which to retrieve the version.
+ * @param {Address} safeAddress The address of the Safe contract for which to retrieve the version.
  *
  * @returns {Promise<SafeVersion>} A promise resolving to the version of the Safe contract.
  * @throws when fetching an address which doesn't have a Safe deployed in it.
  */
 export async function getSafeContractVersion(
   safeProvider: SafeProvider,
-  safeAddress: string
+  safeAddress: Address
 ): Promise<SafeVersion> {
   return (await safeProvider.readContract({
     address: safeAddress,
@@ -316,7 +317,7 @@ export async function predictSafeAddress({
   safeDeploymentConfig = {},
   isL1SafeSingleton,
   customContracts
-}: PredictSafeAddressProps): Promise<string> {
+}: PredictSafeAddressProps): Promise<Address> {
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 
@@ -467,19 +468,19 @@ export function getSafeAddressFromDeploymentTx(
  * Generates a zkSync Era address. zkSync Era uses a distinct address derivation method compared to Ethereum
  * see: https://docs.zksync.io/build/developer-reference/ethereum-differences/evm-instructions/#address-derivation
  *
- * @param {`string`} from - The sender's address.
+ * @param {`0x${string}`} from - The sender's address.
  * @param {SafeVersion} safeVersion - The version of the safe.
  * @param {`0x${string}`} salt - The salt used for address derivation.
  * @param {`0x${string}`} input - Additional input data for the derivation.
  *
- * @returns {string} The derived zkSync Era address.
+ * @returns {`0x${string}`} The derived zkSync Era address.
  */
 export function zkSyncEraCreate2Address(
-  from: string,
+  from: Address,
   safeVersion: SafeVersion,
   salt: Hex,
   input: Hex
-): string {
+): Address {
   const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash
   const inputHash = keccak256(input)
 

@@ -1,4 +1,4 @@
-import { Abi } from 'abitype'
+import { Abi, Address } from 'abitype'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
@@ -41,7 +41,7 @@ abstract class CreateCallBaseContract<
     safeProvider: SafeProvider,
     defaultAbi: CreateCallContractAbiType,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: CreateCallContractAbiType,
     deploymentType?: DeploymentType
   ) {

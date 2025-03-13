@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "2.5.11",
+  "version": "3.0.0",
   "description": "SDK that facilitates the interaction with the Safe Transaction Service API",
   "types": "dist/src/index.d.ts",
   "main": "dist/cjs/index.cjs",
@@ -26,7 +26,7 @@
     "test:ci": "yarn test:ci:viem",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
-    "unbuild": "rimraf dist .nyc_output cache",
+    "unbuild": "rimraf dist coverage .nyc_output",
     "build": "yarn unbuild && yarn build:esm && yarn build:cjs && yarn build:types",
     "build:esm": "esbuild ./src/index --format=esm --bundle --packages=external --outdir=dist/esm --out-extension:.js=.mjs",
     "build:cjs": "esbuild ./src/index --format=cjs --bundle --packages=external --outdir=dist/cjs --out-extension:.js=.cjs",
@@ -46,13 +46,14 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@safe-global/relay-kit": "^3.4.5",
-    "@safe-global/testing-kit": "^0.1.2",
+    "@safe-global/relay-kit": "^4.0.0",
+    "@safe-global/testing-kit": "^0.2.0",
     "@types/chai": "^4.3.20",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.10",
     "@types/node-fetch": "^2.6.12",
-    "@types/sinon": "^17.0.3",
+    "@types/semver": "^7.5.8",
+    "@types/sinon": "^17.0.4",
     "chai": "^4.5.0",
     "chai-as-promised": "^7.1.2",
     "ethers": "^6.13.5",
@@ -64,8 +65,8 @@
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^5.2.4",
-    "@safe-global/types-kit": "^1.0.4",
+    "@safe-global/protocol-kit": "^6.0.0",
+    "@safe-global/types-kit": "^2.0.0",
     "node-fetch": "^2.7.0",
     "viem": "^2.21.8"
   }

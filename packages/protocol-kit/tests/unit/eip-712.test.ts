@@ -1,3 +1,4 @@
+import { Address } from 'abitype'
 import { SafeTransactionData, OperationType, EIP712TypedData } from '@safe-global/types-kit'
 import chai from 'chai'
 import {
@@ -240,7 +241,7 @@ describe('EIP-712 sign typed data', () => {
         domain: {
           chainId: 1,
           name: 'Ether Mail',
-          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC' as Address,
           version: '1'
         },
         message: {

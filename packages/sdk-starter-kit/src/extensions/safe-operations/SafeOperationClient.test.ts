@@ -1,4 +1,5 @@
 import Safe, * as protocolKitModule from '@safe-global/protocol-kit'
+import { MetaTransactionData } from '@safe-global/types-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack, SafeOperationV06 } from '@safe-global/relay-kit'
 
@@ -17,7 +18,7 @@ jest.mock('../../utils', () => {
   }
 })
 
-const TRANSACTION = { to: '0xEthereumAddres', value: '0', data: '0x' }
+const TRANSACTION: MetaTransactionData = { to: '0xEthereumAddres', value: '0', data: '0x' }
 const TRANSACTION_BATCH = [TRANSACTION]
 const SAFE_ADDRESS = '0xSafeAddress'
 const SAFE_OPERATION_HASH = '0xSafeOperationHash'

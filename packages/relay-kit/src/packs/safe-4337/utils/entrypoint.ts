@@ -1,3 +1,4 @@
+import { Address } from 'viem'
 import Safe from '@safe-global/protocol-kit'
 import {
   ENTRYPOINT_ABI,
@@ -32,8 +33,8 @@ export function isEntryPointV7(address: string): boolean {
 
 export async function getSafeNonceFromEntrypoint(
   protocolKit: Safe,
-  safeAddress: string,
-  entryPointAddress: string
+  safeAddress: Address,
+  entryPointAddress: Address
 ): Promise<bigint> {
   const safeProvider = protocolKit.getSafeProvider()
 

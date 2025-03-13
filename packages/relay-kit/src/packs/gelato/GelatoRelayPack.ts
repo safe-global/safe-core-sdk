@@ -35,6 +35,7 @@ import {
   GelatoExecuteTransactionProps,
   GelatoOptions
 } from './types'
+import { Address } from 'viem'
 
 export class GelatoRelayPack extends RelayKitBasePack<{
   EstimateFeeProps: GelatoEstimateFeeProps
@@ -58,7 +59,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
     return !gasToken || gasToken === ZERO_ADDRESS ? GELATO_NATIVE_TOKEN_ADDRESS : gasToken
   }
 
-  getFeeCollector(): string {
+  getFeeCollector(): Address {
     return GELATO_FEE_COLLECTOR
   }
 

@@ -1,4 +1,4 @@
-import { Abi } from 'abitype'
+import { Abi, Address } from 'abitype'
 
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
@@ -41,7 +41,7 @@ abstract class CompatibilityFallbackHandlerBaseContract<
     safeProvider: SafeProvider,
     defaultAbi: CompatibilityFallbackHandlerContractAbiType,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: CompatibilityFallbackHandlerContractAbiType,
     deploymentType?: DeploymentType
   ) {

@@ -1,3 +1,4 @@
+import { Address } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -36,7 +37,7 @@ export interface GetContractInstanceProps {
 
 export interface GetSafeContractInstanceProps extends GetContractInstanceProps {
   isL1SafeSingleton?: boolean
-  customSafeAddress?: string
+  customSafeAddress?: Address
 }
 
 export async function getSafeContract({

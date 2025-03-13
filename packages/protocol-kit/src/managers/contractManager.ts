@@ -1,3 +1,4 @@
+import { Address } from 'abitype'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   getMultiSendCallOnlyContract,
@@ -44,7 +45,7 @@ class ContractManager {
     } else {
       try {
         // We try to fetch the version of the Safe from the blockchain
-        safeVersion = await getSafeContractVersion(safeProvider, safeAddress as string)
+        safeVersion = await getSafeContractVersion(safeProvider, safeAddress as Address)
       } catch (e) {
         // if contract is not deployed we use the default version
         safeVersion = DEFAULT_SAFE_VERSION

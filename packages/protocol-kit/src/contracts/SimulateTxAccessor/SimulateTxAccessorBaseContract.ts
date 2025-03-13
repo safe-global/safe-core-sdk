@@ -1,4 +1,4 @@
-import { Abi } from 'abitype'
+import { Abi, Address } from 'abitype'
 
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -41,7 +41,7 @@ abstract class SimulateTxAccessorBaseContract<
     safeProvider: SafeProvider,
     defaultAbi: SimulateTxAccessorContractAbiType,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SimulateTxAccessorContractAbiType,
     deploymentType?: DeploymentType
   ) {

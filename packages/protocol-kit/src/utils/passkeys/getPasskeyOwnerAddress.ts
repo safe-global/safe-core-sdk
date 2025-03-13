@@ -1,3 +1,4 @@
+import { Address } from 'abitype'
 import Safe from '@safe-global/protocol-kit/Safe'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { PasskeyArgType } from '@safe-global/protocol-kit/types'
@@ -7,9 +8,9 @@ import { PasskeyArgType } from '@safe-global/protocol-kit/types'
  *
  * @param {Safe} safe The protocol-kit instance of the current Safe
  * @param {PasskeyArgType} passkey The passkey to check the owner address
- * @returns {Promise<string>} Returns the passkey owner address associated with the passkey
+ * @returns {Promise<Address>} Returns the passkey owner address associated with the passkey
  */
-async function getPasskeyOwnerAddress(safe: Safe, passkey: PasskeyArgType): Promise<string> {
+async function getPasskeyOwnerAddress(safe: Safe, passkey: PasskeyArgType): Promise<Address> {
   const safeVersion = safe.getContractVersion()
   const safeAddress = await safe.getAddress()
   const owners = await safe.getOwners()

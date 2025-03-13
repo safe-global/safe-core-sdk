@@ -84,7 +84,7 @@ import SafeMessage from './utils/messages/SafeMessage'
 import semverSatisfies from 'semver/functions/satisfies.js'
 import SafeProvider from './SafeProvider'
 import { asHash, asHex } from './utils/types'
-import { Hash, Hex, SendTransactionParameters } from 'viem'
+import { Address, Hash, Hex, SendTransactionParameters } from 'viem'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import createPasskeyDeploymentTransaction from './utils/passkeys/createPasskeyDeploymentTransaction'
 import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
@@ -287,7 +287,7 @@ class Safe {
    *
    * @returns The address of the SafeProxy contract
    */
-  async getAddress(): Promise<string> {
+  async getAddress(): Promise<Address> {
     if (this.#predictedSafe) {
       const safeVersion = this.getContractVersion()
       if (!hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
@@ -336,7 +336,7 @@ class Safe {
    *
    * @returns The address of the MultiSend contract
    */
-  getMultiSendAddress(): string {
+  getMultiSendAddress(): Address {
     return this.#contractManager.multiSendContract.getAddress()
   }
 
@@ -345,7 +345,7 @@ class Safe {
    *
    * @returns The address of the MultiSendCallOnly contract
    */
-  getMultiSendCallOnlyAddress(): string {
+  getMultiSendCallOnlyAddress(): Address {
     return this.#contractManager.multiSendCallOnlyContract.getAddress()
   }
 
@@ -382,7 +382,7 @@ class Safe {
    *
    * @returns The list of owners
    */
-  async getOwners(): Promise<string[]> {
+  async getOwners(): Promise<Address[]> {
     if (this.#predictedSafe?.safeAccountConfig.owners) {
       return Promise.resolve(this.#predictedSafe.safeAccountConfig.owners)
     }
@@ -471,7 +471,7 @@ class Safe {
    * @param pageSize - The size of the page. It will be the max length of the returning array. Must be greater then 0.
    * @returns The list of addresses of all the enabled Safe modules
    */
-  async getModulesPaginated(start: string, pageSize: number = 10): Promise<SafeModulesPaginated> {
+  async getModulesPaginated(start: Address, pageSize: number = 10): Promise<SafeModulesPaginated> {
     return this.#moduleManager.getModulesPaginated(start, pageSize)
   }
 
@@ -481,7 +481,7 @@ class Safe {
    * @param moduleAddress - The desired module address
    * @returns TRUE if the module is enabled
    */
-  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
+  async isModuleEnabled(moduleAddress: Address): Promise<boolean> {
     return this.#moduleManager.isModuleEnabled(moduleAddress)
   }
 
@@ -491,7 +491,7 @@ class Safe {
    * @param ownerAddress - The account address
    * @returns TRUE if the account is an owner
    */
-  async isOwner(ownerAddress: string): Promise<boolean> {
+  async isOwner(ownerAddress: Address): Promise<boolean> {
     if (this.#predictedSafe?.safeAccountConfig.owners) {
       return Promise.resolve(
         this.#predictedSafe?.safeAccountConfig.owners.some((owner: string) =>
@@ -677,7 +677,7 @@ class Safe {
   async signMessage(
     message: SafeMessage,
     signingMethod: SigningMethodType = SigningMethod.ETH_SIGN_TYPED_DATA_V4,
-    preimageSafeAddress?: string
+    preimageSafeAddress?: Address
   ): Promise<SafeMessage> {
     const signerAddress = await this.#safeProvider.getSignerAddress()
     if (!signerAddress) {
@@ -781,7 +781,7 @@ class Safe {
   async signTransaction(
     safeTransaction: SafeTransaction | SafeMultisigTransactionResponse,
     signingMethod: SigningMethodType = SigningMethod.ETH_SIGN_TYPED_DATA_V4,
-    preimageSafeAddress?: string
+    preimageSafeAddress?: Address
   ): Promise<SafeTransaction> {
     const transaction = isSafeMultisigTransactionResponse(safeTransaction)
       ? await this.toSafeTransactionType(safeTransaction)
@@ -896,13 +896,13 @@ class Safe {
    * @param txHash - The Safe transaction hash
    * @returns The list of owners
    */
-  async getOwnersWhoApprovedTx(txHash: string): Promise<string[]> {
+  async getOwnersWhoApprovedTx(txHash: string): Promise<Address[]> {
     if (!this.#contractManager.safeContract) {
       return []
     }
 
     const owners = await this.getOwners()
-    const ownersWhoApproved: string[] = []
+    const ownersWhoApproved: Address[] = []
     for (const owner of owners) {
       const [approved] = await this.#contractManager.safeContract.approvedHashes([
         asHex(owner),
@@ -1037,7 +1037,7 @@ class Safe {
    * @throws "Module provided is already enabled"
    */
   async createEnableModuleTx(
-    moduleAddress: string,
+    moduleAddress: Address,
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeTransactionData = {
@@ -1249,7 +1249,7 @@ class Safe {
     serviceTransactionResponse: SafeMultisigTransactionResponse
   ): Promise<SafeTransaction> {
     const safeTransactionData = {
-      to: serviceTransactionResponse.to,
+      to: serviceTransactionResponse.to as Address,
       value: serviceTransactionResponse.value,
       data: serviceTransactionResponse.data || '0x',
       operation: serviceTransactionResponse.operation
@@ -1258,8 +1258,8 @@ class Safe {
       safeTxGas: serviceTransactionResponse.safeTxGas.toString(),
       baseGas: serviceTransactionResponse.baseGas.toString(),
       gasPrice: serviceTransactionResponse.gasPrice,
-      gasToken: serviceTransactionResponse.gasToken,
-      refundReceiver: serviceTransactionResponse.refundReceiver,
+      gasToken: serviceTransactionResponse.gasToken as Address,
+      refundReceiver: serviceTransactionResponse.refundReceiver as Address,
       nonce: serviceTransactionResponse.nonce
     }
     const safeTransaction = await this.createTransaction({
@@ -1268,7 +1268,10 @@ class Safe {
     })
     serviceTransactionResponse.confirmations?.map(
       (confirmation: SafeMultisigConfirmationResponse) => {
-        const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
+        const signature = new EthSafeSignature(
+          confirmation.owner as Address,
+          confirmation.signature
+        )
         safeTransaction.addSignature(signature)
       }
     )
@@ -1760,7 +1763,7 @@ class Safe {
   getContractInfo = ({
     contractAddress
   }: {
-    contractAddress: string
+    contractAddress: Address
   }): ContractInfo | undefined => {
     return getContractInfo(contractAddress)
   }

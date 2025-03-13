@@ -6,6 +6,7 @@ import {
   CompatibilityFallbackHandlerContract_v1_3_0_Contract,
   compatibilityFallbackHandler_1_3_0_ContractArtifacts
 } from '@safe-global/types-kit'
+import { Address } from 'abitype'
 
 /**
  * CompatibilityFallbackHandlerContract_v1_3_0  is the implementation specific to the CompatibilityFallbackHandler contract version 1.3.0.
@@ -31,7 +32,7 @@ class CompatibilityFallbackHandlerContract_v1_3_0
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: CompatibilityFallbackHandlerContract_v1_3_0_Abi,
     deploymentType?: DeploymentType
   ) {

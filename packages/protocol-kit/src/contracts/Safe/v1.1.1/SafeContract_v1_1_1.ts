@@ -1,3 +1,4 @@
+import { Address, ContractFunctionArgs } from 'viem'
 import { simulateContract } from 'viem/actions'
 import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -14,7 +15,6 @@ import {
   TransactionResult
 } from '@safe-global/types-kit'
 import { asHash, asHex } from '@safe-global/protocol-kit/utils/types'
-import { ContractFunctionArgs } from 'viem'
 
 /**
  * SafeContract_v1_1_1  is the implementation specific to the Safe contract version 1.1.1.
@@ -42,7 +42,7 @@ class SafeContract_v1_1_1
     chainId: bigint,
     safeProvider: SafeProvider,
     isL1SafeSingleton?: boolean,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SafeContract_v1_1_1_Abi,
     deploymentType?: DeploymentType
   ) {

@@ -7,6 +7,7 @@ import {
 } from '@safe-global/types-kit'
 import { IFeeEstimator } from '@safe-global/relay-kit'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
+import { Address } from 'viem'
 
 export type SendTransactionProps = {
   transactions: TransactionBase[]
@@ -41,13 +42,13 @@ export type ConfirmSafeOperationProps = {
 }
 
 export type SafeConfig = {
-  owners: string[]
+  owners: Address[]
   threshold: number
   saltNonce?: string
 }
 
 export type ExistingSafeConfig = {
-  safeAddress?: string
+  safeAddress?: Address
   safeOptions?: never
 }
 
@@ -66,7 +67,7 @@ export type SdkStarterKitConfig = SdkStarterKitRootConfig &
   (ExistingSafeConfig | PredictedSafeConfig)
 
 export type SafeClientResult = {
-  safeAddress: string
+  safeAddress: Address
   description: string
   status: SafeClientTxStatus
   transactions?: {

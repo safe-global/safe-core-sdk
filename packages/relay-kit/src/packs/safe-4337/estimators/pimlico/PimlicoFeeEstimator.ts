@@ -11,6 +11,7 @@ import {
 } from '@safe-global/relay-kit/packs/safe-4337/utils'
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
 import { PIMLICO_CUSTOM_RPC_4337_CALLS, PimlicoCustomRpcSchema } from './types'
+import { Address } from 'viem'
 
 /**
  * PimlicoFeeEstimator is a class that implements the IFeeEstimator interface. You can implement three optional methods that will be called during the estimation process:
@@ -64,7 +65,7 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     )
 
     if (paymasterOptions.isSponsored) {
-      const params: [UserOperationStringValues, string, { sponsorshipPolicyId: string }?] = [
+      const params: [UserOperationStringValues, Address, { sponsorshipPolicyId: string }?] = [
         userOperationToHexValues(userOperation, entryPoint),
         entryPoint
       ]

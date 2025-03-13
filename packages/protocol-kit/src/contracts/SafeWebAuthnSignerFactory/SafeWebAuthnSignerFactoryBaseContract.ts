@@ -1,4 +1,4 @@
-import { Abi } from 'abitype'
+import { Abi, Address } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
@@ -39,7 +39,7 @@ abstract class SafeWebAuthnSignerFactoryBaseContract<
     safeProvider: SafeProvider,
     defaultAbi: SafeWebAuthnSignerFactoryContractAbiType,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SafeWebAuthnSignerFactoryContractAbiType,
     deploymentType?: DeploymentType
   ) {

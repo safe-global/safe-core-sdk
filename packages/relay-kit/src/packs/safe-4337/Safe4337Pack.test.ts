@@ -43,7 +43,7 @@ jest.mock('./utils', () => ({
 }))
 
 let safe4337ModuleAddress: viem.Hash
-let safeModulesSetupAddress: string
+let safeModulesSetupAddress: viem.Address
 
 describe('Safe4337Pack', () => {
   beforeAll(async () => {
@@ -57,7 +57,7 @@ describe('Safe4337Pack', () => {
       released: true,
       version: '0.3.0',
       network
-    })?.networkAddresses[network] as string
+    })?.networkAddresses[network] as viem.Address
   })
 
   afterEach(() => {
@@ -313,14 +313,14 @@ describe('Safe4337Pack', () => {
         ]
       })
 
-      const enable4337ModuleTransaction = {
+      const enable4337ModuleTransaction: MetaTransactionData = {
         to: safeModulesSetupAddress,
         value: '0',
         data: enableModulesData,
         operation: OperationType.DelegateCall
       }
 
-      const approveToPaymasterTransaction = {
+      const approveToPaymasterTransaction: MetaTransactionData = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
         value: '0',
         data: approveData,
@@ -540,7 +540,7 @@ describe('Safe4337Pack', () => {
         }
       })
 
-      const approveTransaction = {
+      const approveTransaction: MetaTransactionData = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
         data: viem.encodeFunctionData({
           abi: constants.ABI,
@@ -655,7 +655,7 @@ describe('Safe4337Pack', () => {
         operation: OperationType.DelegateCall
       }
 
-      const sharedSignerTransaction = {
+      const sharedSignerTransaction: MetaTransactionData = {
         to: SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
         value: '0',
         data: passkeyConfigureData,
@@ -708,7 +708,7 @@ describe('Safe4337Pack', () => {
     })
 
     it('should allow to sign a SafeOperation', async () => {
-      const transferUSDC = {
+      const transferUSDC: MetaTransactionData = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
         data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
         value: '0',
@@ -744,7 +744,7 @@ describe('Safe4337Pack', () => {
     })
 
     it('should allow to send an UserOperation to a bundler', async () => {
-      const transferUSDC = {
+      const transferUSDC: MetaTransactionData = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
         data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
         value: '0',
@@ -792,7 +792,7 @@ describe('Safe4337Pack', () => {
   })
 
   it('should allow to sign a SafeOperation', async () => {
-    const transferUSDC = {
+    const transferUSDC: MetaTransactionData = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
       data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
       value: '0',
@@ -852,7 +852,7 @@ describe('Safe4337Pack', () => {
   })
 
   it('should allow to send an UserOperation to a bundler', async () => {
-    const transferUSDC = {
+    const transferUSDC: MetaTransactionData = {
       to: fixtures.PAYMASTER_TOKEN_ADDRESS,
       data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
       value: '0',
@@ -1061,7 +1061,7 @@ describe('Safe4337Pack', () => {
         safeModulesVersion: '0.3.0'
       })
 
-      const transferUSDC = {
+      const transferUSDC: MetaTransactionData = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
         data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
         value: '0',
@@ -1085,7 +1085,7 @@ describe('Safe4337Pack', () => {
     })
 
     it('should allow to use custom nonces', async () => {
-      const transferUSDC = {
+      const transferUSDC: MetaTransactionData = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,
         data: generateTransferCallData(fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE, 100_000n),
         value: '0',

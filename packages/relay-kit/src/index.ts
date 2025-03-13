@@ -14,9 +14,3 @@ export * from './packs/safe-4337/types'
 export * from './packs/safe-4337/utils'
 
 export * from './RelayKitBasePack'
-
-declare module 'abitype' {
-  export interface Register {
-    AddressType: string
-  }
-}

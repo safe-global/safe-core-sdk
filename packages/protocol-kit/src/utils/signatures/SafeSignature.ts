@@ -1,7 +1,8 @@
+import { Address } from 'abitype'
 import { SafeSignature } from '@safe-global/types-kit'
 
 export class EthSafeSignature implements SafeSignature {
-  signer: string
+  signer: Address
   data: string
   isContractSignature: boolean
 
@@ -12,7 +13,7 @@ export class EthSafeSignature implements SafeSignature {
    * @param signature - The Safe signature
    * @returns The Safe signature instance
    */
-  constructor(signer: string, signature: string, isContractSignature = false) {
+  constructor(signer: Address, signature: string, isContractSignature = false) {
     this.signer = signer
     this.data = signature
     this.isContractSignature = isContractSignature

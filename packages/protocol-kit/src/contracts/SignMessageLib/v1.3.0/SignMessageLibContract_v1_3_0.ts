@@ -1,3 +1,4 @@
+import { Address } from 'abitype'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import SignMessageLibBaseContract from '@safe-global/protocol-kit/contracts/SignMessageLib/SignMessageLibBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -34,7 +35,7 @@ class SignMessageLibContract_v1_3_0
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SignMessageLibContract_v1_3_0_Abi,
     deploymentType?: DeploymentType
   ) {

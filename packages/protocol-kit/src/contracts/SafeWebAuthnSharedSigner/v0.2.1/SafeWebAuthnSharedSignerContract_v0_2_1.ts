@@ -1,3 +1,4 @@
+import { Address } from 'abitype'
 import SafeWebAuthnSharedSignerBaseContract from '@safe-global/protocol-kit/contracts/SafeWebAuthnSharedSigner/SafeWebAuthnSharedSignerBaseContract'
 import {
   SafeVersion,
@@ -35,7 +36,7 @@ class SafeWebAuthnSharedSignerContract_v0_2_1
     chainId: bigint,
     safeProvider: SafeProvider,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SafeWebAuthnSharedSignerContract_v0_2_1_Abi,
     deploymentType?: DeploymentType
   ) {

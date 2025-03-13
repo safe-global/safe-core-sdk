@@ -1,6 +1,6 @@
+import { Address, GetTransactionReceiptReturnType } from 'viem'
 import { validateEthereumAddress } from '@safe-global/protocol-kit'
 import { TransactionResult } from '@safe-global/types-kit'
-import { GetTransactionReceiptReturnType } from 'viem'
 
 import { MESSAGES, SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
 import { SafeClientResult, SafeConfig } from '@safe-global/sdk-starter-kit/types'
@@ -44,7 +44,7 @@ export const createSafeClientResult = ({
   safeOperationHash
 }: {
   status: SafeClientTxStatus
-  safeAddress: string
+  safeAddress: Address
   deploymentTxHash?: string
   safeTxHash?: string
   txHash?: string

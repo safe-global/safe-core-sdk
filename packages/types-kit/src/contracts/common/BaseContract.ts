@@ -1,6 +1,7 @@
 import {
   Abi,
   AbiParametersToPrimitiveTypes,
+  Address,
   ExtractAbiFunction,
   ExtractAbiFunctionNames
 } from 'abitype'
@@ -77,7 +78,7 @@ export type EstimateGasFunction<
   options?: TransactionOptions
 ) => Promise<bigint>
 
-export type GetAddressFunction = () => string
+export type GetAddressFunction = () => Address
 
 /**
  * Defines a function type for a contract, derived by the given function name from a given contract ABI.

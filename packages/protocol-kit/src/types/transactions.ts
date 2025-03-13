@@ -6,6 +6,7 @@ import { SafeContractImplementationType } from './contracts'
 import { ContractNetworksConfig } from './contracts'
 import { PredictedSafeProps } from './safeConfig'
 import { PasskeyArgType } from './passkeys'
+import { Address } from 'abitype'
 
 export type CreateTransactionProps = {
   /** transactions - The transaction array to process */
@@ -49,7 +50,7 @@ export type StandardizeSafeTransactionDataProps =
 
 export type AddOwnerTxParams = {
   /** ownerAddress - The address of the new owner */
-  ownerAddress: string
+  ownerAddress: Address
   /** threshold - The new threshold */
   threshold?: number
 }
@@ -78,19 +79,19 @@ export type RemovePasskeyOwnerTxParams = {
 export type SwapOwnerTxParams =
   | {
       /** oldOwnerAddress - The old owner address */
-      oldOwnerAddress: string
+      oldOwnerAddress: Address
       /** newOwnerAddress - The new owner address */
-      newOwnerAddress: string
+      newOwnerAddress: Address
     }
   | {
       /** oldOwnerPasskey - The old owner passkey */
       oldOwnerPasskey: PasskeyArgType
       /** newOwnerAddress - The new owner address */
-      newOwnerAddress: string
+      newOwnerAddress: Address
     }
   | {
       /** oldOwnerAddress - The old owner address */
-      oldOwnerAddress: string
+      oldOwnerAddress: Address
       /** newOwnerPasskey - The new owner passkey */
       newOwnerPasskey: PasskeyArgType
     }

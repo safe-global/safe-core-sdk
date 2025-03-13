@@ -1,10 +1,10 @@
-import { isAddress } from 'viem'
+import { Address, isAddress } from 'viem'
 import { Eip3770Address } from '@safe-global/types-kit'
 import { networks } from './config'
 
 export function parseEip3770Address(fullAddress: string): Eip3770Address {
   const parts = fullAddress.split(':')
-  const address = parts.length > 1 ? parts[1] : parts[0]
+  const address = parts.length > 1 ? (parts[1] as Address) : (parts[0] as Address)
   const prefix = parts.length > 1 ? parts[0] : ''
   return { prefix, address }
 }

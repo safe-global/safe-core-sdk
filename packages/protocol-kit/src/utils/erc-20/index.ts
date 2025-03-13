@@ -1,6 +1,6 @@
 import Safe from '@safe-global/protocol-kit/Safe'
 import { Transaction } from '@safe-global/types-kit'
-import { encodeFunctionData, parseAbi } from 'viem'
+import { Address, encodeFunctionData, parseAbi } from 'viem'
 import { ZERO_ADDRESS } from '../constants'
 
 const ERC20_ABI = [
@@ -12,12 +12,12 @@ const ERC20_ABI = [
  * Returns the number of decimals of a given ERC-20 token.
  *
  * @async
- * @param {string} tokenAddress - The address of the ERC-20 token.
+ * @param {Address} tokenAddress - The address of the ERC-20 token.
  * @param {Safe} safe - The Safe object.
  * @returns {Promise<number>} The number of decimals that the token uses.
  * @throws "Invalid ERC-20 decimals"
  */
-export async function getERC20Decimals(tokenAddress: string, safe: Safe): Promise<number> {
+export async function getERC20Decimals(tokenAddress: Address, safe: Safe): Promise<number> {
   const safeProvider = safe.getSafeProvider()
   const data = encodeFunctionData({
     abi: parseAbi(ERC20_ABI),
@@ -50,12 +50,12 @@ const STANDARD_ERC20_DECIMALS = 18
  *
  * @async
  * @export
- * @param {string} gasToken - The address of the gas token.
+ * @param {Address} gasToken - The address of the gas token.
  * @param {Safe} safe - The Safe object.
  * @returns {Promise<boolean>} Returns true if the gas token is compatible, otherwise false.
  */
 export async function isGasTokenCompatibleWithHandlePayment(
-  gasToken: string,
+  gasToken: Address,
   safe: Safe
 ): Promise<boolean> {
   const isNativeToken = gasToken === ZERO_ADDRESS
@@ -75,14 +75,14 @@ export async function isGasTokenCompatibleWithHandlePayment(
  * Creates a transaction object to perform a transfer of a specified amount of ERC-20 tokens to a given address.
  *
  * @export
- * @param {string} tokenAddress - The address of the ERC-20 token.
- * @param {string} toAddress - The address to which the tokens should be transferred.
+ * @param {Address} tokenAddress - The address of the ERC-20 token.
+ * @param {Address} toAddress - The address to which the tokens should be transferred.
  * @param {string} amount - The amount of tokens to transfer.
  * @returns {Transaction} Returns a transaction object that represents the transfer.
  */
 export function createERC20TokenTransferTransaction(
-  tokenAddress: string,
-  toAddress: string,
+  tokenAddress: Address,
+  toAddress: Address,
   amount: string
 ): Transaction {
   const data = encodeFunctionData({

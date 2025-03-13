@@ -14,7 +14,8 @@ const playgroundProtocolKitPaths = {
 const playgroundApiKitPaths = {
   'propose-transaction': 'api-kit/propose-transaction',
   'confirm-transaction': 'api-kit/confirm-transaction',
-  'execute-transaction': 'api-kit/execute-transaction'
+  'execute-transaction': 'api-kit/execute-transaction',
+  'estimate-safe-tx-gas': 'api-kit/estimate-safe-tx-gas'
 }
 const playgroundRelayKitPaths = {
   'gelato-paid-transaction': 'relay-kit/gelato-paid-transaction',

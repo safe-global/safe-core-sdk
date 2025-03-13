@@ -3,7 +3,7 @@ import { Chain, gnosis, arbitrum, polygon } from 'viem/chains'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
 const config = {
-  SAFE_ADDRESS: '<SAFE_ADDRESS>',
+  SAFE_ADDRESS: '0xa8a0a94bd80AE6EF2699c7f5fC84abef81CcDCf5',
   chain: gnosis // Add the viem chain where the SAFE_ADDRESS is deployed (gnosis, arbitrum, polygon, etc.)
 }
 
@@ -16,10 +16,22 @@ async function estimate(chain: Chain) {
     safeAddress: config.SAFE_ADDRESS
   })
 
+  const safeProvider = protocolKit.getSafeProvider()
+
   const safeTransaction = await protocolKit.createAddOwnerTx({
     ownerAddress: account.address,
     threshold: 1
   })
+
+  console.log(
+    `gas (${chain.name}):`,
+    await safeProvider.estimateGas({
+      to: safeTransaction.data.to,
+      value: safeTransaction.data.value,
+      data: safeTransaction.data.data,
+      from: config.SAFE_ADDRESS
+    })
+  )
 
   console.log(`safeTxGas (${chain.name}):`, await estimateSafeTxGas(protocolKit, safeTransaction))
 }

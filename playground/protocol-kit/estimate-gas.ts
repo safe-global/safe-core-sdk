@@ -3,7 +3,7 @@ import { Chain, gnosis, arbitrum, polygon } from 'viem/chains'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
 const config = {
-  SAFE_ADDRESS: '0xa8a0a94bd80AE6EF2699c7f5fC84abef81CcDCf5',
+  SAFE_ADDRESS: '<SAFE_ADDRESS>',
   chain: gnosis // Add the viem chain where the SAFE_ADDRESS is deployed (gnosis, arbitrum, polygon, etc.)
 }
 

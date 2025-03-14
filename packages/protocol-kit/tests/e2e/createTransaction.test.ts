@@ -347,13 +347,48 @@ describe('Transactions creation', () => {
           })
         }
       ]
-      const multiSendTx = await safeSdk.createTransaction({ transactions })
+      const multiSendTx = await safeSdk.createTransaction({ transactions, onlyCalls: false })
       chai
         .expect(multiSendTx.data.to)
         .to.be.eq(contractNetworks[chainId.toString()].multiSendAddress)
     })
 
-    it('should create a MultiSend transaction with options', async () => {
+    it('should create a MultiSendCallOnly transaction', async () => {
+      const { safe, accounts, contractNetworks, chainId } = await setupTests()
+      const erc20Mintable = await getERC20Mintable()
+      const safeAddress = safe.address
+      const safeSdk = await Safe.init({
+        provider,
+        safeAddress,
+        contractNetworks
+      })
+      const transactions = [
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [accounts[1].address, '1100000000000000000'] // 1.1 ERC20
+          })
+        },
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [accounts[1].address, '100000000000000000'] // 0.1 ERC20
+          })
+        }
+      ]
+      const multiSendTx = await safeSdk.createTransaction({ transactions })
+      chai
+        .expect(multiSendTx.data.to)
+        .to.be.eq(contractNetworks[chainId.toString()].multiSendCallOnlyAddress)
+    })
+
+    it('should create a MultiSendCallOnly transaction with options', async () => {
       const { safe, accounts, contractNetworks, chainId } = await setupTests()
       const erc20Mintable = await getERC20Mintable()
       const safeAddress = safe.address
@@ -387,7 +422,7 @@ describe('Transactions creation', () => {
       const multiSendTx = await safeSdk.createTransaction({ transactions, options })
       chai
         .expect(multiSendTx.data.to)
-        .to.be.eq(contractNetworks[chainId.toString()].multiSendAddress)
+        .to.be.eq(contractNetworks[chainId.toString()].multiSendCallOnlyAddress)
       chai.expect(multiSendTx.data.value).to.be.eq('0')
       chai.expect(multiSendTx.data.baseGas).to.be.eq(BASE_OPTIONS.baseGas)
       chai.expect(multiSendTx.data.gasPrice).to.be.eq(BASE_OPTIONS.gasPrice)

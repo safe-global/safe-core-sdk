@@ -512,7 +512,7 @@ class Safe {
    */
   async createTransaction({
     transactions,
-    onlyCalls = false,
+    onlyCalls = true,
     options
   }: CreateTransactionProps): Promise<SafeTransaction> {
     const safeVersion = this.getContractVersion()

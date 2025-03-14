@@ -211,7 +211,8 @@ describe('Passkey', () => {
         const transactions = [addSharedSignerAddressOwner, configureSharedSignerTransaction]
 
         const configureSharedSignerSafeTransaction = await safeSdk.createTransaction({
-          transactions
+          transactions,
+          onlyCalls: false
         })
 
         // Sign the configure the shared Signer transaction with the EOA signer
@@ -346,7 +347,8 @@ describe('Passkey', () => {
           const transactions = [addSharedSignerAddressOwner, configureSharedSignerTransaction]
 
           const configureSharedSignerSafeTransaction = await safeSdk.createTransaction({
-            transactions
+            transactions,
+            onlyCalls: false
           })
 
           // Sign the configure the shared Signer transaction with the EOA signer
@@ -406,7 +408,8 @@ describe('Passkey', () => {
           const transactions = [addSharedSignerAddressOwner, configureSharedSignerTransaction]
 
           const configureSharedSignerSafeTransaction = await safeSdk.createTransaction({
-            transactions
+            transactions,
+            onlyCalls: false
           })
 
           // Sign the configure the shared Signer transaction with the EOA signer

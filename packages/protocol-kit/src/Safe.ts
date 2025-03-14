@@ -68,6 +68,7 @@ import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
   encodeMultiSendData,
+  hasDelegateCalls,
   isNewOwnerPasskey,
   isOldOwnerPasskey,
   isPasskeyParam,
@@ -512,7 +513,7 @@ class Safe {
    */
   async createTransaction({
     transactions,
-    onlyCalls = false,
+    onlyCalls = true,
     options
   }: CreateTransactionProps): Promise<SafeTransaction> {
     const safeVersion = this.getContractVersion()
@@ -528,9 +529,17 @@ class Safe {
 
     let newTransaction: SafeTransactionDataPartial
     if (transactions.length > 1) {
-      const multiSendContract = onlyCalls
-        ? this.#contractManager.multiSendCallOnlyContract
-        : this.#contractManager.multiSendContract
+      let multiSendContract
+      if (onlyCalls) {
+        if (hasDelegateCalls(transactions)) {
+          throw new Error(
+            'At least one transaction uses DELEGATECALL. By default only CALL is allowed. Check onlyCalls flag.'
+          )
+        }
+        multiSendContract = this.#contractManager.multiSendCallOnlyContract
+      } else {
+        multiSendContract = this.#contractManager.multiSendContract
+      }
 
       const multiSendData = encodeMultiSendData(transactions.map(standardizeMetaTransactionData))
 

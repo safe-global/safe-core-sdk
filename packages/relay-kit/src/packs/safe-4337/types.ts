@@ -39,7 +39,7 @@ export type ERC20PaymasterOption = {
 }
 
 export type PaymasterOptions =
-  | ({ paymasterUrl: string } & (SponsoredPaymasterOption | ERC20PaymasterOption))
+  | ({ paymasterUrl: string, skipApproveTransaction?: boolean } & (SponsoredPaymasterOption | ERC20PaymasterOption))
   | undefined
 
 export type Safe4337InitOptions = {
@@ -56,6 +56,7 @@ export type Safe4337InitOptions = {
   options: ExistingSafeOptions | PredictedSafeOptions
   paymasterOptions?: PaymasterOptions
   onchainAnalytics?: OnchainAnalyticsProps
+  isL1SafeSingleton?: boolean
 }
 
 export type Safe4337Options = {

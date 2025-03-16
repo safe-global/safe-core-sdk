@@ -9,7 +9,8 @@
     "test": "FORCE_COLOR=1 lerna run test --stream",
     "play": "ts-node ./playground/config/run.ts",
     "format": "lerna run format && prettier --write \"playground/**/*.ts\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "lerna run build --stream"
   },
   "workspaces": {
     "packages": [

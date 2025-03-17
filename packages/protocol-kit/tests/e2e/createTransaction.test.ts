@@ -4,7 +4,7 @@ import Safe, {
   standardizeSafeTransactionData,
   SafeContractImplementationType as SafeContract
 } from '@safe-global/protocol-kit/index'
-import { SafeTransactionDataPartial } from '@safe-global/types-kit'
+import { OperationType, SafeTransactionDataPartial } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider } from './utils/setupProvider'
@@ -21,7 +21,7 @@ const BASE_OPTIONS: SafeTransactionOptionalProps = {
   safeTxGas: '666'
 }
 
-describe('Transactions creation', () => {
+describe.only('Transactions creation', () => {
   const provider = getEip1193Provider()
 
   describe('standardizeSafeTransactionData', async () => {
@@ -316,6 +316,45 @@ describe('Transactions creation', () => {
       })
       const tx = safeSdk.createTransaction({ transactions: [] })
       await chai.expect(tx).to.be.rejectedWith('Invalid empty array of transactions')
+    })
+
+    it('should fail when creating a MultiSendCallOnly transaction passing a transaction with DELEGATE_CALL operation', async () => {
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const erc20Mintable = await getERC20Mintable()
+      const safeAddress = safe.address
+      const safeSdk = await Safe.init({
+        provider,
+        safeAddress,
+        contractNetworks
+      })
+      const transactions = [
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [accounts[1].address, '1100000000000000000'] // 1.1 ERC20
+          }),
+          operation: OperationType.DelegateCall
+        },
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [accounts[1].address, '100000000000000000'] // 0.1 ERC20
+          }),
+          operation: OperationType.DelegateCall
+        }
+      ]
+      const multiSendTx = safeSdk.createTransaction({ transactions })
+      chai
+        .expect(multiSendTx)
+        .to.be.rejectedWith(
+          'At least one transaction uses DELEGATECALL. By default only CALL is allowed. Check onlyCalls flag.'
+        )
     })
 
     it('should create a MultiSend transaction', async () => {

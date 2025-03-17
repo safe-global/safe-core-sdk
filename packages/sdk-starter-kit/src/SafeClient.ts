@@ -62,10 +62,7 @@ export class SafeClient extends BaseClient {
     const isSafeDeployed = await this.protocolKit.isSafeDeployed()
     const isMultisigSafe = (await this.protocolKit.getThreshold()) > 1
 
-    const safeTransaction = await this.protocolKit.createTransaction({
-      transactions,
-      onlyCalls: true
-    })
+    const safeTransaction = await this.protocolKit.createTransaction({ transactions })
 
     if (isSafeDeployed) {
       if (isMultisigSafe) {

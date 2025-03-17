@@ -11,8 +11,8 @@ yarn build
 
 Update the config inside the scripts you want to execute and run the following commands for each of them. There are 2 ways to configure the input parameters of the scripts:
 
-- Environment files are located in each folder with the necessary configuration. In this case, rename the `.env-sample` file to `.env` and update the values based on the comments inside.
-- Set the values directly in the script file, following the comments provided there.
+- Environment files can be found in each folder with the required configuration. In this case, rename the `.env-sample` file to `.env` and update the values according to the comments inside `.env-sample`.
+- Set the values directly in the script file.
 
 ### `protocol-kit`
 
@@ -34,7 +34,7 @@ yarn play generate-safe-address
 
 #### Estimate gas
 
-Showcase how to estimate the `gas` (The complete transaction gas estimation) and `safeTxGas` (The concrete Safe transactions estimation) for a transaction:
+Showcase how to estimate the `gas` (The complete transaction gas cost) and `safeTxGas` (The concrete Safe contracts calls gas cost) for a transaction:
 
 ```bash
 yarn play estimate-gas
@@ -50,7 +50,7 @@ yarn play create-and-execute-transaction
 
 #### Replicate Safe addresses
 
-This script shows how to get the same Safe address from one network to another. This is useful when you want to deploy a Safe account on a different network by keeping the same Safe account address
+This script demonstrates how to obtain the same Safe address across different networks. This is useful when you want to deploy a Safe account on another network while retaining the same Safe account address:
 
 ```bash
 yarn play replicate-safe-address
@@ -58,7 +58,7 @@ yarn play replicate-safe-address
 
 #### Validate signatures
 
-This script demonstrates how to validate the signatures of a Safe message using the `protocol-kit`.
+This script shows how to validate the signatures of a Safe message using the `protocol-kit`:
 
 ```bash
 yarn play validate-signatures
@@ -92,49 +92,49 @@ yarn play execute-transaction
 
 ### `relay-kit`
 
-#### Create and execute a User Operation using an existing Safe
+#### Send User Operation using an existing Safe
 
-This script showcases how to create a batch of transactions, bundle them, and submit them as a User Operation.
+This script showcases how to create a Safe Operation from a batch of transactions, sign it and send to the bundler as an User Operation:
 
 ```bash
 yarn play userop
 ```
 
-#### Create and execute a User Operation with a non-existent Safe account
+#### Send User Operation with a non-existent Safe account
 
-This script demonstrates how to create a batch of transactions, bundle them, and submit them as a User Operation for a non-existent Safe account. This process involves using the `initCode` property to deploy a new Safe.
+This script demonstrates how to create a Safe Operation from a batch of transactions, sign it and send to the bundler as an User Operation for a non-existent Safe account:
 
 ```bash
 yarn play userop-counterfactual
 ```
 
-#### Create and execute a User Operation using an existing Safe and an ERC20 paymaster
+#### Send User Operation using an existing Safe and an ERC20 Paymaster
 
-This script showcases how to create a batch of transactions, bundle them, and submit them as a User Operation. The User Operation is paid with ERC20 tokens.
+This script showcases how to create a Safe Operation from a batch of transactions, sign it and send to the bundler as an User Operation. The User Operation gas costs will be covered with ERC20 tokens by using a paymaster:
 
 ```bash
 yarn play userop-erc20-paymaster
 ```
 
-#### Create and execute a User Operation using an existing Safe and an ERC20 paymaster with a non-existent Safe account
+#### Send User Operation using an ERC20 Paymaster with a non-existent Safe account
 
-This script demonstrates how to create a batch of transactions, bundle them, and submit them as a User Operation for a non-existent Safe account. The User Operation is paid with ERC20 tokens.
+This script showcases how to create a Safe Operation from a batch of transactions, sign it and send to the bundler as an User Operation for a non-existent Safe account. The User Operation gas costs will be covered with ERC20 tokens by using a paymaster:
 
 ```bash
 yarn play userop-erc20-paymaster-counterfactual
 ```
 
-#### Create and execute a User Operation using an existing Safe and sponsored User operations
+#### Send User Operation using an existing Safe and a verifying Paymaster to sponsor the operation
 
-This script showcases how to create a batch of transactions, bundle them, and submit them as a User Operation. The User Operation is sponsored.
+This script showcases how to create a Safe Operation from a batch of transactions, sign it and send to the bundler. The User Operation will be sponsored by using a Paymaster:
 
 ```bash
 yarn play userop-verifying-paymaster
 ```
 
-#### Create and execute a User Operation using an existing Safe and sponsored User operations with a non-existent Safe account
+#### Send User Operation using a verifying Paymaster tp sponsor the operations with a non-existent Safe account
 
-This script demonstrates how to create a batch of transactions, bundle them, and submit them as a User Operation for a non-existent Safe account. The User Operation is sponsored.
+This script demonstrates how to create a Safe Operation from a batch of transactions, sign it and send to the bundler for a non-existent Safe account. The User Operation will be sponsored by using a Paymaster:
 
 ```bash
 yarn play userop-verifying-paymaster-counterfactual
@@ -142,15 +142,15 @@ yarn play userop-verifying-paymaster-counterfactual
 
 #### Execute User Operations in parallel
 
-This script showcases how to execute multiple User Operations in parallel by using custom nonces
+This script showcases how to execute multiple User Operations in parallel by using custom nonces:
 
 ```bash
 yarn play userop-parallel-execution
 ```
 
-#### `api-kit` user operation interoperability
+#### Api kit interoperability
 
-This script shows how to create a User Operation and store it using the Safe Transaction Service. This process orchestrates signatures from additional owners before execution using the bundler.
+This script shows how to create a Safe Operation and store it using the Safe Transaction Service. This process orchestrates signatures from additional owners before bundle the User Operation and send it to provider bundler services:
 
 ```bash
 yarn play userop-api-kit-interoperability
@@ -176,7 +176,7 @@ yarn play gelato-sponsored-transaction
 
 #### Create and execute a transaction
 
-This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute a transaction and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the transactions in case more than one owner signature is required.
+This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute a transaction and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the transactions in case more than one owner signature is required:
 
 ```bash
 yarn play send-transactions
@@ -184,7 +184,7 @@ yarn play send-transactions
 
 #### Create and execute Safe Operations
 
-This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute a Safe Operation and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the Safe Operations in case more than one owner signature is required.
+This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute a Safe Operation and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the Safe Operations in case more than one owner signature is required:
 
 ```bash
 yarn play send-safe-operation
@@ -192,7 +192,7 @@ yarn play send-safe-operation
 
 #### Create and execute on-chain messages
 
-This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute on-chain messages and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the on-chain messages (that are basically regular transactions) in case more than one owner signature is required.
+This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute on-chain messages and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the on-chain messages (that are basically regular transactions) in case more than one owner signature is required:
 
 ```bash
 yarn play send-on-chain-message
@@ -200,7 +200,7 @@ yarn play send-on-chain-message
 
 #### Create and execute off-chain messages
 
-This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute off-chain messages and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the off-chain messages in case more than one owner signature is required.
+This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute off-chain messages and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the off-chain messages in case more than one owner signature is required:
 
 ```bash
 yarn play send-off-chain-message

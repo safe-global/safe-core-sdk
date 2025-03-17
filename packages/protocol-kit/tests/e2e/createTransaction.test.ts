@@ -21,7 +21,7 @@ const BASE_OPTIONS: SafeTransactionOptionalProps = {
   safeTxGas: '666'
 }
 
-describe.only('Transactions creation', () => {
+describe('Transactions creation', () => {
   const provider = getEip1193Provider()
 
   describe('standardizeSafeTransactionData', async () => {

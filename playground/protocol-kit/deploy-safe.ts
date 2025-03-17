@@ -20,6 +20,7 @@ interface Config {
   }
 }
 
+// Adjust the configuration with your own input parameters before running the script
 const config: Config = {
   RPC_URL: sepolia.rpcUrls.default.http[0],
   DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',

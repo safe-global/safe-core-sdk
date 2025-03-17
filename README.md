@@ -46,7 +46,7 @@ If you are interested in contributing, please read the [Contributing Guidelines]
 
 ## Playground
 
-This project includes a [playground](https://github.com/safe-global/safe-core-sdk/tree/main/playground/README.md) with a few scripts that can be used as a starting point to use the Safe{Core} SDK.
+This project includes a [playground](https://github.com/safe-global/safe-core-sdk/tree/main/playground/README.md) with a few scripts that can be used as a starting point to use the Safe{Core} SDK. These scripts contain valuable snippets that demonstrate various Safe features. They serve as a useful learning tool or starting point for implementing these features in your application.
 
 ## License
 

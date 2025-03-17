@@ -9,7 +9,8 @@ const playgroundProtocolKitPaths = {
   'deploy-safe': 'protocol-kit/deploy-safe',
   'replicate-address': 'protocol-kit/replicate-address',
   'generate-safe-address': 'protocol-kit/generate-safe-address',
-  'validate-signatures': 'protocol-kit/validate-signatures'
+  'validate-signatures': 'protocol-kit/validate-signatures',
+  'estimate-gas': 'protocol-kit/estimate-gas'
 }
 const playgroundApiKitPaths = {
   'propose-transaction': 'api-kit/propose-transaction',

@@ -13,7 +13,9 @@ import {
   Transaction,
   EIP712TypedData,
   SafeTransactionData,
-  CompatibilityFallbackHandlerContractType
+  CompatibilityFallbackHandlerContractType,
+  SigningMethod,
+  SigningMethodType
 } from '@safe-global/types-kit'
 import {
   encodeSetupCallData,
@@ -39,8 +41,6 @@ import {
   RemoveOwnerTxParams,
   SafeConfig,
   SafeConfigProps,
-  SigningMethod,
-  SigningMethodType,
   SwapOwnerTxParams,
   SafeModulesPaginated,
   RemovePasskeyOwnerTxParams,
@@ -68,6 +68,7 @@ import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
 import {
   encodeMultiSendData,
+  hasDelegateCalls,
   isNewOwnerPasskey,
   isOldOwnerPasskey,
   isPasskeyParam,
@@ -81,7 +82,7 @@ import {
   getSafeContract
 } from './contracts/safeDeploymentContracts'
 import SafeMessage from './utils/messages/SafeMessage'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import SafeProvider from './SafeProvider'
 import { asHash, asHex } from './utils/types'
 import { Hash, Hex, SendTransactionParameters } from 'viem'
@@ -512,7 +513,7 @@ class Safe {
    */
   async createTransaction({
     transactions,
-    onlyCalls = false,
+    onlyCalls = true,
     options
   }: CreateTransactionProps): Promise<SafeTransaction> {
     const safeVersion = this.getContractVersion()
@@ -528,9 +529,17 @@ class Safe {
 
     let newTransaction: SafeTransactionDataPartial
     if (transactions.length > 1) {
-      const multiSendContract = onlyCalls
-        ? this.#contractManager.multiSendCallOnlyContract
-        : this.#contractManager.multiSendContract
+      let multiSendContract
+      if (onlyCalls) {
+        if (hasDelegateCalls(transactions)) {
+          throw new Error(
+            'At least one transaction uses DELEGATECALL. By default only CALL is allowed. Check onlyCalls flag.'
+          )
+        }
+        multiSendContract = this.#contractManager.multiSendCallOnlyContract
+      } else {
+        multiSendContract = this.#contractManager.multiSendContract
+      }
 
       const multiSendData = encodeMultiSendData(transactions.map(standardizeMetaTransactionData))
 

@@ -15,7 +15,6 @@ import Safe, {
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import sinon from 'sinon'
-import sinonChai from 'sinon-chai'
 import crypto from 'crypto'
 import {
   getSafeWebAuthnSignerFactoryContract,
@@ -23,10 +22,13 @@ import {
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import { getEip1193Provider } from './utils/setupProvider'
 import { waitSafeTxReceipt } from './utils/transactions'
-import { createMockPasskey, getWebAuthnCredentials, deployPasskeysContract } from './utils/passkeys'
+import {
+  createMockPasskey,
+  getWebAuthnCredentials,
+  deployPasskeysContract
+} from '@safe-global/protocol-kit/test-utils'
 
 chai.use(chaiAsPromised)
-chai.use(sinonChai)
 
 const webAuthnCredentials = getWebAuthnCredentials()
 
@@ -209,7 +211,8 @@ describe('Passkey', () => {
         const transactions = [addSharedSignerAddressOwner, configureSharedSignerTransaction]
 
         const configureSharedSignerSafeTransaction = await safeSdk.createTransaction({
-          transactions
+          transactions,
+          onlyCalls: false
         })
 
         // Sign the configure the shared Signer transaction with the EOA signer
@@ -344,7 +347,8 @@ describe('Passkey', () => {
           const transactions = [addSharedSignerAddressOwner, configureSharedSignerTransaction]
 
           const configureSharedSignerSafeTransaction = await safeSdk.createTransaction({
-            transactions
+            transactions,
+            onlyCalls: false
           })
 
           // Sign the configure the shared Signer transaction with the EOA signer
@@ -404,7 +408,8 @@ describe('Passkey', () => {
           const transactions = [addSharedSignerAddressOwner, configureSharedSignerTransaction]
 
           const configureSharedSignerSafeTransaction = await safeSdk.createTransaction({
-            transactions
+            transactions,
+            onlyCalls: false
           })
 
           // Sign the configure the shared Signer transaction with the EOA signer

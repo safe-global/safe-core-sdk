@@ -25,7 +25,7 @@ import {
   TransactionOptions,
   Transaction
 } from '@safe-global/types-kit'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { estimateGas, estimateTxGas } from './gas'
 import {
   Hash,
@@ -315,4 +315,10 @@ export function createTxOptions(options?: TransactionOptions): Partial<WalletTra
   }
 
   return converted
+}
+
+export function hasDelegateCalls(transactions: MetaTransactionData[]): boolean {
+  return transactions.some(
+    (transaction) => transaction.operation && transaction.operation === OperationType.DelegateCall
+  )
 }

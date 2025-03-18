@@ -14,13 +14,12 @@ import {
   itif
 } from '@safe-global/testing-kit'
 import SafeMessage from '@safe-global/protocol-kit/utils/messages/SafeMessage'
-import { OperationType, SafeTransactionDataPartial } from '@safe-global/types-kit'
-import { SigningMethod } from '@safe-global/protocol-kit/types'
+import { OperationType, SafeTransactionDataPartial, SigningMethod } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider } from './utils/setupProvider'
 import { waitSafeTxReceipt } from './utils/transactions'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { asHash } from '@safe-global/protocol-kit/utils/types'
 
 chai.use(chaiAsPromised)

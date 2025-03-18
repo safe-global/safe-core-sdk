@@ -3,7 +3,7 @@ import { parseAbi } from 'viem'
 export const DEFAULT_SAFE_VERSION = '1.4.1'
 export const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
 
-export const EIP712_SAFE_OPERATION_TYPE = {
+export const EIP712_SAFE_OPERATION_TYPE_V06 = {
   SafeOp: [
     { type: 'address', name: 'safe' },
     { type: 'uint256', name: 'nonce' },
@@ -14,6 +14,24 @@ export const EIP712_SAFE_OPERATION_TYPE = {
     { type: 'uint256', name: 'preVerificationGas' },
     { type: 'uint256', name: 'maxFeePerGas' },
     { type: 'uint256', name: 'maxPriorityFeePerGas' },
+    { type: 'bytes', name: 'paymasterAndData' },
+    { type: 'uint48', name: 'validAfter' },
+    { type: 'uint48', name: 'validUntil' },
+    { type: 'address', name: 'entryPoint' }
+  ]
+}
+
+export const EIP712_SAFE_OPERATION_TYPE_V07 = {
+  SafeOp: [
+    { type: 'address', name: 'safe' },
+    { type: 'uint256', name: 'nonce' },
+    { type: 'bytes', name: 'initCode' },
+    { type: 'bytes', name: 'callData' },
+    { type: 'uint128', name: 'verificationGasLimit' },
+    { type: 'uint128', name: 'callGasLimit' },
+    { type: 'uint256', name: 'preVerificationGas' },
+    { type: 'uint128', name: 'maxPriorityFeePerGas' },
+    { type: 'uint128', name: 'maxFeePerGas' },
     { type: 'bytes', name: 'paymasterAndData' },
     { type: 'uint48', name: 'validAfter' },
     { type: 'uint48', name: 'validUntil' },
@@ -52,5 +70,6 @@ export enum RPC_4337_CALLS {
   GET_USER_OPERATION_RECEIPT = 'eth_getUserOperationReceipt',
   SUPPORTED_ENTRY_POINTS = 'eth_supportedEntryPoints',
   CHAIN_ID = 'eth_chainId',
-  SPONSOR_USER_OPERATION = 'pm_sponsorUserOperation'
+  GET_PAYMASTER_STUB_DATA = 'pm_getPaymasterStubData',
+  GET_PAYMASTER_DATA = 'pm_getPaymasterData'
 }

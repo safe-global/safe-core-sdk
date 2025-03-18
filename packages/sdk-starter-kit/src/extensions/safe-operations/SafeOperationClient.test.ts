@@ -1,6 +1,6 @@
 import Safe, * as protocolKitModule from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { Safe4337Pack, EthSafeOperation } from '@safe-global/relay-kit'
+import { Safe4337Pack, SafeOperationV06 } from '@safe-global/relay-kit'
 
 import { SafeOperationClient } from './SafeOperationClient'
 import { MESSAGES, SafeClientTxStatus } from '../../constants'
@@ -33,7 +33,7 @@ const SAFE_OPERATION_RESPONSE = {
     }
   ]
 }
-const SAFE_OPERATION = new EthSafeOperation(
+const SAFE_OPERATION = new SafeOperationV06(
   {
     sender: '0xSenderAddress',
     nonce: '0',
@@ -152,12 +152,14 @@ describe('SafeOperationClient', () => {
   })
 
   describe('confirmSafeOperation', () => {
-    it('should confirm the Safe operation and send it to the bundler when threshold is reached', async () => {
+    it('should send the User operation to the bundler without confirmation when threshold is already reached', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
 
       const safeOperationResult = await safeOperationClient.confirmSafeOperation({
         safeOperationHash: SAFE_OPERATION_HASH
       })
+
+      expect(apiKit.confirmSafeOperation).not.toHaveBeenCalledWith()
 
       expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({
         executable: SAFE_OPERATION_RESPONSE
@@ -173,12 +175,15 @@ describe('SafeOperationClient', () => {
         }
       })
     })
-    it('should indicate more signatures are required when threshold is not reached', async () => {
+
+    it('should return more signatures are required when threshold is not reached after confirmation', async () => {
       protocolKit.getThreshold = jest.fn().mockResolvedValue(3)
 
       const safeOperationResult = await safeOperationClient.confirmSafeOperation({
         safeOperationHash: SAFE_OPERATION_HASH
       })
+
+      expect(apiKit.confirmSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION_HASH, undefined)
 
       expect(safeOperationResult).toEqual({
         safeAddress: SAFE_ADDRESS,
@@ -189,16 +194,52 @@ describe('SafeOperationClient', () => {
         }
       })
     })
+
+    it('should send the User operation to the bundler after reaching the threshold with the confirmation', async () => {
+      const CONFIRMED_SAFE_OPERATION_RESPONSE = {
+        ...SAFE_OPERATION_RESPONSE,
+        confirmations: [
+          ...SAFE_OPERATION_RESPONSE.confirmations,
+          {
+            signature: 'OxSignature'
+          }
+        ]
+      }
+      protocolKit.getThreshold = jest.fn().mockResolvedValue(3)
+      apiKit.getSafeOperation = jest
+        .fn()
+        .mockResolvedValueOnce(SAFE_OPERATION_RESPONSE)
+        .mockResolvedValueOnce(CONFIRMED_SAFE_OPERATION_RESPONSE)
+
+      const safeOperationResult = await safeOperationClient.confirmSafeOperation({
+        safeOperationHash: SAFE_OPERATION_HASH
+      })
+
+      expect(apiKit.confirmSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION_HASH, undefined)
+      expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({
+        executable: CONFIRMED_SAFE_OPERATION_RESPONSE
+      })
+
+      expect(safeOperationResult).toEqual({
+        safeAddress: SAFE_ADDRESS,
+        description: MESSAGES[SafeClientTxStatus.SAFE_OPERATION_EXECUTED],
+        status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
+        safeOperations: {
+          safeOperationHash: SAFE_OPERATION_HASH,
+          userOperationHash: USER_OPERATION_HASH
+        }
+      })
+    })
   })
 
   describe('getPendingSafeOperations', () => {
     it('should return the pending Safe operations for the Safe address', async () => {
-      apiKit.getSafeOperationsByAddress = jest.fn().mockResolvedValue(PENDING_SAFE_OPERATIONS)
+      apiKit.getPendingSafeOperations = jest.fn().mockResolvedValue(PENDING_SAFE_OPERATIONS)
 
       const result = await safeOperationClient.getPendingSafeOperations()
 
       expect(protocolKit.getAddress).toHaveBeenCalled()
-      expect(apiKit.getSafeOperationsByAddress).toHaveBeenCalledWith({ safeAddress: SAFE_ADDRESS })
+      expect(apiKit.getPendingSafeOperations).toHaveBeenCalledWith(SAFE_ADDRESS, undefined)
       expect(result).toBe(PENDING_SAFE_OPERATIONS)
     })
   })

@@ -9,6 +9,7 @@ import {
   SafeClientResult,
   SendSafeOperationProps
 } from '@safe-global/sdk-starter-kit/types'
+import { SafeOperationResponse } from '@safe-global/types-kit'
 
 /**
  * @class
@@ -94,17 +95,28 @@ export class SafeOperationClient {
   }: ConfirmSafeOperationProps): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()
+    let safeOperationResponse = await this.apiKit.getSafeOperation(safeOperationHash)
 
-    await this.apiKit.confirmSafeOperation(
-      safeOperationHash,
-      buildSignatureBytes([await this.protocolKit.signHash(safeOperationHash)])
-    )
+    if (safeOperationResponse.userOperation?.ethereumTxHash) {
+      return createSafeClientResult({
+        status: SafeClientTxStatus.SAFE_OPERATION_EXECUTED,
+        safeAddress,
+        userOperationHash: safeOperationResponse.userOperation.userOperationHash,
+        safeOperationHash
+      })
+    }
 
-    const confirmedSafeOperation = await this.apiKit.getSafeOperation(safeOperationHash)
+    if (this.#needsConfirmation(safeOperationResponse, threshold)) {
+      const signature = buildSignatureBytes([await this.protocolKit.signHash(safeOperationHash)])
 
-    if (confirmedSafeOperation?.confirmations?.length === threshold) {
+      await this.apiKit.confirmSafeOperation(safeOperationHash, signature)
+
+      safeOperationResponse = await this.apiKit.getSafeOperation(safeOperationHash)
+    }
+
+    if (!this.#needsConfirmation(safeOperationResponse, threshold)) {
       const userOperationHash = await this.safe4337Pack.executeTransaction({
-        executable: confirmedSafeOperation
+        executable: safeOperationResponse
       })
 
       await this.#waitForOperationToFinish({ userOperationHash })
@@ -135,7 +147,11 @@ export class SafeOperationClient {
   async getPendingSafeOperations(options?: ListOptions): Promise<GetSafeOperationListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
-    return this.apiKit.getSafeOperationsByAddress({ safeAddress, ...options })
+    return this.apiKit.getPendingSafeOperations(safeAddress, options)
+  }
+
+  #needsConfirmation(safeOperationResponse: SafeOperationResponse, threshold: number): boolean {
+    return (safeOperationResponse.confirmations?.length || 0) < threshold
   }
 
   /**

@@ -6,7 +6,7 @@ import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import { createWalletClient, http } from 'viem'
 import SafeApiKit, {
-  AddMessageProps,
+  AddMessageOptions,
   AddSafeDelegateProps,
   DeleteSafeDelegateProps,
   SafeMultisigTransactionEstimate
@@ -306,7 +306,9 @@ describe('Endpoint tests', () => {
     it('getSafeCreationInfo', async () => {
       await chai
         .expect(safeApiKit.getSafeCreationInfo(safeAddress))
-        .to.be.eventually.deep.equals({ data: { success: true } })
+        // FIXME the singleton hack makes that the property is always added by SafeApiKit.
+        // Remove when is correctly returned by the service.
+        .to.be.eventually.deep.equals({ data: { success: true }, singleton: undefined })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/creation/`,
         method: 'get'
@@ -316,7 +318,9 @@ describe('Endpoint tests', () => {
     it('getSafeCreationInfo EIP-3770', async () => {
       await chai
         .expect(safeApiKit.getSafeCreationInfo(eip3770SafeAddress))
-        .to.be.eventually.deep.equals({ data: { success: true } })
+        // FIXME the singleton hack makes that the property is always added by SafeApiKit.
+        // Remove when is correctly returned by the service.
+        .to.be.eventually.deep.equals({ data: { success: true }, singleton: undefined })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/creation/`,
         method: 'get'
@@ -458,7 +462,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getIncomingTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers/`,
         method: 'get'
       })
     })
@@ -468,7 +472,17 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getIncomingTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers?executed=true`,
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers/`,
+        method: 'get'
+      })
+    })
+
+    it('getIncomingTransactions with default query params', async () => {
+      await chai
+        .expect(safeApiKit.getIncomingTransactions(safeAddress, { from: safeAddress }))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/incoming-transfers/?_from=${safeAddress}`,
         method: 'get'
       })
     })
@@ -513,6 +527,31 @@ describe('Endpoint tests', () => {
       })
     })
 
+    it('getMultisigTransactions with default query params', async () => {
+      await chai
+        .expect(safeApiKit.getMultisigTransactions(safeAddress, { executed: true }))
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/multisig-transactions/?executed=true`,
+        method: 'get'
+      })
+    })
+
+    it('getMultisigTransactions with custom query params', async () => {
+      await chai
+        .expect(
+          safeApiKit.getMultisigTransactions(safeAddress, {
+            hasConfirmations: true,
+            nonce__gte: 1
+          })
+        )
+        .to.be.eventually.deep.equals({ data: { success: true } })
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/multisig-transactions/?has_confirmations=true&nonce__gte=1`,
+        method: 'get'
+      })
+    })
+
     it('getPendingTransactions', async () => {
       const currentNonce = 1
       await chai
@@ -540,7 +579,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getAllTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/`,
         method: 'get'
       })
     })
@@ -550,7 +589,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getAllTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/?trusted=true&queued=true&executed=false`,
+        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/`,
         method: 'get'
       })
     })
@@ -612,7 +651,7 @@ describe('Endpoint tests', () => {
     it('addMessage', async () => {
       const safeAddress = '0x6C465b1D7aBCcDC02Ed48bc32e289795603a5c79'
 
-      const body: AddMessageProps = {
+      const body: AddMessageOptions = {
         message: 'message',
         signature: '0x'
       }
@@ -656,7 +695,7 @@ describe('Endpoint tests', () => {
 
     it('getSafeOperationsByAddress', async () => {
       await chai
-        .expect(safeApiKit.getSafeOperationsByAddress({ safeAddress }))
+        .expect(safeApiKit.getSafeOperationsByAddress(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
@@ -717,7 +756,7 @@ describe('Endpoint tests', () => {
         url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
         method: 'post',
         body: {
-          nonce: Number(userOperation.nonce),
+          nonce: userOperation.nonce,
           initCode: userOperation.initCode,
           callData: userOperation.callData,
           callGasLimit: userOperation.callGasLimit.toString(),

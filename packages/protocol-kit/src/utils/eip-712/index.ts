@@ -8,7 +8,7 @@ import {
   EIP712TypedDataMessage,
   EIP712TypedDataTx
 } from '@safe-global/types-kit'
-import semverSatisfies from 'semver/functions/satisfies'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { hashTypedData as hashTypedStructuredData } from './encode'
 
 const EQ_OR_GT_1_3_0 = '>=1.3.0'

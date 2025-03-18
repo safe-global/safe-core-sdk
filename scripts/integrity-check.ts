@@ -10,12 +10,12 @@ try {
 
   exec('npm publish --access public --dry-run --workspaces --json', (error, stdout, stderr) => {
     if (error) {
-      console.error(`Error al ejecutar el comando: ${error.message}`)
+      console.error(`Error executing command: ${error.message}`)
       return
     }
 
     if (stderr) {
-      console.warn(`Advertencias durante la ejecución: ${stderr}`)
+      console.warn(`Warning during execution: ${stderr}`)
     }
 
     try {
@@ -29,11 +29,11 @@ try {
 
       const yamlOutput = yaml.stringify(jsonOutput)
 
-      fs.writeFile('publish-info.yaml', yamlOutput, (err) => {
+      fs.writeFile('publish-info.yml', yamlOutput, (err) => {
         if (err) {
           console.error(`Error writing file: ${err.message}`)
         } else {
-          console.log('Output stored in output.yaml')
+          console.log('Output stored in publish-info.yml')
         }
       })
     } catch (parseError) {

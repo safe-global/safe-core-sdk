@@ -28,7 +28,7 @@ jobs:
           ts-node ./scripts/integrity-check.ts
 
       - name: Upload YAML artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: package-validation-details
           path: ./publish-info.yaml

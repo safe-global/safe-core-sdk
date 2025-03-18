@@ -1,4 +1,4 @@
-name: Integrity check
+name: Create integrity file
 
 on:
   release:

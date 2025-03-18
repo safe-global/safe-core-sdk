@@ -1,5 +1,9 @@
-import { Address } from 'abitype'
-import { SafeTransactionData, OperationType, EIP712TypedData } from '@safe-global/types-kit'
+import {
+  Address,
+  SafeTransactionData,
+  OperationType,
+  EIP712TypedData
+} from '@safe-global/types-kit'
 import chai from 'chai'
 import {
   EIP712_DOMAIN,

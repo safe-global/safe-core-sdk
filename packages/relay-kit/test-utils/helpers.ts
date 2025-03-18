@@ -1,4 +1,5 @@
-import { Address, encodeFunctionData, parseAbi } from 'viem'
+import { encodeFunctionData, parseAbi } from 'viem'
+import { Address } from '@safe-global/types-kit'
 import { Safe4337InitOptions } from '../src/packs/safe-4337/types'
 import { Safe4337Pack } from '../src/packs/safe-4337/Safe4337Pack'
 import * as fixtures from './fixtures'

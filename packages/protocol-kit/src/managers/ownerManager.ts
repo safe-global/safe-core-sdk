@@ -1,5 +1,5 @@
-import { Address } from 'abitype'
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils'
+import { Address } from '@safe-global/types-kit'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { SafeContractImplementationType } from '../types'
 import SafeProvider from '../SafeProvider'

@@ -1,6 +1,7 @@
-import { Abi, Address } from 'viem'
+import { Abi } from 'viem'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   SafeVersion,
   SafeContract_v1_3_0_Abi,
   SafeContract_v1_4_1_Abi,

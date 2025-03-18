@@ -1,10 +1,11 @@
-import { Account, Address, Chain, Hash, Hex, PublicClient, PublicRpcSchema, Transport } from 'viem'
+import { Account, Chain, Hash, Hex, PublicClient, PublicRpcSchema, Transport } from 'viem'
 import Safe, {
   DeploymentType,
   SafeProviderConfig,
   OnchainAnalyticsProps
 } from '@safe-global/protocol-kit'
 import {
+  Address,
   EstimateGasData,
   MetaTransactionData,
   SafeOperationResponse,

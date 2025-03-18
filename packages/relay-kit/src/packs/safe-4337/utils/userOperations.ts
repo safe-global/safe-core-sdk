@@ -1,6 +1,7 @@
 import Safe from '@safe-global/protocol-kit'
-import { Address, encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex, toHex } from 'viem'
+import { encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex, toHex } from 'viem'
 import {
+  Address,
   MetaTransactionData,
   OperationType,
   UserOperation,

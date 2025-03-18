@@ -1,4 +1,4 @@
-import { Address, ContractFunctionArgs } from 'viem'
+import { ContractFunctionArgs } from 'viem'
 import { simulateContract } from 'viem/actions'
 import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -6,6 +6,7 @@ import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
 import { sameString } from '@safe-global/protocol-kit/utils'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   SafeContract_v1_1_1_Abi,
   SafeContract_v1_1_1_Contract,
   SafeContract_v1_1_1_Function,

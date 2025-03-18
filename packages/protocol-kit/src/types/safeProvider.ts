@@ -63,8 +63,8 @@ export type SafeProviderInitOptions = {
   signer?: SafeProviderConfig['signer']
   safeVersion?: SafeVersion
   contractNetworks?: ContractNetworksConfig
-  safeAddress?: string
-  owners?: string[]
+  safeAddress?: Address
+  owners?: Address[]
 }
 
 export type SafeProviderTransaction = {

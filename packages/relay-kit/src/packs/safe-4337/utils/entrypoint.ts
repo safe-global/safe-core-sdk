@@ -1,5 +1,5 @@
-import { Address } from 'viem'
 import Safe from '@safe-global/protocol-kit'
+import { Address } from '@safe-global/types-kit'
 import {
   ENTRYPOINT_ABI,
   ENTRYPOINT_ADDRESS_V06,

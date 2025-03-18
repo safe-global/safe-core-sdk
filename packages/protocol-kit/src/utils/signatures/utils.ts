@@ -1,6 +1,7 @@
-import { Address, recoverAddress } from 'viem'
+import { recoverAddress } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
+  Address,
   SafeSignature,
   SafeEIP712Args,
   SafeTransactionData,

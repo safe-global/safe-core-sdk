@@ -25,6 +25,7 @@ import {
   SafeWebAuthnSharedSignerContractImplementationType,
   GetPasskeyCredentialFn
 } from '@safe-global/protocol-kit/types'
+import { Address } from '@safe-global/types-kit'
 import { getDefaultFCLP256VerifierAddress } from './extractPasskeyData'
 import { asHex } from '../types'
 import isSharedSigner from './isSharedSigner'
@@ -76,8 +77,8 @@ export const createPasskeyClient = async (
   safeWebAuthnSignerFactoryContract: SafeWebAuthnSignerFactoryContractImplementationType,
   safeWebAuthnSharedSignerContract: SafeWebAuthnSharedSignerContractImplementationType,
   provider: Client,
-  safeAddress: string,
-  owners: string[],
+  safeAddress: Address,
+  owners: Address[],
   chainId: string
 ) => {
   const { rawId, coordinates, customVerifierAddress } = passkey

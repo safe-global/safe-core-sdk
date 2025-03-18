@@ -22,6 +22,7 @@ import {
   ZERO_ADDRESS
 } from '@safe-global/relay-kit/constants'
 import {
+  Address,
   MetaTransactionOptions,
   RelayTransaction,
   SafeTransaction,
@@ -35,7 +36,6 @@ import {
   GelatoExecuteTransactionProps,
   GelatoOptions
 } from './types'
-import { Address } from 'viem'
 
 export class GelatoRelayPack extends RelayKitBasePack<{
   EstimateFeeProps: GelatoEstimateFeeProps

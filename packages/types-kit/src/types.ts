@@ -1,4 +1,4 @@
-import { Address } from 'abitype'
+import { Address as AddressType } from 'abitype'
 
 export { type Hex } from 'viem'
 
@@ -95,7 +95,13 @@ export interface TransactionResult extends BaseTransactionResult {
   options?: TransactionOptions
 }
 
-export interface Eip3770Address {
+export type Address = AddressType // `0x${string}` from viem & abitype
+
+// ERC-3770: Chain-specific addresses, see: https://eips.ethereum.org/EIPS/eip-3770
+export type Eip3770Prefix = `${string}:`
+export type Eip3770Address = `${Eip3770Prefix}${AddressType}` // `${string}:0x${string}`
+
+export interface ParsedEip3770Address {
   prefix: string
   address: Address
 }

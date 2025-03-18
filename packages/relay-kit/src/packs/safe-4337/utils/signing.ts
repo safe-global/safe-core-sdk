@@ -1,4 +1,5 @@
-import { Address, Hex, encodePacked, toHex } from 'viem'
+import { Hex, encodePacked, toHex } from 'viem'
+import { Address } from '@safe-global/types-kit'
 import { EthSafeSignature, buildSignatureBytes } from '@safe-global/protocol-kit'
 
 /**

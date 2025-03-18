@@ -1,10 +1,11 @@
-import { Address, createWalletClient, http } from 'viem'
+import { createWalletClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
 import { privateKeyToAccount } from 'viem/accounts'
 import SafeApiKit, {
   DeleteSafeDelegateProps,
   SafeDelegateResponse
 } from '@safe-global/api-kit/index'
+import { Address } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'

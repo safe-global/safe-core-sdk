@@ -1,4 +1,3 @@
-import { Address } from 'viem'
 import Safe, {
   AddOwnerTxParams,
   AddPasskeyOwnerTxParams,
@@ -7,7 +6,7 @@ import Safe, {
   SwapOwnerTxParams
 } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { SafeTransaction, TransactionBase } from '@safe-global/types-kit'
+import { Address, SafeTransaction, TransactionBase } from '@safe-global/types-kit'
 
 import { ChangeThresholdTxParams } from './types'
 

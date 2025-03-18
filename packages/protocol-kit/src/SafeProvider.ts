@@ -14,9 +14,10 @@ import {
   getSafeWebAuthnSharedSignerContract
 } from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
 import {
+  Address,
   EIP712TypedDataMessage,
   EIP712TypedDataTx,
-  Eip3770Address,
+  ParsedEip3770Address,
   SafeEIP712Args
 } from '@safe-global/types-kit'
 import {
@@ -57,8 +58,7 @@ import {
   createClient,
   PublicRpcSchema,
   WalletRpcSchema,
-  rpcSchema,
-  Address
+  rpcSchema
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import {
@@ -145,7 +145,7 @@ class SafeProvider {
           safeWebAuthnSignerFactoryContract,
           safeWebAuthnSharedSignerContract,
           safeProvider.getExternalProvider(),
-          safeAddress || '',
+          safeAddress!,
           owners || [],
           chainId.toString()
         )
@@ -225,7 +225,7 @@ class SafeProvider {
     return isAddress(address)
   }
 
-  async getEip3770Address(fullAddress: Address): Promise<Eip3770Address> {
+  async getEip3770Address(fullAddress: Address): Promise<ParsedEip3770Address> {
     const chainId = await this.getChainId()
     return validateEip3770Address(fullAddress, chainId)
   }

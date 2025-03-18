@@ -1,8 +1,8 @@
-import { Address, isAddress } from 'viem'
-import { Eip3770Address } from '@safe-global/types-kit'
+import { isAddress } from 'viem'
+import { ParsedEip3770Address, Address } from '@safe-global/types-kit'
 import { networks } from './config'
 
-export function parseEip3770Address(fullAddress: string): Eip3770Address {
+export function parseEip3770Address(fullAddress: string): ParsedEip3770Address {
   const parts = fullAddress.split(':')
   const address = parts.length > 1 ? (parts[1] as Address) : (parts[0] as Address)
   const prefix = parts.length > 1 ? parts[0] : ''
@@ -37,7 +37,7 @@ export function validateEthereumAddress(address: string): void {
 export function validateEip3770Address(
   fullAddress: string,
   currentChainId: bigint
-): Eip3770Address {
+): ParsedEip3770Address {
   const { address, prefix } = parseEip3770Address(fullAddress)
   validateEthereumAddress(address)
   if (prefix) {

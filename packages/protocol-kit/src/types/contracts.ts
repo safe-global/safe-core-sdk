@@ -1,5 +1,5 @@
-import { Abi, Address } from 'viem'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Abi } from 'viem'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 import SafeContract_v1_0_0 from '@safe-global/protocol-kit/contracts/Safe/v1.0.0/SafeContract_v1_0_0'
 import SafeContract_v1_1_1 from '@safe-global/protocol-kit/contracts/Safe/v1.1.1/SafeContract_v1_1_1'
 import SafeContract_v1_2_0 from '@safe-global/protocol-kit/contracts/Safe/v1.2.0/SafeContract_v1_2_0'

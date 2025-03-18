@@ -1,4 +1,4 @@
-import { MetaTransactionData, SafeTransactionDataPartial } from '@safe-global/types-kit'
+import { Address, MetaTransactionData, SafeTransactionDataPartial } from '@safe-global/types-kit'
 import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit/utils/transactions'
 
 import { SafeProviderConfig } from './safeProvider'
@@ -6,7 +6,6 @@ import { SafeContractImplementationType } from './contracts'
 import { ContractNetworksConfig } from './contracts'
 import { PredictedSafeProps } from './safeConfig'
 import { PasskeyArgType } from './passkeys'
-import { Address } from 'abitype'
 
 export type CreateTransactionProps = {
   /** transactions - The transaction array to process */

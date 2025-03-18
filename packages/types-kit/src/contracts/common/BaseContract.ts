@@ -1,11 +1,15 @@
 import {
   Abi,
   AbiParametersToPrimitiveTypes,
-  Address,
   ExtractAbiFunction,
   ExtractAbiFunctionNames
 } from 'abitype'
-import { SafeVersion, TransactionOptions, TransactionResult } from '@safe-global/types-kit/types'
+import {
+  Address,
+  SafeVersion,
+  TransactionOptions,
+  TransactionResult
+} from '@safe-global/types-kit/types'
 
 /**
  * Extracts the names of read-only functions (view or pure) from a given contract ABI.

@@ -1,4 +1,3 @@
-import { Address } from 'abitype'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
 import {
   getMultiSendCallOnlyContract,
@@ -12,7 +11,7 @@ import {
   SafeConfig,
   SafeContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
 import SafeProvider from '../SafeProvider'
 import { getSafeContractVersion } from '@safe-global/protocol-kit/contracts/utils'

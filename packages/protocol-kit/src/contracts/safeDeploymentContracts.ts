@@ -1,4 +1,3 @@
-import { Address } from 'abitype'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   getCompatibilityFallbackHandlerContractInstance,
@@ -26,7 +25,7 @@ import {
   SignMessageLibContractImplementationType,
   SimulateTxAccessorContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 
 export interface GetContractInstanceProps {
   safeProvider: SafeProvider

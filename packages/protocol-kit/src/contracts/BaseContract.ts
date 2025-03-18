@@ -1,4 +1,4 @@
-import { Abi, Address } from 'abitype'
+import { Abi } from 'abitype'
 import {
   ContractFunctionName,
   ContractFunctionArgs,
@@ -15,6 +15,7 @@ import { contractName, getContractDeployment } from '@safe-global/protocol-kit/c
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
+  Address,
   EncodeFunction,
   EstimateGasFunction,
   GetAddressFunction,

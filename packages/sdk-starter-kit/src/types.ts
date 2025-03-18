@@ -1,5 +1,6 @@
 import { SafeProvider } from '@safe-global/protocol-kit'
 import {
+  Address,
   TransactionBase,
   TransactionOptions,
   EIP712TypedData,
@@ -7,7 +8,6 @@ import {
 } from '@safe-global/types-kit'
 import { IFeeEstimator } from '@safe-global/relay-kit'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
-import { Address } from 'viem'
 
 export type SendTransactionProps = {
   transactions: TransactionBase[]

@@ -1,4 +1,4 @@
-import { EstimateGasData } from '@safe-global/types-kit'
+import { Address, EstimateGasData } from '@safe-global/types-kit'
 import {
   BundlerClient,
   EstimateFeeFunctionProps,
@@ -11,7 +11,6 @@ import {
 } from '@safe-global/relay-kit/packs/safe-4337/utils'
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
 import { PIMLICO_CUSTOM_RPC_4337_CALLS, PimlicoCustomRpcSchema } from './types'
-import { Address } from 'viem'
 
 /**
  * PimlicoFeeEstimator is a class that implements the IFeeEstimator interface. You can implement three optional methods that will be called during the estimation process:

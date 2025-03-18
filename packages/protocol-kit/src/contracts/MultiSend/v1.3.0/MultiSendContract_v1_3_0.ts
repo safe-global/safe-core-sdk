@@ -1,8 +1,8 @@
-import { Address } from 'abitype'
 import MultiSendBaseContract from '@safe-global/protocol-kit/contracts/MultiSend/MultiSendBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   multisend_1_3_0_ContractArtifacts,
   MultiSendContract_v1_3_0_Abi,
   MultiSendContract_v1_3_0_Contract

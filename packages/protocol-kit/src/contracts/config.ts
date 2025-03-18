@@ -17,8 +17,7 @@ import {
   getSafeWebAuthnSignerFactoryDeployment,
   getSafeWebAuthnShareSignerDeployment
 } from '@safe-global/safe-modules-deployments'
-import { SafeVersion } from '@safe-global/types-kit'
-import { Address } from 'abitype'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 import { DeploymentType } from '../types'
 
 export const DEFAULT_SAFE_VERSION: SafeVersion = '1.3.0'

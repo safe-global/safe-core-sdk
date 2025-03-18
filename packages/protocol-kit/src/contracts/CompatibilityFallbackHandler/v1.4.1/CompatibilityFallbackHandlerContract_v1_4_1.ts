@@ -2,11 +2,11 @@ import CompatibilityFallbackHandlerBaseContract from '@safe-global/protocol-kit/
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   compatibilityFallbackHandler_1_4_1_ContractArtifacts,
   CompatibilityFallbackHandlerContract_v1_4_1_Abi,
   CompatibilityFallbackHandlerContract_v1_4_1_Contract
 } from '@safe-global/types-kit'
-import { Address } from 'abitype'
 
 /**
  * CompatibilityFallbackHandlerContract_v1_4_1  is the implementation specific to the CompatibilityFallbackHandler contract version 1.4.1.

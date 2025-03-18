@@ -1,5 +1,4 @@
-import { Address } from 'abitype'
-import { SafeSignature } from '@safe-global/types-kit'
+import { Address, SafeSignature } from '@safe-global/types-kit'
 
 export class EthSafeSignature implements SafeSignature {
   signer: Address

@@ -1,4 +1,4 @@
-import { Address, getAddress, toHex } from 'viem'
+import { getAddress, toHex } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies.js'
 import Safe, {
   EthSafeSignature,
@@ -10,6 +10,7 @@ import Safe, {
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
+  Address,
   OperationType,
   SafeOperationConfirmation,
   SafeOperationResponse,

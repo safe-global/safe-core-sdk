@@ -12,8 +12,7 @@ import {
   WalletClient,
   toEventHash,
   FormattedTransactionReceipt,
-  decodeEventLog,
-  Address
+  decodeEventLog
 } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
@@ -21,6 +20,7 @@ import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/consta
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   SafeProxyFactoryContractType,
   SafeVersion,
   TransactionOptions,

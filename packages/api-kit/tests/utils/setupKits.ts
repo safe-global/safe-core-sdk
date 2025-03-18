@@ -3,6 +3,7 @@ import { BrowserProvider } from 'ethers'
 import { custom, createWalletClient } from 'viem'
 
 import Safe, { SafeProviderConfig, Eip1193Provider } from '@safe-global/protocol-kit'
+import { Address } from '@safe-global/types-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 
 import config from './config'
@@ -15,7 +16,7 @@ type GetKits = {
 type GetKitsOptions = {
   signer?: SafeProviderConfig['signer']
   txServiceUrl?: string
-  safeAddress: string
+  safeAddress: Address
 }
 
 export function getEip1193Provider(): Eip1193Provider {

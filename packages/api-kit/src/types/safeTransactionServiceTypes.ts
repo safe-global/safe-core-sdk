@@ -1,5 +1,6 @@
 import { Account, Chain, Transport, WalletClient } from 'viem'
 import {
+  Address,
   EIP712TypedData,
   SafeMultisigTransactionResponse,
   SafeTransactionData,
@@ -79,23 +80,23 @@ export type SafeCreationInfoResponse = {
 }
 
 export type GetSafeDelegateProps = {
-  safeAddress?: string
-  delegateAddress?: string
-  delegatorAddress?: string
+  safeAddress?: Address
+  delegateAddress?: Address
+  delegatorAddress?: Address
   label?: string
 } & ListOptions
 
 export type AddSafeDelegateProps = {
-  safeAddress?: string
-  delegateAddress: string
-  delegatorAddress: string
+  safeAddress?: Address
+  delegateAddress: Address
+  delegatorAddress: Address
   signer: WalletClient<Transport, Chain, Account>
   label: string
 }
 
 export type DeleteSafeDelegateProps = {
-  delegateAddress: string
-  delegatorAddress: string
+  delegateAddress: Address
+  delegatorAddress: Address
   signer: WalletClient<Transport, Chain, Account>
 }
 
@@ -129,10 +130,10 @@ export type SignatureResponse = {
 }
 
 export type ProposeTransactionProps = {
-  safeAddress: string
+  safeAddress: Address
   safeTransactionData: SafeTransactionData
   safeTxHash: string
-  senderAddress: string
+  senderAddress: Address
   senderSignature: string
   origin?: string
 }
@@ -313,11 +314,11 @@ export type GetSafeOperationListResponse = ListResponse<SafeOperationResponse>
 
 export type AddSafeOperationProps = {
   /** Address of the EntryPoint contract */
-  entryPoint: string
+  entryPoint: Address
   /** Address of the Safe4337Module contract */
-  moduleAddress: string
+  moduleAddress: Address
   /** Address of the Safe to add a SafeOperation for */
-  safeAddress: string
+  safeAddress: Address
   /** UserOperation object to add */
   userOperation: UserOperation
   /** Options object */

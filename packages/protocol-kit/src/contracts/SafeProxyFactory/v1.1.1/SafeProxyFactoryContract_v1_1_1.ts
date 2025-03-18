@@ -1,8 +1,8 @@
-import { Address } from 'abitype'
 import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/contracts/SafeProxyFactory/SafeProxyFactoryBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   SafeProxyFactoryContract_v1_1_1_Abi,
   SafeProxyFactoryContract_v1_1_1_Contract,
   SafeProxyFactoryContract_v1_1_1_Function,

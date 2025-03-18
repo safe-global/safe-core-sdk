@@ -4,7 +4,7 @@ import {
   SafeDeploymentConfig,
   predictSafeAddress
 } from '@safe-global/protocol-kit'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 
 // This script can be used to generate a custom Safe address
 
@@ -78,7 +78,7 @@ interface Config {
   pattern: string
 }
 
-const addressesFound: { predictedSafeAddress: string; saltNonce: number }[] = []
+const addressesFound: { predictedSafeAddress: Address; saltNonce: number }[] = []
 
 // util functions
 

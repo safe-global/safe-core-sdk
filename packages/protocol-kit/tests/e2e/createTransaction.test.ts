@@ -4,7 +4,7 @@ import Safe, {
   standardizeSafeTransactionData,
   SafeContractImplementationType as SafeContract
 } from '@safe-global/protocol-kit/index'
-import { SafeTransactionDataPartial } from '@safe-global/types-kit'
+import { OperationType, SafeTransactionDataPartial } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider } from './utils/setupProvider'
@@ -318,7 +318,81 @@ describe('Transactions creation', () => {
       await chai.expect(tx).to.be.rejectedWith('Invalid empty array of transactions')
     })
 
+    it('should fail when creating a MultiSendCallOnly transaction passing a transaction with DELEGATE_CALL operation', async () => {
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const erc20Mintable = await getERC20Mintable()
+      const safeAddress = safe.address
+      const safeSdk = await Safe.init({
+        provider,
+        safeAddress,
+        contractNetworks
+      })
+      const transactions = [
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [accounts[1].address, '1100000000000000000'] // 1.1 ERC20
+          }),
+          operation: OperationType.DelegateCall
+        },
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [accounts[1].address, '100000000000000000'] // 0.1 ERC20
+          }),
+          operation: OperationType.DelegateCall
+        }
+      ]
+      const multiSendTx = safeSdk.createTransaction({ transactions })
+      chai
+        .expect(multiSendTx)
+        .to.be.rejectedWith(
+          'At least one transaction uses DELEGATECALL. By default only CALL is allowed. Check onlyCalls flag.'
+        )
+    })
+
     it('should create a MultiSend transaction', async () => {
+      const { safe, accounts, contractNetworks, chainId } = await setupTests()
+      const erc20Mintable = await getERC20Mintable()
+      const safeAddress = safe.address
+      const safeSdk = await Safe.init({
+        provider,
+        safeAddress,
+        contractNetworks
+      })
+      const transactions = [
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [accounts[1].address, '1100000000000000000'] // 1.1 ERC20
+          })
+        },
+        {
+          to: erc20Mintable.address,
+          value: '0',
+          data: encodeFunctionData({
+            abi: erc20Mintable.abi,
+            functionName: 'transfer',
+            args: [accounts[1].address, '100000000000000000'] // 0.1 ERC20
+          })
+        }
+      ]
+      const multiSendTx = await safeSdk.createTransaction({ transactions, onlyCalls: false })
+      chai
+        .expect(multiSendTx.data.to)
+        .to.be.eq(contractNetworks[chainId.toString()].multiSendAddress)
+    })
+
+    it('should create a MultiSendCallOnly transaction', async () => {
       const { safe, accounts, contractNetworks, chainId } = await setupTests()
       const erc20Mintable = await getERC20Mintable()
       const safeAddress = safe.address
@@ -350,10 +424,10 @@ describe('Transactions creation', () => {
       const multiSendTx = await safeSdk.createTransaction({ transactions })
       chai
         .expect(multiSendTx.data.to)
-        .to.be.eq(contractNetworks[chainId.toString()].multiSendAddress)
+        .to.be.eq(contractNetworks[chainId.toString()].multiSendCallOnlyAddress)
     })
 
-    it('should create a MultiSend transaction with options', async () => {
+    it('should create a MultiSendCallOnly transaction with options', async () => {
       const { safe, accounts, contractNetworks, chainId } = await setupTests()
       const erc20Mintable = await getERC20Mintable()
       const safeAddress = safe.address
@@ -387,7 +461,7 @@ describe('Transactions creation', () => {
       const multiSendTx = await safeSdk.createTransaction({ transactions, options })
       chai
         .expect(multiSendTx.data.to)
-        .to.be.eq(contractNetworks[chainId.toString()].multiSendAddress)
+        .to.be.eq(contractNetworks[chainId.toString()].multiSendCallOnlyAddress)
       chai.expect(multiSendTx.data.value).to.be.eq('0')
       chai.expect(multiSendTx.data.baseGas).to.be.eq(BASE_OPTIONS.baseGas)
       chai.expect(multiSendTx.data.gasPrice).to.be.eq(BASE_OPTIONS.gasPrice)

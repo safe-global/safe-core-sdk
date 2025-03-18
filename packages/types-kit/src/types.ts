@@ -101,6 +101,8 @@ export type Address = AddressType // `0x${string}` from viem & abitype
 export type Eip3770Prefix = `${string}:`
 export type Eip3770Address = `${Eip3770Prefix}${AddressType}` // `${string}:0x${string}`
 
+export type FullAddress = Address | Eip3770Address
+
 export interface ParsedEip3770Address {
   prefix: string
   address: Address

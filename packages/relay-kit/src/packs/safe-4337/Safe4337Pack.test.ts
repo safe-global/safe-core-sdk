@@ -7,7 +7,7 @@ import {
   getSafeModuleSetupDeployment,
   getSafe4337ModuleDeployment
 } from '@safe-global/safe-modules-deployments'
-import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
+import { Address, MetaTransactionData, OperationType } from '@safe-global/types-kit'
 import { Safe4337Pack } from './Safe4337Pack'
 import BaseSafeOperation from './BaseSafeOperation'
 import * as constants from './constants'
@@ -42,8 +42,8 @@ jest.mock('./utils', () => ({
   createBundlerClient: jest.fn(() => ({ request: requestMock }))
 }))
 
-let safe4337ModuleAddress: viem.Hash
-let safeModulesSetupAddress: viem.Address
+let safe4337ModuleAddress: Address
+let safeModulesSetupAddress: Address
 
 describe('Safe4337Pack', () => {
   beforeAll(async () => {
@@ -52,12 +52,12 @@ describe('Safe4337Pack', () => {
       released: true,
       version: '0.3.0',
       network
-    })?.networkAddresses[network] as viem.Hash
+    })?.networkAddresses[network] as Address
     safeModulesSetupAddress = getSafeModuleSetupDeployment({
       released: true,
       version: '0.3.0',
       network
-    })?.networkAddresses[network] as viem.Address
+    })?.networkAddresses[network] as Address
   })
 
   afterEach(() => {

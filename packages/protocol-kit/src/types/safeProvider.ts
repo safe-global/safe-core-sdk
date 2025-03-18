@@ -8,10 +8,9 @@ import {
   WalletRpcSchema,
   Client,
   WalletActions,
-  Hex,
-  Address
+  Hex
 } from 'viem'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
 
 export type RequestArguments = {

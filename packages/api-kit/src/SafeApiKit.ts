@@ -237,17 +237,18 @@ class SafeApiKit {
     label,
     signer
   }: AddSafeDelegateProps): Promise<SignedSafeDelegateResponse> {
-    if (!this.#isValidAddress(delegateAddress)) {
+    const { address: delegate } = this.#getEip3770Address(delegateAddress)
+    const { address: delegator } = this.#getEip3770Address(delegatorAddress)
+
+    if (!this.#isValidAddress(delegate)) {
       throw new Error('Invalid Safe delegate address')
     }
-    if (!this.#isValidAddress(delegatorAddress)) {
+    if (!this.#isValidAddress(delegator)) {
       throw new Error('Invalid Safe delegator address')
     }
     if (label === '') {
       throw new Error('Invalid label')
     }
-    const { address: delegate } = this.#getEip3770Address(delegateAddress)
-    const { address: delegator } = this.#getEip3770Address(delegatorAddress)
     const signature = await signDelegate(signer, delegate, this.#chainId)
 
     const body = {
@@ -280,14 +281,15 @@ class SafeApiKit {
     delegatorAddress,
     signer
   }: DeleteSafeDelegateProps): Promise<void> {
-    if (!this.#isValidAddress(delegateAddress)) {
-      throw new Error('Invalid Safe delegate address')
-    }
-    if (!this.#isValidAddress(delegatorAddress)) {
-      throw new Error('Invalid Safe delegator address')
-    }
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
+
+    if (!this.#isValidAddress(delegate)) {
+      throw new Error('Invalid Safe delegate address')
+    }
+    if (!this.#isValidAddress(delegator)) {
+      throw new Error('Invalid Safe delegator address')
+    }
     const signature = await signDelegate(signer, delegate, this.#chainId)
 
     return sendRequest({

@@ -1,5 +1,6 @@
 import { Account, Chain, Transport, WalletClient } from 'viem'
 import {
+  FullAddress,
   Address,
   EIP712TypedData,
   SafeMultisigTransactionResponse,
@@ -80,23 +81,23 @@ export type SafeCreationInfoResponse = {
 }
 
 export type GetSafeDelegateProps = {
-  safeAddress?: Address
-  delegateAddress?: Address
-  delegatorAddress?: Address
+  safeAddress?: FullAddress
+  delegateAddress?: FullAddress
+  delegatorAddress?: FullAddress
   label?: string
 } & ListOptions
 
 export type AddSafeDelegateProps = {
-  safeAddress?: Address
-  delegateAddress: Address
-  delegatorAddress: Address
+  safeAddress?: FullAddress
+  delegateAddress: FullAddress
+  delegatorAddress: FullAddress
   signer: WalletClient<Transport, Chain, Account>
   label: string
 }
 
 export type DeleteSafeDelegateProps = {
-  delegateAddress: Address
-  delegatorAddress: Address
+  delegateAddress: FullAddress
+  delegatorAddress: FullAddress
   signer: WalletClient<Transport, Chain, Account>
 }
 

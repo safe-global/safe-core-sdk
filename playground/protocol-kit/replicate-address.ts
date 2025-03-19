@@ -22,6 +22,7 @@ import {
 // This file can be used to play around with the Safe Core SDK
 
 // Safe config to be replicated in different chains
+// Adjust the configuration with your own input parameters before running the script
 const safeAccountConfig: SafeAccountConfig = {
   owners: ['0x0Ee26C4481485AC64BfFf2bdCaA21EdAeCEcdCa9'],
   threshold: 1

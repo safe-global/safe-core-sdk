@@ -5,6 +5,8 @@ import { setup4337Playground, waitForOperationToFinish } from '../utils'
 
 dotenv.config({ path: './playground/relay-kit/.env' })
 
+// Load environment variables from ./.env file
+// Follow .env-sample as an example to create your own file
 const {
   PRIVATE_KEY,
   SAFE_ADDRESS = '0x',

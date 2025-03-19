@@ -10,7 +10,7 @@
     "play": "ts-node ./playground/config/run.ts",
     "format": "lerna run format && prettier --write \"playground/**/*.ts\"",
     "prepare": "husky",
-    "integrity-check": "ts-node ./scripts/integrity-check.ts"
+    "generate-publish-info": "ts-node ./scripts/generate-publish-info.ts"
   },
   "workspaces": {
     "packages": [

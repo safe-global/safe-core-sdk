@@ -1,4 +1,4 @@
-name: Create integrity file
+name: Create publish info file
 
 on:
   release:
@@ -10,7 +10,7 @@ on:
       - prepare-release
 
 jobs:
-  integrity-check:
+  generate-publish-info:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
 
       - name: Run integrity check script
         run: |
-          yarn integrity-check
+          yarn generate-publish-info
 
       - name: Upload YAML artifact
         uses: actions/upload-artifact@v4

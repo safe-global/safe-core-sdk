@@ -32,6 +32,10 @@ jobs:
         with:
           name: package-validation-details
           path: ./publish-info.yml
-
+      - name: Upload protocol-kit
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-validation-details
+          path: ./packages/protocol-kit/dist
       - name: Show YAML output
         run: cat ./publish-info.yml

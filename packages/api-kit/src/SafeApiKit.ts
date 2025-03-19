@@ -329,14 +329,16 @@ class SafeApiKit {
    * @returns The paginated list of messages
    */
   async getMessages(
-    safeAddress: Address,
+    safeAddress: FullAddress,
     options: GetSafeMessageListOptions = {}
   ): Promise<SafeMessageListResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+    if (!safeAddress) {
       throw new Error('Invalid safeAddress')
     }
 
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`)
+    const { address } = this.#getEip3770Address(safeAddress)
+
+    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/messages/`)
 
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<GetSafeMessageListOptions>(url, options)
@@ -353,13 +355,15 @@ class SafeApiKit {
    * @param safeAddress The safe address
    * @param options The raw message to add, signature and safeAppId if any
    */
-  async addMessage(safeAddress: Address, addMessageOptions: AddMessageOptions): Promise<void> {
-    if (!this.#isValidAddress(safeAddress)) {
+  async addMessage(safeAddress: FullAddress, addMessageOptions: AddMessageOptions): Promise<void> {
+    if (!safeAddress) {
       throw new Error('Invalid safeAddress')
     }
 
+    const { address } = this.#getEip3770Address(safeAddress)
+
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
+      url: `${this.#txServiceBaseUrl}/v1/safes/${address}/messages/`,
       method: HttpMethod.Post,
       body: addMessageOptions
     })
@@ -843,7 +847,7 @@ class SafeApiKit {
    * @returns The SafeOperations sent from the given Safe's address
    */
   async getSafeOperationsByAddress(
-    safeAddress: Address,
+    safeAddress: FullAddress,
     options?: GetSafeOperationListOptions
   ): Promise<GetSafeOperationListResponse> {
     if (!safeAddress) {
@@ -872,10 +876,16 @@ class SafeApiKit {
    * @returns The pending SafeOperations
    */
   async getPendingSafeOperations(
-    safeAddress: Address,
+    safeAddress: FullAddress,
     options?: GetPendingSafeOperationListOptions
   ): Promise<GetSafeOperationListResponse> {
-    return this.getSafeOperationsByAddress(safeAddress, {
+    if (!safeAddress) {
+      throw new Error('Invalid safeAddress')
+    }
+
+    const { address } = this.#getEip3770Address(safeAddress)
+
+    return this.getSafeOperationsByAddress(address, {
       ...options,
       executed: false
     })
@@ -969,7 +979,7 @@ class SafeApiKit {
         paymasterAndData: isEmptyData(userOperationV06.paymasterAndData)
           ? null
           : userOperationV06.paymasterAndData,
-        entryPoint,
+        entryPoint: this.#getEip3770Address(entryPoint).address,
         validAfter: getISOString(options?.validAfter),
         validUntil: getISOString(options?.validUntil),
         signature: userOperation.signature,

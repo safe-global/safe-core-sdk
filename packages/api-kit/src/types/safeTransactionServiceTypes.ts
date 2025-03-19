@@ -1,7 +1,6 @@
 import { Account, Chain, Transport, WalletClient } from 'viem'
 import {
   FullAddress,
-  Address,
   EIP712TypedData,
   SafeMultisigTransactionResponse,
   SafeTransactionData,
@@ -315,11 +314,11 @@ export type GetSafeOperationListResponse = ListResponse<SafeOperationResponse>
 
 export type AddSafeOperationProps = {
   /** Address of the EntryPoint contract */
-  entryPoint: Address
+  entryPoint: FullAddress
   /** Address of the Safe4337Module contract */
-  moduleAddress: Address
+  moduleAddress: FullAddress
   /** Address of the Safe to add a SafeOperation for */
-  safeAddress: Address
+  safeAddress: FullAddress
   /** UserOperation object to add */
   userOperation: UserOperation
   /** Options object */

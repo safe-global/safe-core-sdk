@@ -17,7 +17,8 @@
     "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
     "skipLibCheck": true /* Skip type checking of declaration files. */,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "incremental": false
   },
   "exclude": ["**/dist", "**/node_modules"]
 }

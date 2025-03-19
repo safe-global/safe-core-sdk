@@ -4,7 +4,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "declarationMap": true,
-    "composite": true,
+    "composite": false,
     "outDir": "dist"
   },
   "include": ["src/**/*", "test-utils/**/*"],

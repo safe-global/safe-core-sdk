@@ -11,6 +11,7 @@ interface Config {
   SIGNER_SAFE_ADDRESS: string
 }
 
+// Adjust the configuration with your own input parameters before running the script
 // To run this script, you need a Safe with the following configuration
 // - 3/3 Safe with 3 owners and threshold 3
 //   - Owner 1: public address from OWNER1_PRIVATE_KEY

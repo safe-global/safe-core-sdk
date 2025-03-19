@@ -8,6 +8,7 @@ import { SafeVersion } from '@safe-global/types-kit'
 
 // This script can be used to generate a custom Safe address
 
+// Adjust the configuration with your own input parameters before running the script
 const config: Config = {
   // REQUIRED PARAMETERS
   owners: ['0x680cde08860141F9D223cE4E620B10Cd6741037E'],

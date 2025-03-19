@@ -5,6 +5,8 @@ import { SafeClientResult, createSafeClient, onChainMessages } from '@safe-globa
 
 dotenv.config({ path: './playground/sdk-starter-kit/.env' })
 
+// Load environment variables from ./.env file
+// Follow .env-sample as an example to create your own file
 const {
   OWNER_1_PRIVATE_KEY = '0x',
   OWNER_2_PRIVATE_KEY = '0x',

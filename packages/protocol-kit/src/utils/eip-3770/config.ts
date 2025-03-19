@@ -88,7 +88,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 466n, shortName: 'appchain' },
   { chainId: 478n, shortName: 'formnetwork' },
   { chainId: 480n, shortName: 'wc' },
-  { chainId: 530n, shortName: 'FxCore' },
+  { chainId: 530n, shortName: 'pundiai' },
   { chainId: 545n, shortName: 'flow-testnet' },
   { chainId: 570n, shortName: 'sys-rollux' },
   { chainId: 588n, shortName: 'metis-stardust' },

@@ -17,6 +17,7 @@ interface Config {
   SAFE_ADDRESS: string
 }
 
+// Adjust the configuration with your own input parameters before running the script
 const config: Config = {
   RPC_URL: 'https://sepolia.gateway.tenderly.co',
   SIGNER_ADDRESS_PRIVATE_KEY: SIGNER_ADDRESS_PRIVATE_KEY!,

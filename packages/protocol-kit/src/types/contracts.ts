@@ -87,43 +87,43 @@ export type GetContractProps = {
 
 export type ContractNetworkConfig = {
   /** safeSingletonAddress - Address of the Safe Singleton contract deployed on a specific network */
-  safeSingletonAddress: Address
+  safeSingletonAddress?: Address
   /** safeSingletonAbi - Abi of the Safe Singleton contract deployed on a specific network */
   safeSingletonAbi?: Abi
   /** safeProxyFactoryAddress - Address of the SafeProxyFactory contract deployed on a specific network */
-  safeProxyFactoryAddress: Address
+  safeProxyFactoryAddress?: Address
   /** safeProxyFactoryAbi - Abi of the SafeProxyFactory contract deployed on a specific network */
   safeProxyFactoryAbi?: Abi
   /** multiSendAddress - Address of the MultiSend contract deployed on a specific network */
-  multiSendAddress: Address
+  multiSendAddress?: Address
   /** multiSendAbi - Abi of the MultiSend contract deployed on a specific network */
   multiSendAbi?: Abi
   /** multiSendCallOnlyAddress - Address of the MultiSendCallOnly contract deployed on a specific network */
-  multiSendCallOnlyAddress: Address
+  multiSendCallOnlyAddress?: Address
   /** multiSendCallOnlyAbi - Abi of the MultiSendCallOnly contract deployed on a specific network */
   multiSendCallOnlyAbi?: Abi
   /** fallbackHandlerAddress - Address of the Fallback Handler contract deployed on a specific network */
-  fallbackHandlerAddress: Address
+  fallbackHandlerAddress?: Address
   /** fallbackHandlerAbi - Abi of the Fallback Handler contract deployed on a specific network */
   fallbackHandlerAbi?: Abi
   /** signMessageLibAddress - Address of the SignMessageLib contract deployed on a specific network */
-  signMessageLibAddress: Address
+  signMessageLibAddress?: Address
   /** signMessageLibAbi - Abi of the SignMessageLib contract deployed on a specific network */
   signMessageLibAbi?: Abi
   /** createCallAddress - Address of the CreateCall contract deployed on a specific network */
-  createCallAddress: Address
+  createCallAddress?: Address
   /** createCallAbi - Abi of the CreateCall contract deployed on a specific network */
   createCallAbi?: Abi
   /** simulateTxAccessorAddress - Address of the SimulateTxAccessor contract deployed on a specific network */
-  simulateTxAccessorAddress: Address
+  simulateTxAccessorAddress?: Address
   /** simulateTxAccessorAbi - Abi of the SimulateTxAccessor contract deployed on a specific network */
   simulateTxAccessorAbi?: Abi
   /** safeWebAuthnSignerFactoryAddress - Address of the SafeWebAuthnSignerFactory contract deployed on a specific network */
-  safeWebAuthnSignerFactoryAddress: Address
+  safeWebAuthnSignerFactoryAddress?: Address
   /** safeWebAuthnSignerFactoryAbi - Abi of the SafeWebAuthnSignerFactory contract deployed on a specific network */
   safeWebAuthnSignerFactoryAbi?: Abi
   /** safeWebAuthnSharedSignerAddress - Address of the SafeWebAuthnSharedSigner contract deployed on a specific network */
-  safeWebAuthnSharedSignerAddress: Address
+  safeWebAuthnSharedSignerAddress?: Address
   /** safeWebAuthnSharedSignerAbi - Abi of the SafeWebAuthnSharedSigner contract deployed on a specific network */
   safeWebAuthnSharedSignerAbi?: Abi
 }

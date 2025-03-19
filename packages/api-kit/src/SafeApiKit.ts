@@ -39,7 +39,7 @@ import {
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
 import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
 import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
-import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
+import { validateEip3770Address } from '@safe-global/protocol-kit'
 import {
   Address,
   DataDecoded,
@@ -82,15 +82,6 @@ class SafeApiKit {
       }
 
       this.#txServiceBaseUrl = url
-    }
-  }
-
-  #isValidAddress(address: Address) {
-    try {
-      validateEthereumAddress(address)
-      return true
-    } catch {
-      return false
     }
   }
 
@@ -880,7 +871,7 @@ class SafeApiKit {
     options?: GetPendingSafeOperationListOptions
   ): Promise<GetSafeOperationListResponse> {
     if (!safeAddress) {
-      throw new Error('Invalid safeAddress')
+      throw new Error('Safe address must not be empty')
     }
 
     const { address } = this.#getEip3770Address(safeAddress)

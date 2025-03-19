@@ -43,6 +43,7 @@ import { validateEip3770Address, validateEthereumAddress } from '@safe-global/pr
 import {
   Address,
   DataDecoded,
+  FullAddress,
   ParsedEip3770Address,
   SafeMultisigConfirmationListResponse,
   SafeMultisigTransactionResponse,
@@ -237,18 +238,19 @@ class SafeApiKit {
     label,
     signer
   }: AddSafeDelegateProps): Promise<SignedSafeDelegateResponse> {
+    if (!delegateAddress) {
+      throw new Error('Invalid Safe delegate address')
+    }
+    if (!delegatorAddress) {
+      throw new Error('Invalid Safe delegator address')
+    }
+    if (!label) {
+      throw new Error('Invalid label')
+    }
+
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
 
-    if (!delegate || !this.#isValidAddress(delegate)) {
-      throw new Error('Invalid Safe delegate address')
-    }
-    if (!delegator || !this.#isValidAddress(delegator)) {
-      throw new Error('Invalid Safe delegator address')
-    }
-    if (label === '') {
-      throw new Error('Invalid label')
-    }
     const signature = await signDelegate(signer, delegate, this.#chainId)
 
     const body = {
@@ -281,15 +283,17 @@ class SafeApiKit {
     delegatorAddress,
     signer
   }: DeleteSafeDelegateProps): Promise<void> {
+    if (!delegateAddress) {
+      throw new Error('Invalid Safe delegate address')
+    }
+
+    if (!delegatorAddress) {
+      throw new Error('Invalid Safe delegator address')
+    }
+
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
 
-    if (!delegate || !this.#isValidAddress(delegate)) {
-      throw new Error('Invalid Safe delegate address')
-    }
-    if (!delegator || !this.#isValidAddress(delegator)) {
-      throw new Error('Invalid Safe delegator address')
-    }
     const signature = await signDelegate(signer, delegate, this.#chainId)
 
     return sendRequest({
@@ -388,8 +392,8 @@ class SafeApiKit {
    * @throws "Invalid owner address"
    * @throws "Checksum address validation failed"
    */
-  async getSafesByOwner(ownerAddress: Address): Promise<OwnerResponse> {
-    if (!this.#isValidAddress(ownerAddress)) {
+  async getSafesByOwner(ownerAddress: FullAddress): Promise<OwnerResponse> {
+    if (!ownerAddress) {
       throw new Error('Invalid owner address')
     }
     const { address } = this.#getEip3770Address(ownerAddress)
@@ -407,8 +411,8 @@ class SafeApiKit {
    * @throws "Invalid module address"
    * @throws "Module address checksum not valid"
    */
-  async getSafesByModule(moduleAddress: Address): Promise<ModulesResponse> {
-    if (!this.#isValidAddress(moduleAddress)) {
+  async getSafesByModule(moduleAddress: FullAddress): Promise<ModulesResponse> {
+    if (!moduleAddress) {
       throw new Error('Invalid module address')
     }
     const { address } = this.#getEip3770Address(moduleAddress)
@@ -490,8 +494,8 @@ class SafeApiKit {
    * @throws "Invalid Safe address"
    * @throws "Checksum address validation failed"
    */
-  async getSafeInfo(safeAddress: Address): Promise<SafeInfoResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+  async getSafeInfo(safeAddress: FullAddress): Promise<SafeInfoResponse> {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
@@ -613,10 +617,10 @@ class SafeApiKit {
    * @throws "Checksum address validation failed"
    */
   async getIncomingTransactions(
-    safeAddress: Address,
+    safeAddress: FullAddress,
     options?: GetIncomingTransactionsOptions
   ): Promise<TransferListResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
@@ -670,10 +674,10 @@ class SafeApiKit {
    * @throws "Checksum address validation failed"
    */
   async getMultisigTransactions(
-    safeAddress: Address,
+    safeAddress: FullAddress,
     options?: GetMultisigTransactionsOptions
   ): Promise<SafeMultisigTransactionListResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
 
@@ -700,10 +704,10 @@ class SafeApiKit {
    * @throws "Invalid ethereum address"
    */
   async getPendingTransactions(
-    safeAddress: Address,
+    safeAddress: FullAddress,
     options: PendingTransactionsOptions = {}
   ): Promise<SafeMultisigTransactionListResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
     const { currentNonce, hasConfirmations, ordering, limit, offset } = options
@@ -775,8 +779,8 @@ class SafeApiKit {
    * @throws "Invalid data"
    * @throws "Invalid ethereum address"
    */
-  async getNextNonce(safeAddress: Address): Promise<string> {
-    if (!this.#isValidAddress(safeAddress)) {
+  async getNextNonce(safeAddress: FullAddress): Promise<string> {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
@@ -819,8 +823,8 @@ class SafeApiKit {
    * @throws "Invalid token address"
    * @throws "Checksum address validation failed"
    */
-  async getToken(tokenAddress: Address): Promise<TokenInfoResponse> {
-    if (!this.#isValidAddress(tokenAddress)) {
+  async getToken(tokenAddress: FullAddress): Promise<TokenInfoResponse> {
+    if (!tokenAddress) {
       throw new Error('Invalid token address')
     }
     const { address } = this.#getEip3770Address(tokenAddress)
@@ -842,7 +846,7 @@ class SafeApiKit {
     safeAddress: Address,
     options?: GetSafeOperationListOptions
   ): Promise<GetSafeOperationListResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+    if (!safeAddress) {
       throw new Error('Safe address must not be empty')
     }
 

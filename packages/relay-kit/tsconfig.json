@@ -5,7 +5,7 @@
     "paths": {
       "@safe-global/relay-kit/*": ["./src/*"]
     },
-    "composite": true,
+    "composite": false,
     "outDir": "dist"
   },
   "include": ["src/**/*"],

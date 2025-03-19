@@ -142,7 +142,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       bundlerUrl,
       customContracts,
       paymasterOptions,
-      onchainAnalytics
+      onchainAnalytics,
+      isL1SafeSingleton
     } = initOptions
 
     let protocolKit: Safe
@@ -244,7 +245,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         !paymasterOptions.isSponsored &&
         !!paymasterOptions.paymasterTokenAddress
 
-      if (isApproveTransactionRequired) {
+      if (isApproveTransactionRequired && !paymasterOptions.skipApproveTransaction) {
         const { paymasterAddress, amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE } = paymasterOptions
 
         // second transaction: approve ERC-20 paymaster token
@@ -347,6 +348,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
             paymentReceiver: zeroAddress
           }
         },
+        isL1SafeSingleton,
         onchainAnalytics
       })
     }

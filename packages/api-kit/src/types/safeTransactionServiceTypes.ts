@@ -131,10 +131,10 @@ export type SignatureResponse = {
 }
 
 export type ProposeTransactionProps = {
-  safeAddress: Address
+  safeAddress: FullAddress
   safeTransactionData: SafeTransactionData
   safeTxHash: string
-  senderAddress: Address
+  senderAddress: FullAddress
   senderSignature: string
   origin?: string
 }

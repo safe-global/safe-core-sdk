@@ -523,8 +523,8 @@ class SafeApiKit {
    * @throws "Checksum address validation failed"
    * @throws "Problem connecting to Ethereum network"
    */
-  async getSafeCreationInfo(safeAddress: Address): Promise<SafeCreationInfoResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+  async getSafeCreationInfo(safeAddress: FullAddress): Promise<SafeCreationInfoResponse> {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
@@ -554,10 +554,10 @@ class SafeApiKit {
    * @throws "Tx not valid"
    */
   async estimateSafeTransaction(
-    safeAddress: Address,
+    safeAddress: FullAddress,
     safeTransaction: SafeMultisigTransactionEstimate
   ): Promise<SafeMultisigTransactionEstimateResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
@@ -586,7 +586,7 @@ class SafeApiKit {
     senderSignature,
     origin
   }: ProposeTransactionProps): Promise<void> {
-    if (!this.#isValidAddress(safeAddress)) {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
     const { address: safe } = this.#getEip3770Address(safeAddress)
@@ -646,10 +646,10 @@ class SafeApiKit {
    * @throws "Invalid ethereum address"
    */
   async getModuleTransactions(
-    safeAddress: Address,
+    safeAddress: FullAddress,
     options?: GetModuleTransactionsOptions
   ): Promise<SafeModuleTransactionListResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
@@ -752,10 +752,10 @@ class SafeApiKit {
    * @throws "Ordering field is not valid"
    */
   async getAllTransactions(
-    safeAddress: Address,
+    safeAddress: FullAddress,
     options?: AllTransactionsOptions
   ): Promise<AllTransactionsListResponse> {
-    if (!this.#isValidAddress(safeAddress)) {
+    if (!safeAddress) {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)

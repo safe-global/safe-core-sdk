@@ -240,10 +240,10 @@ class SafeApiKit {
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
 
-    if (!this.#isValidAddress(delegate)) {
+    if (!delegate || !this.#isValidAddress(delegate)) {
       throw new Error('Invalid Safe delegate address')
     }
-    if (!this.#isValidAddress(delegator)) {
+    if (!delegator || !this.#isValidAddress(delegator)) {
       throw new Error('Invalid Safe delegator address')
     }
     if (label === '') {
@@ -284,10 +284,10 @@ class SafeApiKit {
     const { address: delegate } = this.#getEip3770Address(delegateAddress)
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
 
-    if (!this.#isValidAddress(delegate)) {
+    if (!delegate || !this.#isValidAddress(delegate)) {
       throw new Error('Invalid Safe delegate address')
     }
-    if (!this.#isValidAddress(delegator)) {
+    if (!delegator || !this.#isValidAddress(delegator)) {
       throw new Error('Invalid Safe delegator address')
     }
     const signature = await signDelegate(signer, delegate, this.#chainId)

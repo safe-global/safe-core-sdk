@@ -316,3 +316,9 @@ export function createTxOptions(options?: TransactionOptions): Partial<WalletTra
 
   return converted
 }
+
+export function hasDelegateCalls(transactions: MetaTransactionData[]): boolean {
+  return transactions.some(
+    (transaction) => transaction.operation && transaction.operation === OperationType.DelegateCall
+  )
+}

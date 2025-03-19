@@ -1,5 +1,5 @@
 import chai from 'chai'
-import { polygon, optimism, bsc, gnosis, base, avalanche } from 'viem/chains'
+import { polygon, optimism, gnosis, base, avalanche } from 'viem/chains'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   getSafeAddressFromDeploymentTx,
@@ -730,7 +730,7 @@ describe('Contract utils', () => {
         })
 
         const protocolKitBNB = await Safe.init({
-          provider: bsc.rpcUrls.default.http[0],
+          provider: 'https://bsc-rpc.publicnode.com', // bsc.rpcUrls.default.http[0],
           predictedSafe: {
             safeAccountConfig,
             safeDeploymentConfig

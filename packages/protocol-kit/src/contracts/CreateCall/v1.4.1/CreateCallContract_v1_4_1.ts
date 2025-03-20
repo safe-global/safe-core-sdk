@@ -2,6 +2,7 @@ import CreateCallBaseContract from '@safe-global/protocol-kit/contracts/CreateCa
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   CreateCallContract_v1_4_1_Abi,
   CreateCallContract_v1_4_1_Contract,
   createCall_1_4_1_ContractArtifacts,
@@ -33,7 +34,7 @@ class CreateCallContract_v1_4_1
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: CreateCallContract_v1_4_1_Abi,
     deploymentType?: DeploymentType
   ) {

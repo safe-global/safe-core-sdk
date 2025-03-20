@@ -1,5 +1,6 @@
 import SafeWebAuthnSignerFactoryBaseContract from '@safe-global/protocol-kit/contracts/SafeWebAuthnSignerFactory/SafeWebAuthnSignerFactoryBaseContract'
 import {
+  Address,
   SafeVersion,
   SafeWebAuthnSignerFactoryContract_v0_2_1_Abi,
   SafeWebAuthnSignerFactoryContract_v0_2_1_Contract,
@@ -35,7 +36,7 @@ class SafeWebAuthnSignerFactoryContract_v0_2_1
     chainId: bigint,
     safeProvider: SafeProvider,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SafeWebAuthnSignerFactoryContract_v0_2_1_Abi,
     deploymentType?: DeploymentType
   ) {

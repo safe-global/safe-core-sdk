@@ -1,4 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
+import { Address } from '@safe-global/types-kit'
 import {
   ENTRYPOINT_ABI,
   ENTRYPOINT_ADDRESS_V06,
@@ -32,8 +33,8 @@ export function isEntryPointV7(address: string): boolean {
 
 export async function getSafeNonceFromEntrypoint(
   protocolKit: Safe,
-  safeAddress: string,
-  entryPointAddress: string
+  safeAddress: Address,
+  entryPointAddress: Address
 ): Promise<bigint> {
   const safeProvider = protocolKit.getSafeProvider()
 

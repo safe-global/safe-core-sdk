@@ -1,9 +1,10 @@
 import { encodeFunctionData, parseAbi } from 'viem'
+import { Address } from '@safe-global/types-kit'
 import { Safe4337InitOptions } from '../src/packs/safe-4337/types'
 import { Safe4337Pack } from '../src/packs/safe-4337/Safe4337Pack'
 import * as fixtures from './fixtures'
 
-export const generateTransferCallData = (to: string, value: bigint) => {
+export const generateTransferCallData = (to: Address, value: bigint) => {
   const functionAbi = parseAbi(['function transfer(address _to, uint256 _value) returns (bool)'])
 
   return encodeFunctionData({
@@ -29,7 +30,7 @@ export const createSafe4337Pack = async (
     signer: process.env.PRIVATE_KEY,
     safeModulesVersion: initOptions.safeModulesVersion,
     options: {
-      safeAddress: ''
+      safeAddress: '0x'
     },
     ...initOptions,
     bundlerUrl: fixtures.BUNDLER_URL

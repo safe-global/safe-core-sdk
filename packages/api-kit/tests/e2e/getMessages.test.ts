@@ -1,4 +1,5 @@
 import SafeApiKit from '@safe-global/api-kit/index'
+import { Address } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getApiKit } from '../utils/setupKits'
@@ -15,8 +16,12 @@ describe('getMessages', () => {
   })
 
   it('should fail if safeAddress is empty or invalid', async () => {
-    await chai.expect(safeApiKit.getMessages('')).to.be.rejectedWith('Invalid safeAddress')
-    await chai.expect(safeApiKit.getMessages('0x123')).to.be.rejectedWith('Invalid safeAddress')
+    await chai
+      .expect(safeApiKit.getMessages('' as Address))
+      .to.be.rejectedWith('Invalid safeAddress')
+    await chai
+      .expect(safeApiKit.getMessages('0x123'))
+      .to.be.rejectedWith('Invalid Ethereum address 0x123')
   })
 
   it('should get the messages list', async () => {

@@ -11,7 +11,7 @@ import {
   SafeConfig,
   SafeContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
 import SafeProvider from '../SafeProvider'
 import { getSafeContractVersion } from '@safe-global/protocol-kit/contracts/utils'
@@ -44,7 +44,7 @@ class ContractManager {
     } else {
       try {
         // We try to fetch the version of the Safe from the blockchain
-        safeVersion = await getSafeContractVersion(safeProvider, safeAddress as string)
+        safeVersion = await getSafeContractVersion(safeProvider, safeAddress as Address)
       } catch (e) {
         // if contract is not deployed we use the default version
         safeVersion = DEFAULT_SAFE_VERSION

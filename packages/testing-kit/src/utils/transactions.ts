@@ -1,4 +1,5 @@
-import { Hex, WalletClient, Transport, Chain, Account, Address } from 'viem'
+import { Hex, WalletClient, Transport, Chain, Account } from 'viem'
+import { Address } from '@safe-global/types-kit'
 import hre, { viem } from 'hardhat'
 
 export async function waitTransactionReceipt(hash: Hex) {

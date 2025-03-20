@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 import Safe from '@safe-global/protocol-kit'
-import { OperationType, SafeTransactionDataPartial, SigningMethod } from '@safe-global/types-kit'
+import { Address, OperationType, SafeTransactionDataPartial, SigningMethod } from '@safe-global/types-kit'
 
 dotenv.config()
 
@@ -14,14 +14,14 @@ interface Config {
   /** Private key of a signer owning the Safe */
   SIGNER_ADDRESS_PRIVATE_KEY: string
   /** Address of a 1/1 Safe */
-  SAFE_ADDRESS: string
+  SAFE_ADDRESS: Address
 }
 
 // Adjust the configuration with your own input parameters before running the script
 const config: Config = {
   RPC_URL: 'https://sepolia.gateway.tenderly.co',
   SIGNER_ADDRESS_PRIVATE_KEY: SIGNER_ADDRESS_PRIVATE_KEY!,
-  SAFE_ADDRESS: '<SAFE_ADDRESS>'
+  SAFE_ADDRESS: '0x<SAFE_ADDRESS>'
 }
 
 async function main() {

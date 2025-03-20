@@ -3,7 +3,7 @@ import { Abi } from 'abitype'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 import { contractName } from '@safe-global/protocol-kit/contracts/config'
 
 /**
@@ -41,7 +41,7 @@ abstract class SimulateTxAccessorBaseContract<
     safeProvider: SafeProvider,
     defaultAbi: SimulateTxAccessorContractAbiType,
     safeVersion: SafeVersion,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SimulateTxAccessorContractAbiType,
     deploymentType?: DeploymentType
   ) {

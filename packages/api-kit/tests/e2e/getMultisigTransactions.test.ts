@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
+import { Address, Eip3770Address } from '@safe-global/types-kit'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
 
@@ -14,14 +15,14 @@ describe('getMultisigTransactions', () => {
   })
 
   it('should fail if Safe address is empty', async () => {
-    const safeAddress = ''
+    const safeAddress = '' as Address
     await chai
       .expect(safeApiKit.getMultisigTransactions(safeAddress))
       .to.be.rejectedWith('Invalid Safe address')
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
+    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase() as Address
     await chai
       .expect(safeApiKit.getMultisigTransactions(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -48,7 +49,7 @@ describe('getMultisigTransactions', () => {
 
   it('should return the list of multisig transactions EIP-3770', async () => {
     const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with multisig transactions
-    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const eip3770SafeAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const safeMultisigTransactionListResponse =
       await safeApiKit.getMultisigTransactions(eip3770SafeAddress)
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(10)

@@ -1,4 +1,5 @@
 import SafeApiKit from '@safe-global/api-kit/index'
+import { Address, Eip3770Address } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
@@ -15,14 +16,14 @@ describe('getSafeInfo', () => {
   })
 
   it('should fail if Safe address is empty', async () => {
-    const safeAddress = ''
+    const safeAddress = '' as Address
     await chai
       .expect(safeApiKit.getSafeInfo(safeAddress))
       .to.be.rejectedWith('Invalid Safe address')
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = API_TESTING_SAFE.address.toLowerCase()
+    const safeAddress = API_TESTING_SAFE.address.toLowerCase() as Address
     await chai
       .expect(safeApiKit.getSafeInfo(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -48,7 +49,7 @@ describe('getSafeInfo', () => {
 
   it('should return the Safe info if EIP-3770 address is correct', async () => {
     const safeAddress = API_TESTING_SAFE.address
-    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const eip3770SafeAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const safeInfoResponse = await safeApiKit.getSafeInfo(eip3770SafeAddress)
     chai.expect(safeInfoResponse.address).to.be.equal(safeAddress)
     chai.expect(safeInfoResponse.nonce).to.be.a('string')

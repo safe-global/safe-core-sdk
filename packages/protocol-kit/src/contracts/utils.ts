@@ -20,6 +20,7 @@ import { EMPTY_DATA, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/consta
 import { createMemoizedFunction } from '@safe-global/protocol-kit/utils/memoized'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   SafeProxyFactoryContractType,
   SafeVersion,
   TransactionOptions,
@@ -88,7 +89,7 @@ export interface encodeSetupCallDataProps {
 
 export function encodeCreateProxyWithNonce(
   safeProxyFactoryContract: SafeProxyFactoryContractType,
-  safeSingletonAddress: string,
+  safeSingletonAddress: Address,
   initializer: string,
   salt?: string
 ) {
@@ -222,14 +223,14 @@ const memoizedGetSafeContract = createMemoizedFunction(
  * Retrieves the version of the Safe contract associated with the given Safe address from the blockchain.
  *
  * @param {SafeProvider} safeProvider The provider to use when reading the contract.
- * @param {string} safeAddress The address of the Safe contract for which to retrieve the version.
+ * @param {Address} safeAddress The address of the Safe contract for which to retrieve the version.
  *
  * @returns {Promise<SafeVersion>} A promise resolving to the version of the Safe contract.
  * @throws when fetching an address which doesn't have a Safe deployed in it.
  */
 export async function getSafeContractVersion(
   safeProvider: SafeProvider,
-  safeAddress: string
+  safeAddress: Address
 ): Promise<SafeVersion> {
   return (await safeProvider.readContract({
     address: safeAddress,
@@ -316,7 +317,7 @@ export async function predictSafeAddress({
   safeDeploymentConfig = {},
   isL1SafeSingleton,
   customContracts
-}: PredictSafeAddressProps): Promise<string> {
+}: PredictSafeAddressProps): Promise<Address> {
   validateSafeAccountConfig(safeAccountConfig)
   validateSafeDeploymentConfig(safeDeploymentConfig)
 
@@ -432,14 +433,14 @@ function getProxyCreationEvent(safeVersion: SafeVersion): string {
  *
  * @param {FormattedTransactionReceipt} txReceipt - The transaction receipt containing logs.
  * @param {safeVersion} safeVersion - The Safe Version.
- * @returns {string} - The address of the deployed SafeProxy.
+ * @returns {Address} - The address of the deployed SafeProxy.
  * @throws {Error} - Throws an error if the SafeProxy was not deployed correctly.
  */
 
 export function getSafeAddressFromDeploymentTx(
   txReceipt: FormattedTransactionReceipt,
   safeVersion: SafeVersion
-): string {
+): Address {
   const eventHash = toEventHash(getProxyCreationEvent(safeVersion))
   const proxyCreationEvent = txReceipt?.logs.find((event) => event.topics[0] === eventHash)
 
@@ -460,26 +461,26 @@ export function getSafeAddressFromDeploymentTx(
     throw new Error('SafeProxy was not deployed correctly')
   }
 
-  return args[0] as string
+  return args[0] as Address
 }
 
 /**
  * Generates a zkSync Era address. zkSync Era uses a distinct address derivation method compared to Ethereum
  * see: https://docs.zksync.io/build/developer-reference/ethereum-differences/evm-instructions/#address-derivation
  *
- * @param {`string`} from - The sender's address.
+ * @param {`0x${string}`} from - The sender's address.
  * @param {SafeVersion} safeVersion - The version of the safe.
  * @param {`0x${string}`} salt - The salt used for address derivation.
  * @param {`0x${string}`} input - Additional input data for the derivation.
  *
- * @returns {string} The derived zkSync Era address.
+ * @returns {`0x${string}`} The derived zkSync Era address.
  */
 export function zkSyncEraCreate2Address(
-  from: string,
+  from: Address,
   safeVersion: SafeVersion,
   salt: Hex,
   input: Hex
-): string {
+): Address {
   const bytecodeHash = ZKSYNC_SAFE_PROXY_DEPLOYED_BYTECODE[safeVersion].deployedBytecodeHash
   const inputHash = keccak256(input)
 

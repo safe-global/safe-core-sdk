@@ -14,7 +14,12 @@ import {
   itif
 } from '@safe-global/testing-kit'
 import SafeMessage from '@safe-global/protocol-kit/utils/messages/SafeMessage'
-import { OperationType, SafeTransactionDataPartial, SigningMethod } from '@safe-global/types-kit'
+import {
+  Address,
+  OperationType,
+  SafeTransactionDataPartial,
+  SigningMethod
+} from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getEip1193Provider } from './utils/setupProvider'
@@ -25,7 +30,7 @@ import { asHash } from '@safe-global/protocol-kit/utils/types'
 chai.use(chaiAsPromised)
 
 const calculateSafeMessageHash = (
-  safeAddress: string,
+  safeAddress: Address,
   message: string,
   chainId: number
 ): string => {

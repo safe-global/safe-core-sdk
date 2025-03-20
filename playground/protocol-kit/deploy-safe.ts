@@ -1,5 +1,5 @@
 import Safe, { SafeAccountConfig, getSafeAddressFromDeploymentTx } from '@safe-global/protocol-kit'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 
 import { createWalletClient, http } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -13,7 +13,7 @@ interface Config {
   RPC_URL: string
   DEPLOYER_ADDRESS_PRIVATE_KEY: string
   DEPLOY_SAFE: {
-    OWNERS: string[]
+    OWNERS: Address[]
     THRESHOLD: number
     SALT_NONCE: string
     SAFE_VERSION: string
@@ -25,7 +25,7 @@ const config: Config = {
   RPC_URL: sepolia.rpcUrls.default.http[0],
   DEPLOYER_ADDRESS_PRIVATE_KEY: '<DEPLOYER_ADDRESS_PRIVATE_KEY>',
   DEPLOY_SAFE: {
-    OWNERS: ['OWNER_ADDRESS'],
+    OWNERS: ['0xOWNER_ADDRESS'],
     THRESHOLD: 1, // <SAFE_THRESHOLD>
     SALT_NONCE: '150000',
     SAFE_VERSION: '1.3.0'

@@ -1,17 +1,17 @@
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 
 import { SafeProviderConfig } from './safeProvider'
 import { ContractNetworksConfig } from './contracts'
 
 export type SafeAccountConfig = {
-  owners: string[]
+  owners: Address[]
   threshold: number
-  to?: string
+  to?: Address
   data?: string
-  fallbackHandler?: string
-  paymentToken?: string
+  fallbackHandler?: Address
+  paymentToken?: Address
   payment?: number
-  paymentReceiver?: string
+  paymentReceiver?: Address
 }
 
 export type DeploymentType = 'canonical' | 'eip155' | 'zksync'
@@ -29,7 +29,7 @@ export type PredictedSafeProps = {
 
 type SafeConfigWithSafeAddressProps = {
   /** safeAddress - The address of the Safe account to use */
-  safeAddress: string
+  safeAddress: Address
   /** predictedSafe - The configuration of the Safe that is not yet deployed */
   predictedSafe?: never
 }
@@ -65,7 +65,7 @@ export type SafeConfig = SafeConfigWithSafeAddress | SafeConfigWithPredictedSafe
 
 type ConnectSafeConfigWithSafeAddressProps = {
   /** safeAddress - The address of the Safe account to use */
-  safeAddress?: string
+  safeAddress?: Address
   /** predictedSafe - The configuration of the Safe that is not yet deployed */
   predictedSafe?: never
 }

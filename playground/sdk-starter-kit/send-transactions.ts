@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv'
 import { Hex } from 'viem'
 import { privateKeyToAddress } from 'viem/accounts'
 import { SafeClientResult, createSafeClient } from '@safe-global/sdk-starter-kit'
+import { Address } from '@safe-global/types-kit'
 import { generateTransferCallData } from '../utils'
 
 dotenv.config({ path: './playground/sdk-starter-kit/.env' })
@@ -17,7 +18,7 @@ const {
   SALT_NONCE
 } = process.env
 
-const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
+const usdcTokenAddress: Address = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
 const usdcAmount = 10_000n // 0.01 USDC
 
 async function send(): Promise<SafeClientResult> {

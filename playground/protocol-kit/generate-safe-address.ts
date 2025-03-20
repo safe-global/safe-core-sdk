@@ -4,7 +4,7 @@ import {
   SafeDeploymentConfig,
   predictSafeAddress
 } from '@safe-global/protocol-kit'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 
 // This script can be used to generate a custom Safe address
 
@@ -73,13 +73,13 @@ generateSafeAddresses()
 interface Config {
   safeVersion: SafeVersion
   rpcUrl: string
-  owners: string[]
+  owners: Address[]
   threshold: number
   initialSaltNonce: number
   pattern: string
 }
 
-const addressesFound: { predictedSafeAddress: string; saltNonce: number }[] = []
+const addressesFound: { predictedSafeAddress: Address; saltNonce: number }[] = []
 
 // util functions
 
@@ -110,7 +110,7 @@ function printPerfomanceMessage(addresses: number, saltNonce: number): void {
 }
 
 // used to print the found addresses
-function printValidAddress(validAddress: string, saltNonce: number): void {
+function printValidAddress(validAddress: Address, saltNonce: number): void {
   addressesFound.push({
     predictedSafeAddress: validAddress,
     saltNonce

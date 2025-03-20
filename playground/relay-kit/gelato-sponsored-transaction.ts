@@ -5,6 +5,7 @@ import { sepolia } from 'viem/chains'
 import { createSafeClient, SafeClient } from '@safe-global/sdk-starter-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
+  Address,
   MetaTransactionData,
   MetaTransactionOptions,
   OperationType,
@@ -20,9 +21,15 @@ import {
 // Check the status of a transaction after it is executed:
 // https://sepolia.etherscan.io/tx/<TRANSACTION_HASH>
 
-const config = {
+interface Config {
+  SAFE_SIGNER_PRIVATE_KEY: string,
+  SAFE_SIGNER_ADDRESS: Address,
+  RELAY_API_KEY: string
+}
+
+const config: Config = {
   SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>',
-  SAFE_SIGNER_ADDRESS: '<SAFE_SIGNER_ADDRESS>',
+  SAFE_SIGNER_ADDRESS: '0x<SAFE_SIGNER_ADDRESS>',
   RELAY_API_KEY: '<GELATO_RELAY_API_KEY>'
 }
 
@@ -110,7 +117,7 @@ async function main() {
 
   const safeTransactions: MetaTransactionData[] = [
     {
-      to: txConfig.TO,
+      to: txConfig.TO as Address,
       data: txConfig.DATA,
       value: txConfig.VALUE,
       operation: OperationType.Call

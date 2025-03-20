@@ -10,7 +10,7 @@ import {
   WalletActions,
   Hex
 } from 'viem'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 import { ContractNetworksConfig } from '@safe-global/protocol-kit/types'
 
 export type RequestArguments = {
@@ -30,7 +30,7 @@ export type GetPasskeyType = {
 }
 
 export type PasskeyActions = {
-  createDeployTxRequest: () => { to: string; value: string; data: Hex }
+  createDeployTxRequest: () => { to: Address; value: string; data: Hex }
   encodeCreateSigner: () => Hex
   encodeConfigure: () => Hex
 }
@@ -46,16 +46,15 @@ export type PasskeyClient = Client<
 export type ExternalSigner = WalletClient<Transport, Chain | undefined, Account> | PasskeyClient
 export type ExternalClient = PublicClient | (ExternalSigner & PublicClient)
 
-export type HexAddress = string
 export type PrivateKey = string
 export type HttpTransport = string
 export type SocketTransport = string
-export type SafeSigner = HexAddress | PrivateKey | PasskeyArgType | PasskeyClient
+export type SafeSigner = Address | PrivateKey | PasskeyArgType | PasskeyClient
 
 export type SafeProviderConfig = {
   /** signerOrProvider - Ethers signer or provider */
   provider: Eip1193Provider | HttpTransport | SocketTransport
-  signer?: HexAddress | PrivateKey | PasskeyArgType | PasskeyClient
+  signer?: Address | PrivateKey | PasskeyArgType | PasskeyClient
 }
 
 export type SafeProviderInitOptions = {
@@ -63,13 +62,13 @@ export type SafeProviderInitOptions = {
   signer?: SafeProviderConfig['signer']
   safeVersion?: SafeVersion
   contractNetworks?: ContractNetworksConfig
-  safeAddress?: string
-  owners?: string[]
+  safeAddress?: Address
+  owners?: Address[]
 }
 
 export type SafeProviderTransaction = {
-  to: string
-  from: string
+  to: Address
+  from: Address
   data: string
   value?: string
   gasPrice?: number | string

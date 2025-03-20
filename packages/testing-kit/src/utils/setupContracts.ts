@@ -1,4 +1,5 @@
-import { GetContractReturnType, Abi, WalletClient, Address, zeroAddress } from 'viem'
+import { GetContractReturnType, Abi, WalletClient, zeroAddress } from 'viem'
+import { Address } from '@safe-global/types-kit'
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,

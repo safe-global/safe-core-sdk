@@ -10,6 +10,7 @@ import Safe, {
 } from '@safe-global/protocol-kit'
 import { RelayKitBasePack } from '@safe-global/relay-kit/RelayKitBasePack'
 import {
+  Address,
   OperationType,
   SafeOperationConfirmation,
   SafeOperationResponse,
@@ -75,9 +76,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
 }> {
   #BUNDLER_URL: string
 
-  #ENTRYPOINT_ADDRESS: string
-  #SAFE_4337_MODULE_ADDRESS: string = '0x'
-  #SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS: string = '0x'
+  #ENTRYPOINT_ADDRESS: Address
+  #SAFE_4337_MODULE_ADDRESS: Address = '0x'
+  #SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS: Address = '0x'
 
   #bundlerClient: BundlerClient
 
@@ -160,7 +161,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         version: safeModulesVersion,
         network
       })
-      safeModulesSetupAddress = safeModuleSetupDeployment?.networkAddresses[network]
+      safeModulesSetupAddress = safeModuleSetupDeployment?.networkAddresses[network] as Address
     }
 
     let safe4337ModuleAddress = customContracts?.safe4337ModuleAddress
@@ -170,7 +171,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         version: safeModulesVersion,
         network
       })
-      safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network]
+      safe4337ModuleAddress = safe4337ModuleDeployment?.networkAddresses[network] as Address
     }
 
     if (!safeModulesSetupAddress || !safe4337ModuleAddress) {
@@ -275,8 +276,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
             version: '0.2.1',
             network
           })
-          safeWebAuthnSharedSignerAddress =
-            safeWebAuthnSharedSignerDeployment?.networkAddresses[network]
+          safeWebAuthnSharedSignerAddress = safeWebAuthnSharedSignerDeployment?.networkAddresses[
+            network
+          ] as Address
         }
 
         if (!safeWebAuthnSharedSignerAddress) {
@@ -503,7 +505,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     const paymasterData = (userOperation?.paymasterData as Hex) || '0x'
     const safeOperation = SafeOperationFactory.createSafeOperation(
       {
-        sender: userOperation?.sender || '0x',
+        sender: (userOperation?.sender as Address) || '0x',
         nonce: userOperation?.nonce || '0',
         initCode: userOperation?.initCode || '',
         callData: userOperation?.callData || '',
@@ -518,7 +520,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       {
         chainId: this.#chainId,
         moduleAddress: this.#SAFE_4337_MODULE_ADDRESS,
-        entryPoint: userOperation?.entryPoint || this.#ENTRYPOINT_ADDRESS,
+        entryPoint: (userOperation?.entryPoint as Address) || this.#ENTRYPOINT_ADDRESS,
         validAfter: this.#timestamp(validAfter),
         validUntil: this.#timestamp(validUntil)
       }

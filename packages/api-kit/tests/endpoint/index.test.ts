@@ -13,7 +13,7 @@ import SafeApiKit, {
 } from '@safe-global/api-kit/index'
 import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import Safe from '@safe-global/protocol-kit'
-import { UserOperation } from '@safe-global/types-kit'
+import { Address, Eip3770Address, UserOperation } from '@safe-global/types-kit'
 import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import config from '../utils/config'
 import { getApiKit, getKits } from '../utils/setupKits'
@@ -24,16 +24,16 @@ chai.use(sinonChai)
 const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 
 const chainId = 11155111n
-const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
-const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-const randomAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
-const eip3770RandomAddress = `${config.EIP_3770_PREFIX}:${randomAddress}`
-const delegateAddress = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
-const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
-const tokenAddress = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
-const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
-const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
-const safeOpHash = '0x8b1840745ec0a6288e868c6e285dadcfebd49e846d307610a9ccd97f445ace93'
+const safeAddress: Address = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
+const eip3770SafeAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${safeAddress}`
+const randomAddress: Address = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'
+const eip3770RandomAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${randomAddress}`
+const delegateAddress: Address = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
+const eip3770DelegateAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${delegateAddress}`
+const tokenAddress: Address = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
+const eip3770TokenAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${tokenAddress}`
+const safeTxHash: Address = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
+const safeOpHash: Address = '0x8b1840745ec0a6288e868c6e285dadcfebd49e846d307610a9ccd97f445ace93'
 const txServiceBaseUrl = 'https://safe-transaction-sepolia.safe.global/api'
 
 const signer = createWalletClient({

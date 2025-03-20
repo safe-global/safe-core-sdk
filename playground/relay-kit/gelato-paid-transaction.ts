@@ -5,6 +5,7 @@ import { privateKeyToAccount } from 'viem/accounts'
 import { createSafeClient, SafeClient } from '@safe-global/sdk-starter-kit'
 import { GelatoRelayPack } from '@safe-global/relay-kit'
 import {
+  Address,
   MetaTransactionData,
   MetaTransactionOptions,
   OperationType,
@@ -17,9 +18,23 @@ import {
 // Check the status of a transaction after it is executed:
 // https://sepolia.etherscan.io/tx/<TRANSACTION_HASH>
 
-const config = {
+interface Config {
+  SAFE_SIGNER_PRIVATE_KEY: string
+  SAFE_SIGNER_ADDRESS: Address
+}
+
+interface txConfig {
+  TO: Address,
+  DATA: string,
+  VALUE: string,
+  // Options:
+  GAS_LIMIT: string,
+  GAS_TOKEN: Address
+}
+
+const config: Config = {
   SAFE_SIGNER_PRIVATE_KEY: '<SAFE_SIGNER_PRIVATE_KEY>',
-  SAFE_SIGNER_ADDRESS: '<SAFE_SIGNER_ADDRESS>'
+  SAFE_SIGNER_ADDRESS: '0x<SAFE_SIGNER_ADDRESS>'
 }
 
 const CHAIN: Chain = sepolia
@@ -30,8 +45,8 @@ const mockOnRampConfig = {
   PRIVATE_KEY: '<PRIVATE_KEY>'
 }
 
-const txConfig = {
-  TO: '<TO>',
+const txConfig: txConfig = {
+  TO: '0x<TO>',
   DATA: '<DATA>',
   VALUE: '<VALUE>',
   // Options:
@@ -127,7 +142,7 @@ async function main() {
   ]
   const options: MetaTransactionOptions = {
     gasLimit: txConfig.GAS_LIMIT,
-    gasToken: txConfig.GAS_TOKEN
+    gasToken: txConfig.GAS_TOKEN,
   }
 
   const response = await gelatoSafeClient.relayTransaction(safeTransactions, options)

@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
+import { Address, FullAddress } from '@safe-global/types-kit'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
 
@@ -14,14 +15,14 @@ describe('getSafesByOwner', () => {
   })
 
   it('should fail if owner address is empty', async () => {
-    const ownerAddress = ''
+    const ownerAddress = '' as Address
     await chai
       .expect(safeApiKit.getSafesByOwner(ownerAddress))
       .to.be.rejectedWith('Invalid owner address')
   })
 
   it('should fail if owner address is not checksummed', async () => {
-    const ownerAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
+    const ownerAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase() as Address
     await chai
       .expect(safeApiKit.getSafesByOwner(ownerAddress))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -43,7 +44,7 @@ describe('getSafesByOwner', () => {
 
   it('should return the array of owned Safes EIP-3770', async () => {
     const ownerAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const eip3770OwnerAddress = `${config.EIP_3770_PREFIX}:${ownerAddress}`
+    const eip3770OwnerAddress: FullAddress = `${config.EIP_3770_PREFIX}:${ownerAddress}`
     const ownerResponse = await safeApiKit.getSafesByOwner(eip3770OwnerAddress)
     const { safes } = ownerResponse
     chai.expect(safes.length).to.be.greaterThan(1)

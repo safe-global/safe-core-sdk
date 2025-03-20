@@ -1,5 +1,6 @@
 import { SafeProvider } from '@safe-global/protocol-kit'
 import {
+  Address,
   TransactionBase,
   TransactionOptions,
   EIP712TypedData,
@@ -41,13 +42,13 @@ export type ConfirmSafeOperationProps = {
 }
 
 export type SafeConfig = {
-  owners: string[]
+  owners: Address[]
   threshold: number
   saltNonce?: string
 }
 
 export type ExistingSafeConfig = {
-  safeAddress?: string
+  safeAddress?: Address
   safeOptions?: never
 }
 
@@ -66,7 +67,7 @@ export type SdkStarterKitConfig = SdkStarterKitRootConfig &
   (ExistingSafeConfig | PredictedSafeConfig)
 
 export type SafeClientResult = {
-  safeAddress: string
+  safeAddress: Address
   description: string
   status: SafeClientTxStatus
   transactions?: {

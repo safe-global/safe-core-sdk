@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
+import { Address, Eip3770Address } from '@safe-global/types-kit'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
 import { API_TESTING_SAFE } from '../helpers/safe'
@@ -15,14 +16,14 @@ describe('getIncomingTransactions', () => {
   })
 
   it('should fail if Safe address is empty', async () => {
-    const safeAddress = ''
+    const safeAddress = '' as Address
     await chai
       .expect(safeApiKit.getIncomingTransactions(safeAddress))
       .to.be.rejectedWith('Invalid Safe address')
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = API_TESTING_SAFE.address.toLowerCase()
+    const safeAddress = API_TESTING_SAFE.address.toLowerCase() as Address
     await chai
       .expect(safeApiKit.getIncomingTransactions(safeAddress))
       .to.be.rejectedWith('Checksum address validation failed')
@@ -62,7 +63,7 @@ describe('getIncomingTransactions', () => {
 
   it('should return the list of incoming transactions EIP-3770', async () => {
     const safeAddress = API_TESTING_SAFE.address // Safe with incoming transactions
-    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const eip3770SafeAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const transferListResponse = await safeApiKit.getIncomingTransactions(eip3770SafeAddress)
     chai.expect(transferListResponse.count).to.be.equal(6)
     chai.expect(transferListResponse.results.length).to.be.equal(6)

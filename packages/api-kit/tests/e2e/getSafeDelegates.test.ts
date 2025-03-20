@@ -1,10 +1,11 @@
-import { Address, createWalletClient, http } from 'viem'
+import { createWalletClient, http } from 'viem'
 import { sepolia } from 'viem/chains'
 import { privateKeyToAccount } from 'viem/accounts'
 import SafeApiKit, {
   DeleteSafeDelegateProps,
   SafeDelegateResponse
 } from '@safe-global/api-kit/index'
+import { Address, Eip3770Address } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
@@ -33,7 +34,7 @@ describe('getSafeDelegates', () => {
   })
 
   it('should fail if Safe address is empty', async () => {
-    const safeAddress = ''
+    const safeAddress = '' as Address
     await chai
       .expect(safeApiKit.getSafeDelegates({ safeAddress }))
       .to.be.rejectedWith('Bad Request')
@@ -41,7 +42,7 @@ describe('getSafeDelegates', () => {
 
   it('should fail if Safe address is not checksummed', async () => {
     await chai
-      .expect(safeApiKit.getSafeDelegates({ safeAddress: safeAddress.toLowerCase() }))
+      .expect(safeApiKit.getSafeDelegates({ safeAddress: safeAddress.toLowerCase() as Address }))
       .to.be.rejectedWith('Enter a valid checksummed Ethereum Address')
   })
 
@@ -128,7 +129,7 @@ describe('getSafeDelegates', () => {
   })
 
   it('should return an array of delegates EIP-3770', async () => {
-    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const eip3770SafeAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateConfig1: DeleteSafeDelegateProps = {
       delegateAddress: `${config.EIP_3770_PREFIX}:0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B`,
       delegatorAddress,

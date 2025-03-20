@@ -6,7 +6,13 @@ import Safe, {
   estimateSafeDeploymentGas,
   createERC20TokenTransferTransaction
 } from '@safe-global/protocol-kit'
-import { MetaTransactionData, OperationType, SafeTransaction } from '@safe-global/types-kit'
+import {
+  MetaTransactionData,
+  MetaTransactionOptions,
+  OperationType,
+  SafeTransaction,
+  TransactionBase
+} from '@safe-global/types-kit'
 
 import {
   GELATO_FEE_COLLECTOR,
@@ -236,13 +242,13 @@ describe('GelatoRelayPack', () => {
         // non standard ERC20 like USDC
         mockedIsGasTokenCompatibleWithHandlePayment.mockResolvedValue(Promise.resolve(false))
 
-        const options = {
+        const options: MetaTransactionOptions = {
           gasToken: GAS_TOKEN,
           isSponsored: false,
           gasLimit: '5000' // manual gas limit
         }
 
-        const transferToGelato = {
+        const transferToGelato: TransactionBase = {
           to: GELATO_FEE_COLLECTOR,
           value: FEE_ESTIMATION.toString(),
           data: '0x'
@@ -323,7 +329,7 @@ describe('GelatoRelayPack', () => {
         })
 
         it('should allow you to create relay transaction using a compatible ERC20 token to pay Gelato fees', async () => {
-          const options = {
+          const options: MetaTransactionOptions = {
             gasToken: GAS_TOKEN
           }
 
@@ -351,11 +357,11 @@ describe('GelatoRelayPack', () => {
         })
 
         it('should allow you to create relay transaction using a non standard ERC20 gas token to pay Gelato fees', async () => {
-          const options = {
+          const options: MetaTransactionOptions = {
             gasToken: GAS_TOKEN
           }
 
-          const transferToGelato = {
+          const transferToGelato: MetaTransactionData = {
             to: GELATO_FEE_COLLECTOR,
             value: FEE_ESTIMATION.toString(),
             data: '0x'

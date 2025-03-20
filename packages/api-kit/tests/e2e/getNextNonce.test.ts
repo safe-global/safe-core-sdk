@@ -1,6 +1,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
+import { Address, Eip3770Address } from '@safe-global/types-kit'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
 import { API_TESTING_SAFE } from '../helpers/safe'
@@ -15,7 +16,7 @@ describe('getNextNonce', () => {
   })
 
   it('should fail if Safe address is empty', async () => {
-    const safeAddress = ''
+    const safeAddress = '' as Address
     await chai
       .expect(safeApiKit.getNextNonce(safeAddress))
       .to.be.rejectedWith('Invalid Safe address')
@@ -29,7 +30,7 @@ describe('getNextNonce', () => {
 
   it('should return the next Safe nonce when there are pending transactions EIP-3770', async () => {
     const safeAddress = API_TESTING_SAFE.address
-    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const eip3770SafeAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const nextNonce = await safeApiKit.getNextNonce(eip3770SafeAddress)
     chai.expect(nextNonce).to.be.equal((BigInt(API_TESTING_SAFE.nonce) + 2n).toString())
   })

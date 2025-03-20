@@ -1,7 +1,6 @@
 {
   "extends": "../tsconfig.settings.json",
   "compilerOptions": {
-    "composite": false,
     "noImplicitThis": false,
     "outDir": "dist"
   },

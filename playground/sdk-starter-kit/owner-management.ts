@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv'
 import { Hex } from 'viem'
 import { createSafeClient } from '@safe-global/sdk-starter-kit'
+import { Address } from '@safe-global/types-kit'
 import { privateKeyToAddress } from 'viem/accounts'
 
 dotenv.config({ path: './playground/sdk-starter-kit/.env' })
@@ -14,11 +15,13 @@ const {
   RPC_URL = ''
 } = process.env
 
+const safeAddress = SAFE_ADDRESS as Address
+
 async function addOwner() {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
-    safeAddress: SAFE_ADDRESS
+    safeAddress
   })
 
   const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY as Hex)
@@ -37,13 +40,13 @@ async function removeOwner() {
   const safeClient1 = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
-    safeAddress: SAFE_ADDRESS
+    safeAddress
   })
 
   const safeClient2 = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_2_PRIVATE_KEY,
-    safeAddress: SAFE_ADDRESS
+    safeAddress
   })
 
   const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY as Hex)
@@ -64,7 +67,7 @@ async function safeInfo() {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
-    safeAddress: SAFE_ADDRESS
+    safeAddress
   })
 
   console.log('Safe Address', await safeClient.protocolKit.getAddress())

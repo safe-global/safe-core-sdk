@@ -73,7 +73,7 @@ generateSafeAddresses()
 interface Config {
   safeVersion: SafeVersion
   rpcUrl: string
-  owners: string[]
+  owners: Address[]
   threshold: number
   initialSaltNonce: number
   pattern: string
@@ -110,7 +110,7 @@ function printPerfomanceMessage(addresses: number, saltNonce: number): void {
 }
 
 // used to print the found addresses
-function printValidAddress(validAddress: string, saltNonce: number): void {
+function printValidAddress(validAddress: Address, saltNonce: number): void {
   addressesFound.push({
     predictedSafeAddress: validAddress,
     saltNonce

@@ -433,14 +433,14 @@ function getProxyCreationEvent(safeVersion: SafeVersion): string {
  *
  * @param {FormattedTransactionReceipt} txReceipt - The transaction receipt containing logs.
  * @param {safeVersion} safeVersion - The Safe Version.
- * @returns {string} - The address of the deployed SafeProxy.
+ * @returns {Address} - The address of the deployed SafeProxy.
  * @throws {Error} - Throws an error if the SafeProxy was not deployed correctly.
  */
 
 export function getSafeAddressFromDeploymentTx(
   txReceipt: FormattedTransactionReceipt,
   safeVersion: SafeVersion
-): string {
+): Address {
   const eventHash = toEventHash(getProxyCreationEvent(safeVersion))
   const proxyCreationEvent = txReceipt?.logs.find((event) => event.topics[0] === eventHash)
 
@@ -461,7 +461,7 @@ export function getSafeAddressFromDeploymentTx(
     throw new Error('SafeProxy was not deployed correctly')
   }
 
-  return args[0] as string
+  return args[0] as Address
 }
 
 /**

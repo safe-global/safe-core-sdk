@@ -1,10 +1,16 @@
 import Safe, { estimateSafeTxGas } from '@safe-global/protocol-kit'
-import { Chain, gnosis, arbitrum, polygon } from 'viem/chains'
+import { Chain, gnosis } from 'viem/chains'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
+import { Address } from '@safe-global/types-kit/'
+
+interface Config {
+  SAFE_ADDRESS: Address
+  chain: Chain
+}
 
 // Adjust the configuration with your own input parameters before running the script
-const config = {
-  SAFE_ADDRESS: '<SAFE_ADDRESS>',
+const config: Config = {
+  SAFE_ADDRESS: '0x<SAFE_ADDRESS>',
   chain: gnosis // Add the viem chain where the SAFE_ADDRESS is deployed (gnosis, arbitrum, polygon, etc.)
 }
 

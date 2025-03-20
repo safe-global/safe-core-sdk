@@ -9,6 +9,9 @@ on:
     branches:
       - prepare-release
 
+permissions:
+  contents: read
+
 jobs:
   generate-publish-info:
     runs-on: ubuntu-latest

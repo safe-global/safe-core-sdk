@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: publish-info
-          path: ./publish-info.yml
+          path: ./publish-info
 
       - name: Show YAML output
         run: cat ./publish-info.yml

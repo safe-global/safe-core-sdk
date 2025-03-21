@@ -37,4 +37,4 @@ jobs:
           path: ./publish-info
 
       - name: Show YAML output
-        run: cat ./publish-info.yml
+        run: cat ./publish-info/*.yml

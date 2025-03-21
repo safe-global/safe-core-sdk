@@ -5,7 +5,6 @@
     "paths": {
       "@safe-global/protocol-kit/*": ["./src/*"]
     },
-    "composite": true,
     "outDir": "dist"
   },
   "include": ["src/**/*", "tests/**/*"],

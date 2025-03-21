@@ -1711,17 +1711,17 @@
   resolved "https://registry.yarnpkg.com/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz#82605342f3289dc6b99818f599a3409ec2cb3fdc"
   integrity sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==
 
-"@safe-global/safe-deployments@^1.37.28":
-  version "1.37.28"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.28.tgz#9bc7e8bf5f4df088321e8cb324387d6c7b01fd9d"
-  integrity sha512-b+dxFmJK4peNWGJyc6mXoyFsbwK3eXT2jRKDKoElZMovdefl4D0zn8OKme+GtHqxFgbeT9pswZdAoRRT/SBxeA==
+"@safe-global/safe-deployments@^1.37.31":
+  version "1.37.31"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.31.tgz#582120fb2468a0f3bb284f0d3c6c94bb61b151f7"
+  integrity sha512-9ab33ttfSTiWCYKwI7n7eky9bNPQD0f21cCTu/nn4+OwjZvYUrcYfmxNvjXy3JERDToHbalAZ1KHUjfA0teN4A==
   dependencies:
     semver "^7.6.2"
 
-"@safe-global/safe-modules-deployments@^2.2.5":
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.5.tgz#c8d826b04cc362ed191499c435d06b83a01baba9"
-  integrity sha512-rkKqj6gGKokjBX2JshH1EwjPkzFD14oOk2vY3LSxKhpkQyjdqxcj+OlWkjzpi613HzCtxY0mHgMiyLID7nzueA==
+"@safe-global/safe-modules-deployments@^2.2.7":
+  version "2.2.7"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.7.tgz#8d9cabea778767776de2dc62258dcc458f2f2c14"
+  integrity sha512-xlnAW7d0394EwlRgWJ+nuQNQmGkL0qBE54pN+1IBbUEFvWW8q0SbhDsTmlGgeDM+9F8q2KM06Ip1JMmddppA/Q==
 
 "@safe-global/safe-passkey@0.2.0-alpha.1":
   version "0.2.0-alpha.1"

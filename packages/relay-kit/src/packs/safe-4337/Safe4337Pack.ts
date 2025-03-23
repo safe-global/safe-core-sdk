@@ -142,8 +142,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       bundlerUrl,
       customContracts,
       paymasterOptions,
-      onchainAnalytics,
-      isL1SafeSingleton
+      onchainAnalytics
     } = initOptions
 
     let protocolKit: Safe
@@ -348,7 +347,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
             paymentReceiver: zeroAddress
           }
         },
-        isL1SafeSingleton,
         onchainAnalytics
       })
     }

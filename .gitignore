@@ -62,3 +62,5 @@ openapi/
 yalc.lock
 # Local Netlify folder
 .netlify
+
+publish-info/

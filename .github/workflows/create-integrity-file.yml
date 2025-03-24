@@ -1,0 +1,39 @@
+name: Create publish info file
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+  push:
+    branches:
+      - prepare-release
+
+permissions:
+  contents: read
+
+jobs:
+  generate-publish-info:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: yarn
+      - run: |
+          yarn install --frozen-lockfile
+          yarn build
+
+      - name: Run integrity check script
+        run: |
+          yarn generate-publish-info
+
+      - name: Upload YAML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-info
+          path: ./publish-info
+
+      - name: Show YAML output
+        run: cat ./publish-info/*.yml

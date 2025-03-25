@@ -46,9 +46,9 @@
   },
   "dependencies": {
     "@safe-global/api-kit": "^3.0.1",
-    "@safe-global/protocol-kit": "^6.0.1",
+    "@safe-global/protocol-kit": "^6.0.2",
     "@safe-global/relay-kit": "^4.0.1",
-    "@safe-global/types-kit": "^2.0.0",
+    "@safe-global/types-kit": "^2.0.1",
     "viem": "^2.21.8"
   }
 }

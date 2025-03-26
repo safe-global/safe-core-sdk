@@ -1,5 +1,5 @@
 import Safe, { buildContractSignature, hashSafeMessage } from '@safe-global/protocol-kit'
-import { SigningMethod } from '@safe-global/types-kit'
+import { Address, SigningMethod } from '@safe-global/types-kit'
 
 // This file can be used to play around with the Safe Core SDK
 
@@ -7,8 +7,8 @@ interface Config {
   RPC_URL: string
   OWNER1_PRIVATE_KEY: string
   OWNER2_PRIVATE_KEY: string
-  SAFE_3_3_ADDRESS: string
-  SIGNER_SAFE_ADDRESS: string
+  SAFE_3_3_ADDRESS: Address
+  SIGNER_SAFE_ADDRESS: Address
 }
 
 // Adjust the configuration with your own input parameters before running the script
@@ -21,8 +21,8 @@ const config: Config = {
   RPC_URL: 'https://sepolia.gateway.tenderly.co',
   OWNER1_PRIVATE_KEY: '<OWNER1_PRIVATE_KEY>',
   OWNER2_PRIVATE_KEY: '<OWNER2_PRIVATE_KEY>',
-  SIGNER_SAFE_ADDRESS: '<SIGNER_SAFE_ADDRESS>',
-  SAFE_3_3_ADDRESS: '<SAFE_3_3_ADDRESS>'
+  SIGNER_SAFE_ADDRESS: '0x<SIGNER_SAFE_ADDRESS>',
+  SAFE_3_3_ADDRESS: '0x<SAFE_3_3_ADDRESS>'
 }
 
 async function main() {

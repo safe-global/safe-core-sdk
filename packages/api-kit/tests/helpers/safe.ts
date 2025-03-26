@@ -1,5 +1,7 @@
+import { Address } from '@safe-global/types-kit'
+
 export const API_TESTING_SAFE = {
-  address: '0xF8ef84392f7542576F6b9d1b140334144930Ac78',
+  address: '0xF8ef84392f7542576F6b9d1b140334144930Ac78' as Address,
   nonce: '10',
   threshold: 2,
   owners: [

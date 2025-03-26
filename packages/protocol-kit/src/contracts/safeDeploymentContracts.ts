@@ -25,7 +25,7 @@ import {
   SignMessageLibContractImplementationType,
   SimulateTxAccessorContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 
 export interface GetContractInstanceProps {
   safeProvider: SafeProvider
@@ -36,7 +36,7 @@ export interface GetContractInstanceProps {
 
 export interface GetSafeContractInstanceProps extends GetContractInstanceProps {
   isL1SafeSingleton?: boolean
-  customSafeAddress?: string
+  customSafeAddress?: Address
 }
 
 export async function getSafeContract({

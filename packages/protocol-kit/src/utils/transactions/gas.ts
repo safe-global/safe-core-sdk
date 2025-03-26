@@ -1,5 +1,5 @@
 import { BaseError, CallExecutionErrorType, RawContractErrorType } from 'viem'
-import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/types-kit'
+import { Address, OperationType, SafeVersion, SafeTransaction } from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies.js'
 import Safe from '@safe-global/protocol-kit/Safe'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
@@ -66,7 +66,7 @@ export async function estimateGas(
   safeVersion: SafeVersion,
   safeContract: SafeContractImplementationType,
   safeProvider: SafeProvider,
-  to: string,
+  to: Address,
   valueInWei: string,
   data: string,
   operation: OperationType,
@@ -113,7 +113,7 @@ export async function estimateGas(
 export async function estimateTxGas(
   safeContract: SafeContractImplementationType,
   safeProvider: SafeProvider,
-  to: string,
+  to: Address,
   valueInWei: string,
   data: string,
   operation: OperationType

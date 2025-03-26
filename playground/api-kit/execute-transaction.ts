@@ -2,6 +2,7 @@ import { Hash } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
+import { Address } from '@safe-global/types-kit'
 
 // This file can be used to play around with the Safe Core SDK
 
@@ -9,7 +10,7 @@ interface Config {
   CHAIN_ID: bigint
   RPC_URL: string
   SIGNER_ADDRESS_PRIVATE_KEY: string
-  SAFE_ADDRESS: string
+  SAFE_ADDRESS: Address
   SAFE_TX_HASH: string
 }
 
@@ -18,7 +19,7 @@ const config: Config = {
   CHAIN_ID: 11155111n,
   RPC_URL: 'https://sepolia.gateway.tenderly.co',
   SIGNER_ADDRESS_PRIVATE_KEY: '<SIGNER_ADDRESS_PRIVATE_KEY>',
-  SAFE_ADDRESS: '<SAFE_ADDRESS>',
+  SAFE_ADDRESS: '0x<SAFE_ADDRESS>',
   SAFE_TX_HASH: '<SAFE_TX_HASH>'
 }
 

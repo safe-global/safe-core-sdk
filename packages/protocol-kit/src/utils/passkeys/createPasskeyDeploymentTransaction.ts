@@ -3,6 +3,7 @@ import { Hex } from 'viem'
 import Safe from '@safe-global/protocol-kit/Safe'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { PasskeyArgType, PasskeyClient } from '@safe-global/protocol-kit/types'
+import { Address } from '@safe-global/types-kit'
 
 /**
  * Creates the deployment transaction to create a passkey signer.
@@ -14,7 +15,7 @@ import { PasskeyArgType, PasskeyClient } from '@safe-global/protocol-kit/types'
 async function createPasskeyDeploymentTransaction(
   safe: Safe,
   passkey: PasskeyArgType
-): Promise<{ to: string; value: string; data: Hex }> {
+): Promise<{ to: Address; value: string; data: Hex }> {
   const safeVersion = safe.getContractVersion()
   const safeAddress = await safe.getAddress()
   const owners = await safe.getOwners()

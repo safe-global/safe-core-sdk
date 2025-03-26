@@ -2,6 +2,7 @@ import SimulateTxAccessorBaseContract from '@safe-global/protocol-kit/contracts/
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   simulateTxAccessor_1_4_1_ContractArtifacts,
   SimulateTxAccessorContract_v1_4_1_Abi,
   SimulateTxAccessorContract_v1_4_1_Contract,
@@ -32,7 +33,7 @@ class SimulateTxAccessorContract_v1_4_1
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SimulateTxAccessorContract_v1_4_1_Abi,
     deploymentType?: DeploymentType
   ) {

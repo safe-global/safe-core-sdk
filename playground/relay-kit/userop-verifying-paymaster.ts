@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv'
 import { Safe4337Pack } from '@safe-global/relay-kit'
+import { Address } from '@safe-global/types-kit'
 import { setup4337Playground, waitForOperationToFinish } from '../utils'
 
 dotenv.config({ path: './playground/relay-kit/.env' })
@@ -33,7 +34,7 @@ async function main() {
       sponsorshipPolicyId: POLICY_ID
     },
     options: {
-      safeAddress: SAFE_ADDRESS
+      safeAddress: SAFE_ADDRESS as Address
     }
   })
 

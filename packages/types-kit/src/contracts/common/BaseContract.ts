@@ -4,7 +4,12 @@ import {
   ExtractAbiFunction,
   ExtractAbiFunctionNames
 } from 'abitype'
-import { SafeVersion, TransactionOptions, TransactionResult } from '@safe-global/types-kit/types'
+import {
+  Address,
+  SafeVersion,
+  TransactionOptions,
+  TransactionResult
+} from '@safe-global/types-kit/types'
 
 /**
  * Extracts the names of read-only functions (view or pure) from a given contract ABI.
@@ -77,7 +82,7 @@ export type EstimateGasFunction<
   options?: TransactionOptions
 ) => Promise<bigint>
 
-export type GetAddressFunction = () => string
+export type GetAddressFunction = () => Address
 
 /**
  * Defines a function type for a contract, derived by the given function name from a given contract ABI.

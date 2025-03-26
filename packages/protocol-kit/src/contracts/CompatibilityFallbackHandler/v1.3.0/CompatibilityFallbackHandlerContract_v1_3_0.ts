@@ -2,6 +2,7 @@ import CompatibilityFallbackHandlerBaseContract from '@safe-global/protocol-kit/
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   CompatibilityFallbackHandlerContract_v1_3_0_Abi,
   CompatibilityFallbackHandlerContract_v1_3_0_Contract,
   compatibilityFallbackHandler_1_3_0_ContractArtifacts
@@ -31,7 +32,7 @@ class CompatibilityFallbackHandlerContract_v1_3_0
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: CompatibilityFallbackHandlerContract_v1_3_0_Abi,
     deploymentType?: DeploymentType
   ) {

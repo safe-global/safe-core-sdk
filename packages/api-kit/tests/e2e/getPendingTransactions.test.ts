@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
+import { Eip3770Address } from '@safe-global/types-kit'
 
 chai.use(chaiAsPromised)
 
@@ -43,7 +44,7 @@ describe('getPendingTransactions', () => {
 
   it('should return the the transaction list EIP-3770', async () => {
     const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
-    const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
+    const eip3770SafeAddress: Eip3770Address = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const transactionList = await safeApiKit.getPendingTransactions(eip3770SafeAddress)
     chai.expect(transactionList.count).to.be.equal(10)
     chai.expect(transactionList.results.length).to.be.equal(10)

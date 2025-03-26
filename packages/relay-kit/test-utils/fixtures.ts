@@ -1,4 +1,9 @@
-import { SignatureTypes } from '@safe-global/types-kit'
+import {
+  SafeOperationResponse,
+  SignatureTypes,
+  UserOperationV06,
+  UserOperationV07
+} from '@safe-global/types-kit'
 
 export const OWNER_1 = '0xFfAC5578BE8AC1B2B9D13b34cAf4A074B96B8A1b'
 export const OWNER_2 = '0x3059EfD1BCe33be41eeEfd5fb6D520d7fEd54E43'
@@ -53,7 +58,7 @@ export const USER_OPERATION_RECEIPT = {
   }
 }
 
-export const USER_OPERATION_V06 = {
+export const USER_OPERATION_V06: UserOperationV06 = {
   sender: '0x1405B3659a11a16459fc27Fa1925b60388C38Ce1',
   nonce: '1',
   initCode: '0x',
@@ -69,7 +74,7 @@ export const USER_OPERATION_V06 = {
     '0x000000000000000000000000a397ca32ee7fb5282256ee3465da0843485930b803d747516aac76e152f834051ac18fd2b3c0565590f9d65085538993c85c9bb189c940d15c15402c7c2885821b'
 }
 
-export const USER_OPERATION_V07 = {
+export const USER_OPERATION_V07: UserOperationV07 = {
   sender: '0x26874a65eA7B6B6655e4582c8D215e1De05dd39b',
   nonce: '0x0',
   factory: '0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67',
@@ -123,7 +128,7 @@ export const GAS_ESTIMATION = {
   callGasLimit: '0x186A0'
 }
 
-export const SAFE_OPERATION_RESPONSE = {
+export const SAFE_OPERATION_RESPONSE: SafeOperationResponse = {
   created: '2024-05-31T10:12:21.169031Z',
   modified: '2024-05-31T10:12:21.169031Z',
   safeOperationHash: '0x5a62b1d61f8fca5f766e9456523bb42765d318058b5f235f967ffe3c2af8b1d7',

@@ -1,4 +1,5 @@
 import { Hex, encodePacked, toHex } from 'viem'
+import { Address } from '@safe-global/types-kit'
 import { EthSafeSignature, buildSignatureBytes } from '@safe-global/protocol-kit'
 
 /**
@@ -30,7 +31,7 @@ DUMMY_AUTHENTICATOR_DATA[32] = 0x04
  * @param threshold - The Safe threshold
  * @returns The user operation with the dummy passkey signature
  */
-export function getDummySignature(signer: string, threshold: number): string {
+export function getDummySignature(signer: Address, threshold: number): string {
   const signatures = []
 
   for (let i = 0; i < threshold; i++) {

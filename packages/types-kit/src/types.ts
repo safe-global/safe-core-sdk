@@ -1,3 +1,5 @@
+import { Address as AddressType } from 'abitype'
+
 export { type Hex } from 'viem'
 
 export type SafeVersion = '1.4.1' | '1.3.0' | '1.2.0' | '1.1.1' | '1.0.0'
@@ -8,17 +10,17 @@ export enum OperationType {
 }
 
 export interface SafeSetupConfig {
-  owners: string[]
+  owners: Address[]
   threshold: number
-  to?: string
+  to?: Address
   data?: string
-  fallbackHandler?: string
-  paymentToken?: string
+  fallbackHandler?: Address
+  paymentToken?: Address
   payment?: string
-  paymentReceiver?: string
+  paymentReceiver?: Address
 }
 export interface MetaTransactionData {
-  to: string
+  to: Address
   value: string
   data: string
   operation?: OperationType
@@ -29,8 +31,8 @@ export interface SafeTransactionData extends MetaTransactionData {
   safeTxGas: string
   baseGas: string
   gasPrice: string
-  gasToken: string
-  refundReceiver: string
+  gasToken: Address
+  refundReceiver: Address
   nonce: number
 }
 
@@ -38,13 +40,13 @@ export interface SafeTransactionDataPartial extends MetaTransactionData {
   safeTxGas?: string
   baseGas?: string
   gasPrice?: string
-  gasToken?: string
-  refundReceiver?: string
+  gasToken?: Address
+  refundReceiver?: Address
   nonce?: number
 }
 
 export interface SafeSignature {
-  readonly signer: string
+  readonly signer: Address
   readonly data: string
   readonly isContractSignature: boolean
   staticPart(dynamicOffset?: string): string
@@ -54,7 +56,7 @@ export interface SafeSignature {
 export interface SafeTransaction {
   readonly data: SafeTransactionData
   readonly signatures: Map<string, SafeSignature>
-  getSignature(signer: string): SafeSignature | undefined
+  getSignature(signer: Address): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
 }
@@ -62,7 +64,7 @@ export interface SafeTransaction {
 export interface SafeMessage {
   readonly data: EIP712TypedData | string
   readonly signatures: Map<string, SafeSignature>
-  getSignature(signer: string): SafeSignature | undefined
+  getSignature(signer: Address): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
 }
@@ -70,13 +72,13 @@ export interface SafeMessage {
 export type Transaction = TransactionBase & TransactionOptions
 
 export interface TransactionBase {
-  to: string
+  to: Address
   value: string
   data: string
 }
 
 export interface TransactionOptions {
-  from?: string
+  from?: Address
   gasLimit?: number | string | bigint
   gasPrice?: number | string
   maxFeePerGas?: number | string
@@ -93,13 +95,21 @@ export interface TransactionResult extends BaseTransactionResult {
   options?: TransactionOptions
 }
 
-export interface Eip3770Address {
+export type Address = AddressType // `0x${string}` from viem & abitype
+
+// ERC-3770: Chain-specific addresses, see: https://eips.ethereum.org/EIPS/eip-3770
+export type Eip3770Prefix = `${string}:`
+export type Eip3770Address = `${Eip3770Prefix}${AddressType}` // `${string}:0x${string}`
+
+export type FullAddress = Address | Eip3770Address
+
+export interface ParsedEip3770Address {
   prefix: string
-  address: string
+  address: Address
 }
 
 export interface SafeEIP712Args {
-  safeAddress: string
+  safeAddress: Address
   safeVersion: string
   chainId: bigint
   data: SafeTransactionData | EIP712TypedData | string
@@ -135,19 +145,19 @@ export interface EIP712TypedDataTx {
   types: EIP712TxTypes
   domain: {
     chainId?: string
-    verifyingContract: string
+    verifyingContract: Address
   }
   primaryType: 'SafeTx'
   message: {
-    to: string
+    to: Address
     value: string
     data: string
     operation: OperationType
     safeTxGas: string
     baseGas: string
     gasPrice: string
-    gasToken: string
-    refundReceiver: string
+    gasToken: Address
+    refundReceiver: Address
     nonce: number
   }
 }
@@ -156,7 +166,7 @@ export interface EIP712TypedDataMessage {
   types: EIP712MessageTypes
   domain: {
     chainId?: number
-    verifyingContract: string
+    verifyingContract: Address
   }
   primaryType: 'SafeMessage'
   message: {
@@ -178,7 +188,7 @@ export interface TypedDataDomain {
   name?: string
   version?: string
   chainId?: number
-  verifyingContract?: string
+  verifyingContract?: Address
   salt?: ArrayLike<number> | string
 }
 
@@ -286,12 +296,12 @@ export interface RelayTransaction {
 
 export interface MetaTransactionOptions {
   gasLimit?: string
-  gasToken?: string
+  gasToken?: Address
   isSponsored?: boolean
 }
 
 export type UserOperationV06 = {
-  sender: string
+  sender: Address
   nonce: string
   initCode: string
   callData: string
@@ -305,7 +315,7 @@ export type UserOperationV06 = {
 }
 
 export type UserOperationV07 = {
-  sender: string
+  sender: Address
   nonce: string
   factory?: string
   factoryData?: string
@@ -315,7 +325,7 @@ export type UserOperationV07 = {
   preVerificationGas: bigint
   maxFeePerGas: bigint
   maxPriorityFeePerGas: bigint
-  paymaster?: string
+  paymaster?: Address
   paymasterData?: string
   paymasterVerificationGasLimit?: bigint
   paymasterPostOpGasLimit?: bigint
@@ -325,7 +335,7 @@ export type UserOperationV07 = {
 export type UserOperation = UserOperationV06 | UserOperationV07
 
 export type SafeUserOperation = {
-  safe: string
+  safe: Address
   nonce: string
   initCode: string
   callData: string
@@ -337,7 +347,7 @@ export type SafeUserOperation = {
   paymasterAndData: string
   validAfter: number
   validUntil: number
-  entryPoint: string
+  entryPoint: Address
 }
 
 export type EstimateGasData = {
@@ -354,8 +364,8 @@ export type EstimateGasData = {
 }
 
 export type SafeOperationOptions = {
-  moduleAddress: string
-  entryPoint: string
+  moduleAddress: Address
+  entryPoint: Address
   chainId: bigint
   validAfter?: number
   validUntil?: number
@@ -364,7 +374,7 @@ export type SafeOperationOptions = {
 export type SafeOperationConfirmation = {
   readonly created: string
   readonly modified: string
-  readonly owner: string
+  readonly owner: Address
   readonly signature: string
   readonly signatureType: SignatureType
 }
@@ -408,7 +418,7 @@ export interface SafeOperation {
 
   addEstimations(estimations: EstimateGasData): void
   getSafeOperation(): SafeUserOperation
-  getSignature(signer: string): SafeSignature | undefined
+  getSignature(signer: Address): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
   getUserOperation(): UserOperation

@@ -17,7 +17,7 @@ import {
   getSafeWebAuthnSignerFactoryDeployment,
   getSafeWebAuthnShareSignerDeployment
 } from '@safe-global/safe-modules-deployments'
-import { SafeVersion } from '@safe-global/types-kit'
+import { Address, SafeVersion } from '@safe-global/types-kit'
 import { DeploymentType } from '../types'
 
 export const DEFAULT_SAFE_VERSION: SafeVersion = '1.3.0'
@@ -151,7 +151,7 @@ export function getContractDeployment(
   return deployment
 }
 
-export function getContractInfo(contractAddress: string): ContractInfo | undefined {
+export function getContractInfo(contractAddress: Address): ContractInfo | undefined {
   for (const [safeVersion, contracts] of Object.entries(safeDeploymentsVersions)) {
     for (const [contractName, contractVersion] of Object.entries(contracts)) {
       const filters: DeploymentFilter = {

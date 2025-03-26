@@ -1,4 +1,4 @@
-import { EstimateGasData } from '@safe-global/types-kit'
+import { Address, EstimateGasData } from '@safe-global/types-kit'
 import {
   BundlerClient,
   EstimateFeeFunctionProps,
@@ -64,7 +64,7 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     )
 
     if (paymasterOptions.isSponsored) {
-      const params: [UserOperationStringValues, string, { sponsorshipPolicyId: string }?] = [
+      const params: [UserOperationStringValues, Address, { sponsorshipPolicyId: string }?] = [
         userOperationToHexValues(userOperation, entryPoint),
         entryPoint
       ]

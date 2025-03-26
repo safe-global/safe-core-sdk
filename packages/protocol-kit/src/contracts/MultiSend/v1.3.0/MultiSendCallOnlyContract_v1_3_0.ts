@@ -2,6 +2,7 @@ import MultiSendCallOnlyBaseContract from '@safe-global/protocol-kit/contracts/M
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   MultiSendCallOnlyContract_v1_3_0_Abi,
   MultiSendCallOnlyContract_v1_3_0_Contract,
   multiSendCallOnly_1_3_0_ContractArtifacts
@@ -31,7 +32,7 @@ class MultiSendCallOnlyContract_v1_3_0
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: MultiSendCallOnlyContract_v1_3_0_Abi,
     deploymentType?: DeploymentType
   ) {

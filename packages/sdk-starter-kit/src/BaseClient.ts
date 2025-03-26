@@ -6,7 +6,7 @@ import Safe, {
   SwapOwnerTxParams
 } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-import { SafeTransaction, TransactionBase } from '@safe-global/types-kit'
+import { Address, SafeTransaction, TransactionBase } from '@safe-global/types-kit'
 
 import { ChangeThresholdTxParams } from './types'
 
@@ -22,9 +22,9 @@ export class BaseClient {
   /**
    * Returns the Safe address.
    *
-   * @returns {string} The Safe address
+   * @returns {Address} The Safe address
    */
-  async getAddress(): Promise<string> {
+  async getAddress(): Promise<Address> {
     return this.protocolKit.getAddress()
   }
 
@@ -40,10 +40,10 @@ export class BaseClient {
   /**
    * Checks if a specific address is an owner of the current Safe.
    *
-   * @param {string} ownerAddress - The account address
+   * @param {Address} ownerAddress - The account address
    * @returns {boolean} TRUE if the account is an owner
    */
-  async isOwner(ownerAddress: string): Promise<boolean> {
+  async isOwner(ownerAddress: Address): Promise<boolean> {
     return this.protocolKit.isOwner(ownerAddress)
   }
 
@@ -52,7 +52,7 @@ export class BaseClient {
    *
    * @returns The list of owners
    */
-  async getOwners(): Promise<string[]> {
+  async getOwners(): Promise<Address[]> {
     return this.protocolKit.getOwners()
   }
 
@@ -78,9 +78,9 @@ export class BaseClient {
    * Returns a list of owners who have approved a specific Safe transaction.
    *
    * @param {string} txHash - The Safe transaction hash
-   * @returns {string[]} The list of owners
+   * @returns {Address[]} The list of owners
    */
-  async getOwnersWhoApprovedTransaction(txHash: string): Promise<string[]> {
+  async getOwnersWhoApprovedTransaction(txHash: string): Promise<Address[]> {
     return this.protocolKit.getOwnersWhoApprovedTx(txHash)
   }
 

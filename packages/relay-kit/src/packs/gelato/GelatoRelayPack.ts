@@ -22,6 +22,7 @@ import {
   ZERO_ADDRESS
 } from '@safe-global/relay-kit/constants'
 import {
+  Address,
   MetaTransactionOptions,
   RelayTransaction,
   SafeTransaction,
@@ -58,7 +59,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
     return !gasToken || gasToken === ZERO_ADDRESS ? GELATO_NATIVE_TOKEN_ADDRESS : gasToken
   }
 
-  getFeeCollector(): string {
+  getFeeCollector(): Address {
     return GELATO_FEE_COLLECTOR
   }
 

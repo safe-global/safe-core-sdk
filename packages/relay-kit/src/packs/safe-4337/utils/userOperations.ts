@@ -1,6 +1,7 @@
 import Safe from '@safe-global/protocol-kit'
 import { encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex, toHex } from 'viem'
 import {
+  Address,
   MetaTransactionData,
   OperationType,
   UserOperation,
@@ -104,7 +105,7 @@ function unpackInitCode(initCode: string): Pick<UserOperationV07, 'factory' | 'f
  * @param {MetaTransactionData[]} transactions - The transactions to batch
  * @param {{ entryPoint: string; amountToApprove?: bigint; paymasterOptions: PaymasterOptions }} options
  * @param {bigint} options.amountToApprove - The amount to approve. Useful for ERC20 paymasters to include an approve transaction for the ERC20 token ruling the paymaster
- * @param {string} options.entryPoint - The entry point for the UserOperation
+ * @param {Address} options.entryPoint - The entry point for the UserOperation
  * @param {PaymasterOptions} options.paymasterOptions - The options for the paymaster
  * @returns {Promise<UserOperation>} The initialized UserOperation
  */
@@ -117,7 +118,7 @@ export async function createUserOperation(
     paymasterOptions,
     customNonce
   }: {
-    entryPoint: string
+    entryPoint: Address
     amountToApprove?: bigint
     paymasterOptions: PaymasterOptions
     customNonce?: bigint

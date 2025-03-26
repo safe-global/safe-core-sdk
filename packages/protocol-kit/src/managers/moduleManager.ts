@@ -1,5 +1,6 @@
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { Address } from '@safe-global/types-kit'
 import {
   SafeContractImplementationType,
   SafeModulesPaginated
@@ -49,7 +50,7 @@ class ModuleManager {
     return [...modules]
   }
 
-  async getModulesPaginated(start: string, pageSize: number): Promise<SafeModulesPaginated> {
+  async getModulesPaginated(start: Address, pageSize: number): Promise<SafeModulesPaginated> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
@@ -58,7 +59,7 @@ class ModuleManager {
     return { modules: modules as string[], next }
   }
 
-  async isModuleEnabled(moduleAddress: string): Promise<boolean> {
+  async isModuleEnabled(moduleAddress: Address): Promise<boolean> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
@@ -68,7 +69,7 @@ class ModuleManager {
     return isModuleEnabled
   }
 
-  async encodeEnableModuleData(moduleAddress: string): Promise<string> {
+  async encodeEnableModuleData(moduleAddress: Address): Promise<string> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }

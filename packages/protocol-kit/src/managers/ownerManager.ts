@@ -1,4 +1,5 @@
 import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils'
+import { Address } from '@safe-global/types-kit'
 import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { SafeContractImplementationType } from '../types'
 import SafeProvider from '../SafeProvider'
@@ -53,7 +54,7 @@ class OwnerManager {
     return ownerIndex
   }
 
-  async getOwners(): Promise<string[]> {
+  async getOwners(): Promise<Address[]> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
@@ -71,7 +72,7 @@ class OwnerManager {
     return Number(threshold)
   }
 
-  async isOwner(ownerAddress: string): Promise<boolean> {
+  async isOwner(ownerAddress: Address): Promise<boolean> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }
@@ -80,7 +81,10 @@ class OwnerManager {
     return isOwner
   }
 
-  async encodeAddOwnerWithThresholdData(ownerAddress: string, threshold?: number): Promise<string> {
+  async encodeAddOwnerWithThresholdData(
+    ownerAddress: Address,
+    threshold?: number
+  ): Promise<string> {
     if (!this.#safeContract) {
       throw new Error('Safe is not deployed')
     }

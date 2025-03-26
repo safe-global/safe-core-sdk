@@ -1,5 +1,6 @@
 import CreateCallBaseContract from '@safe-global/protocol-kit/contracts/CreateCall/CreateCallBaseContract'
 import {
+  Address,
   CreateCallContract_v1_3_0_Abi,
   CreateCallContract_v1_3_0_Contract,
   createCall_1_3_0_ContractArtifacts,
@@ -33,7 +34,7 @@ class CreateCallContract_v1_3_0
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: CreateCallContract_v1_3_0_Abi,
     deploymentType?: DeploymentType
   ) {

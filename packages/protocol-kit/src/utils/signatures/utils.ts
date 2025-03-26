@@ -1,6 +1,7 @@
 import { recoverAddress } from 'viem'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
+  Address,
   SafeSignature,
   SafeEIP712Args,
   SafeTransactionData,
@@ -15,7 +16,7 @@ import { encodeTypedData } from '../eip-712/encode'
 import { asHash, asHex } from '../types'
 import { EMPTY_DATA } from '../constants'
 
-export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
+export function generatePreValidatedSignature(ownerAddress: Address): SafeSignature {
   const signature =
     '0x000000000000000000000000' +
     ownerAddress.slice(2) +
@@ -28,7 +29,7 @@ export function generatePreValidatedSignature(ownerAddress: string): SafeSignatu
 export async function isTxHashSignedWithPrefix(
   txHash: string,
   signature: string,
-  ownerAddress: string
+  ownerAddress: Address
 ): Promise<boolean> {
   let hasPrefix
   try {
@@ -50,7 +51,7 @@ type AdjustVOverload = {
     signingMethod: SigningMethod.ETH_SIGN,
     signature: string,
     safeTxHash: string,
-    sender: string
+    sender: Address
   ): Promise<string>
 }
 
@@ -58,7 +59,7 @@ export const adjustVInSignature: AdjustVOverload = async (
   signingMethod: SigningMethod.ETH_SIGN | SigningMethod.ETH_SIGN_TYPED_DATA,
   signature: string,
   safeTxHash?: string,
-  signerAddress?: string
+  signerAddress?: Address
 ): Promise<string> => {
   const ETHEREUM_V_VALUES = [0, 1, 27, 28]
   const MIN_VALID_V_VALUE_FOR_SAFE_ECDSA = 27
@@ -85,7 +86,7 @@ export const adjustVInSignature: AdjustVOverload = async (
     const signatureHasPrefix = await isTxHashSignedWithPrefix(
       safeTxHash as string,
       adjustedSignature,
-      signerAddress as string
+      signerAddress!
     )
     if (signatureHasPrefix) {
       signatureV += 4
@@ -136,7 +137,7 @@ export async function generateEIP712Signature(
 
 export const buildContractSignature = async (
   signatures: SafeSignature[],
-  signerSafeAddress: string
+  signerSafeAddress: Address
 ): Promise<SafeSignature> => {
   const contractSignature = new EthSafeSignature(
     signerSafeAddress,
@@ -187,7 +188,7 @@ export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
 }
 
 export const preimageSafeTransactionHash = (
-  safeAddress: string,
+  safeAddress: Address,
   safeTx: SafeTransactionData,
   safeVersion: string,
   chainId: bigint
@@ -203,7 +204,7 @@ export const preimageSafeTransactionHash = (
 }
 
 export const preimageSafeMessageHash = (
-  safeAddress: string,
+  safeAddress: Address,
   message: string,
   safeVersion: string,
   chainId: bigint
@@ -220,7 +221,7 @@ export const preimageSafeMessageHash = (
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
 export const calculateSafeTransactionHash = (
-  safeAddress: string,
+  safeAddress: Address,
   safeTx: SafeTransactionData,
   safeVersion: string,
   chainId: bigint
@@ -228,7 +229,7 @@ export const calculateSafeTransactionHash = (
   const safeTxTypes = getEip712TxTypes(safeVersion)
   const domain: {
     chainId?: number
-    verifyingContract: string
+    verifyingContract: Address
   } = { verifyingContract: safeAddress }
 
   if (semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)) {
@@ -241,7 +242,7 @@ export const calculateSafeTransactionHash = (
 }
 
 export const calculateSafeMessageHash = (
-  safeAddress: string,
+  safeAddress: Address,
   message: string,
   safeVersion: string,
   chainId: bigint

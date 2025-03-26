@@ -2,6 +2,7 @@ import SafeProxyFactoryBaseContract from '@safe-global/protocol-kit/contracts/Sa
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   SafeProxyFactoryContract_v1_1_1_Abi,
   SafeProxyFactoryContract_v1_1_1_Contract,
   SafeProxyFactoryContract_v1_1_1_Function,
@@ -32,7 +33,7 @@ class SafeProxyFactoryContract_v1_1_1
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SafeProxyFactoryContract_v1_1_1_Abi,
     deploymentType?: DeploymentType
   ) {

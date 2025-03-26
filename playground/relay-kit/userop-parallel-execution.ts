@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv'
 import { encodeNonce, Safe4337Pack } from '@safe-global/relay-kit'
+import { Address } from '@safe-global/types-kit'
 import { waitForOperationToFinish, setup4337Playground } from '../utils'
 
 dotenv.config({ path: './playground/relay-kit/.env' })
@@ -28,7 +29,7 @@ async function main() {
     bundlerUrl: BUNDLER_URL,
     safeModulesVersion: '0.3.0', // Blank or 0.3.0 for Entrypoint v0.7, 0.2.0 for Entrypoint v0.6
     options: {
-      safeAddress: SAFE_ADDRESS
+      safeAddress: SAFE_ADDRESS as Address
     }
   })
 

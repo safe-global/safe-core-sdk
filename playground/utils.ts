@@ -1,5 +1,4 @@
 import {
-  Address,
   createPublicClient,
   custom,
   encodeFunctionData,
@@ -9,7 +8,7 @@ import {
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { ExternalSigner } from '@safe-global/protocol-kit'
 import { getBlock, waitForTransactionReceipt } from 'viem/actions'
-import { MetaTransactionData } from '@safe-global/types-kit'
+import { Address, MetaTransactionData } from '@safe-global/types-kit'
 import * as chains from 'viem/chains'
 
 export const generateTransferCallData = (to: string, value: bigint) => {
@@ -90,9 +89,9 @@ export async function setup4337Playground(
     erc20TokenAmount?: bigint
     erc20TokenContractAddress: string
   } = {
-    erc20TokenAmount: 200_000n,
-    erc20TokenContractAddress: '0xFC3e86566895Fb007c6A0d3809eb2827DF94F751'
-  }
+      erc20TokenAmount: 200_000n,
+      erc20TokenContractAddress: '0xFC3e86566895Fb007c6A0d3809eb2827DF94F751'
+    }
 ): Promise<{ transactions: MetaTransactionData[]; timestamp: bigint }> {
   const senderAddress = await safe4337Pack.protocolKit.getAddress()
   const chainId = await safe4337Pack.getChainId()

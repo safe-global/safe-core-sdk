@@ -1,4 +1,5 @@
 import {
+  Address,
   UserOperationV07,
   EstimateGasData,
   SafeUserOperation,
@@ -38,7 +39,8 @@ class SafeOperationV07 extends BaseSafeOperation {
     this.userOperation.paymasterVerificationGasLimit = estimations.paymasterVerificationGasLimit
       ? BigInt(estimations.paymasterVerificationGasLimit)
       : this.userOperation.paymasterVerificationGasLimit
-    this.userOperation.paymaster = estimations.paymaster || this.userOperation.paymaster
+    this.userOperation.paymaster =
+      (estimations.paymaster as Address) || this.userOperation.paymaster
     this.userOperation.paymasterData = estimations.paymasterData || this.userOperation.paymasterData
   }
 

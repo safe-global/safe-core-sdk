@@ -3,6 +3,7 @@ import SignMessageLibBaseContract from '@safe-global/protocol-kit/contracts/Sign
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
+  Address,
   SafeContractFunction,
   SignMessageLibContract_v1_3_0_Abi,
   SignMessageLibContract_v1_3_0_Contract,
@@ -34,7 +35,7 @@ class SignMessageLibContract_v1_3_0
   constructor(
     chainId: bigint,
     safeProvider: SafeProvider,
-    customContractAddress?: string,
+    customContractAddress?: Address,
     customContractAbi?: SignMessageLibContract_v1_3_0_Abi,
     deploymentType?: DeploymentType
   ) {

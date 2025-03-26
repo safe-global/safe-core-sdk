@@ -1,4 +1,5 @@
 import SafeApiKit from '@safe-global/api-kit/index'
+import { Address } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getApiKit } from '../utils/setupKits'
@@ -18,7 +19,7 @@ describe('getPendingSafeOperations', () => {
   describe('should fail', () => {
     it('should fail if safeAddress is empty', async () => {
       await chai
-        .expect(safeApiKit.getPendingSafeOperations(''))
+        .expect(safeApiKit.getPendingSafeOperations('' as Address))
         .to.be.rejectedWith('Safe address must not be empty')
     })
 

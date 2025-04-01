@@ -340,6 +340,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 534353n, shortName: 'scr-alpha' },
   { chainId: 543210n, shortName: 'zero-network' },
   { chainId: 555666n, shortName: 'eclipset' },
+  { chainId: 560048n, shortName: 'hoe' },
   { chainId: 622277n, shortName: 'rth' },
   { chainId: 656476n, shortName: 'open-campus-codex' },
   { chainId: 660279n, shortName: 'xai' },

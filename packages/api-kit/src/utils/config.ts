@@ -18,6 +18,7 @@ export const TRANSACTION_SERVICE_URLS: Record<string, string> = {
   '81457': 'https://safe-transaction-blast.safe.global/api',
   '84532': 'https://safe-transaction-base-sepolia.safe.global/api',
   '534352': 'https://safe-transaction-scroll.safe.global/api',
+  '560048': 'https://transaction-ethereum-hoodi.safe.protofire.io/api',
   '11155111': 'https://safe-transaction-sepolia.safe.global/api',
   '1313161554': 'https://safe-transaction-aurora.safe.global/api'
 }

@@ -351,10 +351,7 @@ async function estimateSafeTxGasWithRequiredTxGas(
   const returnedData = safeProvider.decodeParameters(['uint256', 'bool', 'bytes'], simulateAndRevertResponse[1])
   */
 function decodeSafeTxGas(encodedDataResponse: string): string {
-  const [, encodedSafeTxGas] = encodedDataResponse.split('0x')
-  const data = '0x' + encodedSafeTxGas
-
-  return Number('0x' + data.slice(184).slice(0, 10)).toString()
+  return Number('0x' + encodedDataResponse.slice(186, 196)).toString()
 }
 
 type GnosisChainEstimationError = { info: { error: { data: string | { data: string } } } }

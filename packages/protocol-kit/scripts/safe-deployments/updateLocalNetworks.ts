@@ -26,7 +26,7 @@ function updateLocalNetworks(networks: NetworkShortName[]) {
     const startIndex =
       content.indexOf('export const networks: NetworkShortName[] = [') +
       'export const networks: NetworkShortName[] = ['.length
-    const endIndex = content.indexOf(']\n\nif (process.env.TEST_NETWORK ===')
+    const endIndex = content.indexOf(']\n\ntry {')
 
     const sortedNetworks = networks
       .sort((a, b) => Number(a.chainId - b.chainId))

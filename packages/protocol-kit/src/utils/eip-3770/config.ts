@@ -396,6 +396,10 @@ export const networks: NetworkShortName[] = [
   { chainId: 920637907288165n, shortName: 'kkrt-starknet-sepolia' }
 ]
 
-if (process && process.env.TEST_NETWORK === 'hardhat') {
-  networks.push({ shortName: 'local', chainId: 31337n })
+try {
+  if (process.env.TEST_NETWORK === 'hardhat') {
+    networks.push({ shortName: 'local', chainId: 31337n })
+  }
+} catch {
+  // When process is not available we run on a browser environment
 }

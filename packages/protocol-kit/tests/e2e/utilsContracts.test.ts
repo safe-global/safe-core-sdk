@@ -548,7 +548,7 @@ describe('Contract utils', () => {
     )
 
     itif(safeVersionDeployed === '1.3.0')(
-      'returns the predicted address for Safes deployed on zkSync Era',
+      'returns the predicted address for Safes deployed on zkSync EVM',
       async () => {
         const { contractNetworks } = await setupTests()
 

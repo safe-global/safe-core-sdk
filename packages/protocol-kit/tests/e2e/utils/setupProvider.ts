@@ -47,14 +47,11 @@ export function getSafeProviderFromNetwork(
     case 'gnosis':
       rpcUrl = 'https://rpc.gnosischain.com'
       break
-    case 'goerli':
-      rpcUrl = 'https://rpc.ankr.com/eth_goerli'
-      break
     case 'sepolia':
       rpcUrl = 'https://sepolia.gateway.tenderly.co'
       break
     case 'mainnet':
-      rpcUrl = 'https://rpc.ankr.com/eth'
+      rpcUrl = 'https://ethereum-rpc.publicnode.com'
       break
     default:
       throw new Error('Chain not supported')

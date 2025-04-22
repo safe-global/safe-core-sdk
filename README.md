@@ -50,4 +50,4 @@ This project includes a [playground](https://github.com/safe-global/safe-core-sd
 
 ## License
 
-This library is released under [MIT](https://github.com/safe-global/safe-core-sdk/tree/main/LICENSE.md).
+This library is released under [MIT](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md).

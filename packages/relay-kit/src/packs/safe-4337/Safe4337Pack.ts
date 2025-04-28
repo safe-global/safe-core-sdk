@@ -244,7 +244,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         !paymasterOptions.isSponsored &&
         !!paymasterOptions.paymasterTokenAddress
 
-      if (isApproveTransactionRequired) {
+      if (isApproveTransactionRequired && !paymasterOptions.skipApproveTransaction) {
         const { paymasterAddress, amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE } = paymasterOptions
 
         // second transaction: approve ERC-20 paymaster token
@@ -609,22 +609,61 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
         const signerAddress = signer.account.address
         const safeOperation = safeOp.getSafeOperation()
-        const signature = await signer.signTypedData({
-          domain: {
-            chainId: Number(this.#chainId),
-            verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
-          },
-          types: safeOp.getEIP712Type(),
-          message: {
-            ...safeOperation,
-            nonce: BigInt(safeOperation.nonce),
-            validAfter: toHex(safeOperation.validAfter),
-            validUntil: toHex(safeOperation.validUntil),
-            maxFeePerGas: toHex(safeOperation.maxFeePerGas),
-            maxPriorityFeePerGas: toHex(safeOperation.maxPriorityFeePerGas)
-          },
-          primaryType: 'SafeOp'
-        })
+
+        // Prepare the parameters for signTypedData
+        const domain = {
+          chainId: Number(this.#chainId),
+          verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
+        }
+
+        const types = safeOp.getEIP712Type()
+
+        const message = {
+          ...safeOperation,
+          nonce: BigInt(safeOperation.nonce),
+          validAfter: toHex(safeOperation.validAfter),
+          validUntil: toHex(safeOperation.validUntil),
+          maxFeePerGas: toHex(safeOperation.maxFeePerGas),
+          maxPriorityFeePerGas: toHex(safeOperation.maxPriorityFeePerGas)
+        }
+
+        let signature: string
+
+        // Use a try-catch to support both viem and ethers.js signers
+        try {
+          // First try the standard viem way
+          signature = await signer.signTypedData({
+            domain,
+            types,
+            message,
+            primaryType: 'SafeOp'
+          })
+        } catch (error) {
+          // If viem fails, try ethers.js way using a type assertion
+          const ethersCompatibleSigner = signer as any
+
+          if (typeof ethersCompatibleSigner._signTypedData === 'function') {
+            // Ethers v5
+            signature = await ethersCompatibleSigner._signTypedData(domain, types, message)
+          } else if (typeof ethersCompatibleSigner.signTypedData === 'function') {
+            // Ethers v6 with different parameter format
+            try {
+              // Try calling with object format first (some implementations support this)
+              signature = await ethersCompatibleSigner.signTypedData({
+                domain,
+                types,
+                primaryType: 'SafeOp',
+                message
+              })
+            } catch {
+              // Fallback to ethers v6 standard format
+              signature = await ethersCompatibleSigner.signTypedData(domain, types, message)
+            }
+          } else {
+            // Re-throw if we couldn't handle it
+            throw error
+          }
+        }
 
         safeSignature = new EthSafeSignature(signerAddress, signature)
       } else {

@@ -89,5 +89,8 @@
   "optionalDependencies": {
     "@noble/curves": "^1.6.0",
     "@peculiar/asn1-schema": "^2.3.13"
+  },
+  "peerDependencies": {
+    "ethers": "^6.13.7"
   }
 }

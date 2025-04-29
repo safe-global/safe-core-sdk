@@ -181,7 +181,7 @@ export type UserOperationStringValues = Omit<
 export type Safe4337RpcSchema = [
   {
     Method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA
-    Parameters: [UserOperationStringValues, string, string, { token: string }?]
+    Parameters: [UserOperationStringValues, string, string, { token?: string }?]
     ReturnType:
       | {
           paymasterAndData: string
@@ -195,7 +195,7 @@ export type Safe4337RpcSchema = [
   },
   {
     Method: RPC_4337_CALLS.GET_PAYMASTER_DATA
-    Parameters: [UserOperationStringValues, string, string, { token: string }?]
+    Parameters: [UserOperationStringValues, string, string, { token?: string }?]
     ReturnType:
       | {
           paymasterAndData: string

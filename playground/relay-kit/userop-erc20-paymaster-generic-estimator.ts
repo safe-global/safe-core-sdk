@@ -31,7 +31,9 @@ async function main() {
     paymasterOptions: {
       paymasterUrl: PAYMASTER_URL,
       paymasterTokenAddress: tokenAddress,
-      paymasterAddress: paymasterAddress
+      paymasterAddress: paymasterAddress,
+      //infinit approval just for testing - don't do that in production
+      amountToApprove: 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
     },
     options: {
       safeAddress: SAFE_ADDRESS

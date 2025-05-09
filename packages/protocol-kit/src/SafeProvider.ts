@@ -168,7 +168,7 @@ class SafeProvider {
   async getExternalSigner(): Promise<ExternalSigner | undefined> {
     const { transport, chain = await this.#getChain() } = this.getExternalProvider()
 
-    if (isSignerPasskeyClient(this.signer) || isEthersSigner(this.signer)) {
+    if (isSignerPasskeyClient(this.signer) || !isEthersSigner(this.signer)) {
       return this.signer as PasskeyClient
     }
 

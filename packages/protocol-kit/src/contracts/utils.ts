@@ -511,7 +511,7 @@ export function toTxResult(
 export function isEthersSigner(signer: any): signer is Client {
   const isPasskeySigner = !!signer?.passkeyRawId
   // Check for both viem wallets and our ethers adapter
-  return typeof signer?.signTypedData === 'function' || !isPasskeySigner
+  return typeof signer?.signTypedData === 'function' && !isPasskeySigner
 }
 
 /**

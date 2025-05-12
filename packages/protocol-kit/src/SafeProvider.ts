@@ -168,7 +168,7 @@ class SafeProvider {
   async getExternalSigner(): Promise<ExternalSigner | undefined> {
     const { transport, chain = await this.#getChain() } = this.getExternalProvider()
 
-    if (isSignerPasskeyClient(this.signer) || !isEthersSigner(this.signer)) {
+    if (isSignerPasskeyClient(this.signer)) {
       return this.signer as PasskeyClient
     }
 
@@ -231,15 +231,6 @@ class SafeProvider {
       const account = privateKeyToAccount(asHex(this.signer as string))
       return createWalletClient({
         account,
-        chain,
-        transport: custom(transport)
-      })
-    }
-
-    // If we have a signer and its not a PK, it might be a delegate on the rpc levels and this should work with eth_requestAcc
-    if (this.signer && typeof this.signer === 'string') {
-      return createWalletClient({
-        account: this.signer,
         chain,
         transport: custom(transport)
       })

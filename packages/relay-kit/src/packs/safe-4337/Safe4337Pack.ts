@@ -432,6 +432,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
     })
 
     if (estimateUserOperationGas) {
+      if (
+        feeEstimator.defaultVerificationGasLimitOverhead != null &&
+        estimateUserOperationGas.verificationGasLimit != null
+      ) {
+        estimateUserOperationGas.verificationGasLimit = (
+          BigInt(estimateUserOperationGas.verificationGasLimit) +
+          BigInt(threshold) * feeEstimator.defaultVerificationGasLimitOverhead
+        ).toString()
+      }
+
       safeOperation.addEstimations(estimateUserOperationGas)
     }
 
@@ -446,6 +456,15 @@ export class Safe4337Pack extends RelayKitBasePack<{
     })
 
     if (postEstimationData) {
+      if (
+        feeEstimator.defaultVerificationGasLimitOverhead != null &&
+        postEstimationData.verificationGasLimit != null
+      ) {
+        postEstimationData.verificationGasLimit = (
+          BigInt(postEstimationData.verificationGasLimit) +
+          BigInt(threshold) * feeEstimator.defaultVerificationGasLimitOverhead
+        ).toString()
+      }
       safeOperation.addEstimations(postEstimationData)
     }
 

@@ -156,6 +156,7 @@ export type EstimateFeeFunction = ({
 export interface IFeeEstimator {
   preEstimateUserOperationGas?: EstimateFeeFunction
   postEstimateUserOperationGas?: EstimateFeeFunction
+  defaultVerificationGasLimitOverhead?: bigint
 }
 
 export type EstimateFeeProps = {

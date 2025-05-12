@@ -21,6 +21,8 @@ export class GenericFeeEstimator implements IFeeEstimator {
   nodeUrl: string
   chainId: string
   gasMultiplier: number
+  defaultVerificationGasLimitOverhead?: bigint
+
   constructor(nodeUrl: string, chainId: string, gasMultiplier: number = 1.5) {
     this.nodeUrl = nodeUrl
     this.chainId = chainId
@@ -28,6 +30,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
       throw new Error("gasMultiplier can't be equal or less than 0.")
     }
     this.gasMultiplier = gasMultiplier
+    this.defaultVerificationGasLimitOverhead = 55_000n
   }
 
   async preEstimateUserOperationGas({

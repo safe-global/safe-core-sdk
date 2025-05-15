@@ -12,6 +12,16 @@ import {
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
 import { PaymasterRpcSchema } from './types'
 
+export type GenericFeeEstimatorOverrides = {
+  callGasLimit?: bigint
+  verificationGasLimit?: bigint
+  preVerificationGas?: bigint
+  maxFeePerGas?: bigint
+  maxPriorityFeePerGas?: bigint
+  maxFeePerGasMultiplier?: number
+  maxPriorityFeePerGasMultiplier?: number
+}
+
 /**
  * GenericFeeEstimator is a class that implements the IFeeEstimator interface. You can implement three optional methods that will be called during the estimation process:
  * - preEstimateUserOperationGas: Setup the userOperation before calling the eth_estimateUserOperation gas method.
@@ -20,17 +30,14 @@ import { PaymasterRpcSchema } from './types'
 export class GenericFeeEstimator implements IFeeEstimator {
   nodeUrl: string
   chainId: string
-  gasMultiplier: number
   defaultVerificationGasLimitOverhead?: bigint
+  overrides: GenericFeeEstimatorOverrides
 
-  constructor(nodeUrl: string, chainId: string, gasMultiplier: number = 1.5) {
+  constructor(nodeUrl: string, chainId: string, overrides: GenericFeeEstimatorOverrides = {}) {
     this.nodeUrl = nodeUrl
     this.chainId = chainId
-    if (gasMultiplier <= 0) {
-      throw new Error("gasMultiplier can't be equal or less than 0.")
-    }
-    this.gasMultiplier = gasMultiplier
     this.defaultVerificationGasLimitOverhead = 55_000n
+    this.overrides = overrides
   }
 
   async preEstimateUserOperationGas({
@@ -40,6 +47,9 @@ export class GenericFeeEstimator implements IFeeEstimator {
     paymasterOptions
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     bundlerUrl
+    let feeDataRes: EstimateGasData = {}
+    let paymasterStubDataRes = {}
+
     if (paymasterOptions) {
       const paymasterClient = createBundlerClient<PaymasterRpcSchema>(paymasterOptions.paymasterUrl)
       const context =
@@ -61,16 +71,25 @@ export class GenericFeeEstimator implements IFeeEstimator {
           ]
         })
       ])
-      return {
-        ...feeData,
-        ...paymasterStubData
-      }
+      feeDataRes = feeData
+      paymasterStubDataRes = paymasterStubData
     } else {
       const feeData = await this.#getUserOperationGasPrices(this.nodeUrl)
-      return {
-        ...feeData,
-        ...{}
-      }
+      feeDataRes = feeData
+    }
+
+    feeDataRes.callGasLimit = this.overrides.callGasLimit ?? feeDataRes.callGasLimit
+    feeDataRes.verificationGasLimit =
+      this.overrides.verificationGasLimit ?? feeDataRes.verificationGasLimit
+    feeDataRes.preVerificationGas =
+      this.overrides.preVerificationGas ?? feeDataRes.preVerificationGas
+    feeDataRes.maxFeePerGas = this.overrides.maxFeePerGas ?? feeDataRes.maxFeePerGas
+    feeDataRes.maxPriorityFeePerGas =
+      this.overrides.maxPriorityFeePerGas ?? feeDataRes.maxPriorityFeePerGas
+
+    return {
+      ...feeDataRes,
+      ...paymasterStubDataRes
     }
   }
 
@@ -133,8 +152,14 @@ export class GenericFeeEstimator implements IFeeEstimator {
     // Calculate maxFeePerGas
     const maxFeePerGas = baseFeePerGas + maxPriorityFeePerGas
     return {
-      maxFeePerGas: BigInt(Math.ceil(Number(maxFeePerGas) * this.gasMultiplier)),
-      maxPriorityFeePerGas: BigInt(Math.ceil(Number(maxPriorityFeePerGas) * this.gasMultiplier))
+      maxFeePerGas: BigInt(
+        Math.ceil(Number(maxFeePerGas) * (this.overrides.maxFeePerGasMultiplier ?? 1.5))
+      ),
+      maxPriorityFeePerGas: BigInt(
+        Math.ceil(
+          Number(maxPriorityFeePerGas) * (this.overrides.maxPriorityFeePerGasMultiplier ?? 1.5)
+        )
+      )
     }
   }
 }

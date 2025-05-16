@@ -400,12 +400,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
    *
    * @param {EstimateFeeProps} props - The parameters for the gas estimation.
    * @param {BaseSafeOperation} props.safeOperation - The SafeOperation to estimate the gas.
+   * @param {PaymasterOptions} props.paymasterOptions - The paymaster options.
    * @param {IFeeEstimator} props.feeEstimator - The function to estimate the gas.
    * @return {Promise<BaseSafeOperation>} The Promise object that will be resolved into the gas estimation.
    */
 
   async getEstimateFee({
     safeOperation,
+    paymasterOptions,
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<BaseSafeOperation> {
     const threshold = await this.protocolKit.getThreshold()
@@ -413,7 +415,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.getUserOperation(),
-      paymasterOptions: this.#paymasterOptions
+      paymasterOptions
     })
 
     if (preEstimationData) {
@@ -452,7 +454,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ...safeOperation.getUserOperation(),
         signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
       },
-      paymasterOptions: this.#paymasterOptions
+      paymasterOptions
     })
 
     if (postEstimationData) {
@@ -482,11 +484,26 @@ export class Safe4337Pack extends RelayKitBasePack<{
     transactions,
     options = {}
   }: Safe4337CreateTransactionProps): Promise<BaseSafeOperation> {
-    const { amountToApprove, validUntil, validAfter, feeEstimator, customNonce } = options
+    const {
+      amountToApprove,
+      validUntil,
+      validAfter,
+      feeEstimator,
+      customNonce,
+      paymasterTokenAddress
+    } = options
+
+    const paymasterOptions: PaymasterOptions = this.#paymasterOptions
+      ? { ...this.#paymasterOptions }
+      : undefined
+
+    if (paymasterOptions && !paymasterOptions.isSponsored && paymasterTokenAddress) {
+      paymasterOptions.paymasterTokenAddress = paymasterTokenAddress
+    }
 
     const userOperation = await createUserOperation(this.protocolKit, transactions, {
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      paymasterOptions: this.#paymasterOptions,
+      paymasterOptions,
       amountToApprove,
       customNonce
     })
@@ -505,6 +522,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     return await this.getEstimateFee({
       safeOperation,
+      paymasterOptions,
       feeEstimator
     })
   }

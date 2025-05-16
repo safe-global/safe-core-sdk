@@ -81,6 +81,7 @@ export type Safe4337CreateTransactionProps = {
     validAfter?: number
     feeEstimator?: IFeeEstimator
     customNonce?: bigint
+    paymasterTokenAddress?: string
   }
 }
 
@@ -165,6 +166,7 @@ export interface IFeeEstimator {
 export type EstimateFeeProps = {
   safeOperation: BaseSafeOperation
   feeEstimator?: IFeeEstimator
+  paymasterOptions?: PaymasterOptions
 }
 
 export type UserOperationStringValues = Omit<

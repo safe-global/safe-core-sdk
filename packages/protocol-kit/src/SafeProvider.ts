@@ -8,7 +8,7 @@ import {
   toTransactionRequest,
   sameString
 } from '@safe-global/protocol-kit/utils'
-import { isTypedDataSigner } from '@safe-global/protocol-kit/contracts/utils'
+import { isEthersSigner } from '@safe-global/protocol-kit/contracts/utils'
 import {
   getSafeWebAuthnSignerFactoryContract,
   getSafeWebAuthnSharedSignerContract
@@ -125,7 +125,7 @@ class SafeProvider {
 
       let passkeySigner
 
-      if (!isSignerPasskeyClient(signer)) {
+      if (!isSignerPasskeyClient(signer) && !isEthersSigner(signer)) {
         // signer is type PasskeyArgType {rawId, coordinates, customVerifierAddress? }
         const safeWebAuthnSignerFactoryContract = await getSafeWebAuthnSignerFactoryContract({
           safeProvider,
@@ -172,20 +172,65 @@ class SafeProvider {
       return this.signer as PasskeyClient
     }
 
+    // Check for ethers.js signer
+    if (isEthersSigner(this.signer)) {
+      // Return the ethers.js signer with a compatible interface
+      const ethersSignerAddress = (await (this.signer as any).getAddress?.()) || ''
+
+      // Create a minimal viem-like adapter for ethers signer
+      return {
+        account: {
+          address: ethersSignerAddress,
+          type: 'json-rpc'
+        },
+        signTypedData: async (params: any) => {
+          try {
+            // Ethers v5 style
+            if (typeof (this.signer as any)._signTypedData === 'function') {
+              return await (this.signer as any)._signTypedData(
+                params.domain,
+                params.types,
+                params.message
+              )
+            }
+            // Ethers v6 style
+            else if (typeof (this.signer as any).signTypedData === 'function') {
+              // Try object param style first
+              try {
+                return await (this.signer as any).signTypedData(params)
+              } catch {
+                // Fallback to separate params
+                return await (this.signer as any).signTypedData(
+                  params.domain,
+                  params.types,
+                  params.message
+                )
+              }
+            }
+          } catch (error) {
+            console.error('Error signing typed data with ethers signer:', error)
+            throw error
+          }
+        },
+        signMessage: async (params: any) => {
+          const message =
+            typeof params.message === 'object' && params.message.raw
+              ? new Uint8Array(params.message.raw)
+              : params.message
+
+          if (typeof (this.signer as any).signMessage === 'function') {
+            return await (this.signer as any).signMessage(message)
+          }
+          throw new Error('Ethers signer does not implement signMessage')
+        }
+      } as unknown as ExternalSigner
+    }
+
     if (isPrivateKey(this.signer)) {
       // This is a client with a local account, the account needs to be of type Account as Viem consider strings as 'json-rpc' (on parseAccount)
       const account = privateKeyToAccount(asHex(this.signer as string))
       return createWalletClient({
         account,
-        chain,
-        transport: custom(transport)
-      })
-    }
-
-    // If we have a signer and its not a PK, it might be a delegate on the rpc levels and this should work with eth_requestAcc
-    if (this.signer && typeof this.signer === 'string') {
-      return createWalletClient({
-        account: this.signer,
         chain,
         transport: custom(transport)
       })
@@ -319,7 +364,7 @@ class SafeProvider {
       throw new Error('SafeProvider must be initialized with a signer to use this method')
     }
 
-    if (isTypedDataSigner(signer)) {
+    if (isEthersSigner(signer)) {
       const typedData = generateTypedData(safeEIP712Args)
       const { chainId, verifyingContract } = typedData.domain
       const chain = chainId ? Number(chainId) : undefined // ensure empty string becomes undefined

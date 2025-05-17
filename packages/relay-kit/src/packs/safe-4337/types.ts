@@ -250,6 +250,16 @@ export type Safe4337RpcSchema = [
     Method: RPC_4337_CALLS.GET_USER_OPERATION_RECEIPT
     Parameters: [Hash]
     ReturnType: UserOperationReceipt
+  },
+  {
+    Method: 'pimlico_getTokenQuotes'
+    Parameters: [{ tokens: string[] }, string, string]
+    ReturnType: PimlicoTokenQuotesResponse
+  },
+  {
+    Method: 'pm_supportedERC20Tokens'
+    Parameters: [string]
+    ReturnType: DefaultPaymasterTokensResponse
   }
 ]
 
@@ -265,3 +275,34 @@ export type BundlerClient<ProviderCustomRpcSchema extends RpcSchemaEntry[] = []>
   Account | undefined,
   [...PublicRpcSchema, ...Safe4337RpcSchema, ...ProviderCustomRpcSchema]
 >
+
+export type PimlicoPaymasterTokenQuote = {
+  paymaster: string
+  token: string
+  postOpGas: string
+  exchangeRate: string
+  exchangeRateNativeToUsd: string
+  balanceSlot: string
+  allowanceSlot: string
+}
+
+export type DefaultPaymasterTokenQuote = {
+  address: string
+  exchangeRate: string
+}
+
+export type PimlicoTokenQuotesResponse = {
+  jsonrpc: string
+  id: number
+  result: {
+    quotes: PimlicoPaymasterTokenQuote[]
+  }
+}
+
+export type DefaultPaymasterTokensResponse = {
+  jsonrpc: string
+  id: number
+  result: {
+    tokens: DefaultPaymasterTokenQuote[]
+  }
+}

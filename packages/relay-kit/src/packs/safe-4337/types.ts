@@ -292,17 +292,9 @@ export type DefaultPaymasterTokenQuote = {
 }
 
 export type PimlicoTokenQuotesResponse = {
-  jsonrpc: string
-  id: number
-  result: {
-    quotes: PimlicoPaymasterTokenQuote[]
-  }
+  quotes: PimlicoPaymasterTokenQuote[]
 }
 
 export type DefaultPaymasterTokensResponse = {
-  jsonrpc: string
-  id: number
-  result: {
-    tokens: DefaultPaymasterTokenQuote[]
-  }
+  tokens: DefaultPaymasterTokenQuote[]
 }

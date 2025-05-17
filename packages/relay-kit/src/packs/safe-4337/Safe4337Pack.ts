@@ -794,7 +794,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
    *
    * @param {string} tokenAddress - The address of the token to get the exchange rate for.
    * @returns {Promise<number>} - The exchange rate for the token used by the paymaster.
-   * @throws {Error} If paymaster URL is not configured
+   * @throws {Error} If paymaster URL is not configured or if the token is not supported
    */
   async getTokenExchangeRate(tokenAddress: string): Promise<number> {
     if (!this.#paymasterOptions?.paymasterUrl) {
@@ -816,18 +816,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ]
       })
 
-      if (!response.result.quotes[0]) {
-        throw new Error(`No exchange rate found for token: ${tokenAddress}`)
-      }
-
-      return parseInt(response.result.quotes[0].exchangeRate, 16)
+      return parseInt(response.quotes[0].exchangeRate, 16)
     } else {
       const response = await bundlerClient.request({
         method: 'pm_supportedERC20Tokens',
         params: [this.#ENTRYPOINT_ADDRESS]
       })
 
-      const matchingToken = response.result.tokens.find(
+      const matchingToken = response.tokens.find(
         (token: { address: string; exchangeRate: string }) =>
           token.address.toLowerCase() === tokenAddress.toLowerCase()
       )

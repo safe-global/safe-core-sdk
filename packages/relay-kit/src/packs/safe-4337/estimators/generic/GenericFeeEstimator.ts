@@ -28,14 +28,10 @@ export type GenericFeeEstimatorOverrides = {
  * - postEstimateUserOperationGas: Adjust the userOperation values returned after calling the eth_estimateUserOperation method.
  */
 export class GenericFeeEstimator implements IFeeEstimator {
-  nodeUrl: string
-  chainId: string
   defaultVerificationGasLimitOverhead?: bigint
   overrides: GenericFeeEstimatorOverrides
 
-  constructor(nodeUrl: string, chainId: string, overrides: GenericFeeEstimatorOverrides = {}) {
-    this.nodeUrl = nodeUrl
-    this.chainId = chainId
+  constructor(overrides: GenericFeeEstimatorOverrides = {}) {
     this.defaultVerificationGasLimitOverhead = 55_000n
     this.overrides = overrides
   }
@@ -44,9 +40,18 @@ export class GenericFeeEstimator implements IFeeEstimator {
     bundlerUrl, // eslint-disable-line @typescript-eslint/no-unused-vars
     userOperation,
     entryPoint,
-    paymasterOptions
+    paymasterOptions,
+    nodeUrl,
+    chainId
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     bundlerUrl
+    if (nodeUrl == null || chainId == null) {
+      throw new Error("Can't use GenericFeeEstimator if nodeUrl or chainId is null.")
+    }
+    if (typeof nodeUrl != 'string') {
+      throw new Error("Can't use GenericFeeEstimator if nodeUrl is not a string.")
+    }
+
     let feeDataRes: EstimateGasData = {}
     let paymasterStubDataRes = {}
 
@@ -60,13 +65,13 @@ export class GenericFeeEstimator implements IFeeEstimator {
           : {}
 
       const [feeData, paymasterStubData] = await Promise.all([
-        this.#getUserOperationGasPrices(this.nodeUrl),
+        this.#getUserOperationGasPrices(nodeUrl),
         paymasterClient.request({
           method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA,
           params: [
             userOperationToHexValues(userOperation, entryPoint),
             entryPoint,
-            this.chainId,
+            '0x' + chainId.toString(16),
             context
           ]
         })
@@ -74,7 +79,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
       feeDataRes = feeData
       paymasterStubDataRes = paymasterStubData
     } else {
-      const feeData = await this.#getUserOperationGasPrices(this.nodeUrl)
+      const feeData = await this.#getUserOperationGasPrices(nodeUrl)
       feeDataRes = feeData
     }
 
@@ -96,14 +101,24 @@ export class GenericFeeEstimator implements IFeeEstimator {
   async postEstimateUserOperationGas({
     userOperation,
     entryPoint,
-    paymasterOptions
+    paymasterOptions,
+    nodeUrl,
+    chainId
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
+    if (nodeUrl == null || chainId == null) {
+      throw new Error("Can't use GenericFeeEstimator if nodeUrl or chainId is null.")
+    }
+
     if (!paymasterOptions) return {}
 
     const paymasterClient = createBundlerClient<PaymasterRpcSchema>(paymasterOptions.paymasterUrl)
     if (paymasterOptions.isSponsored) {
       const params: [UserOperationStringValues, string, string, { sponsorshipPolicyId: string }?] =
-        [userOperationToHexValues(userOperation, entryPoint), entryPoint, this.chainId]
+        [
+          userOperationToHexValues(userOperation, entryPoint),
+          entryPoint,
+          '0x' + chainId.toString(16)
+        ]
 
       if (paymasterOptions.sponsorshipPolicyId) {
         params.push({
@@ -124,7 +139,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
       params: [
         userOperationToHexValues(userOperation, entryPoint),
         entryPoint,
-        this.chainId,
+        '0x' + chainId.toString(16),
         { token: paymasterOptions.paymasterTokenAddress }
       ]
     })

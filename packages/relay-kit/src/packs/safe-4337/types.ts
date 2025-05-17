@@ -68,6 +68,7 @@ export type Safe4337Options = {
   safe4337ModuleAddress: string
   safeWebAuthnSharedSignerAddress?: string
   onchainAnalytics?: OnchainAnalyticsProps
+  nodeUrl?: string
 }
 
 export type Safe4337CreateTransactionProps = {
@@ -144,6 +145,8 @@ export type EstimateFeeFunctionProps = {
   bundlerUrl: string
   entryPoint: string
   paymasterOptions?: PaymasterOptions
+  nodeUrl?: string
+  chainId?: bigint
 }
 
 export type EstimateFeeFunction = ({

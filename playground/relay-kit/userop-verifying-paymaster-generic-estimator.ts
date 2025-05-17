@@ -42,8 +42,6 @@ async function main() {
     }],
     options: {
       feeEstimator: new GenericFeeEstimator(
-          RPC_URL,
-          CHAIN_ID,
           {
             maxFeePerGasMultiplier:1.1, //defaults to 1.5
             maxPriorityFeePerGasMultiplier: 1.1 //defaults to 1.5

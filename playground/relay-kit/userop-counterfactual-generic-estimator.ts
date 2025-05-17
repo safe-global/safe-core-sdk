@@ -33,7 +33,7 @@ async function main() {
       data: '0x'
     }],
     options: {
-      feeEstimator: new GenericFeeEstimator(RPC_URL, CHAIN_ID),
+      feeEstimator: new GenericFeeEstimator(),
     }
   })
 

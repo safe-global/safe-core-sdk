@@ -29,6 +29,7 @@ type PredictedSafeOptions = {
 export type SponsoredPaymasterOption = {
   isSponsored: true
   sponsorshipPolicyId?: string
+  paymasterContext?: Record<string, any>
 }
 
 export type ERC20PaymasterOption = {

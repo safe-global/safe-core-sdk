@@ -26,7 +26,7 @@ async function main() {
     paymasterOptions: {
       isSponsored: true,
       paymasterUrl: PAYMASTER_URL,
-      sponsorshipPolicyId: POLICY_ID
+      paymasterContext:{sponsorshipPolicyId: POLICY_ID}
     },
     options: {
       safeAddress: SAFE_ADDRESS

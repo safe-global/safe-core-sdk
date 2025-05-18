@@ -113,17 +113,14 @@ export class GenericFeeEstimator implements IFeeEstimator {
 
     const paymasterClient = createBundlerClient<PaymasterRpcSchema>(paymasterOptions.paymasterUrl)
     if (paymasterOptions.isSponsored) {
-      const params: [UserOperationStringValues, string, string, { sponsorshipPolicyId: string }?] =
-        [
-          userOperationToHexValues(userOperation, entryPoint),
-          entryPoint,
-          '0x' + chainId.toString(16)
-        ]
+      const params: [UserOperationStringValues, string, string, Record<string, any>?] = [
+        userOperationToHexValues(userOperation, entryPoint),
+        entryPoint,
+        '0x' + chainId.toString(16)
+      ]
 
-      if (paymasterOptions.sponsorshipPolicyId) {
-        params.push({
-          sponsorshipPolicyId: paymasterOptions.sponsorshipPolicyId
-        })
+      if (paymasterOptions.paymasterContext) {
+        params.push(paymasterOptions.paymasterContext)
       }
 
       const sponsoredData = await paymasterClient.request({

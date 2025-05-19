@@ -1,4 +1,5 @@
 import hre from 'hardhat'
+import dotenv from 'dotenv'
 import { BrowserProvider } from 'ethers'
 import { custom, createWalletClient } from 'viem'
 
@@ -6,6 +7,9 @@ import Safe, { SafeProviderConfig, Eip1193Provider } from '@safe-global/protocol
 import SafeApiKit from '@safe-global/api-kit/index'
 
 import config from './config'
+import path from 'path'
+
+dotenv.config({ path: path.join(__dirname, '../.env') })
 
 type GetKits = {
   protocolKit: Safe
@@ -54,7 +58,11 @@ export async function getProtocolKit({
 }
 
 export function getApiKit(txServiceUrl?: GetKitsOptions['txServiceUrl']): SafeApiKit {
-  const safeApiKit = new SafeApiKit({ chainId: config.CHAIN_ID, txServiceUrl })
+  const safeApiKit = new SafeApiKit({
+    chainId: config.CHAIN_ID,
+    txServiceApiKey: process.env.TX_SERVICE_API_KEY || '',
+    txServiceUrl
+  })
 
   return safeApiKit
 }

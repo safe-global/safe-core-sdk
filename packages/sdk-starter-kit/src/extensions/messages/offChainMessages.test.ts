@@ -1,3 +1,4 @@
+import dotenv from 'dotenv'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { offChainMessages } from './offChainMessages'
@@ -14,6 +15,9 @@ jest.mock('../../utils', () => {
   }
 })
 
+dotenv.config()
+const { TX_SERVICE_API_KEY } = process.env
+
 describe('onChainMessages', () => {
   let protocolKit: Safe
   let apiKit: jest.Mocked<SafeApiKit>
@@ -21,7 +25,10 @@ describe('onChainMessages', () => {
 
   beforeEach(() => {
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
+    apiKit = new SafeApiKit({
+      chainId: 1n,
+      txServiceApiKey: TX_SERVICE_API_KEY || ''
+    }) as jest.Mocked<SafeApiKit>
     safeClient = new SafeClient(protocolKit, apiKit)
   })
 

@@ -1,9 +1,13 @@
+import dotenv from 'dotenv'
 import Safe, * as protocolKitModule from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 
 import * as utils from '../../utils'
 import { SafeMessageClient } from './SafeMessageClient'
 import { MESSAGES, SafeClientTxStatus } from '../../constants'
+
+dotenv.config()
+const { TX_SERVICE_API_KEY } = process.env
 
 jest.mock('@safe-global/protocol-kit')
 jest.mock('@safe-global/api-kit')
@@ -33,7 +37,10 @@ describe('SafeClient', () => {
 
   beforeEach(() => {
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
+    apiKit = new SafeApiKit({
+      chainId: 1n,
+      txServiceApiKey: TX_SERVICE_API_KEY || ''
+    }) as jest.Mocked<SafeApiKit>
     safeMessageClient = new SafeMessageClient(protocolKit, apiKit)
 
     apiKit.getMessage = jest.fn().mockResolvedValue(MESSAGE_RESPONSE)

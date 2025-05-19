@@ -1,9 +1,13 @@
+import dotenv from 'dotenv'
 import Safe, * as protocolKitModule from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 import { Safe4337Pack, SafeOperationV06 } from '@safe-global/relay-kit'
 
 import { SafeOperationClient } from './SafeOperationClient'
 import { MESSAGES, SafeClientTxStatus } from '../../constants'
+
+dotenv.config()
+const { TX_SERVICE_API_KEY } = process.env
 
 jest.mock('@safe-global/protocol-kit')
 jest.mock('@safe-global/relay-kit')
@@ -64,7 +68,10 @@ describe('SafeOperationClient', () => {
     const bundlerClientMock = { send: jest.fn().mockResolvedValue('1') } as any
 
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
+    apiKit = new SafeApiKit({
+      chainId: 1n,
+      txServiceApiKey: TX_SERVICE_API_KEY || ''
+    }) as jest.Mocked<SafeApiKit>
     safe4337Pack = new Safe4337Pack({
       protocolKit,
       bundlerClient: bundlerClientMock,

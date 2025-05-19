@@ -4,13 +4,16 @@ export enum HttpMethod {
   Delete = 'delete'
 }
 
-interface HttpRequest {
+export interface HttpRequest {
   url: string
   method: HttpMethod
   body?: any
 }
 
-export async function sendRequest<T>({ url, method, body }: HttpRequest): Promise<T> {
+export async function sendRequest<T>(
+  { url, method, body }: HttpRequest,
+  apiKey: string
+): Promise<T> {
   const fetch = await (typeof window === 'undefined'
     ? import('node-fetch').then((m) => m.default)
     : Promise.resolve(window.fetch))
@@ -19,7 +22,8 @@ export async function sendRequest<T>({ url, method, body }: HttpRequest): Promis
     method,
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Authorization: `${apiKey}`
     },
     body: JSON.stringify(body)
   })

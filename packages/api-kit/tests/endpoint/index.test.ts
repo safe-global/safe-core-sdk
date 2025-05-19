@@ -34,7 +34,8 @@ const tokenAddress = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
 const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
 const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
 const safeOpHash = '0x8b1840745ec0a6288e868c6e285dadcfebd49e846d307610a9ccd97f445ace93'
-const txServiceBaseUrl = 'https://safe-transaction-sepolia.safe.global/api'
+//TODO: Update with the production one
+const txServiceBaseUrl = 'https://api.5afe.dev/tx-service/11155111/api'
 
 const signer = createWalletClient({
   transport: http(),

@@ -6,13 +6,12 @@ import { getApiKit } from '../utils/setupKits'
 chai.use(chaiAsPromised)
 
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // v1.4.1
-const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 
 let safeApiKit: SafeApiKit
 
 describe('getSafeOperation', () => {
   before(async () => {
-    safeApiKit = getApiKit(TX_SERVICE_URL)
+    safeApiKit = getApiKit()
   })
 
   describe('should fail', () => {

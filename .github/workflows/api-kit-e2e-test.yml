@@ -24,13 +24,9 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: 'Create .env file'
-        run: |
-          cd packages/api-kit/tests
-          touch .env
-          echo TX_SERVICE_API_KEY=${{ secrets.TX_SERVICE_API_KEY }} >> .env
-
       - name: Test
+        env:
+          TX_SERVICE_API_KEY: ${{ secrets.TX_SERVICE_API_KEY }}
         run: |
           cd packages/api-kit
           yarn test:ci:ethers

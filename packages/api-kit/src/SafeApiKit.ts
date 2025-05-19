@@ -124,7 +124,7 @@ class SafeApiKit {
     })
   }
 
-  #api<T>(request: HttpRequest): Promise<T> {
+  async #api<T>(request: HttpRequest): Promise<T> {
     return sendRequest(request, this.#txServiceApiKey)
   }
 

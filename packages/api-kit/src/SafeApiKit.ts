@@ -66,7 +66,7 @@ export interface SafeApiKitConfig {
 
 class SafeApiKit {
   #chainId: bigint
-  #txServiceApiKey: string = ''
+  #txServiceApiKey: string
   #txServiceBaseUrl: string
 
   constructor({ chainId, txServiceUrl, txServiceApiKey }: SafeApiKitConfig) {
@@ -83,8 +83,9 @@ class SafeApiKit {
       }
 
       this.#txServiceBaseUrl = url
-      this.#txServiceApiKey = txServiceApiKey
     }
+
+    this.#txServiceApiKey = txServiceApiKey
   }
 
   #isValidAddress(address: string) {

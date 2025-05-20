@@ -25,6 +25,8 @@ jobs:
         run: yarn build
 
       - name: Test
+        env:
+          TX_SERVICE_API_KEY: ${{ secrets.TX_SERVICE_API_KEY }}
         run: |
           cd packages/api-kit
           yarn test:ci:ethers

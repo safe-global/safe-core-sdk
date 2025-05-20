@@ -29,7 +29,10 @@ describe('safeOperations', () => {
 
   beforeEach(() => {
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
+    apiKit = new SafeApiKit({
+      chainId: 1n,
+      txServiceApiKey: 'txServiceApiKey'
+    }) as jest.Mocked<SafeApiKit>
     safeClient = new SafeClient(protocolKit, apiKit)
   })
 

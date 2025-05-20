@@ -11,7 +11,6 @@ chai.use(chaiAsPromised)
 const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676' // 0x56e2C102c664De6DfD7315d12c0178b61D16F171
 const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44' // 0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 4337 enabled 1/2 Safe (v1.4.1) owned by PRIVATE_KEY_1 + PRIVATE_KEY_2
-const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 const BUNDLER_URL = 'https://api.pimlico.io/v2/sepolia/rpc?apikey=pim_Vjs7ohRqWdvsjUegngf9Bg'
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 
@@ -62,7 +61,7 @@ describe('confirmSafeOperation', () => {
 
   before(async () => {
     safe4337Pack = await getSafe4337Pack({ signer: PRIVATE_KEY_1 })
-    safeApiKit = getApiKit(TX_SERVICE_URL)
+    safeApiKit = getApiKit()
 
     // Submit a new Safe operation to the transaction service
     safeOperation = await addSafeOperation()

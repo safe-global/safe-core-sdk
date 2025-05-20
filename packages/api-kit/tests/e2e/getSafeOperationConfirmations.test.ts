@@ -8,7 +8,6 @@ chai.use(chaiAsPromised)
 
 let safeApiKit: SafeApiKit
 
-const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 const SAFE_OPERATION_HASH = '0x375d3bd580600ce04d7d2c1d8d88d85f27b9c7d14d7b544f2ee585d672f2b449'
 const EXPECTED_SAFE_OPERATION_CONFIRMATIONS = [
   {
@@ -31,7 +30,7 @@ const EXPECTED_SAFE_OPERATION_CONFIRMATIONS = [
 
 describe('getSafeOperationConfirmations', () => {
   before(() => {
-    safeApiKit = getApiKit(TX_SERVICE_URL)
+    safeApiKit = getApiKit()
   })
 
   it('should fail if safeOperationHash is empty', async () => {

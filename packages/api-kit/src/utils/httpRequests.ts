@@ -12,19 +12,24 @@ export interface HttpRequest {
 
 export async function sendRequest<T>(
   { url, method, body }: HttpRequest,
-  apiKey: string
+  apiKey?: string
 ): Promise<T> {
   const fetch = await (typeof window === 'undefined'
     ? import('node-fetch').then((m) => m.default)
     : Promise.resolve(window.fetch))
 
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  }
+
+  if (apiKey) {
+    headers['Authorization'] = `Bearer ${apiKey}`
+  }
+
   const response = await fetch(url, {
     method,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `${apiKey}`
-    },
+    headers,
     body: JSON.stringify(body)
   })
 

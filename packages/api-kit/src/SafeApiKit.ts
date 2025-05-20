@@ -58,23 +58,42 @@ import { QUERY_PARAMS_MAP } from './utils/queryParamsMap'
 export interface SafeApiKitConfig {
   /** chainId - The chainId */
   chainId: bigint
-  /** txServiceApiKey - The API key to access the Safe Transaction Service */
-  txServiceApiKey: string
   /** txServiceUrl - Safe Transaction Service URL */
   txServiceUrl?: string
+  /**
+   * txServiceApiKey - The API key to access the Safe Transaction Service.
+   * - Required if txServiceUrl is undefined
+   * - Required if txServiceUrl contains "safe.global" or "5afe.dev"
+   * - Optional otherwise
+   */
+  txServiceApiKey?: string
 }
 
 class SafeApiKit {
   #chainId: bigint
-  #txServiceApiKey: string
+  #txServiceApiKey?: string
   #txServiceBaseUrl: string
 
   constructor({ chainId, txServiceUrl, txServiceApiKey }: SafeApiKitConfig) {
     this.#chainId = chainId
 
     if (txServiceUrl) {
+      // If txServiceUrl contains safe.global or 5afe.dev, txServiceApiKey is mandatory
+      if (
+        (txServiceUrl.includes('api.safe.global') || txServiceUrl.includes('api.5afe.dev')) &&
+        !txServiceApiKey
+      ) {
+        throw new Error(
+          'txServiceApiKey is mandatory when using api.safe.global or api.5afe.dev domains'
+        )
+      }
       this.#txServiceBaseUrl = txServiceUrl
     } else {
+      // If txServiceUrl is not defined, txServiceApiKey is mandatory
+      if (!txServiceApiKey) {
+        throw new Error('txServiceApiKey is mandatory when txServiceUrl is not defined')
+      }
+
       const url = getTransactionServiceUrl(chainId)
       if (!url) {
         throw new TypeError(

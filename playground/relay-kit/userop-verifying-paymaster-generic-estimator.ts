@@ -27,6 +27,7 @@ async function main() {
       isSponsored: true,
       paymasterUrl: PAYMASTER_URL,
       paymasterContext:{sponsorshipPolicyId: POLICY_ID}
+      //paymasterContext:{policyId: POLICY_ID}// for providers that use different key names for sponsorshipPolicyId
     },
     options: {
       safeAddress: SAFE_ADDRESS
@@ -43,8 +44,10 @@ async function main() {
     options: {
       feeEstimator: new GenericFeeEstimator(
           {
-            maxFeePerGasMultiplier:1.1, //defaults to 1.5
-            maxPriorityFeePerGasMultiplier: 1.1 //defaults to 1.5
+            //maxFeePerGasMultiplier:1.1, //defaults to 1.5
+            //maxPriorityFeePerGasMultiplier: 1.1 //defaults to 1.5
+            //maxFeePerGas: 142220151n, //override with exact values
+            //maxPriorityFeePerGas: 110000000n //override with exact values
           }
       )
     }

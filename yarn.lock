@@ -1833,10 +1833,10 @@
   dependencies:
     semver "^7.6.2"
 
-"@safe-global/safe-modules-deployments@^2.2.7":
-  version "2.2.7"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.7.tgz#8d9cabea778767776de2dc62258dcc458f2f2c14"
-  integrity sha512-xlnAW7d0394EwlRgWJ+nuQNQmGkL0qBE54pN+1IBbUEFvWW8q0SbhDsTmlGgeDM+9F8q2KM06Ip1JMmddppA/Q==
+"@safe-global/safe-modules-deployments@^2.2.8":
+  version "2.2.8"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.8.tgz#444bd078d8d04f2cac6427ed82608e8e9db314eb"
+  integrity sha512-XqRhEUzO8PNs5kCXztlPmQJBZO+YTDCRbiumCr5JBuS8RhU0pRSkG5Gs8qjKlZicxZvy3IdXZ14APVwb6+dj/Q==
 
 "@safe-global/safe-passkey@0.2.0":
   version "0.2.0"
@@ -2748,9 +2748,9 @@ balanced-match@^1.0.0:
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
 
 base-x@^3.0.2:
-  version "3.0.9"
-  resolved "https://registry.npmjs.org/base-x/-/base-x-3.0.9.tgz"
-  integrity sha512-H7JU6iBHTal1gp56aKoaa//YUxEaAOUiydvrV/pILqIHXTtqxSkATOnDA2u+jZ/61sD+L/412+7kzXRtWukhpQ==
+  version "3.0.11"
+  resolved "https://registry.yarnpkg.com/base-x/-/base-x-3.0.11.tgz#40d80e2a1aeacba29792ccc6c5354806421287ff"
+  integrity sha512-xz7wQ8xDhdyP7tQxwdteLYeFfS68tSMNCZ/Y37WJ4bhGfKPpqEIlmIyueQHqOyoPhE6xNUqjzRr8ra0eF9VRvA==
   dependencies:
     safe-buffer "^5.0.1"
 

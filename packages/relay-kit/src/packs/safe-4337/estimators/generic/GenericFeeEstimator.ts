@@ -62,7 +62,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
           ? {
               token: paymasterOptions.paymasterTokenAddress
             }
-          : {}
+          : (paymasterOptions.paymasterContext ?? {})
 
       const [feeData, paymasterStubData] = await Promise.all([
         this.#getUserOperationGasPrices(nodeUrl),

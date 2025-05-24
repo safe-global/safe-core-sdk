@@ -87,6 +87,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
   #onchainIdentifier: string = ''
 
+  #nodeUrl?: string
   /**
    * Creates an instance of the Safe4337Pack.
    *
@@ -101,7 +102,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
     entryPointAddress,
     safe4337ModuleAddress,
     safeWebAuthnSharedSignerAddress,
-    onchainAnalytics
+    onchainAnalytics,
+    nodeUrl
   }: Safe4337Options) {
     super(protocolKit)
 
@@ -112,6 +114,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
     this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = safeWebAuthnSharedSignerAddress || '0x'
+    this.#nodeUrl = nodeUrl
 
     if (onchainAnalytics?.project) {
       const { project, platform } = onchainAnalytics
@@ -382,6 +385,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
     }
 
+    let nodeUrl = undefined
+    if (typeof provider == 'string') {
+      nodeUrl = provider
+    }
+
     return new Safe4337Pack({
       chainId: BigInt(chainId),
       protocolKit,
@@ -391,7 +399,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       entryPointAddress: selectedEntryPoint!,
       safe4337ModuleAddress,
       safeWebAuthnSharedSignerAddress,
-      onchainAnalytics
+      onchainAnalytics,
+      nodeUrl
     })
   }
 
@@ -413,7 +422,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.getUserOperation(),
-      paymasterOptions: this.#paymasterOptions
+      paymasterOptions: this.#paymasterOptions,
+      nodeUrl: this.#nodeUrl,
+      chainId: this.#chainId
     })
 
     if (preEstimationData) {
@@ -432,6 +443,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
     })
 
     if (estimateUserOperationGas) {
+      if (
+        feeEstimator.defaultVerificationGasLimitOverhead != null &&
+        estimateUserOperationGas.verificationGasLimit != null
+      ) {
+        estimateUserOperationGas.verificationGasLimit = (
+          BigInt(estimateUserOperationGas.verificationGasLimit) +
+          BigInt(threshold) * feeEstimator.defaultVerificationGasLimitOverhead
+        ).toString()
+      }
+
       safeOperation.addEstimations(estimateUserOperationGas)
     }
 
@@ -442,10 +463,21 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ...safeOperation.getUserOperation(),
         signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
       },
-      paymasterOptions: this.#paymasterOptions
+      paymasterOptions: this.#paymasterOptions,
+      nodeUrl: this.#nodeUrl,
+      chainId: this.#chainId
     })
 
     if (postEstimationData) {
+      if (
+        feeEstimator.defaultVerificationGasLimitOverhead != null &&
+        postEstimationData.verificationGasLimit != null
+      ) {
+        postEstimationData.verificationGasLimit = (
+          BigInt(postEstimationData.verificationGasLimit) +
+          BigInt(threshold) * feeEstimator.defaultVerificationGasLimitOverhead
+        ).toString()
+      }
       safeOperation.addEstimations(postEstimationData)
     }
 

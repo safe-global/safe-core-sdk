@@ -20,6 +20,7 @@ export type GenericFeeEstimatorOverrides = {
   maxPriorityFeePerGas?: bigint
   maxFeePerGasMultiplier?: number
   maxPriorityFeePerGasMultiplier?: number
+  defaultVerificationGasLimitOverhead?: bigint
 }
 
 /**
@@ -32,7 +33,8 @@ export class GenericFeeEstimator implements IFeeEstimator {
   overrides: GenericFeeEstimatorOverrides
 
   constructor(overrides: GenericFeeEstimatorOverrides = {}) {
-    this.defaultVerificationGasLimitOverhead = 55_000n
+    this.defaultVerificationGasLimitOverhead =
+      overrides.defaultVerificationGasLimitOverhead ?? 35_000n
     this.overrides = overrides
   }
 

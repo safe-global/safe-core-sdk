@@ -16,7 +16,7 @@ export default {
         {
           internalType: 'P256.Verifiers',
           name: 'verifiers',
-          type: 'uint192'
+          type: 'uint176'
         }
       ],
       name: 'createSigner',
@@ -45,7 +45,7 @@ export default {
         {
           internalType: 'P256.Verifiers',
           name: 'verifiers',
-          type: 'uint192'
+          type: 'uint176'
         }
       ],
       name: 'getSigner',
@@ -84,7 +84,7 @@ export default {
         {
           internalType: 'P256.Verifiers',
           name: 'verifiers',
-          type: 'uint192'
+          type: 'uint176'
         }
       ],
       name: 'isValidSignatureForSigner',

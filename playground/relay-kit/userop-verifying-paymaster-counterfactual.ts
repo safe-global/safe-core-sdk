@@ -5,6 +5,8 @@ import { privateKeyToAccount } from 'viem/accounts'
 
 dotenv.config({ path: './playground/relay-kit/.env' })
 
+// Load environment variables from ./.env file
+// Follow .env-sample as an example to create your own file
 const {
   PRIVATE_KEY,
   RPC_URL = '',

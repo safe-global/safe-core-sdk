@@ -11,6 +11,7 @@ interface Config {
   SAFE_TX_HASH: string
 }
 
+// Adjust the configuration with your own input parameters before running the script
 const config: Config = {
   CHAIN_ID: 11155111n,
   RPC_URL: 'https://sepolia.gateway.tenderly.co',

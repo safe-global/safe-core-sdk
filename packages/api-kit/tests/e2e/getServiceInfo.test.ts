@@ -1,17 +1,10 @@
 import { expect } from 'chai'
-import SafeApiKit from '@safe-global/api-kit/index'
-import { networks, getTransactionServiceUrl } from '@safe-global/api-kit/utils/config'
-
+import { getTransactionServiceUrl, networks } from '@safe-global/api-kit/utils/config'
 import { getApiKit } from '../utils/setupKits'
 
-let safeApiKit: SafeApiKit
-
 describe.only('getServiceInfo', () => {
-  before(async () => {
-    safeApiKit = getApiKit()
-  })
-
   it('should return the Safe service info', async () => {
+    const safeApiKit = getApiKit()
     const serviceInfo = await safeApiKit.getServiceInfo()
     expect(serviceInfo.api_version).to.be.equal('v1')
   })
@@ -22,16 +15,13 @@ describe.only('getServiceInfo', () => {
     })
 
     networks.forEach((network) => {
-      it(`should return correct network info for ${network.shortName} (chain ID: ${network.chainId})`, async function () {
+      it(`should return correct network info for chainId ${network.chainId} (${getTransactionServiceUrl(network.chainId)})`, async function () {
         this.timeout(10000)
-        const url = getTransactionServiceUrl(network.chainId)
-        console.log(`Testing URL: ${url}`)
-
+        const safeApiKit = getApiKit(undefined, network.chainId)
         const serviceInfo = await safeApiKit.getServiceInfo()
-        console.log(`Service Info: ${JSON.stringify(serviceInfo, null, 2)}`)
-        // Verify that the response contains information about the correct network
-        expect(serviceInfo).to.have.property('version')
-        expect(serviceInfo).to.have.property('name')
+
+        expect(serviceInfo).to.have.property('version').to.be.a('string').not.empty
+        expect(serviceInfo).to.have.property('name').to.be.a('string').not.empty
       })
     })
   })

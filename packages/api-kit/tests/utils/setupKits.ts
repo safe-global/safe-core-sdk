@@ -19,6 +19,7 @@ type GetKits = {
 type GetKitsOptions = {
   signer?: SafeProviderConfig['signer']
   txServiceUrl?: string
+  chainId?: bigint
   safeAddress: string
 }
 
@@ -57,9 +58,12 @@ export async function getProtocolKit({
   return protocolKit
 }
 
-export function getApiKit(txServiceUrl?: GetKitsOptions['txServiceUrl']): SafeApiKit {
+export function getApiKit(
+  txServiceUrl?: GetKitsOptions['txServiceUrl'],
+  chainId?: GetKitsOptions['chainId']
+): SafeApiKit {
   const safeApiKit = new SafeApiKit({
-    chainId: config.CHAIN_ID,
+    chainId: chainId || config.CHAIN_ID,
     txServiceApiKey: process.env.TX_SERVICE_API_KEY || '',
     txServiceUrl
   })

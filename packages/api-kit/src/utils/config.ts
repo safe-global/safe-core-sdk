@@ -11,7 +11,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 56n, shortName: 'bnb' },
   { chainId: 100n, shortName: 'gno' },
   { chainId: 130n, shortName: 'unichain' },
-  { chainId: 137n, shortName: 'matic' },
+  { chainId: 137n, shortName: 'pol' },
   { chainId: 146n, shortName: 'sonic' },
   { chainId: 196n, shortName: 'okb' },
   { chainId: 232n, shortName: 'lens' },

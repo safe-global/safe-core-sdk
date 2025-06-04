@@ -9,7 +9,7 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import config from './config'
 import path from 'path'
 
-dotenv.config({ path: path.join(__dirname, '../.env') })
+dotenv.config({ path: path.join(__dirname, '../../.env') })
 
 type GetKits = {
   protocolKit: Safe

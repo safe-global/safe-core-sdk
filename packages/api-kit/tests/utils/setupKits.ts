@@ -64,7 +64,7 @@ export function getApiKit(
 ): SafeApiKit {
   const safeApiKit = new SafeApiKit({
     chainId: chainId || config.CHAIN_ID,
-    apiKey: process.env.API_KEY || '',
+    apiKey: process.env.API_KEY || 'jwt-token',
     txServiceUrl
   })
 

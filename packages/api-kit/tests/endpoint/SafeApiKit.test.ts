@@ -10,49 +10,49 @@ describe('SafeApiKit', () => {
   const chainId = config.CHAIN_ID
 
   describe('txServiceUrl with api.safe.global domain', () => {
-    it('should throw an error when txServiceUrl contains safe.global and txServiceApiKey is not provided', () => {
+    it('should throw an error when txServiceUrl contains safe.global and apiKey is not provided', () => {
       expect(() => {
         new SafeApiKit({
           chainId,
           txServiceUrl: 'https://api.safe.global/tx-service'
         })
-      }).to.throw('txServiceApiKey is mandatory when using api.safe.global or api.5afe.dev domains')
+      }).to.throw('apiKey is mandatory when using api.safe.global or api.5afe.dev domains')
     })
 
-    it('should instantiate successfully when txServiceUrl contains api.safe.global and txServiceApiKey is provided', () => {
+    it('should instantiate successfully when txServiceUrl contains api.safe.global and apiKey is provided', () => {
       expect(() => {
         new SafeApiKit({
           chainId,
           txServiceUrl: 'https://api.safe.global/tx-service',
-          txServiceApiKey: 'valid-api-key'
+          apiKey: 'valid-api-key'
         })
       }).not.to.throw()
     })
   })
 
   describe('txServiceUrl with api.5afe.dev domain', () => {
-    it('should throw an error when txServiceUrl contains api.5afe.dev and txServiceApiKey is not provided', () => {
+    it('should throw an error when txServiceUrl contains api.5afe.dev and apiKey is not provided', () => {
       expect(() => {
         new SafeApiKit({
           chainId,
           txServiceUrl: 'https://api.5afe.dev/tx-service'
         })
-      }).to.throw('txServiceApiKey is mandatory when using api.safe.global or api.5afe.dev domains')
+      }).to.throw('apiKey is mandatory when using api.safe.global or api.5afe.dev domains')
     })
 
-    it('should instantiate successfully when txServiceUrl contains api.5afe.dev and txServiceApiKey is provided', () => {
+    it('should instantiate successfully when txServiceUrl contains api.5afe.dev and apiKey is provided', () => {
       expect(() => {
         new SafeApiKit({
           chainId,
           txServiceUrl: 'https://api.5afe.dev/tx-service',
-          txServiceApiKey: 'valid-api-key'
+          apiKey: 'valid-api-key'
         })
       }).not.to.throw()
     })
   })
 
   describe('txServiceUrl with other domains', () => {
-    it('should instantiate successfully when txServiceUrl is for a custom domain and txServiceApiKey is not provided', () => {
+    it('should instantiate successfully when txServiceUrl is for a custom domain and apiKey is not provided', () => {
       expect(() => {
         new SafeApiKit({
           chainId,
@@ -61,31 +61,31 @@ describe('SafeApiKit', () => {
       }).not.to.throw()
     })
 
-    it('should instantiate successfully when txServiceUrl is for a custom domain and txServiceApiKey is provided', () => {
+    it('should instantiate successfully when txServiceUrl is for a custom domain and apiKey is provided', () => {
       expect(() => {
         new SafeApiKit({
           chainId,
           txServiceUrl: 'https://my-custom-service.example.com',
-          txServiceApiKey: 'valid-api-key'
+          apiKey: 'valid-api-key'
         })
       }).not.to.throw()
     })
   })
 
   describe('no txServiceUrl provided', () => {
-    it('should throw an error when txServiceUrl is not provided and txServiceApiKey is not provided', () => {
+    it('should throw an error when txServiceUrl is not provided and apiKey is not provided', () => {
       expect(() => {
         new SafeApiKit({
           chainId
         })
-      }).to.throw('txServiceApiKey is mandatory when txServiceUrl is not defined')
+      }).to.throw('apiKey is mandatory when txServiceUrl is not defined')
     })
 
-    it('should instantiate successfully when txServiceUrl is not provided and txServiceApiKey is provided', () => {
+    it('should instantiate successfully when txServiceUrl is not provided and apiKey is provided', () => {
       expect(() => {
         new SafeApiKit({
           chainId,
-          txServiceApiKey: 'valid-api-key'
+          apiKey: 'valid-api-key'
         })
       }).not.to.throw()
     })

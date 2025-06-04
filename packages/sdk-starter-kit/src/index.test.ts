@@ -6,14 +6,14 @@ const SAFE_OWNERS = [
   '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B',
   '0x56e2C102c664De6DfD7315d12c0178b61D16F171'
 ]
-const TX_SERVICE_API_KEY = 'txServiceApiKey'
+const API_KEY = 'apiKey'
 
 describe('createSafeClient', () => {
   it('should create a Safe client instance', async () => {
     const safeClient = await createSafeClient({
       provider: RPC_URL,
       safeAddress: SAFE_ADDRESS,
-      txServiceApiKey: TX_SERVICE_API_KEY
+      apiKey: API_KEY
     })
 
     const safeAddress = await safeClient.getAddress()
@@ -29,7 +29,7 @@ describe('createSafeClient', () => {
     const safeClient1 = await createSafeClient({
       provider: RPC_URL,
       safeAddress: SAFE_ADDRESS,
-      txServiceApiKey: TX_SERVICE_API_KEY
+      apiKey: API_KEY
     })
 
     const safeClient2 = safeClient1.extend(offChainMessages())

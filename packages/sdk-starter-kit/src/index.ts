@@ -100,7 +100,7 @@ async function getApiKitInstance(
 
   return new SafeApiKit({
     chainId,
-    txServiceApiKey: config.txServiceApiKey,
+    apiKey: config.apiKey,
     txServiceUrl: config.txServiceUrl
   })
 }

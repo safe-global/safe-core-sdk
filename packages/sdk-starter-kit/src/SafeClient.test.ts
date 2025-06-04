@@ -47,7 +47,7 @@ describe('SafeClient', () => {
     protocolKit = new Safe()
     apiKit = new SafeApiKit({
       chainId: 1n,
-      txServiceApiKey: 'txServiceApiKey'
+      apiKey: 'apiKey'
     }) as jest.Mocked<SafeApiKit>
 
     safeClient = new SafeClient(protocolKit, apiKit)

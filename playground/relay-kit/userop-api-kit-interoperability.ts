@@ -18,12 +18,12 @@ const PAYMASTER_URL = 'https://...'
 
 dotenv.config({ path: './playground/relay-kit/.env' })
 
-const { TX_SERVICE_API_KEY } = process.env
+const { API_KEY } = process.env
 
 async function main() {
   const apiKit = new SafeApiKit({
     chainId: BigInt(CHAIN_ID),
-    txServiceApiKey: TX_SERVICE_API_KEY || ''
+    apiKey: API_KEY || ''
   })
 
   let safe4337Pack = await Safe4337Pack.init({

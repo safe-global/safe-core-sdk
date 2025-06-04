@@ -61,37 +61,35 @@ export interface SafeApiKitConfig {
   /** txServiceUrl - Safe Transaction Service URL */
   txServiceUrl?: string
   /**
-   * txServiceApiKey - The API key to access the Safe Transaction Service.
+   * apiKey - The API key to access the Safe Transaction Service.
    * - Required if txServiceUrl is undefined
    * - Required if txServiceUrl contains "safe.global" or "5afe.dev"
    * - Optional otherwise
    */
-  txServiceApiKey?: string
+  apiKey?: string
 }
 
 class SafeApiKit {
   #chainId: bigint
-  #txServiceApiKey?: string
+  #apiKey?: string
   #txServiceBaseUrl: string
 
-  constructor({ chainId, txServiceUrl, txServiceApiKey }: SafeApiKitConfig) {
+  constructor({ chainId, txServiceUrl, apiKey }: SafeApiKitConfig) {
     this.#chainId = chainId
 
     if (txServiceUrl) {
-      // If txServiceUrl contains safe.global or 5afe.dev, txServiceApiKey is mandatory
+      // If txServiceUrl contains safe.global or 5afe.dev, apiKey is mandatory
       if (
         (txServiceUrl.includes('api.safe.global') || txServiceUrl.includes('api.5afe.dev')) &&
-        !txServiceApiKey
+        !apiKey
       ) {
-        throw new Error(
-          'txServiceApiKey is mandatory when using api.safe.global or api.5afe.dev domains'
-        )
+        throw new Error('apiKey is mandatory when using api.safe.global or api.5afe.dev domains')
       }
       this.#txServiceBaseUrl = txServiceUrl
     } else {
-      // If txServiceUrl is not defined, txServiceApiKey is mandatory
-      if (!txServiceApiKey) {
-        throw new Error('txServiceApiKey is mandatory when txServiceUrl is not defined')
+      // If txServiceUrl is not defined, apiKey is mandatory
+      if (!apiKey) {
+        throw new Error('apiKey is mandatory when txServiceUrl is not defined')
       }
 
       const url = getTransactionServiceUrl(chainId)
@@ -104,7 +102,7 @@ class SafeApiKit {
       this.#txServiceBaseUrl = url
     }
 
-    this.#txServiceApiKey = txServiceApiKey
+    this.#apiKey = apiKey
   }
 
   #isValidAddress(address: string) {
@@ -144,7 +142,7 @@ class SafeApiKit {
   }
 
   async #api<T>(request: HttpRequest): Promise<T> {
-    return sendRequest(request, this.#txServiceApiKey)
+    return sendRequest(request, this.#apiKey)
   }
 
   /**

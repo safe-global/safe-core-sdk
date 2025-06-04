@@ -8,7 +8,7 @@ dotenv.config({ path: './playground/api-kit/.env' })
 const {
   CHAIN_ID = 11155111,
   RPC_URL = '',
-  TX_SERVICE_API_KEY = '',
+  API_KEY = '',
   SIGNER_ADDRESS_PRIVATE_KEY = '',
   SAFE_ADDRESS = '',
   SAFE_TX_HASH = ''
@@ -25,7 +25,7 @@ async function main() {
   // Create Safe API Kit instance
   const apiKit = new SafeApiKit({
     chainId: BigInt(CHAIN_ID),
-    txServiceApiKey: TX_SERVICE_API_KEY
+    apiKey: API_KEY
   })
 
   // Get the transaction

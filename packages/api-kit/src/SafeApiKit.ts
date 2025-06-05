@@ -83,13 +83,17 @@ class SafeApiKit {
         (txServiceUrl.includes('api.safe.global') || txServiceUrl.includes('api.5afe.dev')) &&
         !apiKey
       ) {
-        throw new Error('apiKey is mandatory when using api.safe.global or api.5afe.dev domains')
+        throw new Error(
+          'apiKey is mandatory when using api.safe.global or api.5afe.dev domains. Please obtain your API key at https://developer.safe.global.'
+        )
       }
       this.#txServiceBaseUrl = txServiceUrl
     } else {
       // If txServiceUrl is not defined, apiKey is mandatory
       if (!apiKey) {
-        throw new Error('apiKey is mandatory when txServiceUrl is not defined')
+        throw new Error(
+          'apiKey is mandatory when txServiceUrl is not defined. Please obtain your API key at https://developer.safe.global.'
+        )
       }
 
       const url = getTransactionServiceUrl(chainId)

@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import { getTransactionServiceUrl, networks } from '@safe-global/api-kit/utils/config'
 import { getApiKit } from '../utils/setupKits'
 
-describe.only('getServiceInfo', () => {
+describe('getServiceInfo', () => {
   it('should return the Safe service info', async () => {
     const safeApiKit = getApiKit()
     const serviceInfo = await safeApiKit.getServiceInfo()

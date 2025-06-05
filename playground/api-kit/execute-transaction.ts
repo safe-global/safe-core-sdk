@@ -1,42 +1,37 @@
+import * as dotenv from 'dotenv'
 import { Hash } from 'viem'
 import { waitForTransactionReceipt } from 'viem/actions'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
 
-// This file can be used to play around with the Safe Core SDK
-
-interface Config {
-  CHAIN_ID: bigint
-  RPC_URL: string
-  SIGNER_ADDRESS_PRIVATE_KEY: string
-  SAFE_ADDRESS: string
-  SAFE_TX_HASH: string
-}
-
-// Adjust the configuration with your own input parameters before running the script
-const config: Config = {
-  CHAIN_ID: 11155111n,
-  RPC_URL: 'https://sepolia.gateway.tenderly.co',
-  SIGNER_ADDRESS_PRIVATE_KEY: '<SIGNER_ADDRESS_PRIVATE_KEY>',
-  SAFE_ADDRESS: '<SAFE_ADDRESS>',
-  SAFE_TX_HASH: '<SAFE_TX_HASH>'
-}
+dotenv.config({ path: './playground/api-kit/.env' })
+// Load environment variables from ./.env file
+// Follow .env-sample as an example to create your own file
+const {
+  CHAIN_ID = 11155111,
+  RPC_URL = '',
+  API_KEY = '',
+  SIGNER_ADDRESS_PRIVATE_KEY = '',
+  SAFE_ADDRESS = '',
+  SAFE_TX_HASH = ''
+} = process.env
 
 async function main() {
   // Create Safe instance
   const protocolKit = await Safe.init({
-    provider: config.RPC_URL,
-    signer: config.SIGNER_ADDRESS_PRIVATE_KEY,
-    safeAddress: config.SAFE_ADDRESS
+    provider: RPC_URL,
+    signer: SIGNER_ADDRESS_PRIVATE_KEY,
+    safeAddress: SAFE_ADDRESS
   })
 
   // Create Safe API Kit instance
   const apiKit = new SafeApiKit({
-    chainId: config.CHAIN_ID
+    chainId: BigInt(CHAIN_ID),
+    apiKey: API_KEY || ''
   })
 
   // Get the transaction
-  const safeTransaction = await apiKit.getTransaction(config.SAFE_TX_HASH)
+  const safeTransaction = await apiKit.getTransaction(SAFE_TX_HASH)
   const isTxExecutable = await protocolKit.isValidTransaction(safeTransaction)
 
   if (isTxExecutable) {

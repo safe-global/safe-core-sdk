@@ -59,6 +59,7 @@ export type PredictedSafeConfig = {
 export type SdkStarterKitRootConfig = {
   provider: SafeProvider['provider']
   signer?: SafeProvider['signer']
+  apiKey?: string
   txServiceUrl?: string
 }
 

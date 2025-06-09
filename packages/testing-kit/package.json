@@ -50,7 +50,7 @@
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
     "@safe-global/safe-passkey": "0.2.0",
     "@safe-global/types-kit": "^2.0.1",
-    "@types/semver": "^7.5.8",
+    "@types/semver": "^7.7.0",
     "hardhat": "^2.22.19",
     "hardhat-deploy": "^0.12.4",
     "tsconfig-paths": "^4.2.0"

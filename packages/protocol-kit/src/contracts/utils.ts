@@ -508,9 +508,10 @@ export function toTxResult(
   }
 }
 
-export function isTypedDataSigner(signer: any): signer is Client {
+export function isEthersSigner(signer: any): signer is Client {
   const isPasskeySigner = !!signer?.passkeyRawId
-  return (signer as unknown as WalletClient).signTypedData !== undefined || !isPasskeySigner
+  // Check for both viem wallets and our ethers adapter
+  return typeof signer?.signTypedData === 'function' && !isPasskeySigner
 }
 
 /**

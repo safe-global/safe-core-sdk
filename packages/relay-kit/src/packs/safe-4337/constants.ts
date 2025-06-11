@@ -1,7 +1,7 @@
 import { parseAbi } from 'viem'
 
 export const DEFAULT_SAFE_VERSION = '1.4.1'
-export const DEFAULT_SAFE_MODULES_VERSION = '0.2.0'
+export const DEFAULT_SAFE_MODULES_VERSION = '0.3.0'
 
 export const EIP712_SAFE_OPERATION_TYPE_V06 = {
   SafeOp: [

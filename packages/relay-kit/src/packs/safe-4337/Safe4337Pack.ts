@@ -244,7 +244,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         !paymasterOptions.isSponsored &&
         !!paymasterOptions.paymasterTokenAddress
 
-      if (isApproveTransactionRequired) {
+      if (isApproveTransactionRequired && !paymasterOptions.skipApproveTransaction) {
         const { paymasterAddress, amountToApprove = MAX_ERC20_AMOUNT_TO_APPROVE } = paymasterOptions
 
         // second transaction: approve ERC-20 paymaster token
@@ -400,12 +400,14 @@ export class Safe4337Pack extends RelayKitBasePack<{
    *
    * @param {EstimateFeeProps} props - The parameters for the gas estimation.
    * @param {BaseSafeOperation} props.safeOperation - The SafeOperation to estimate the gas.
+   * @param {PaymasterOptions} props.paymasterOptions - The paymaster options.
    * @param {IFeeEstimator} props.feeEstimator - The function to estimate the gas.
    * @return {Promise<BaseSafeOperation>} The Promise object that will be resolved into the gas estimation.
    */
 
   async getEstimateFee({
     safeOperation,
+    paymasterOptions,
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<BaseSafeOperation> {
     const threshold = await this.protocolKit.getThreshold()
@@ -413,7 +415,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.getUserOperation(),
-      paymasterOptions: this.#paymasterOptions
+      paymasterOptions
     })
 
     if (preEstimationData) {
@@ -432,6 +434,16 @@ export class Safe4337Pack extends RelayKitBasePack<{
     })
 
     if (estimateUserOperationGas) {
+      if (
+        feeEstimator.defaultVerificationGasLimitOverhead != null &&
+        estimateUserOperationGas.verificationGasLimit != null
+      ) {
+        estimateUserOperationGas.verificationGasLimit = (
+          BigInt(estimateUserOperationGas.verificationGasLimit) +
+          BigInt(threshold) * feeEstimator.defaultVerificationGasLimitOverhead
+        ).toString()
+      }
+
       safeOperation.addEstimations(estimateUserOperationGas)
     }
 
@@ -442,10 +454,19 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ...safeOperation.getUserOperation(),
         signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
       },
-      paymasterOptions: this.#paymasterOptions
+      paymasterOptions
     })
 
     if (postEstimationData) {
+      if (
+        feeEstimator.defaultVerificationGasLimitOverhead != null &&
+        postEstimationData.verificationGasLimit != null
+      ) {
+        postEstimationData.verificationGasLimit = (
+          BigInt(postEstimationData.verificationGasLimit) +
+          BigInt(threshold) * feeEstimator.defaultVerificationGasLimitOverhead
+        ).toString()
+      }
       safeOperation.addEstimations(postEstimationData)
     }
 
@@ -463,11 +484,26 @@ export class Safe4337Pack extends RelayKitBasePack<{
     transactions,
     options = {}
   }: Safe4337CreateTransactionProps): Promise<BaseSafeOperation> {
-    const { amountToApprove, validUntil, validAfter, feeEstimator, customNonce } = options
+    const {
+      amountToApprove,
+      validUntil,
+      validAfter,
+      feeEstimator,
+      customNonce,
+      paymasterTokenAddress
+    } = options
+
+    const paymasterOptions: PaymasterOptions = this.#paymasterOptions
+      ? { ...this.#paymasterOptions }
+      : undefined
+
+    if (paymasterOptions && !paymasterOptions.isSponsored && paymasterTokenAddress) {
+      paymasterOptions.paymasterTokenAddress = paymasterTokenAddress
+    }
 
     const userOperation = await createUserOperation(this.protocolKit, transactions, {
       entryPoint: this.#ENTRYPOINT_ADDRESS,
-      paymasterOptions: this.#paymasterOptions,
+      paymasterOptions,
       amountToApprove,
       customNonce
     })
@@ -486,6 +522,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     return await this.getEstimateFee({
       safeOperation,
+      paymasterOptions,
       feeEstimator
     })
   }
@@ -609,22 +646,61 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
         const signerAddress = signer.account.address
         const safeOperation = safeOp.getSafeOperation()
-        const signature = await signer.signTypedData({
-          domain: {
-            chainId: Number(this.#chainId),
-            verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
-          },
-          types: safeOp.getEIP712Type(),
-          message: {
-            ...safeOperation,
-            nonce: BigInt(safeOperation.nonce),
-            validAfter: toHex(safeOperation.validAfter),
-            validUntil: toHex(safeOperation.validUntil),
-            maxFeePerGas: toHex(safeOperation.maxFeePerGas),
-            maxPriorityFeePerGas: toHex(safeOperation.maxPriorityFeePerGas)
-          },
-          primaryType: 'SafeOp'
-        })
+
+        // Prepare the parameters for signTypedData
+        const domain = {
+          chainId: Number(this.#chainId),
+          verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
+        }
+
+        const types = safeOp.getEIP712Type()
+
+        const message = {
+          ...safeOperation,
+          nonce: BigInt(safeOperation.nonce),
+          validAfter: toHex(safeOperation.validAfter),
+          validUntil: toHex(safeOperation.validUntil),
+          maxFeePerGas: toHex(safeOperation.maxFeePerGas),
+          maxPriorityFeePerGas: toHex(safeOperation.maxPriorityFeePerGas)
+        }
+
+        let signature: string
+
+        // Use a try-catch to support both viem and ethers.js signers
+        try {
+          // First try the standard viem way
+          signature = await signer.signTypedData({
+            domain,
+            types,
+            message,
+            primaryType: 'SafeOp'
+          })
+        } catch (error) {
+          // If viem fails, try ethers.js way using a type assertion
+          const ethersCompatibleSigner = signer as any
+
+          if (typeof ethersCompatibleSigner._signTypedData === 'function') {
+            // Ethers v5
+            signature = await ethersCompatibleSigner._signTypedData(domain, types, message)
+          } else if (typeof ethersCompatibleSigner.signTypedData === 'function') {
+            // Ethers v6 with different parameter format
+            try {
+              // Try calling with object format first (some implementations support this)
+              signature = await ethersCompatibleSigner.signTypedData({
+                domain,
+                types,
+                primaryType: 'SafeOp',
+                message
+              })
+            } catch {
+              // Fallback to ethers v6 standard format
+              signature = await ethersCompatibleSigner.signTypedData(domain, types, message)
+            }
+          } else {
+            // Re-throw if we couldn't handle it
+            throw error
+          }
+        }
 
         safeSignature = new EthSafeSignature(signerAddress, signature)
       } else {
@@ -711,6 +787,53 @@ export class Safe4337Pack extends RelayKitBasePack<{
    */
   async getChainId(): Promise<string> {
     return this.#bundlerClient.request({ method: RPC_4337_CALLS.CHAIN_ID })
+  }
+
+  /**
+   * Returns the exchange rate applied by the paymaster.
+   *
+   * @param {string} tokenAddress - The address of the token to get the exchange rate for.
+   * @returns {Promise<number>} - The exchange rate for the token used by the paymaster.
+   * @throws {Error} If paymaster URL is not configured or if the token is not supported
+   */
+  async getTokenExchangeRate(tokenAddress: string): Promise<number> {
+    if (!this.#paymasterOptions?.paymasterUrl) {
+      throw new Error('Paymaster URL is not configured')
+    }
+
+    const bundlerClient = createBundlerClient(this.#paymasterOptions?.paymasterUrl)
+    const isPimlico = this.#paymasterOptions.paymasterUrl.includes('pimlico')
+
+    if (isPimlico) {
+      const response = await bundlerClient.request({
+        method: 'pimlico_getTokenQuotes',
+        params: [
+          {
+            tokens: [tokenAddress]
+          },
+          this.#ENTRYPOINT_ADDRESS,
+          '0x1'
+        ]
+      })
+
+      return parseInt(response.quotes[0].exchangeRate, 16)
+    } else {
+      const response = await bundlerClient.request({
+        method: 'pm_supportedERC20Tokens',
+        params: [this.#ENTRYPOINT_ADDRESS]
+      })
+
+      const matchingToken = response.tokens.find(
+        (token: { address: string; exchangeRate: string }) =>
+          token.address.toLowerCase() === tokenAddress.toLowerCase()
+      )
+
+      if (!matchingToken) {
+        throw new Error(`No exchange rate found for token: ${tokenAddress}`)
+      }
+
+      return parseInt(matchingToken.exchangeRate, 16)
+    }
   }
 
   getOnchainIdentifier(): string {

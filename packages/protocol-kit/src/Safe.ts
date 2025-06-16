@@ -779,7 +779,7 @@ class Safe {
    * Adds the signature of the current signer to the Safe transaction object.
    *
    * @param safeTransaction - The Safe transaction to be signed
-   * @param signingMethod - Method followed to sign a transaction. Optional. Default value is "eth_sign"
+   * @param signingMethod - Method followed to sign a transaction. Optional. Default value is "eth_signTypedData_v4"
    * @param preimageSafeAddress - If the preimage is required, the address of the Safe that will be used to calculate the preimage
    * This field is mandatory for 1.3.0 and 1.4.1 contract versions Because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
    * we need to use the pre-image of the message to calculate the message hash

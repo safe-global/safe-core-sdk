@@ -579,7 +579,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getAllTransactions(safeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/`,
+        url: `${txServiceBaseUrl}/v2/safes/${safeAddress}/all-transactions/`,
         method: 'get'
       })
     })
@@ -589,7 +589,7 @@ describe('Endpoint tests', () => {
         .expect(safeApiKit.getAllTransactions(eip3770SafeAddress))
         .to.be.eventually.deep.equals({ data: { success: true } })
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${txServiceBaseUrl}/v1/safes/${safeAddress}/all-transactions/`,
+        url: `${txServiceBaseUrl}/v2/safes/${safeAddress}/all-transactions/`,
         method: 'get'
       })
     })

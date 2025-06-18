@@ -5,6 +5,7 @@ export const TRANSACTION_SERVICE_URLS: Record<string, string> = {
   '100': 'https://safe-transaction-gnosis-chain.safe.global/api',
   '130': 'https://safe-transaction-unichain.safe.global/api',
   '137': 'https://safe-transaction-polygon.safe.global/api',
+  '146': 'https://safe-transaction-sonic.safe.global/api',
   '196': 'https://safe-transaction-xlayer.safe.global/api',
   '324': 'https://safe-transaction-zksync.safe.global/api',
   '480': 'https://safe-transaction-worldchain.safe.global/api',

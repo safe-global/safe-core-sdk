@@ -428,7 +428,7 @@ class SafeApiKit {
       throw new Error('Invalid safeTxHash')
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/multisig-transactions/${safeTxHash}/`,
+      url: `${this.#txServiceBaseUrl}/v2/multisig-transactions/${safeTxHash}/`,
       method: HttpMethod.Get
     })
   }
@@ -588,7 +588,7 @@ class SafeApiKit {
       throw new Error('Invalid safeTxHash')
     }
     return sendRequest({
-      url: `${this.#txServiceBaseUrl}/v1/safes/${safe}/multisig-transactions/`,
+      url: `${this.#txServiceBaseUrl}/v2/safes/${safe}/multisig-transactions/`,
       method: HttpMethod.Post,
       body: {
         ...safeTransactionData,
@@ -675,7 +675,7 @@ class SafeApiKit {
     }
 
     const { address } = this.#getEip3770Address(safeAddress)
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v2/safes/${address}/multisig-transactions/`)
 
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<GetMultisigTransactionsOptions>(url, options)
@@ -709,7 +709,7 @@ class SafeApiKit {
     const nonce = currentNonce ? currentNonce : (await this.getSafeInfo(address)).nonce
 
     const url = new URL(
-      `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/?executed=false&nonce__gte=${nonce}`
+      `${this.#txServiceBaseUrl}/v2/safes/${address}/multisig-transactions/?executed=false&nonce__gte=${nonce}`
     )
 
     if (hasConfirmations) {
@@ -752,7 +752,7 @@ class SafeApiKit {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
-    const url = new URL(`${this.#txServiceBaseUrl}/v1/safes/${address}/all-transactions/`)
+    const url = new URL(`${this.#txServiceBaseUrl}/v2/safes/${address}/all-transactions/`)
 
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<AllTransactionsOptions>(url, options)

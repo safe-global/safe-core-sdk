@@ -1272,12 +1272,14 @@ class Safe {
       operation: serviceTransactionResponse.operation
     }
     const options = {
+      // TODO remove toString() in next major v7.0
       safeTxGas: serviceTransactionResponse.safeTxGas.toString(),
+      // TODO remove toString() in next major v7.0
       baseGas: serviceTransactionResponse.baseGas.toString(),
       gasPrice: serviceTransactionResponse.gasPrice,
       gasToken: serviceTransactionResponse.gasToken,
       refundReceiver: serviceTransactionResponse.refundReceiver,
-      nonce: serviceTransactionResponse.nonce
+      nonce: parseInt(serviceTransactionResponse.nonce, 10)
     }
     const safeTransaction = await this.createTransaction({
       transactions: [safeTransactionData],

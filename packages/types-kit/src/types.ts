@@ -248,11 +248,11 @@ export type SafeMultisigTransactionResponse = {
   readonly data?: string
   readonly operation: number
   readonly gasToken: string
-  readonly safeTxGas: number
-  readonly baseGas: number
+  readonly safeTxGas: string
+  readonly baseGas: string
   readonly gasPrice: string
   readonly refundReceiver?: string
-  readonly nonce: number
+  readonly nonce: string
   readonly executionDate: string | null
   readonly submissionDate: string
   readonly modified: string

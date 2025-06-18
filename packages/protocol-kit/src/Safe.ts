@@ -215,13 +215,21 @@ class Safe {
    * @throws "MultiSendCallOnly contract is not deployed on the current network"
    */
   async connect(config: ConnectSafeConfig): Promise<Safe> {
-    const { provider, signer, safeAddress, predictedSafe, isL1SafeSingleton, contractNetworks } =
-      config
+    const {
+      provider,
+      signer,
+      safeAddress,
+      predictedSafe,
+      isL1SafeSingleton,
+      contractNetworks,
+      onchainAnalytics
+    } = config
     const configProps: SafeConfigProps = {
       provider: provider || this.#safeProvider.provider,
       signer,
       isL1SafeSingleton: isL1SafeSingleton || this.#contractManager.isL1SafeSingleton,
-      contractNetworks: contractNetworks || this.#contractManager.contractNetworks
+      contractNetworks: contractNetworks || this.#contractManager.contractNetworks,
+      onchainAnalytics
     }
 
     // A new existing Safe is connected to the Signer
@@ -1264,12 +1272,14 @@ class Safe {
       operation: serviceTransactionResponse.operation
     }
     const options = {
+      // TODO remove toString() in next major v7.0
       safeTxGas: serviceTransactionResponse.safeTxGas.toString(),
+      // TODO remove toString() in next major v7.0
       baseGas: serviceTransactionResponse.baseGas.toString(),
       gasPrice: serviceTransactionResponse.gasPrice,
       gasToken: serviceTransactionResponse.gasToken,
       refundReceiver: serviceTransactionResponse.refundReceiver,
-      nonce: serviceTransactionResponse.nonce
+      nonce: parseInt(serviceTransactionResponse.nonce, 10)
     }
     const safeTransaction = await this.createTransaction({
       transactions: [safeTransactionData],

@@ -1,24 +1,47 @@
-export const TRANSACTION_SERVICE_URLS: Record<string, string> = {
-  '1': 'https://safe-transaction-mainnet.safe.global/api',
-  '10': 'https://safe-transaction-optimism.safe.global/api',
-  '56': 'https://safe-transaction-bsc.safe.global/api',
-  '100': 'https://safe-transaction-gnosis-chain.safe.global/api',
-  '130': 'https://safe-transaction-unichain.safe.global/api',
-  '137': 'https://safe-transaction-polygon.safe.global/api',
-  '146': 'https://safe-transaction-sonic.safe.global/api',
-  '196': 'https://safe-transaction-xlayer.safe.global/api',
-  '324': 'https://safe-transaction-zksync.safe.global/api',
-  '480': 'https://safe-transaction-worldchain.safe.global/api',
-  '1101': 'https://safe-transaction-zkevm.safe.global/api',
-  '5000': 'https://safe-transaction-mantle.safe.global/api',
-  '8453': 'https://safe-transaction-base.safe.global/api',
-  '42161': 'https://safe-transaction-arbitrum.safe.global/api',
-  '42220': 'https://safe-transaction-celo.safe.global/api',
-  '43114': 'https://safe-transaction-avalanche.safe.global/api',
-  '59144': 'https://safe-transaction-linea.safe.global/api',
-  '81457': 'https://safe-transaction-blast.safe.global/api',
-  '84532': 'https://safe-transaction-base-sepolia.safe.global/api',
-  '534352': 'https://safe-transaction-scroll.safe.global/api',
-  '11155111': 'https://safe-transaction-sepolia.safe.global/api',
-  '1313161554': 'https://safe-transaction-aurora.safe.global/api'
+const TRANSACTION_SERVICE_URL = 'https://api.safe.global/tx-service'
+
+type NetworkShortName = {
+  shortName: string
+  chainId: bigint
+}
+
+export const networks: NetworkShortName[] = [
+  { chainId: 1n, shortName: 'eth' },
+  { chainId: 10n, shortName: 'oeth' },
+  { chainId: 56n, shortName: 'bnb' },
+  { chainId: 100n, shortName: 'gno' },
+  { chainId: 130n, shortName: 'unichain' },
+  { chainId: 137n, shortName: 'pol' },
+  { chainId: 146n, shortName: 'sonic' },
+  { chainId: 196n, shortName: 'okb' },
+  { chainId: 232n, shortName: 'lens' },
+  { chainId: 324n, shortName: 'zksync' },
+  { chainId: 480n, shortName: 'wc' },
+  { chainId: 1101n, shortName: 'zkevm' },
+  { chainId: 5000n, shortName: 'mantle' },
+  { chainId: 8453n, shortName: 'base' },
+  { chainId: 10200n, shortName: 'chi' },
+  { chainId: 42161n, shortName: 'arb1' },
+  { chainId: 43111n, shortName: 'hemi' },
+  { chainId: 57073n, shortName: 'ink' },
+  { chainId: 80094n, shortName: 'berachain' },
+  { chainId: 59144n, shortName: 'linea' },
+  { chainId: 42220n, shortName: 'celo' },
+  { chainId: 43114n, shortName: 'avax' },
+  { chainId: 84532n, shortName: 'basesep' },
+  { chainId: 534352n, shortName: 'scr' },
+  { chainId: 11155111n, shortName: 'sep' },
+  { chainId: 1313161554n, shortName: 'aurora' }
+]
+
+export const getNetworkShortName = (chainId: bigint): string => {
+  const network = networks.find((n) => n.chainId === chainId)
+  if (!network) {
+    throw new Error(`Network with chainId ${chainId} not found`)
+  }
+  return network.shortName
+}
+
+export const getTransactionServiceUrl = (chainId: bigint) => {
+  return `${TRANSACTION_SERVICE_URL}/${getNetworkShortName(chainId)}/api`
 }

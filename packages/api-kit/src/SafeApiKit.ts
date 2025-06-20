@@ -37,7 +37,7 @@ import {
   TokenInfoResponse,
   TransferListResponse
 } from '@safe-global/api-kit/types/safeTransactionServiceTypes'
-import { HttpMethod, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
+import { HttpMethod, HttpRequest, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
 import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import {
@@ -50,7 +50,7 @@ import {
   SafeOperationResponse,
   UserOperationV06
 } from '@safe-global/types-kit'
-import { TRANSACTION_SERVICE_URLS } from './utils/config'
+import { getTransactionServiceUrl } from './utils/config'
 import { isEmptyData } from './utils'
 import { getAddSafeOperationProps, isSafeOperation } from './utils/safeOperation'
 import { QUERY_PARAMS_MAP } from './utils/queryParamsMap'
@@ -60,19 +60,43 @@ export interface SafeApiKitConfig {
   chainId: bigint
   /** txServiceUrl - Safe Transaction Service URL */
   txServiceUrl?: string
+  /**
+   * apiKey - The API key to access the Safe Transaction Service.
+   * - Required if txServiceUrl is undefined
+   * - Required if txServiceUrl contains "safe.global" or "5afe.dev"
+   * - Optional otherwise
+   */
+  apiKey?: string
 }
 
 class SafeApiKit {
   #chainId: bigint
+  #apiKey?: string
   #txServiceBaseUrl: string
 
-  constructor({ chainId, txServiceUrl }: SafeApiKitConfig) {
+  constructor({ chainId, txServiceUrl, apiKey }: SafeApiKitConfig) {
     this.#chainId = chainId
 
     if (txServiceUrl) {
+      // If txServiceUrl contains safe.global or 5afe.dev, apiKey is mandatory
+      if (
+        (txServiceUrl.includes('api.safe.global') || txServiceUrl.includes('api.5afe.dev')) &&
+        !apiKey
+      ) {
+        throw new Error(
+          'apiKey is mandatory when using api.safe.global or api.5afe.dev domains. Please obtain your API key at https://developer.safe.global.'
+        )
+      }
       this.#txServiceBaseUrl = txServiceUrl
     } else {
-      const url = TRANSACTION_SERVICE_URLS[chainId.toString()]
+      // If txServiceUrl is not defined, apiKey is mandatory
+      if (!apiKey) {
+        throw new Error(
+          'apiKey is mandatory when txServiceUrl is not defined. Please obtain your API key at https://developer.safe.global.'
+        )
+      }
+
+      const url = getTransactionServiceUrl(chainId)
       if (!url) {
         throw new TypeError(
           `There is no transaction service available for chainId ${chainId}. Please set the txServiceUrl property to use a custom transaction service.`
@@ -81,6 +105,8 @@ class SafeApiKit {
 
       this.#txServiceBaseUrl = url
     }
+
+    this.#apiKey = apiKey
   }
 
   #isValidAddress(address: string) {
@@ -119,13 +145,17 @@ class SafeApiKit {
     })
   }
 
+  async #api<T>(request: HttpRequest): Promise<T> {
+    return sendRequest(request, this.#apiKey)
+  }
+
   /**
    * Returns the information and configuration of the service.
    *
    * @returns The information and configuration of the service
    */
   async getServiceInfo(): Promise<SafeServiceInfoResponse> {
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/about`,
       method: HttpMethod.Get
     })
@@ -137,7 +167,7 @@ class SafeApiKit {
    * @returns The list of Safe singletons
    */
   async getServiceSingletonsInfo(): Promise<SafeSingletonResponse[]> {
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/about/singletons`,
       method: HttpMethod.Get
     })
@@ -164,7 +194,7 @@ class SafeApiKit {
       dataDecoderRequest.to = to
     }
 
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/data-decoder/`,
       method: HttpMethod.Post,
       body: dataDecoderRequest
@@ -210,7 +240,7 @@ class SafeApiKit {
       url.searchParams.set('offset', offset.toString())
     }
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -256,7 +286,7 @@ class SafeApiKit {
       label,
       signature
     }
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v2/delegates/`,
       method: HttpMethod.Post,
       body
@@ -289,7 +319,7 @@ class SafeApiKit {
     const { address: delegator } = this.#getEip3770Address(delegatorAddress)
     const signature = await signDelegate(signer, delegate, this.#chainId)
 
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v2/delegates/${delegate}`,
       method: HttpMethod.Delete,
       body: {
@@ -309,7 +339,7 @@ class SafeApiKit {
       throw new Error('Invalid messageHash')
     }
 
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/`,
       method: HttpMethod.Get
     })
@@ -334,7 +364,7 @@ class SafeApiKit {
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<GetSafeMessageListOptions>(url, options)
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -351,7 +381,7 @@ class SafeApiKit {
       throw new Error('Invalid safeAddress')
     }
 
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/messages/`,
       method: HttpMethod.Post,
       body: addMessageOptions
@@ -368,7 +398,7 @@ class SafeApiKit {
       throw new Error('Invalid messageHash or signature')
     }
 
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/messages/${messageHash}/signatures/`,
       method: HttpMethod.Post,
       body: {
@@ -390,7 +420,7 @@ class SafeApiKit {
       throw new Error('Invalid owner address')
     }
     const { address } = this.#getEip3770Address(ownerAddress)
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/owners/${address}/safes/`,
       method: HttpMethod.Get
     })
@@ -409,7 +439,7 @@ class SafeApiKit {
       throw new Error('Invalid module address')
     }
     const { address } = this.#getEip3770Address(moduleAddress)
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/modules/${address}/safes/`,
       method: HttpMethod.Get
     })
@@ -427,7 +457,7 @@ class SafeApiKit {
     if (safeTxHash === '') {
       throw new Error('Invalid safeTxHash')
     }
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v2/multisig-transactions/${safeTxHash}/`,
       method: HttpMethod.Get
     })
@@ -446,7 +476,7 @@ class SafeApiKit {
     if (safeTxHash === '') {
       throw new Error('Invalid safeTxHash')
     }
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/multisig-transactions/${safeTxHash}/confirmations/`,
       method: HttpMethod.Get
     })
@@ -470,7 +500,7 @@ class SafeApiKit {
     if (signature === '') {
       throw new Error('Invalid signature')
     }
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/multisig-transactions/${safeTxHash}/confirmations/`,
       method: HttpMethod.Post,
       body: {
@@ -492,7 +522,7 @@ class SafeApiKit {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/`,
       method: HttpMethod.Get
     }).then((response: any) => {
@@ -521,7 +551,7 @@ class SafeApiKit {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/creation/`,
       method: HttpMethod.Get
     }).then((response: any) => {
@@ -554,7 +584,7 @@ class SafeApiKit {
       throw new Error('Invalid Safe address')
     }
     const { address } = this.#getEip3770Address(safeAddress)
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/safes/${address}/multisig-transactions/estimations/`,
       method: HttpMethod.Post,
       body: safeTransaction
@@ -587,7 +617,7 @@ class SafeApiKit {
     if (safeTxHash === '') {
       throw new Error('Invalid safeTxHash')
     }
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v2/safes/${safe}/multisig-transactions/`,
       method: HttpMethod.Post,
       body: {
@@ -622,7 +652,7 @@ class SafeApiKit {
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<GetIncomingTransactionsOptions>(url, options)
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -651,7 +681,7 @@ class SafeApiKit {
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<GetModuleTransactionsOptions>(url, options)
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -680,7 +710,7 @@ class SafeApiKit {
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<GetMultisigTransactionsOptions>(url, options)
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -728,7 +758,7 @@ class SafeApiKit {
       url.searchParams.set('offset', offset.toString())
     }
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -757,7 +787,7 @@ class SafeApiKit {
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<AllTransactionsOptions>(url, options)
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -802,7 +832,7 @@ class SafeApiKit {
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<TokenInfoListOptions>(url, options)
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -821,7 +851,7 @@ class SafeApiKit {
       throw new Error('Invalid token address')
     }
     const { address } = this.#getEip3770Address(tokenAddress)
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/tokens/${address}/`,
       method: HttpMethod.Get
     })
@@ -850,7 +880,7 @@ class SafeApiKit {
     // Check if options are given and add query parameters
     this.#addUrlQueryParams<TokenInfoListOptions>(url, options)
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -886,7 +916,7 @@ class SafeApiKit {
       throw new Error('SafeOperation hash must not be empty')
     }
 
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/`,
       method: HttpMethod.Get
     })
@@ -947,7 +977,7 @@ class SafeApiKit {
 
     const userOperationV06 = userOperation as UserOperationV06
 
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/safes/${safeAddress}/safe-operations/`,
       method: HttpMethod.Post,
       body: {
@@ -1000,7 +1030,7 @@ class SafeApiKit {
       url.searchParams.set('offset', offset.toString())
     }
 
-    return sendRequest({
+    return this.#api({
       url: url.toString(),
       method: HttpMethod.Get
     })
@@ -1024,7 +1054,7 @@ class SafeApiKit {
     if (!signature) {
       throw new Error('Invalid signature')
     }
-    return sendRequest({
+    return this.#api({
       url: `${this.#txServiceBaseUrl}/v1/safe-operations/${safeOperationHash}/confirmations/`,
       method: HttpMethod.Post,
       body: { signature }

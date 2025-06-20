@@ -13,7 +13,6 @@ const SIGNER_PK = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a
 const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 1/2 Safe (v1.4.1) with signer above being an owner + 4337 module enabled
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 const BUNDLER_URL = 'https://api.pimlico.io/v2/sepolia/rpc?apikey=pim_Vjs7ohRqWdvsjUegngf9Bg'
-const TX_SERVICE_URL = 'https://safe-transaction-sepolia.staging.5afe.dev/api'
 
 let safeApiKit: SafeApiKit
 let protocolKit: Safe
@@ -30,8 +29,7 @@ describe('addSafeOperation', () => {
   before(async () => {
     ;({ safeApiKit, protocolKit } = await getKits({
       safeAddress: SAFE_ADDRESS,
-      signer: SIGNER_PK,
-      txServiceUrl: TX_SERVICE_URL
+      signer: SIGNER_PK
     }))
 
     safe4337Pack = await Safe4337Pack.init({

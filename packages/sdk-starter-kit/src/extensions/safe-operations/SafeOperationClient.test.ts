@@ -64,7 +64,10 @@ describe('SafeOperationClient', () => {
     const bundlerClientMock = { send: jest.fn().mockResolvedValue('1') } as any
 
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
+    apiKit = new SafeApiKit({
+      chainId: 1n,
+      apiKey: 'apiKey'
+    }) as jest.Mocked<SafeApiKit>
     safe4337Pack = new Safe4337Pack({
       protocolKit,
       bundlerClient: bundlerClientMock,

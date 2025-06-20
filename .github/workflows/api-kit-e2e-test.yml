@@ -25,6 +25,8 @@ jobs:
         run: yarn build
 
       - name: Test
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
         run: |
           cd packages/api-kit
           yarn test:ci:ethers

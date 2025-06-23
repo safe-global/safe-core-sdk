@@ -87,7 +87,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
   #onchainIdentifier: string = ''
 
-  #nodeUrl?: string
   /**
    * Creates an instance of the Safe4337Pack.
    *
@@ -102,8 +101,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     entryPointAddress,
     safe4337ModuleAddress,
     safeWebAuthnSharedSignerAddress,
-    onchainAnalytics,
-    nodeUrl
+    onchainAnalytics
   }: Safe4337Options) {
     super(protocolKit)
 
@@ -114,7 +112,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
     this.#ENTRYPOINT_ADDRESS = entryPointAddress
     this.#SAFE_4337_MODULE_ADDRESS = safe4337ModuleAddress
     this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = safeWebAuthnSharedSignerAddress || '0x'
-    this.#nodeUrl = nodeUrl
 
     if (onchainAnalytics?.project) {
       const { project, platform } = onchainAnalytics
@@ -385,11 +382,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
     }
 
-    let nodeUrl = undefined
-    if (typeof provider == 'string') {
-      nodeUrl = provider
-    }
-
     return new Safe4337Pack({
       chainId: BigInt(chainId),
       protocolKit,
@@ -399,8 +391,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       entryPointAddress: selectedEntryPoint!,
       safe4337ModuleAddress,
       safeWebAuthnSharedSignerAddress,
-      onchainAnalytics,
-      nodeUrl
+      onchainAnalytics
     })
   }
 
@@ -418,12 +409,17 @@ export class Safe4337Pack extends RelayKitBasePack<{
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<BaseSafeOperation> {
     const threshold = await this.protocolKit.getThreshold()
+    const nodeUrl = this.protocolKit.getSafeProvider().getExternalProvider().transport.url
+
+    if (nodeUrl == null) {
+      throw new Error('Invalid provider/nodeUrl.')
+    }
     const preEstimationData = await feeEstimator?.preEstimateUserOperationGas?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.getUserOperation(),
       paymasterOptions: this.#paymasterOptions,
-      nodeUrl: this.#nodeUrl,
+      nodeUrl: nodeUrl,
       chainId: this.#chainId
     })
 
@@ -464,7 +460,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
       },
       paymasterOptions: this.#paymasterOptions,
-      nodeUrl: this.#nodeUrl,
+      nodeUrl: nodeUrl,
       chainId: this.#chainId
     })
 

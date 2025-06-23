@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/relay-kit",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "description": "SDK for Safe Smart Accounts with support for ERC-4337 and Relay",
   "types": "dist/src/index.d.ts",
   "main": "dist/cjs/src/index.cjs",
@@ -56,8 +56,8 @@
   },
   "dependencies": {
     "@gelatonetwork/relay-sdk": "^5.6.0",
-    "@safe-global/protocol-kit": "^6.0.4",
-    "@safe-global/safe-modules-deployments": "^2.2.8",
+    "@safe-global/protocol-kit": "^6.0.5",
+    "@safe-global/safe-modules-deployments": "^2.2.9",
     "@safe-global/types-kit": "^2.0.1",
     "semver": "^7.7.1",
     "viem": "^2.21.8"

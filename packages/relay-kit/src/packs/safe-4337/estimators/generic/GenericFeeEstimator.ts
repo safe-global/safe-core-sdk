@@ -10,7 +10,6 @@ import {
   userOperationToHexValues
 } from '@safe-global/relay-kit/packs/safe-4337/utils'
 import { RPC_4337_CALLS } from '@safe-global/relay-kit/packs/safe-4337/constants'
-import { PaymasterRpcSchema } from './types'
 
 export type GenericFeeEstimatorOverrides = {
   callGasLimit?: bigint
@@ -58,7 +57,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
     let paymasterStubDataRes = {}
 
     if (paymasterOptions) {
-      const paymasterClient = createBundlerClient<PaymasterRpcSchema>(paymasterOptions.paymasterUrl)
+      const paymasterClient = createBundlerClient(paymasterOptions.paymasterUrl)
       const context =
         'paymasterTokenAddress' in paymasterOptions
           ? {
@@ -113,7 +112,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
 
     if (!paymasterOptions) return {}
 
-    const paymasterClient = createBundlerClient<PaymasterRpcSchema>(paymasterOptions.paymasterUrl)
+    const paymasterClient = createBundlerClient(paymasterOptions.paymasterUrl)
     if (paymasterOptions.isSponsored) {
       const params: [UserOperationStringValues, string, string, Record<string, any>?] = [
         userOperationToHexValues(userOperation, entryPoint),

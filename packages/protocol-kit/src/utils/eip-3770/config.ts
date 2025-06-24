@@ -266,6 +266,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 13337n, shortName: 'beam-testnet' },
   { chainId: 13371n, shortName: 'imx' },
   { chainId: 13473n, shortName: 'imx-testnet' },
+  { chainId: 13505n, shortName: 'gravitysep' },
   { chainId: 13746n, shortName: 'g7t' },
   { chainId: 14800n, shortName: 'vana-moksha' },
   { chainId: 17000n, shortName: 'holesky' },

@@ -4,23 +4,32 @@ export enum HttpMethod {
   Delete = 'delete'
 }
 
-interface HttpRequest {
+export interface HttpRequest {
   url: string
   method: HttpMethod
   body?: any
 }
 
-export async function sendRequest<T>({ url, method, body }: HttpRequest): Promise<T> {
+export async function sendRequest<T>(
+  { url, method, body }: HttpRequest,
+  apiKey?: string
+): Promise<T> {
   const fetch = await (typeof window === 'undefined'
     ? import('node-fetch').then((m) => m.default)
     : Promise.resolve(window.fetch))
 
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  }
+
+  if (apiKey) {
+    headers['Authorization'] = `Bearer ${apiKey}`
+  }
+
   const response = await fetch(url, {
     method,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
+    headers,
     body: JSON.stringify(body)
   })
 

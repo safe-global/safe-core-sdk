@@ -33,7 +33,10 @@ describe('SafeClient', () => {
 
   beforeEach(() => {
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
+    apiKit = new SafeApiKit({
+      chainId: 1n,
+      apiKey: 'apiKey'
+    }) as jest.Mocked<SafeApiKit>
     safeMessageClient = new SafeMessageClient(protocolKit, apiKit)
 
     apiKit.getMessage = jest.fn().mockResolvedValue(MESSAGE_RESPONSE)

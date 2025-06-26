@@ -145,7 +145,7 @@ export type EstimateFeeFunctionProps = {
   bundlerUrl: string
   entryPoint: string
   paymasterOptions?: PaymasterOptions
-  chainId?: bigint
+  protocolKit?: Safe
 }
 
 export type EstimateFeeFunction = ({
@@ -158,7 +158,6 @@ export type EstimateFeeFunction = ({
 export interface IFeeEstimator {
   preEstimateUserOperationGas?: EstimateFeeFunction
   postEstimateUserOperationGas?: EstimateFeeFunction
-  defaultVerificationGasLimitOverhead?: bigint
 }
 
 export type EstimateFeeProps = {

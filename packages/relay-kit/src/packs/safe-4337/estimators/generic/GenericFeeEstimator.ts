@@ -28,7 +28,7 @@ export type GenericFeeEstimatorOverrides = {
  * - postEstimateUserOperationGas: Adjust the userOperation values returned after calling the eth_estimateUserOperation method.
  */
 export class GenericFeeEstimator implements IFeeEstimator {
-  defaultVerificationGasLimitOverhead?: bigint
+  defaultVerificationGasLimitOverhead: bigint
   overrides: GenericFeeEstimatorOverrides
   nodeUrl: string
 
@@ -44,17 +44,18 @@ export class GenericFeeEstimator implements IFeeEstimator {
     userOperation,
     entryPoint,
     paymasterOptions,
-    chainId
+    protocolKit
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     bundlerUrl
-    if (chainId == null) {
-      throw new Error("Can't use GenericFeeEstimator if chainId is null.")
+    if (protocolKit == null) {
+      throw new Error("Can't use GenericFeeEstimator if protocolKit is null.")
     }
 
     let feeDataRes: EstimateGasData = {}
     let paymasterStubDataRes = {}
 
     if (paymasterOptions) {
+      const chainId = await protocolKit.getChainId()
       const paymasterClient = createBundlerClient(paymasterOptions.paymasterUrl)
       const context =
         'paymasterTokenAddress' in paymasterOptions
@@ -91,25 +92,34 @@ export class GenericFeeEstimator implements IFeeEstimator {
     feeDataRes.maxPriorityFeePerGas =
       this.overrides.maxPriorityFeePerGas ?? feeDataRes.maxPriorityFeePerGas
 
-    return {
+    const result = {
       ...feeDataRes,
       ...paymasterStubDataRes
     }
+    if (result.verificationGasLimit != null) {
+      const threshold = await protocolKit.getThreshold()
+      result.verificationGasLimit = (
+        BigInt(result.verificationGasLimit) +
+        BigInt(threshold) * this.defaultVerificationGasLimitOverhead
+      ).toString()
+    }
+    return result
   }
 
   async postEstimateUserOperationGas({
     userOperation,
     entryPoint,
     paymasterOptions,
-    chainId
+    protocolKit
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
-    if (chainId == null) {
-      throw new Error("Can't use GenericFeeEstimator if chainId is null.")
+    if (protocolKit == null) {
+      throw new Error("Can't use GenericFeeEstimator if protocolKit is null.")
     }
 
     if (!paymasterOptions) return {}
 
     const paymasterClient = createBundlerClient(paymasterOptions.paymasterUrl)
+    const chainId = await protocolKit.getChainId()
     if (paymasterOptions.isSponsored) {
       const params: [UserOperationStringValues, string, string, Record<string, any>?] = [
         userOperationToHexValues(userOperation, entryPoint),
@@ -139,6 +149,16 @@ export class GenericFeeEstimator implements IFeeEstimator {
       ]
     })
 
+    if (
+      'verificationGasLimit' in erc20PaymasterData &&
+      erc20PaymasterData.verificationGasLimit != null
+    ) {
+      const threshold = await protocolKit.getThreshold()
+      erc20PaymasterData.verificationGasLimit = (
+        BigInt(erc20PaymasterData.verificationGasLimit) +
+        BigInt(threshold) * this.defaultVerificationGasLimitOverhead
+      ).toString()
+    }
     return erc20PaymasterData
   }
 

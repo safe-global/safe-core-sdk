@@ -30,11 +30,13 @@ export type GenericFeeEstimatorOverrides = {
 export class GenericFeeEstimator implements IFeeEstimator {
   defaultVerificationGasLimitOverhead?: bigint
   overrides: GenericFeeEstimatorOverrides
+  nodeUrl: string
 
-  constructor(overrides: GenericFeeEstimatorOverrides = {}) {
+  constructor(nodeUrl: string, overrides: GenericFeeEstimatorOverrides = {}) {
     this.defaultVerificationGasLimitOverhead =
       overrides.defaultVerificationGasLimitOverhead ?? 35_000n
     this.overrides = overrides
+    this.nodeUrl = nodeUrl
   }
 
   async preEstimateUserOperationGas({
@@ -42,15 +44,11 @@ export class GenericFeeEstimator implements IFeeEstimator {
     userOperation,
     entryPoint,
     paymasterOptions,
-    nodeUrl,
     chainId
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     bundlerUrl
-    if (nodeUrl == null || chainId == null) {
-      throw new Error("Can't use GenericFeeEstimator if nodeUrl or chainId is null.")
-    }
-    if (typeof nodeUrl != 'string') {
-      throw new Error("Can't use GenericFeeEstimator if nodeUrl is not a string.")
+    if (chainId == null) {
+      throw new Error("Can't use GenericFeeEstimator if chainId is null.")
     }
 
     let feeDataRes: EstimateGasData = {}
@@ -66,7 +64,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
           : (paymasterOptions.paymasterContext ?? {})
 
       const [feeData, paymasterStubData] = await Promise.all([
-        this.#getUserOperationGasPrices(nodeUrl),
+        this.#getUserOperationGasPrices(this.nodeUrl),
         paymasterClient.request({
           method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA,
           params: [
@@ -80,7 +78,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
       feeDataRes = feeData
       paymasterStubDataRes = paymasterStubData
     } else {
-      const feeData = await this.#getUserOperationGasPrices(nodeUrl)
+      const feeData = await this.#getUserOperationGasPrices(this.nodeUrl)
       feeDataRes = feeData
     }
 
@@ -103,11 +101,10 @@ export class GenericFeeEstimator implements IFeeEstimator {
     userOperation,
     entryPoint,
     paymasterOptions,
-    nodeUrl,
     chainId
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
-    if (nodeUrl == null || chainId == null) {
-      throw new Error("Can't use GenericFeeEstimator if nodeUrl or chainId is null.")
+    if (chainId == null) {
+      throw new Error("Can't use GenericFeeEstimator if chainId is null.")
     }
 
     if (!paymasterOptions) return {}

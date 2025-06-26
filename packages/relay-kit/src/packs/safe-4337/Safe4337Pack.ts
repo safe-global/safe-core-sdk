@@ -419,7 +419,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.getUserOperation(),
       paymasterOptions: this.#paymasterOptions,
-      nodeUrl: nodeUrl,
       chainId: this.#chainId
     })
 
@@ -460,7 +459,6 @@ export class Safe4337Pack extends RelayKitBasePack<{
         signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
       },
       paymasterOptions: this.#paymasterOptions,
-      nodeUrl: nodeUrl,
       chainId: this.#chainId
     })
 

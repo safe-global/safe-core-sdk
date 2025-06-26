@@ -34,7 +34,7 @@ async function main() {
           data: '0x'
       }],
       options: {
-        feeEstimator: new GenericFeeEstimator()
+        feeEstimator: new GenericFeeEstimator(RPC_URL)
       }
   })
 

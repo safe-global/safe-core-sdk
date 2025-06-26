@@ -146,7 +146,6 @@ export type EstimateFeeFunctionProps = {
   bundlerUrl: string
   entryPoint: string
   paymasterOptions?: PaymasterOptions
-  nodeUrl?: string
   chainId?: bigint
 }
 

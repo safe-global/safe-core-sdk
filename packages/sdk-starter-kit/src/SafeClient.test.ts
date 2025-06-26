@@ -1,6 +1,5 @@
 import Safe, * as protocolKitModule from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit'
-
 import * as utils from './utils'
 import { SafeClient } from './SafeClient'
 import { MESSAGES, SafeClientTxStatus } from './constants'
@@ -46,7 +45,10 @@ describe('SafeClient', () => {
 
   beforeEach(() => {
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({ chainId: 1n }) as jest.Mocked<SafeApiKit>
+    apiKit = new SafeApiKit({
+      chainId: 1n,
+      apiKey: 'apiKey'
+    }) as jest.Mocked<SafeApiKit>
 
     safeClient = new SafeClient(protocolKit, apiKit)
 

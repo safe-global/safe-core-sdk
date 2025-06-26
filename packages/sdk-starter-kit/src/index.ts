@@ -98,7 +98,11 @@ async function getApiKitInstance(
 ): Promise<SafeApiKit> {
   const chainId = await protocolKit.getChainId()
 
-  return new SafeApiKit({ chainId, txServiceUrl: config.txServiceUrl })
+  return new SafeApiKit({
+    chainId,
+    apiKey: config.apiKey,
+    txServiceUrl: config.txServiceUrl
+  })
 }
 
 export * from './types'

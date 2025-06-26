@@ -409,11 +409,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<BaseSafeOperation> {
     const threshold = await this.protocolKit.getThreshold()
-    const nodeUrl = this.protocolKit.getSafeProvider().getExternalProvider().transport.url
 
-    if (nodeUrl == null) {
-      throw new Error('Invalid provider/nodeUrl.')
-    }
     const preEstimationData = await feeEstimator?.preEstimateUserOperationGas?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,

@@ -40,17 +40,11 @@ export class GenericFeeEstimator implements IFeeEstimator {
   }
 
   async preEstimateUserOperationGas({
-    bundlerUrl, // eslint-disable-line @typescript-eslint/no-unused-vars
     userOperation,
     entryPoint,
     paymasterOptions,
     protocolKit
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
-    bundlerUrl
-    if (protocolKit == null) {
-      throw new Error("Can't use GenericFeeEstimator if protocolKit is null.")
-    }
-
     let feeDataRes: EstimateGasData = {}
     let paymasterStubDataRes = {}
 
@@ -121,7 +115,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
     const paymasterClient = createBundlerClient(paymasterOptions.paymasterUrl)
     const chainId = await protocolKit.getChainId()
     if (paymasterOptions.isSponsored) {
-      const params: [UserOperationStringValues, string, string, Record<string, any>?] = [
+      const params: [UserOperationStringValues, string, string, Record<string, unknown>?] = [
         userOperationToHexValues(userOperation, entryPoint),
         entryPoint,
         toHex(chainId)

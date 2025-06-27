@@ -1,10 +1,10 @@
+import { createPublicClient, http, toHex } from 'viem'
 import { EstimateGasData } from '@safe-global/types-kit'
 import {
   EstimateFeeFunctionProps,
   IFeeEstimator,
   UserOperationStringValues
 } from '@safe-global/relay-kit/packs/safe-4337/types'
-import { createPublicClient, http } from 'viem'
 import {
   createBundlerClient,
   userOperationToHexValues
@@ -71,7 +71,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
           params: [
             userOperationToHexValues(userOperation, entryPoint),
             entryPoint,
-            '0x' + chainId.toString(16),
+            toHex(chainId),
             context
           ]
         })
@@ -124,7 +124,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
       const params: [UserOperationStringValues, string, string, Record<string, any>?] = [
         userOperationToHexValues(userOperation, entryPoint),
         entryPoint,
-        '0x' + chainId.toString(16)
+        toHex(chainId)
       ]
 
       if (paymasterOptions.paymasterContext) {
@@ -144,7 +144,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
       params: [
         userOperationToHexValues(userOperation, entryPoint),
         entryPoint,
-        '0x' + chainId.toString(16),
+        toHex(chainId),
         { token: paymasterOptions.paymasterTokenAddress }
       ]
     })

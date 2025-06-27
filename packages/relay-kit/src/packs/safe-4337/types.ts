@@ -145,15 +145,10 @@ export type EstimateFeeFunctionProps = {
   bundlerUrl: string
   entryPoint: string
   paymasterOptions?: PaymasterOptions
-  protocolKit?: Safe
+  protocolKit: Safe
 }
 
-export type EstimateFeeFunction = ({
-  userOperation,
-  bundlerUrl,
-  entryPoint,
-  paymasterOptions
-}: EstimateFeeFunctionProps) => Promise<EstimateGasData>
+export type EstimateFeeFunction = (props: EstimateFeeFunctionProps) => Promise<EstimateGasData>
 
 export interface IFeeEstimator {
   preEstimateUserOperationGas?: EstimateFeeFunction

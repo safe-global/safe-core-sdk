@@ -2,6 +2,7 @@ import { PimlicoFeeEstimator } from './PimlicoFeeEstimator'
 import { fixtures } from '@safe-global/relay-kit/test-utils'
 import { PIMLICO_CUSTOM_RPC_4337_CALLS } from './types'
 import { RPC_4337_CALLS } from '../../constants'
+import Safe from '@safe-global/protocol-kit'
 
 jest.mock('../../utils', () => ({
   ...jest.requireActual('../../utils'),
@@ -31,7 +32,8 @@ describe('PimlicoFeeEstimator', () => {
     const sponsoredGasEstimation = await estimator.preEstimateUserOperationGas({
       bundlerUrl: fixtures.BUNDLER_URL,
       userOperation: fixtures.USER_OPERATION_V07,
-      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07
+      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,
+      protocolKit: new Safe()
     })
 
     expect(sponsoredGasEstimation).toEqual({
@@ -49,7 +51,8 @@ describe('PimlicoFeeEstimator', () => {
         paymasterAddress: fixtures.PAYMASTER_ADDRESS,
         paymasterTokenAddress: fixtures.PAYMASTER_TOKEN_ADDRESS
       },
-      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07
+      entryPoint: fixtures.ENTRYPOINT_ADDRESS_V07,
+      protocolKit: new Safe()
     })
 
     expect(paymasterGasEstimation).toEqual(fixtures.SPONSORED_GAS_ESTIMATION)

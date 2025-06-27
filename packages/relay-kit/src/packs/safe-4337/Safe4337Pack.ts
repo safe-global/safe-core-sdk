@@ -409,11 +409,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
     feeEstimator = new PimlicoFeeEstimator()
   }: EstimateFeeProps): Promise<BaseSafeOperation> {
     const threshold = await this.protocolKit.getThreshold()
+
     const preEstimationData = await feeEstimator?.preEstimateUserOperationGas?.({
       bundlerUrl: this.#BUNDLER_URL,
       entryPoint: this.#ENTRYPOINT_ADDRESS,
       userOperation: safeOperation.getUserOperation(),
-      paymasterOptions: this.#paymasterOptions
+      paymasterOptions: this.#paymasterOptions,
+      protocolKit: this.protocolKit
     })
 
     if (preEstimationData) {
@@ -442,7 +444,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
         ...safeOperation.getUserOperation(),
         signature: getDummySignature(this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS, threshold)
       },
-      paymasterOptions: this.#paymasterOptions
+      paymasterOptions: this.#paymasterOptions,
+      protocolKit: this.protocolKit
     })
 
     if (postEstimationData) {

@@ -22,10 +22,14 @@ const playgroundRelayKitPaths = {
   'gelato-sponsored-transaction': 'relay-kit/gelato-sponsored-transaction',
   'userop-api-kit-interoperability': 'relay-kit/userop-api-kit-interoperability',
   userop: 'relay-kit/userop',
+  'userop-generic-estimator': 'relay-kit/userop-generic-estimator',
   'userop-counterfactual': 'relay-kit/userop-counterfactual',
+  'userop-counterfactual-generic-estimator': 'relay-kit/userop-counterfactual-generic-estimator',
   'userop-erc20-paymaster': 'relay-kit/userop-erc20-paymaster',
+  'userop-erc20-paymaster-generic-estimator': 'relay-kit/userop-erc20-paymaster-generic-estimator',
   'userop-erc20-paymaster-counterfactual': 'relay-kit/userop-erc20-paymaster-counterfactual',
   'userop-verifying-paymaster': 'relay-kit/userop-verifying-paymaster',
+  'userop-verifying-paymaster-generic-estimator': 'relay-kit/userop-verifying-paymaster-generic-estimator',
   'userop-verifying-paymaster-counterfactual':
     'relay-kit/userop-verifying-paymaster-counterfactual',
   'userop-parallel-execution': 'relay-kit/userop-parallel-execution'

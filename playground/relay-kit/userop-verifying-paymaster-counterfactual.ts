@@ -13,7 +13,7 @@ const {
   CHAIN_ID = '',
   BUNDLER_URL = '',
   PAYMASTER_URL = '',
-  POLICY_ID
+  SPONSORSHIP_POLICY_ID
 } = process.env
 
 // PIM test token contract address
@@ -31,7 +31,7 @@ async function main() {
     safeModulesVersion: '0.3.0', // Blank or 0.3.0 for Entrypoint v0.7, 0.2.0 for Entrypoint v0.6
     paymasterOptions: {
       isSponsored: true,
-      sponsorshipPolicyId: POLICY_ID,
+      sponsorshipPolicyId: SPONSORSHIP_POLICY_ID,
       paymasterUrl: PAYMASTER_URL
     },
     options: {

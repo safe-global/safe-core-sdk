@@ -13,7 +13,7 @@ const {
   CHAIN_ID = '',
   BUNDLER_URL = '',
   PAYMASTER_URL = '',
-  POLICY_ID
+  SPONSORSHIP_POLICY_ID
 } = process.env
 
 // PIM test token contract address
@@ -30,7 +30,7 @@ async function main() {
     paymasterOptions: {
       isSponsored: true,
       paymasterUrl: PAYMASTER_URL,
-      sponsorshipPolicyId: POLICY_ID
+      sponsorshipPolicyId: SPONSORSHIP_POLICY_ID
     },
     options: {
       safeAddress: SAFE_ADDRESS

@@ -13,7 +13,7 @@ const {
   CHAIN_ID = '',
   BUNDLER_URL = '',
   PAYMASTER_URL = '',
-  POLICY_ID
+  SPONSORSHIP_POLICY_ID
 } = process.env
 
 async function main() {
@@ -26,8 +26,7 @@ async function main() {
     paymasterOptions: {
       isSponsored: true,
       paymasterUrl: PAYMASTER_URL,
-      paymasterContext:{sponsorshipPolicyId: POLICY_ID}
-      //paymasterContext:{policyId: POLICY_ID}// for providers that use different key names for sponsorshipPolicyId
+      paymasterContext: { sponsorshipPolicyId: SPONSORSHIP_POLICY_ID }
     },
     options: {
       safeAddress: SAFE_ADDRESS
@@ -36,21 +35,20 @@ async function main() {
 
   // 2) Create SafeOperation
   const safeOperation = await safe4337Pack.createTransaction({
-    transactions:[{
-      to: '0xfaDDcFd59924F559AC24350C4b9dA44b57E62857',
-      value: '0x0',
-      data: '0x'
-    }],
+    transactions: [
+      {
+        to: '0xfaDDcFd59924F559AC24350C4b9dA44b57E62857',
+        value: '0x0',
+        data: '0x'
+      }
+    ],
     options: {
-      feeEstimator: new GenericFeeEstimator(
-          RPC_URL,
-          {
-            //maxFeePerGasMultiplier:1.1, //defaults to 1.5
-            //maxPriorityFeePerGasMultiplier: 1.1 //defaults to 1.5
-            //maxFeePerGas: 142220151n, //override with exact values
-            //maxPriorityFeePerGas: 110000000n //override with exact values
-          }
-      )
+      feeEstimator: new GenericFeeEstimator(RPC_URL, {
+        //maxFeePerGasMultiplier:1.1, //defaults to 1.5
+        //maxPriorityFeePerGasMultiplier: 1.1 //defaults to 1.5
+        //maxFeePerGas: 142220151n, //override with exact values
+        //maxPriorityFeePerGas: 110000000n //override with exact values
+      })
     }
   })
 

@@ -30,13 +30,13 @@ export type GenericFeeEstimatorOverrides = {
 export class GenericFeeEstimator implements IFeeEstimator {
   defaultVerificationGasLimitOverhead: bigint
   overrides: GenericFeeEstimatorOverrides
-  nodeUrl: string
+  rpcUrl: string
 
-  constructor(nodeUrl: string, overrides: GenericFeeEstimatorOverrides = {}) {
+  constructor(rpcUrl: string, overrides: GenericFeeEstimatorOverrides = {}) {
     this.defaultVerificationGasLimitOverhead =
       overrides.defaultVerificationGasLimitOverhead ?? 35_000n
     this.overrides = overrides
-    this.nodeUrl = nodeUrl
+    this.rpcUrl = rpcUrl
   }
 
   async preEstimateUserOperationGas({
@@ -59,7 +59,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
           : (paymasterOptions.paymasterContext ?? {})
 
       const [feeData, paymasterStubData] = await Promise.all([
-        this.#getUserOperationGasPrices(this.nodeUrl),
+        this.#getUserOperationGasPrices(this.rpcUrl),
         paymasterClient.request({
           method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA,
           params: [
@@ -73,7 +73,7 @@ export class GenericFeeEstimator implements IFeeEstimator {
       feeDataRes = feeData
       paymasterStubDataRes = paymasterStubData
     } else {
-      const feeData = await this.#getUserOperationGasPrices(this.nodeUrl)
+      const feeData = await this.#getUserOperationGasPrices(this.rpcUrl)
       feeDataRes = feeData
     }
 
@@ -157,10 +157,10 @@ export class GenericFeeEstimator implements IFeeEstimator {
   }
 
   async #getUserOperationGasPrices(
-    nodeUrl: string
+    rpcUrl: string
   ): Promise<Pick<EstimateGasData, 'maxFeePerGas' | 'maxPriorityFeePerGas'>> {
     const client = createPublicClient({
-      transport: http(nodeUrl)
+      transport: http(rpcUrl)
     })
     const [block, maxPriorityFeePerGas] = await Promise.all([
       client.getBlock({ blockTag: 'latest' }),

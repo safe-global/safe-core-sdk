@@ -1,6 +1,5 @@
 import dotenv from 'dotenv'
-import { parseEther } from 'viem'
-import { Safe4337Pack } from '@safe-global/relay-kit'
+import { GenericFeeEstimator, Safe4337Pack } from '@safe-global/relay-kit'
 import { setup4337Playground, waitForOperationToFinish } from '../utils'
 
 dotenv.config({ path: './playground/relay-kit/.env' })
@@ -33,8 +32,8 @@ async function main() {
 
   // 2) Setup Playground
   const { transactions, timestamp } = await setup4337Playground(safe4337Pack, {
-    nativeTokenAmount: parseEther('0.01'), // Increase this value when is not enough to cover the gas fees
-    erc20TokenAmount: 200_000n,
+    // nativeTokenAmount: parseEther('0.01'), // Increase this value when is not enough to cover the gas fees
+    // erc20TokenAmount: 200_000n,
     erc20TokenContractAddress: pimlicoTokenAddress
   })
 
@@ -44,6 +43,8 @@ async function main() {
     options: {
       validAfter: Number(timestamp - 60_000n),
       validUntil: Number(timestamp + 60_000n)
+      // Change the fee estimator to use a custom one
+      // feeEstimator: new GenericFeeEstimator(RPC_URL, {})
     }
   })
 

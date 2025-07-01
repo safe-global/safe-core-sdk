@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import { parseEther } from 'viem'
 import { GenericFeeEstimator, Safe4337Pack } from '@safe-global/relay-kit'
 import { setup4337Playground, waitForOperationToFinish } from '../utils'
 
@@ -32,8 +33,8 @@ async function main() {
 
   // 2) Setup Playground
   const { transactions, timestamp } = await setup4337Playground(safe4337Pack, {
-    // nativeTokenAmount: parseEther('0.01'), // Increase this value when is not enough to cover the gas fees
-    // erc20TokenAmount: 200_000n,
+    nativeTokenAmount: parseEther('0.01'), // Increase this value when is not enough to cover the gas fees
+    erc20TokenAmount: 200_000n,
     erc20TokenContractAddress: pimlicoTokenAddress
   })
 

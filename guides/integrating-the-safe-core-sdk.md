@@ -264,25 +264,39 @@ type SafeMultisigTransactionResponse = {
   data?: string
   operation: number
   gasToken: string
-  safeTxGas: number
-  baseGas: number
+  safeTxGas: string
+  baseGas: string
   gasPrice: string
   refundReceiver?: string
-  nonce: number
-  executionDate: string
+  nonce: string
+  executionDate: string | null
   submissionDate: string
   modified: string
   blockNumber?: number
-  transactionHash: string
+  transactionHash: string | null
   safeTxHash: string
-  executor?: string
+  executor: string | null
+  proposer: string | null
+  proposedByDelegate: string | null
   isExecuted: boolean
-  isSuccessful?: boolean
-  ethGasPrice?: string
-  gasUsed?: number
-  fee?: string
+  isSuccessful: boolean | null
+  ethGasPrice: string | null
+  maxFeePerGas: string | null
+  maxPriorityFeePerGas: string | null
+  gasUsed: number | null
+  fee: string | null
   origin: string
-  dataDecoded?: string
+  dataDecoded?: {
+    method: string
+    parameters: [
+      {
+        name: string
+        type: string
+        value: string
+        valueDecoded?: ValueDecoded[]
+      }
+    ]
+  }
   confirmationsRequired: number
   confirmations?: [
     {

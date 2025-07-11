@@ -30,6 +30,7 @@ type PredictedSafeOptions = {
 export type SponsoredPaymasterOption = {
   isSponsored: true
   sponsorshipPolicyId?: string
+  paymasterContext?: Record<string, unknown>
 }
 
 export type ERC20PaymasterOption = {
@@ -146,14 +147,10 @@ export type EstimateFeeFunctionProps = {
   bundlerUrl: string
   entryPoint: string
   paymasterOptions?: PaymasterOptions
+  protocolKit: Safe
 }
 
-export type EstimateFeeFunction = ({
-  userOperation,
-  bundlerUrl,
-  entryPoint,
-  paymasterOptions
-}: EstimateFeeFunctionProps) => Promise<EstimateGasData>
+export type EstimateFeeFunction = (props: EstimateFeeFunctionProps) => Promise<EstimateGasData>
 
 export interface IFeeEstimator {
   preEstimateUserOperationGas?: EstimateFeeFunction
@@ -183,7 +180,7 @@ export type UserOperationStringValues = Omit<
 export type Safe4337RpcSchema = [
   {
     Method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA
-    Parameters: [UserOperationStringValues, string, string, { token: string }?]
+    Parameters: [UserOperationStringValues, string, string, { token?: string }?]
     ReturnType:
       | {
           paymasterAndData: string
@@ -197,7 +194,7 @@ export type Safe4337RpcSchema = [
   },
   {
     Method: RPC_4337_CALLS.GET_PAYMASTER_DATA
-    Parameters: [UserOperationStringValues, string, string, { token: string }?]
+    Parameters: [UserOperationStringValues, string, string, { token?: string }?]
     ReturnType:
       | {
           paymasterAndData: string

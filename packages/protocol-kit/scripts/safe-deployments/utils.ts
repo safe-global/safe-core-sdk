@@ -49,9 +49,17 @@ export function getLocalNetworksConfig(): string[] {
  * @returns {Promise<string>} A promise that resolves with the chain shortName
  */
 export async function getChainShortName(chainId: string): Promise<string> {
-  const response = await axios.get(
-    `https://raw.githubusercontent.com/ethereum-lists/chains/master/_data/chains/eip155-${chainId.toString()}.json`
-  )
+  let response
+
+  if (chainId === '81224') {
+    response = await axios.get(
+      `https://raw.githubusercontent.com/JasonwLi/chains/435863dabe1152380a6f9a02721aedfd2a237ad9/_data/chains/eip155-81224.json`
+    )
+  } else {
+    response = await axios.get(
+      `https://raw.githubusercontent.com/ethereum-lists/chains/master/_data/chains/eip155-${chainId.toString()}.json`
+    )
+  }
   if (!response.data.shortName) {
     throw new Error('Failed to retrieve chain shortName')
   }

@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/relay-kit",
-  "version": "3.4.7",
+  "version": "3.4.6",
   "description": "SDK for Safe Smart Accounts with support for ERC-4337 and Relay",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

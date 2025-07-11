@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "2.5.12",
+  "version": "2.5.11",
   "description": "SDK that facilitates the interaction with the Safe Transaction Service API",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

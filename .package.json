@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "dotenv": "^16.0.3",            // For managing .env files
+    "axios": "^1.5.0",              // For HTTP requests (e.g., Safe Transaction Service)
+    "zod": "^3.22.0",               // Schema validation (great with Safe data)
+    "viem": "^1.21.0"               // If you're using Viem instead of Ethers
+  }
+}

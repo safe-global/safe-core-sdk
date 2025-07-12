@@ -1,0 +1,36 @@
+name: Safe Core SDK CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  safe-sdk-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: 📦 Install dependencies
+        run: |
+          corepack enable
+          pnpm install
+
+      - name: 🔍 TypeScript Check
+        run: pnpm tsc --noEmit
+
+      - name: 🧪 Run Safe SDK script
+        run: pnpm ts-node scripts/safe-client.ts
+
+      - name: ✅ Done
+        run: echo "Safe SDK CI complete!"

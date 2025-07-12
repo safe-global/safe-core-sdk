@@ -1,51 +1,8 @@
 {
-  "name": "safe-core-sdk",
-  "private": true,
-  "scripts": {
-    "clean": "lerna clean",
-    "unbuild": "lerna run unbuild",
-    "build": "lerna run build --stream",
-    "lint:check": "eslint './packages/**/*.{js,jsx,ts,tsx}'",
-    "test": "FORCE_COLOR=1 lerna run test --stream",
-    "play": "ts-node ./playground/config/run.ts",
-    "format": "lerna run format && prettier --write \"playground/**/*.ts\"",
-    "prepare": "husky",
-    "generate-publish-info": "ts-node ./scripts/generate-publish-info.ts"
-  },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
-  },
-  "author": "Safe (https://safe.global)",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22.15.30",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "esbuild": "^0.25.0",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.3",
-    "husky": "^9.1.7",
-    "jest": "^29.7.0",
-    "lerna": "^8.2.0",
-    "lint-staged": "^15.4.3",
-    "prettier": "^3.4.2",
-    "rimraf": "^5.0.10",
-    "ts-jest": "^29.2.5",
-    "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.8",
-    "typescript": "^5.6.3"
-  },
-  "lint-staged": {
-    "./packages/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "./packages/**/*.{json,md}": [
-      "prettier --write"
-    ]
+  "dependencies": {
+    "@safe-global/protocol-kit": "^1.18.0",       // Safe Core SDK
+    "@safe-global/safe-core-sdk-types": "^1.13.0", // Types for Safe SDK
+    "@safe-global/safe-ethers-adapters": "^1.18.0", // For Ethers.js compatibility
+    "ethers": "^5.7.2" // Or ^6.x if you're using Ethers v6 (Safe SDK works best with v5)
   }
 }

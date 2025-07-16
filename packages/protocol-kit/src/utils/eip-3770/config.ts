@@ -136,7 +136,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 1329n, shortName: 'sei' },
   { chainId: 1337n, shortName: 'geth' },
   { chainId: 1424n, shortName: 'perennial' },
-  { chainId: 1439n, shortName: 'injective' },
+  { chainId: 1439n, shortName: 'injective-testnet' },
   { chainId: 1442n, shortName: 'testnet-zkEVM-mango' },
   { chainId: 1480n, shortName: 'vana' },
   { chainId: 1513n, shortName: 'Story' },

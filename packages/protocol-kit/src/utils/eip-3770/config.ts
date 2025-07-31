@@ -184,7 +184,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 2818n, shortName: 'morph' },
   { chainId: 3338n, shortName: 'PEAQ' },
   { chainId: 3501n, shortName: 'JFIN' },
-  { chainId: 3636n, shortName: 'BTNX' },
+  { chainId: 3636n, shortName: 'BTNXt' },
   { chainId: 3637n, shortName: 'BTNX' },
   { chainId: 3737n, shortName: 'csb' },
   { chainId: 3776n, shortName: 'astrzk' },

@@ -90,6 +90,9 @@ async function getChainShortNameFromEthereumLists(chainId: string): Promise<stri
   if (!response.data.shortName) {
     throw new Error('Failed to retrieve chain shortName from ethereum-lists')
   }
+  if (response.data.status) {
+    console.log(`WARNING: Chain ${chainId} status is ${response.data.status}`)
+  }
   return response.data.shortName
 }
 

@@ -15,7 +15,7 @@ jobs:
         provider: [ethers, viem]
         contract-version: [v1.0.0, v1.1.1, v1.2.0, v1.3.0, v1.4.1]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:

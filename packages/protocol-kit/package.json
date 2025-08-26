@@ -79,11 +79,11 @@
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
-    "@safe-global/safe-deployments": "^1.37.39",
-    "@safe-global/safe-modules-deployments": "^2.2.12",
+    "@safe-global/safe-deployments": "^1.37.42",
+    "@safe-global/safe-modules-deployments": "^2.2.14",
     "@safe-global/types-kit": "^3.0.0",
     "abitype": "^1.0.2",
-    "semver": "^7.7.1",
+    "semver": "^7.7.2",
     "viem": "^2.21.8"
   },
   "optionalDependencies": {

@@ -27,7 +27,7 @@ export async function waitForOperationToFinish(
   chainName: string,
   safe4337Pack: Safe4337Pack
 ) {
-  console.log(`https://jiffyscan.xyz/userOpHash/${userOperationHash}?network=${chainName}`)
+  console.log(`https://v2.jiffyscan.xyz/userOpHash/${userOperationHash}?network=${chainName}`)
 
   let userOperationReceipt = null
   while (!userOperationReceipt) {

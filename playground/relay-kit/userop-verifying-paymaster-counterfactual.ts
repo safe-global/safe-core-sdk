@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv'
-import { Safe4337Pack } from '@safe-global/relay-kit'
+import { GenericFeeEstimator, Safe4337Pack } from '@safe-global/relay-kit'
 import { setup4337Playground, waitForOperationToFinish } from '../utils'
 import { privateKeyToAccount } from 'viem/accounts'
 
@@ -13,7 +13,7 @@ const {
   CHAIN_ID = '',
   BUNDLER_URL = '',
   PAYMASTER_URL = '',
-  POLICY_ID
+  SPONSORSHIP_POLICY_ID
 } = process.env
 
 // PIM test token contract address
@@ -31,7 +31,7 @@ async function main() {
     safeModulesVersion: '0.3.0', // Blank or 0.3.0 for Entrypoint v0.7, 0.2.0 for Entrypoint v0.6
     paymasterOptions: {
       isSponsored: true,
-      sponsorshipPolicyId: POLICY_ID,
+      sponsorshipPolicyId: SPONSORSHIP_POLICY_ID,
       paymasterUrl: PAYMASTER_URL
     },
     options: {
@@ -53,6 +53,8 @@ async function main() {
     options: {
       validAfter: Number(timestamp - 60_000n),
       validUntil: Number(timestamp + 60_000n)
+      // Change the fee estimator to use a custom one
+      // feeEstimator: new GenericFeeEstimator(RPC_URL, {})
     }
   })
 

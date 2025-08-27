@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/sdk-starter-kit",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "SDK that provides the basic tools to interact with the Safe Smart Account.",
   "types": "dist/src/index.d.ts",
   "main": "dist/cjs/index.cjs",
@@ -46,8 +46,8 @@
   },
   "dependencies": {
     "@safe-global/api-kit": "^4.0.0",
-    "@safe-global/protocol-kit": "^6.1.0",
-    "@safe-global/relay-kit": "^4.0.5",
+    "@safe-global/protocol-kit": "^6.1.1",
+    "@safe-global/relay-kit": "^4.1.0",
     "@safe-global/types-kit": "^3.0.0",
     "viem": "^2.21.8"
   }

@@ -15,6 +15,9 @@ export * from './packs/safe-4337/utils'
 
 export * from './RelayKitBasePack'
 
+export { GenericFeeEstimator } from './packs/safe-4337/estimators/generic/GenericFeeEstimator'
+export { PimlicoFeeEstimator } from './packs/safe-4337/estimators/pimlico/PimlicoFeeEstimator'
+
 declare module 'abitype' {
   export interface Register {
     AddressType: string

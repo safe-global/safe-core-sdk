@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv'
-import { Safe4337Pack } from '@safe-global/relay-kit'
+import { GenericFeeEstimator, Safe4337Pack } from '@safe-global/relay-kit'
 import { parseEther } from 'viem'
 import { waitForOperationToFinish, setup4337Playground } from '../utils'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -43,6 +43,8 @@ async function main() {
     options: {
       validAfter: Number(timestamp - 60_000n),
       validUntil: Number(timestamp + 60_000n)
+      // Change the fee estimator to use a custom one
+      // feeEstimator: new GenericFeeEstimator(RPC_URL, {})
     }
   })
 

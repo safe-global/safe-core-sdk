@@ -1,3 +1,4 @@
+import { toHex } from 'viem'
 import { EstimateGasData } from '@safe-global/types-kit'
 import {
   BundlerClient,
@@ -22,11 +23,12 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
     bundlerUrl,
     userOperation,
     entryPoint,
-    paymasterOptions
+    paymasterOptions,
+    protocolKit
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     const bundlerClient = createBundlerClient<PimlicoCustomRpcSchema>(bundlerUrl)
     const feeData = await this.#getUserOperationGasPrices(bundlerClient)
-    const chainId = await this.#getChainId(bundlerClient)
+    const chainId = await protocolKit.getChainId()
 
     let paymasterStubData = {}
 
@@ -42,7 +44,12 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
           : undefined
       paymasterStubData = await paymasterClient.request({
         method: RPC_4337_CALLS.GET_PAYMASTER_STUB_DATA,
-        params: [userOperationToHexValues(userOperation, entryPoint), entryPoint, chainId, context]
+        params: [
+          userOperationToHexValues(userOperation, entryPoint),
+          entryPoint,
+          toHex(chainId),
+          context
+        ]
       })
     }
 
@@ -55,7 +62,8 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
   async postEstimateUserOperationGas({
     userOperation,
     entryPoint,
-    paymasterOptions
+    paymasterOptions,
+    protocolKit
   }: EstimateFeeFunctionProps): Promise<EstimateGasData> {
     if (!paymasterOptions) return {}
 
@@ -83,14 +91,14 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
       return sponsoredData
     }
 
-    const chainId = await this.#getChainId(paymasterClient)
+    const chainId = await protocolKit.getChainId()
 
     const erc20PaymasterData = await paymasterClient.request({
       method: RPC_4337_CALLS.GET_PAYMASTER_DATA,
       params: [
         userOperationToHexValues(userOperation, entryPoint),
         entryPoint,
-        chainId,
+        toHex(chainId),
         { token: paymasterOptions.paymasterTokenAddress }
       ]
     })
@@ -113,11 +121,5 @@ export class PimlicoFeeEstimator implements IFeeEstimator {
       maxFeePerGas: maxFeePerGas,
       maxPriorityFeePerGas: maxPriorityFeePerGas
     }
-  }
-
-  async #getChainId(client: BundlerClient<PimlicoCustomRpcSchema>): Promise<string> {
-    const chainId = await client.request({ method: 'eth_chainId' })
-
-    return chainId
   }
 }

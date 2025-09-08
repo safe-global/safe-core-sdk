@@ -1826,10 +1826,10 @@
   resolved "https://registry.yarnpkg.com/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz#82605342f3289dc6b99818f599a3409ec2cb3fdc"
   integrity sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==
 
-"@safe-global/safe-deployments@^1.37.42":
-  version "1.37.42"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.42.tgz#dea932a447fe2c76d894df8de4f0aed72ed7fcef"
-  integrity sha512-hu/GEQhO5lmHsSeVJavtVysdqy16VAumd3pgILN9bTj82ImlHWgkFNYXyeOSbjPvmizdnVVEUzH49yBmoM6oMQ==
+"@safe-global/safe-deployments@^1.37.43":
+  version "1.37.43"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.43.tgz#18d6e70775ba120b10491a5e49b3ba0abeda36cf"
+  integrity sha512-kIpMiQdGPiNn390cxuSA9a681jaoEMvz79grkmrb2eTJq4DjGbirtYRFDC6Pt6hZ75GE57/MhQe2MVF5RQy+rA==
   dependencies:
     semver "^7.6.2"
 

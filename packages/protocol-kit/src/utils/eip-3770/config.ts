@@ -178,6 +178,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 2039n, shortName: 'aleph' },
   { chainId: 2187n, shortName: 'g7' },
   { chainId: 2192n, shortName: 'snax' },
+  { chainId: 2201n, shortName: 'stable' },
   { chainId: 2221n, shortName: 'tkava' },
   { chainId: 2222n, shortName: 'kava' },
   { chainId: 2331n, shortName: 'rss3-testnet' },

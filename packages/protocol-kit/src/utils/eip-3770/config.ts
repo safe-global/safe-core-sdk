@@ -262,7 +262,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 9700n, shortName: 'MainnetDev' },
   { chainId: 9728n, shortName: 'boba-testnet' },
   { chainId: 9745n, shortName: 'plasma' },
-  { chainId: 9746n, shortName: 'plasma' },
+  { chainId: 9746n, shortName: 'plasma-testnet' },
   { chainId: 10000n, shortName: 'smartbch' },
   { chainId: 10001n, shortName: 'smartbchtest' },
   { chainId: 10081n, shortName: 'joct' },

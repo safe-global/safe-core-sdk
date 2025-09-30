@@ -15,6 +15,7 @@ import { SafeVersion } from '@safe-global/types-kit'
 import { isSafeConfigWithPredictedSafe } from '../utils/types'
 import SafeProvider from '../SafeProvider'
 import { getSafeContractVersion } from '@safe-global/protocol-kit/contracts/utils'
+import { detectSafeVersionFromMastercopy } from '../utils/mastercopyMatcher'
 
 class ContractManager {
   #contractNetworks?: ContractNetworksConfig
@@ -42,18 +43,36 @@ class ContractManager {
     if (isSafeConfigWithPredictedSafe(config)) {
       safeVersion = predictedSafe?.safeDeploymentConfig?.safeVersion ?? DEFAULT_SAFE_VERSION
     } else {
+      let detectedVersion: SafeVersion | undefined
+      let detectedIsL1: boolean | undefined
+
       try {
         // We try to fetch the version of the Safe from the blockchain
         safeVersion = await getSafeContractVersion(safeProvider, safeAddress as string)
       } catch (e) {
-        // if contract is not deployed we use the default version
-        safeVersion = DEFAULT_SAFE_VERSION
+        // If contract is not deployed or VERSION() call fails, try mastercopy matching
+        const mastercopyMatch = await detectSafeVersionFromMastercopy(
+          safeProvider,
+          safeAddress as string,
+          chainId,
+          isL1SafeSingleton
+        )
+
+        if (mastercopyMatch) {
+          // Successfully matched the mastercopy to a known version
+          detectedVersion = mastercopyMatch.version
+          detectedIsL1 = mastercopyMatch.isL1
+          safeVersion = detectedVersion
+        } else {
+          // If no match found, use the default version
+          safeVersion = DEFAULT_SAFE_VERSION
+        }
       }
 
       this.#safeContract = await getSafeContract({
         safeProvider,
         safeVersion,
-        isL1SafeSingleton,
+        isL1SafeSingleton: detectedIsL1 ?? isL1SafeSingleton,
         customSafeAddress: safeAddress,
         customContracts
       })

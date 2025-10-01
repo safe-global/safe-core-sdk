@@ -67,10 +67,6 @@ The mastercopy matching detects:
 - The mastercopy must be deployed and accessible on the network
 - Performance: The first initialization with a custom mastercopy will require additional RPC calls to fetch and compare bytecode
 
-## Technical Details
-
-For more technical information about the implementation, see [MASTERCOPY_MATCHING.md](../MASTERCOPY_MATCHING.md).
-
 ## Troubleshooting
 
 ### My Safe initialization fails with "Invalid ... contract address"

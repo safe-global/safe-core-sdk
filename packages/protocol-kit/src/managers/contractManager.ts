@@ -50,16 +50,15 @@ class ContractManager {
         // We try to fetch the version of the Safe from the blockchain
         safeVersion = await getSafeContractVersion(safeProvider, safeAddress as string)
       } catch (e) {
-        // If contract is not deployed or VERSION() call fails, try mastercopy matching
+        // If contract is not deployed or VERSION() call fails, try mastercopy matching (L2 only)
         const mastercopyMatch = await detectSafeVersionFromMastercopy(
           safeProvider,
           safeAddress as string,
-          chainId,
-          isL1SafeSingleton
+          chainId
         )
 
         if (mastercopyMatch) {
-          // Successfully matched the mastercopy to a known version
+          // Successfully matched the mastercopy to a known L2 version
           detectedVersion = mastercopyMatch.version
           detectedIsL1 = mastercopyMatch.isL1
           safeVersion = detectedVersion

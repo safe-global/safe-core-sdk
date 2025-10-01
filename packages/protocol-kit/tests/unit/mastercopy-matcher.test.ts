@@ -55,12 +55,7 @@ describe('Mastercopy Matcher', () => {
     it('should return undefined if contract code is empty', async () => {
       ;(safeProvider.getContractCode as sinon.SinonStub).resolves('0x')
 
-      const result = await matchContractCodeToSafeVersion(
-        safeProvider,
-        '0xContractAddress',
-        1n,
-        true
-      )
+      const result = await matchContractCodeToSafeVersion(safeProvider, '0xContractAddress', 1n)
 
       chai.expect(result).to.be.undefined
     })
@@ -68,30 +63,21 @@ describe('Mastercopy Matcher', () => {
     it('should return undefined if contract code is null', async () => {
       ;(safeProvider.getContractCode as sinon.SinonStub).resolves(null)
 
-      const result = await matchContractCodeToSafeVersion(
-        safeProvider,
-        '0xContractAddress',
-        1n,
-        true
-      )
+      const result = await matchContractCodeToSafeVersion(safeProvider, '0xContractAddress', 1n)
 
       chai.expect(result).to.be.undefined
     })
 
-    it('should match contract code against known Safe versions', async () => {
+    it('should match contract code against supported Safe L2 versions', async () => {
       // This test would require actual contract bytecode from safe-deployments
       // For now, we test that it correctly computes the hash and tries to match
+      // Only 1.1.1 L2 and 1.3.0 L2 are supported
       const mockCode = '0x1234567890abcdef'
       ;(safeProvider.getContractCode as sinon.SinonStub).resolves(mockCode)
 
-      const result = await matchContractCodeToSafeVersion(
-        safeProvider,
-        '0xContractAddress',
-        1n,
-        true
-      )
+      const result = await matchContractCodeToSafeVersion(safeProvider, '0xContractAddress', 1n)
 
-      // Since we're using mock code that won't match any real Safe, expect undefined
+      // Since we're using mock code that won't match any real Safe L2, expect undefined
       chai.expect(result).to.be.undefined
       chai.expect((safeProvider.getContractCode as sinon.SinonStub).calledOnce).to.be.true
     })
@@ -101,35 +87,35 @@ describe('Mastercopy Matcher', () => {
     it('should return undefined if mastercopy detection fails', async () => {
       ;(safeProvider.getStorageAt as sinon.SinonStub).rejects(new Error('Network error'))
 
-      const result = await detectSafeVersionFromMastercopy(safeProvider, '0xSafeAddress', 1n, true)
+      const result = await detectSafeVersionFromMastercopy(safeProvider, '0xSafeAddress', 1n)
 
       chai.expect(result).to.be.undefined
     })
 
-    it('should return undefined if no matching version is found', async () => {
+    it('should return undefined if no matching L2 version is found', async () => {
       const mastercopyAddress = '0x1234567890123456789012345678901234567890'
       const storageValue = '0x000000000000000000000000' + mastercopyAddress.slice(2)
 
       ;(safeProvider.getStorageAt as sinon.SinonStub).resolves(storageValue)
       ;(safeProvider.getContractCode as sinon.SinonStub).resolves('0x1234567890abcdef')
 
-      const result = await detectSafeVersionFromMastercopy(safeProvider, '0xSafeAddress', 1n, true)
+      const result = await detectSafeVersionFromMastercopy(safeProvider, '0xSafeAddress', 1n)
 
-      // Since we're using mock code that won't match any real Safe, expect undefined
+      // Since we're using mock code that won't match any real Safe L2 (1.1.1 or 1.3.0), expect undefined
       chai.expect(result).to.be.undefined
     })
 
-    it('should return version and mastercopy address if match is found', async () => {
-      // This test would need real Safe bytecode to properly test
+    it('should return version and mastercopy address if L2 match is found', async () => {
+      // This test would need real Safe L2 bytecode to properly test
       // For demonstration, we show the expected structure
       const mastercopyAddress = '0x1234567890123456789012345678901234567890'
       const storageValue = '0x000000000000000000000000' + mastercopyAddress.slice(2)
 
       ;(safeProvider.getStorageAt as sinon.SinonStub).resolves(storageValue)
 
-      // If a match were found, it would return an object with version, mastercopyAddress, and isL1
+      // If a match were found for 1.1.1 L2 or 1.3.0 L2, it would return an object with version, mastercopyAddress, and isL1=false
       // For this test with mock data, it will return undefined
-      const result = await detectSafeVersionFromMastercopy(safeProvider, '0xSafeAddress', 1n, true)
+      const result = await detectSafeVersionFromMastercopy(safeProvider, '0xSafeAddress', 1n)
 
       // With mock data, no match is found
       chai.expect(result).to.be.undefined

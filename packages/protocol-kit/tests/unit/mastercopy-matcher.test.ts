@@ -71,7 +71,7 @@ describe('Mastercopy Matcher', () => {
     it('should match contract code against supported Safe L2 versions', async () => {
       // This test would require actual contract bytecode from safe-deployments
       // For now, we test that it correctly computes the hash and tries to match
-      // Only 1.1.1 L2 and 1.3.0 L2 are supported
+      // Only 1.3.0 L2 and 1.4.1 L2 are supported
       const mockCode = '0x1234567890abcdef'
       ;(safeProvider.getContractCode as sinon.SinonStub).resolves(mockCode)
 
@@ -101,7 +101,7 @@ describe('Mastercopy Matcher', () => {
 
       const result = await detectSafeVersionFromMastercopy(safeProvider, '0xSafeAddress', 1n)
 
-      // Since we're using mock code that won't match any real Safe L2 (1.1.1 or 1.3.0), expect undefined
+      // Since we're using mock code that won't match any real Safe L2 (1.3.0 or 1.4.1), expect undefined
       chai.expect(result).to.be.undefined
     })
 
@@ -113,7 +113,7 @@ describe('Mastercopy Matcher', () => {
 
       ;(safeProvider.getStorageAt as sinon.SinonStub).resolves(storageValue)
 
-      // If a match were found for 1.1.1 L2 or 1.3.0 L2, it would return an object with version, mastercopyAddress, and isL1=false
+      // If a match were found for 1.3.0 L2 or 1.4.1 L2, it would return an object with version, mastercopyAddress, and isL1=false
       // For this test with mock data, it will return undefined
       const result = await detectSafeVersionFromMastercopy(safeProvider, '0xSafeAddress', 1n)
 

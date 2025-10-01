@@ -27,7 +27,7 @@ export async function getMasterCopyAddressFromProxy(
 
 /**
  * Attempts to match a contract's bytecode hash against supported Safe L2 singleton versions.
- * Only supports 1.1.1 L2 and 1.3.0 L2 mastercopies.
+ * Only supports 1.3.0 L2 and 1.4.1 L2 mastercopies.
  *
  * @param safeProvider - The SafeProvider instance
  * @param contractAddress - The address of the contract to check
@@ -49,8 +49,8 @@ export async function matchContractCodeToSafeVersion(
   // Compute the keccak256 hash of the bytecode
   const contractCodeHash = keccak256(contractCode as `0x${string}`)
 
-  // Only check 1.1.1 L2 and 1.3.0 L2 versions
-  const versionsToCheck: SafeVersion[] = ['1.3.0', '1.1.1']
+  // Only check 1.3.0 L2 and 1.4.1 L2 versions
+  const versionsToCheck: SafeVersion[] = ['1.4.1', '1.3.0']
 
   // Try to match against each version - L2 only
   for (const version of versionsToCheck) {
@@ -87,7 +87,7 @@ export async function matchContractCodeToSafeVersion(
 /**
  * Attempts to determine the Safe version by matching the mastercopy code.
  * This is used as a fallback when the Safe address is not in the safe-deployments package.
- * Only supports 1.1.1 L2 and 1.3.0 L2 mastercopies.
+ * Only supports 1.3.0 L2 and 1.4.1 L2 mastercopies.
  *
  * @param safeProvider - The SafeProvider instance
  * @param safeAddress - The address of the Safe proxy

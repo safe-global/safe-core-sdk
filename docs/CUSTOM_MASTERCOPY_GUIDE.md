@@ -4,7 +4,7 @@
 
 The Safe protocol-kit now supports Safe contracts that use custom-deployed L2 mastercopies (also called singletons), as long as the mastercopy bytecode exactly matches an official Safe L2 version. This enables using the SDK on custom networks, testnets, or with independently deployed Safe contracts.
 
-**Supported versions**: Only **1.1.1 L2** and **1.3.0 L2** mastercopies are supported for bytecode matching.
+**Supported versions**: Only **1.3.0 L2** and **1.4.1 L2** mastercopies are supported for bytecode matching.
 
 ## How It Works
 
@@ -14,7 +14,7 @@ When you initialize a Safe instance, the SDK will:
 2. **Fallback mechanism**: If the VERSION() call fails:
    - Read the mastercopy address from storage slot 0 of the Safe proxy
    - Fetch the bytecode of the mastercopy contract
-   - Compare the bytecode hash against supported Safe L2 versions (1.1.1 L2 and 1.3.0 L2)
+   - Compare the bytecode hash against supported Safe L2 versions (1.3.0 L2 and 1.4.1 L2)
    - If a match is found, use that version to initialize the SDK
    - If no match is found, fall back to the default version (1.3.0)
 
@@ -47,7 +47,7 @@ For the mastercopy matching to work, the following conditions must be met:
 
 1. **Exact bytecode match**: The mastercopy bytecode must be byte-for-byte identical to an official Safe L2 deployment
 2. **Contract must be deployed**: Both the Safe proxy and the mastercopy must be deployed on the network
-3. **Supported version**: The mastercopy must match one of the supported Safe L2 versions (**1.1.1 L2** or **1.3.0 L2** only)
+3. **Supported version**: The mastercopy must match one of the supported Safe L2 versions (**1.3.0 L2** or **1.4.1 L2** only)
 
 ## Benefits
 
@@ -59,13 +59,13 @@ For the mastercopy matching to work, the following conditions must be met:
 ## What Gets Detected
 
 The mastercopy matching detects:
-- **Safe version**: Which Safe L2 contract version (1.1.1 or 1.3.0)
+- **Safe version**: Which Safe L2 contract version (1.3.0 or 1.4.1)
 - **Singleton type**: Always L2 singleton
 - **Mastercopy address**: The address of the matched mastercopy
 
 ## Limitations
 
-- **Only L2 versions supported**: Only 1.1.1 L2 and 1.3.0 L2 mastercopies are supported
+- **Only L2 versions supported**: Only 1.3.0 L2 and 1.4.1 L2 mastercopies are supported
 - Only works with official Safe bytecode (no modified versions)
 - The mastercopy must be deployed and accessible on the network
 - Performance: The first initialization with a custom mastercopy will require additional RPC calls to fetch and compare bytecode
@@ -122,7 +122,7 @@ const safe = await Safe.init({
 // 3. If that fails:
 //    - Read mastercopy address from storage (gets 0xabc...)
 //    - Fetch bytecode from 0xabc...
-//    - Compare with supported Safe L2 versions (1.1.1 L2 and 1.3.0 L2)
+//    - Compare with supported Safe L2 versions (1.3.0 L2 and 1.4.1 L2)
 //    - Find it matches v1.3.0 L2
 //    - Initialize using v1.3.0 ABI
 

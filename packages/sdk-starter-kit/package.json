@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/sdk-starter-kit",
-  "version": "1.1.8",
+  "version": "1.1.7",
   "description": "SDK that provides the basic tools to interact with the Safe Smart Account.",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

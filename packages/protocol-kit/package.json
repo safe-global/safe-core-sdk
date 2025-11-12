@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/protocol-kit",
-  "version": "5.2.20",
+  "version": "5.2.21",
   "description": "SDK that facilitates the interaction with Safe Smart Accounts",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "@safe-global/safe-deployments": "^1.37.48",
-    "@safe-global/safe-modules-deployments": "^2.2.19",
+    "@safe-global/safe-modules-deployments": "^2.2.20",
     "@safe-global/types-kit": "^1.0.5",
     "abitype": "^1.0.2",
     "semver": "^7.6.3",

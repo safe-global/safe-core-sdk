@@ -1,1 +1,1 @@
-export const getProtocolKitVersion = () => '5.2.21'
+export const getProtocolKitVersion = () => '5.2.22'

@@ -453,6 +453,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 333000333n, shortName: 'meld' },
   { chainId: 476462898n, shortName: 'Skopje' },
   { chainId: 531050104n, shortName: 'sophon-testnet' },
+  { chainId: 531050204n, shortName: 'sophon-os-testnet' },
   { chainId: 666666666n, shortName: 'degen-chain' },
   { chainId: 888888888n, shortName: 'ancient8' },
   { chainId: 994873017n, shortName: 'lumia-mainnet' },

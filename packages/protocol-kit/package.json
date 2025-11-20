@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/protocol-kit",
-  "version": "6.1.1",
+  "version": "6.1.2",
   "description": "SDK that facilitates the interaction with Safe Smart Accounts",
   "types": "dist/src/index.d.ts",
   "main": "dist/cjs/src/index.cjs",

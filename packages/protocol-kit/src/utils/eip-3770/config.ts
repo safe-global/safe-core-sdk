@@ -483,7 +483,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 94204209n, shortName: 'polygon-blackberry' },
   { chainId: 111557560n, shortName: 'cysep' },
   { chainId: 123420111n, shortName: 'opcelestia-raspberry' },
-  { chainId: 161221135n, shortName: 'plume-testnet' },
+  { chainId: 161221135n, shortName: 'plume-testnet-legacy' },
   { chainId: 168587773n, shortName: 'blastsepolia' },
   { chainId: 222000222n, shortName: 'kanazawa' },
   { chainId: 245022926n, shortName: 'neonevm-devnet' },

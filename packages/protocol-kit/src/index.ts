@@ -42,7 +42,11 @@ import {
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import EthSafeMessage from './utils/messages/SafeMessage'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
-import { encodeMultiSendData, standardizeSafeTransactionData } from './utils/transactions/utils'
+import {
+  encodeMultiSendData,
+  decodeMultiSendData,
+  standardizeSafeTransactionData
+} from './utils/transactions/utils'
 import {
   getERC20Decimals,
   isGasTokenCompatibleWithHandlePayment,
@@ -89,6 +93,7 @@ export {
   SignMessageLibBaseContract,
   encodeCreateProxyWithNonce,
   encodeMultiSendData,
+  decodeMultiSendData,
   encodeSetupCallData,
   getCompatibilityFallbackHandlerContract,
   getCreateCallContract,

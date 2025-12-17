@@ -142,7 +142,8 @@ export class Safe4337Pack extends RelayKitBasePack<{
       bundlerUrl,
       customContracts,
       paymasterOptions,
-      onchainAnalytics
+      onchainAnalytics,
+      contractNetworks
     } = initOptions
 
     let protocolKit: Safe
@@ -262,7 +263,12 @@ export class Safe4337Pack extends RelayKitBasePack<{
         setupTransactions.push(approveToPaymasterTransaction)
       }
 
-      const safeProvider = await SafeProvider.init({ provider, signer, safeVersion })
+      const safeProvider = await SafeProvider.init({
+        provider,
+        signer,
+        safeVersion,
+        contractNetworks
+      })
 
       // third transaction: passkey support via shared signer SafeWebAuthnSharedSigner
       // see: https://github.com/safe-global/safe-modules/blob/main/modules/passkey/contracts/4337/experimental/README.md

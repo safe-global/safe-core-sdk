@@ -1,5 +1,11 @@
 import fs from 'fs'
-import { getChainShortName, getLocalNetworksConfig, getSafeDeploymentNetworks } from './utils'
+import {
+  getChainShortName,
+  getLocalNetworksConfig,
+  getSafeDeploymentNetworks,
+  checkForDuplicateShortNames,
+  formatDuplicateReport
+} from './utils'
 import { networks } from '../../src/utils/eip-3770/config'
 
 interface NetworkShortName {
@@ -68,6 +74,15 @@ async function checkAndUpdate() {
       } catch (error) {
         throw new Error(`EIP-3770 Failed to retrieve chain name for ${chainId}`)
       }
+    }
+
+    // Check for duplicates before writing
+    const duplicateCheck = checkForDuplicateShortNames(updateNetworks)
+    if (duplicateCheck.hasDuplicates) {
+      console.log('\n⚠️  WARNING: ' + formatDuplicateReport(duplicateCheck.duplicates))
+      console.log(
+        '\nThe file will be updated, but the build will fail until duplicates are resolved manually.\n'
+      )
     }
 
     updateLocalNetworks(updateNetworks)

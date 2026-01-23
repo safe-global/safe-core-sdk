@@ -80,7 +80,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 255n, shortName: 'kroma' },
   { chainId: 274n, shortName: 'lachain' },
   { chainId: 280n, shortName: 'zksync-goerli' },
-  { chainId: 282n, shortName: 'zkTCRO' },
+  { chainId: 282n, shortName: 'deprecated-zkTCRO' },
   { chainId: 288n, shortName: 'boba' },
   { chainId: 291n, shortName: 'orderly' },
   { chainId: 295n, shortName: 'hedera-mainnet' },

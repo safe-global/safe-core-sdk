@@ -1287,7 +1287,11 @@ class Safe {
     })
     serviceTransactionResponse.confirmations?.map(
       (confirmation: SafeMultisigConfirmationResponse) => {
-        const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
+        const signature = new EthSafeSignature(
+          confirmation.owner,
+          confirmation.signature,
+          confirmation?.signatureType === "CONTRACT_SIGNATURE",
+        )
         safeTransaction.addSignature(signature)
       }
     )

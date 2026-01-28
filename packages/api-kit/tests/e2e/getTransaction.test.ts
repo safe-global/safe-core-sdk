@@ -26,7 +26,7 @@ describe('getTransaction', () => {
   })
 
   it('should return the transaction with the given safeTxHash', async () => {
-    const safeTxHash = '0x71eb4e7daac8a5461c6b946c95895c5732281de9cb9dad6efa139fc42a063229'
+    const safeTxHash = '0x6eb95c6264c3fe1416e41c21d9bd6d084ffe596c7d04c945eb20cde637274503'
     const transaction = await safeApiKit.getTransaction(safeTxHash)
     chai.expect(transaction.safeTxHash).to.be.equal(safeTxHash)
     chai.expect(transaction.safe).to.be.eq(API_TESTING_SAFE.address)

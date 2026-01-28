@@ -8,8 +8,8 @@ export const API_TESTING_SAFE = {
     '0xDa734d0A0c2328394e3DbC88cDcD4D197142C37D'
   ],
   modules: [],
-  fallbackHandler: '0xfd0732dc9e303f09fcef3a7388ad10a83459ec99',
+  fallbackHandler: '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
   guard: '0x0000000000000000000000000000000000000000',
   version: '1.4.1+L2',
-  singleton: '0x29fcb43b46531bca003ddc8fcb67ffe91900c762'
+  singleton: '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762'
 }

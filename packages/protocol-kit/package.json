@@ -69,8 +69,8 @@
     "web3": "^4.12.1"
   },
   "dependencies": {
-    "@safe-global/safe-deployments": "^1.37.50",
-    "@safe-global/safe-modules-deployments": "^2.2.22",
+    "@safe-global/safe-deployments": "^1.37.51",
+    "@safe-global/safe-modules-deployments": "^2.2.23",
     "@safe-global/types-kit": "^1.0.5",
     "abitype": "^1.0.2",
     "semver": "^7.6.3",

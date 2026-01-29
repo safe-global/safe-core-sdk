@@ -1729,17 +1729,17 @@
   resolved "https://registry.yarnpkg.com/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz#82605342f3289dc6b99818f599a3409ec2cb3fdc"
   integrity sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==
 
-"@safe-global/safe-deployments@^1.37.50":
-  version "1.37.50"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.50.tgz#a31ef3aec094af749073e0810a941b1f49e670a8"
-  integrity sha512-WUgH0YeVmHm0Uv5dQ8QW4nEAMs8Pm6DhObglBSUlW8ur+RGDd4/xmhFJKm8up/qbDVB/n5Skf+5d+eWZIPRClg==
+"@safe-global/safe-deployments@^1.37.51":
+  version "1.37.51"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.51.tgz#a527843117787f6ba5de84851f3475e60a8f866f"
+  integrity sha512-w+p9XOtoS6j0sN57zfKkSGz2ts0blf+gzVZz5sqKUlov4wsSJdqtaUPcNJnKvpV8x1aes/k1Do7qJMBvJivPtQ==
   dependencies:
     semver "^7.6.2"
 
-"@safe-global/safe-modules-deployments@^2.2.22":
-  version "2.2.22"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.22.tgz#374e6645526085e6b3232ec80815bb354100c48a"
-  integrity sha512-HxVSX2F3yHvtwm85KlRpM4QXnnq1LDXZZKs5X2+Ip9DeQX+xXSRm9MjHED7ZdCdxXT/Sfga/2vmKsnoSU1t/lA==
+"@safe-global/safe-modules-deployments@^2.2.23":
+  version "2.2.23"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.23.tgz#5a6a49a17ed4b147006fdf89f46e7f2c03b57721"
+  integrity sha512-73V/PM3ire3Xc2JacalHEif3E3zyIF5xpJ9c0MVrzK3eS5S04CaTaTH/Sy6kCqh4g5fmJp/8Mc4hs20Op/Cd6A==
 
 "@safe-global/safe-passkey@0.2.0":
   version "0.2.0"
@@ -7652,10 +7652,15 @@ semver@^6.0.0, semver@^6.3.0, semver@^6.3.1:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
 
-semver@^7.0.0, semver@^7.1.1, semver@^7.3.4, semver@^7.3.5, semver@^7.3.7, semver@^7.3.8, semver@^7.5.3, semver@^7.5.4, semver@^7.6.0, semver@^7.6.1, semver@^7.6.2, semver@^7.6.3:
+semver@^7.0.0, semver@^7.1.1, semver@^7.3.4, semver@^7.3.5, semver@^7.3.7, semver@^7.3.8, semver@^7.5.3, semver@^7.5.4, semver@^7.6.0, semver@^7.6.1, semver@^7.6.3:
   version "7.6.3"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.3.tgz#980f7b5550bc175fb4dc09403085627f9eb33143"
   integrity sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==
+
+semver@^7.6.2:
+  version "7.7.3"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.3.tgz#4b5f4143d007633a8dc671cd0a6ef9147b8bb946"
+  integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==
 
 serialize-javascript@6.0.0:
   version "6.0.0"

@@ -66,11 +66,22 @@ export async function getSafeContractInstance(
   | SafeContract_v1_2_0
   | SafeContract_v1_1_1
   | SafeContract_v1_0_0
+  | SafeContract_v1_5_0
 > {
   const chainId = await safeProvider.getChainId()
   let safeContractInstance
 
   switch (safeVersion) {
+    case '1.5.0':
+      safeContractInstance = new SafeContract_v1_5_0(
+        chainId,
+        safeProvider,
+        isL1SafeSingleton,
+        contractAddress,
+        customContractAbi as SafeContract_v1_4_1_Abi,
+        deploymentType
+      )
+      break
     case '1.4.1':
       safeContractInstance = new SafeContract_v1_4_1(
         chainId,

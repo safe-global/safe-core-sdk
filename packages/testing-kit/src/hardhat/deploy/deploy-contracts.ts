@@ -7,6 +7,7 @@ export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
 type SafeVersions = { [key: string]: { name: string } }
 
 const safeContracts: SafeVersions = {
+  '1.5.0': { name: 'Safe_SV1_5_0' },
   '1.4.1': { name: 'Safe_SV1_4_1' },
   '1.3.0': { name: 'Safe_SV1_3_0' },
   '1.2.0': { name: 'Safe_SV1_2_0' },
@@ -15,6 +16,7 @@ const safeContracts: SafeVersions = {
 }
 
 const proxyFactoryContracts: SafeVersions = {
+  '1.5.0': { name: 'SafeProxyFactory_SV1_5_0' },
   '1.4.1': { name: 'SafeProxyFactory_SV1_4_1' },
   '1.3.0': { name: 'SafeProxyFactory_SV1_3_0' },
   '1.2.0': { name: 'SafeProxyFactory_SV1_2_0' },
@@ -23,6 +25,7 @@ const proxyFactoryContracts: SafeVersions = {
 }
 
 const multiSendContracts: SafeVersions = {
+  '1.5.0': { name: 'MultiSend_SV1_5_0' },
   '1.4.1': { name: 'MultiSend_SV1_4_1' },
   '1.3.0': { name: 'MultiSend_SV1_3_0' },
   '1.2.0': { name: 'MultiSend_SV1_2_0' },
@@ -31,6 +34,7 @@ const multiSendContracts: SafeVersions = {
 }
 
 const multiSendCallOnlyContracts: SafeVersions = {
+  '1.5.0': { name: 'MultiSendCallOnly_SV1_5_0' },
   '1.4.1': { name: 'MultiSendCallOnly_SV1_4_1' },
   '1.3.0': { name: 'MultiSendCallOnly_SV1_3_0' },
   '1.2.0': { name: 'MultiSendCallOnly_SV1_3_0' },
@@ -39,6 +43,7 @@ const multiSendCallOnlyContracts: SafeVersions = {
 }
 
 const compatibilityFallbackHandlerContracts: SafeVersions = {
+  '1.5.0': { name: 'CompatibilityFallbackHandler_SV1_5_0' },
   '1.4.1': { name: 'CompatibilityFallbackHandler_SV1_4_1' },
   '1.3.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
   '1.2.0': { name: 'CompatibilityFallbackHandler_SV1_3_0' },
@@ -47,6 +52,7 @@ const compatibilityFallbackHandlerContracts: SafeVersions = {
 }
 
 const signMessageLibContracts: SafeVersions = {
+  '1.5.0': { name: 'SignMessageLib_SV1_5_0' },
   '1.4.1': { name: 'SignMessageLib_SV1_4_1' },
   '1.3.0': { name: 'SignMessageLib_SV1_3_0' },
   '1.2.0': { name: 'SignMessageLib_SV1_3_0' },
@@ -55,6 +61,7 @@ const signMessageLibContracts: SafeVersions = {
 }
 
 const createCallContracts: SafeVersions = {
+  '1.5.0': { name: 'CreateCall_SV1_5_0' },
   '1.4.1': { name: 'CreateCall_SV1_4_1' },
   '1.3.0': { name: 'CreateCall_SV1_3_0' },
   '1.2.0': { name: 'CreateCall_SV1_3_0' },
@@ -63,6 +70,7 @@ const createCallContracts: SafeVersions = {
 }
 
 const simulateTxAccessorContracts: SafeVersions = {
+  '1.5.0': { name: 'SimulateTxAccessor_SV1_4_1' },
   '1.4.1': { name: 'SimulateTxAccessor_SV1_4_1' },
   '1.3.0': { name: 'SimulateTxAccessor_SV1_3_0' },
   '1.2.0': { name: 'SimulateTxAccessor_SV1_3_0' },
@@ -71,6 +79,7 @@ const simulateTxAccessorContracts: SafeVersions = {
 }
 
 const safeWebAuthnSignerFactoryContracts: SafeVersions = {
+  '1.5.0': { name: 'SafeWebAuthnSignerFactory_SV1_5_0' },
   '1.4.1': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
   '1.3.0': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
   '1.2.0': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
@@ -79,6 +88,7 @@ const safeWebAuthnSignerFactoryContracts: SafeVersions = {
 }
 
 const safeWebAuthnSharedSignerContracts: SafeVersions = {
+  '1.5.0': { name: 'SafeWebAuthnSharedSigner' },
   '1.4.1': { name: 'SafeWebAuthnSharedSigner' },
   '1.3.0': { name: 'SafeWebAuthnSharedSigner' },
   '1.2.0': { name: 'SafeWebAuthnSharedSigner' },

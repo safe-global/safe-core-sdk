@@ -17,6 +17,7 @@ import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'
  * @extends BaseContract<SafeContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
+ * - SafeContract_v1_5_0  extends SafeBaseContract<SafeContract_v1_5_0_Abi>
  * - SafeContract_v1_4_1  extends SafeBaseContract<SafeContract_v1_4_1_Abi>
  * - SafeContract_v1_3_0  extends SafeBaseContract<SafeContract_v1_3_0_Abi>
  * - SafeContract_v1_2_0  extends SafeBaseContract<SafeContract_v1_2_0_Abi>

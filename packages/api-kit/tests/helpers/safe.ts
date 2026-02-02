@@ -13,3 +13,19 @@ export const API_TESTING_SAFE = {
   version: '1.3.0+L2',
   singleton: '0xfb1bffC9d739B8D520DaF37dF666da4C687191EA'
 }
+
+export const API_TESTING_SAFE_1_4_1 = {
+  address: '0x4103eEB76EBBcB652F8B15d3817EBFC07b664b0c',
+  nonce: '0',
+  threshold: 2,
+  owners: [
+    '0x56e2C102c664De6DfD7315d12c0178b61D16F171',
+    '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B',
+    '0xDa734d0A0c2328394e3DbC88cDcD4D197142C37D'
+  ],
+  modules: [],
+  fallbackHandler: '0xfd0732Dc9E303f09fCEf3a7388Ad10A83459Ec99',
+  guard: '0x0000000000000000000000000000000000000000',
+  version: '1.4.1+L2',
+  singleton: '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762'
+}

@@ -6,7 +6,7 @@ import { getEip1193Provider } from './utils/setupProvider'
 
 chai.use(chaiAsPromised)
 
-describe('Contract Info', () => {
+describe.only('Contract Info', () => {
   const provider = getEip1193Provider()
   let protocolKit: Safe
 
@@ -31,6 +31,30 @@ describe('Contract Info', () => {
     })
 
     it('should return the contract info for SafeSingleton contracts', async () => {
+      chai
+        .expect(
+          protocolKit.getContractInfo({
+            contractAddress: '0xB8e8e97972046ac26514A9e2F2ca1299b4c4aaB6'
+          })
+        )
+        .to.be.deep.equal({
+          contractName: 'safeSingletonVersion',
+          type: 'canonical',
+          version: '1.5.0'
+        })
+
+      chai
+        .expect(
+          protocolKit.getContractInfo({
+            contractAddress: '0x4103eEB76EBBcB652F8B15d3817EBFC07b664b0c'
+          })
+        )
+        .to.be.deep.equal({
+          contractName: 'safeSingletonVersion',
+          type: 'canonical',
+          version: '1.4.1'
+        })
+
       chai
         .expect(
           protocolKit.getContractInfo({
@@ -80,6 +104,18 @@ describe('Contract Info', () => {
           type: 'canonical',
           version: '1.4.1'
         })
+
+      chai
+        .expect(
+          protocolKit.getContractInfo({
+            contractAddress: '0x3EfCBb83A4A7AfcB4F68D501E2c2203a38be77f4'
+          })
+        )
+        .to.be.deep.equal({
+          contractName: 'compatibilityFallbackHandler',
+          type: 'canonical',
+          version: '1.5.0'
+        })
     })
 
     it('should return the contract info for a SignMessageLib contracts', async () => {
@@ -93,6 +129,18 @@ describe('Contract Info', () => {
           contractName: 'signMessageLibVersion',
           type: 'canonical',
           version: '1.4.1'
+        })
+
+      chai
+        .expect(
+          protocolKit.getContractInfo({
+            contractAddress: '0x4FfeF8222648872B3dE295Ba1e49110E61f5b5aa'
+          })
+        )
+        .to.be.deep.equal({
+          contractName: 'signMessageLibVersion',
+          type: 'canonical',
+          version: '1.5.0'
         })
     })
   })

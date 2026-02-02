@@ -70,7 +70,7 @@ const createCallContracts: SafeVersions = {
 }
 
 const simulateTxAccessorContracts: SafeVersions = {
-  '1.5.0': { name: 'SimulateTxAccessor_SV1_4_1' },
+  '1.5.0': { name: 'SimulateTxAccessor_SV1_5_0' },
   '1.4.1': { name: 'SimulateTxAccessor_SV1_4_1' },
   '1.3.0': { name: 'SimulateTxAccessor_SV1_3_0' },
   '1.2.0': { name: 'SimulateTxAccessor_SV1_3_0' },
@@ -79,7 +79,7 @@ const simulateTxAccessorContracts: SafeVersions = {
 }
 
 const safeWebAuthnSignerFactoryContracts: SafeVersions = {
-  '1.5.0': { name: 'SafeWebAuthnSignerFactory_SV1_5_0' },
+  '1.5.0': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
   '1.4.1': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
   '1.3.0': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },
   '1.2.0': { name: 'SafeWebAuthnSignerFactory_SV1_4_1' },

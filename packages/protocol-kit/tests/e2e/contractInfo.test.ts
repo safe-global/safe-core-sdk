@@ -6,7 +6,7 @@ import { getEip1193Provider } from './utils/setupProvider'
 
 chai.use(chaiAsPromised)
 
-describe.only('Contract Info', () => {
+describe('Contract Info', () => {
   const provider = getEip1193Provider()
   let protocolKit: Safe
 
@@ -34,7 +34,7 @@ describe.only('Contract Info', () => {
       chai
         .expect(
           protocolKit.getContractInfo({
-            contractAddress: '0xB8e8e97972046ac26514A9e2F2ca1299b4c4aaB6'
+            contractAddress: '0xFf51A5898e281Db6DfC7855790607438dF2ca44b'
           })
         )
         .to.be.deep.equal({
@@ -46,7 +46,7 @@ describe.only('Contract Info', () => {
       chai
         .expect(
           protocolKit.getContractInfo({
-            contractAddress: '0x4103eEB76EBBcB652F8B15d3817EBFC07b664b0c'
+            contractAddress: '0x41675C099F32341bf84BFc5382aF534df5C7461a'
           })
         )
         .to.be.deep.equal({

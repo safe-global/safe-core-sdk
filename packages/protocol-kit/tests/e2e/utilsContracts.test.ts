@@ -695,7 +695,9 @@ describe('Contract utils', () => {
       }
     )
 
-    itif(safeVersionDeployed >= '1.3.0')(
+    // Note: v1.5.0 is excluded because it has not been yet added to chains
+    // (Polygon, Gnosis, BNB, Optimism, Base, Avalanche) yet according to @safe-global/safe-deployments.
+    itif(safeVersionDeployed >= '1.3.0' && safeVersionDeployed < '1.5.0')(
       'returns the same predicted address based on the deploymentType for different chains',
       async () => {
         const { accounts } = await setupTests()

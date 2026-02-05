@@ -9,7 +9,7 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getKits } from '../utils/setupKits'
-import { API_TESTING_SAFE_1_4_1 } from '../helpers/safe'
+import { getSafe } from '../helpers/safe'
 
 chai.use(chaiAsPromised)
 
@@ -18,8 +18,6 @@ const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfe
 
 let safeApiKit: SafeApiKit
 let protocolKit: Safe
-const safeAddress = API_TESTING_SAFE_1_4_1.address
-const signerSafeAddress = API_TESTING_SAFE_1_4_1.owners[2]
 
 const generateRandomUUID = (): string => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -31,7 +29,10 @@ const generateRandomUUID = (): string => {
 
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
 
-describe('addMessageSignature', () => {
+const { address: safeAddress, owners, version } = getSafe()
+const signerSafeAddress = owners[2]
+
+describe(`[${version}] addMessageSignature`, () => {
   before(async () => {
     ;({ safeApiKit, protocolKit } = await getKits({
       safeAddress,

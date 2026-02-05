@@ -11,6 +11,8 @@ jobs:
     strategy:
       matrix:
         node-version: [20.x]
+        provider: [ethers, viem]
+        safe-version: [v1.4.1, v1.5.0]
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
@@ -18,16 +20,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: yarn
-      - name: Yarn install
-        run: yarn install --frozen-lockfile
-
-      - name: Build
-        run: yarn build
-
-      - name: Test
+      - run: |
+          yarn install --frozen-lockfile
+          yarn build
+      - name: Test ${{ matrix.provider }} - Safe ${{ matrix.safe-version }}
         env:
           API_KEY: ${{ secrets.API_KEY }}
         run: |
           cd packages/api-kit
-          yarn test:ci:ethers
-          yarn test:ci:viem
+          yarn test:ci:${{ matrix.provider }}:${{ matrix.safe-version }}

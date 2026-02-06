@@ -1,3 +1,8 @@
+import { SafeVersion } from '@safe-global/types-kit'
+import { Address } from 'viem'
+
+export const safeVersionDeployed = process.env.SAFE_VERSION as SafeVersion
+
 export type SafeInfo = {
   address: string
   nonce: string
@@ -10,7 +15,7 @@ export type SafeInfo = {
   singleton: string
 }
 
-export const API_TESTING_SAFE: SafeInfo = {
+const API_TESTING_SAFE_1_3_0: SafeInfo = {
   address: '0xF8ef84392f7542576F6b9d1b140334144930Ac78',
   nonce: '10',
   threshold: 2,
@@ -26,7 +31,7 @@ export const API_TESTING_SAFE: SafeInfo = {
   singleton: '0xfb1bffC9d739B8D520DaF37dF666da4C687191EA'
 }
 
-export const API_TESTING_SAFE_1_4_1: SafeInfo = {
+const API_TESTING_SAFE_1_4_1: SafeInfo = {
   address: '0x4103eEB76EBBcB652F8B15d3817EBFC07b664b0c',
   nonce: '0',
   threshold: 2,
@@ -42,25 +47,30 @@ export const API_TESTING_SAFE_1_4_1: SafeInfo = {
   singleton: '0x29fcB43b46531BcA003ddC8FCB67FFE91900C762'
 }
 
-export const API_TESTING_SAFE_1_5_0: SafeInfo = {
-  address: '0x698e119e679ef03F14E4e518a5F9A1D2e8E32159',
+const API_TESTING_SAFE_1_5_0: SafeInfo = {
+  address: '0xd121c0b37253455305bD22155d2eDec867e30Ead',
   nonce: '0',
   threshold: 2,
   owners: [
     '0x56e2C102c664De6DfD7315d12c0178b61D16F171',
     '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B',
-    '0xB8e8e97972046ac26514A9e2F2ca1299b4c4aaB6'
+    '0x7bb4924812b1451A754a210e88FdD27594DFBb57'
   ],
   modules: [],
   fallbackHandler: '0x3EfCBb83A4A7AfcB4F68D501E2c2203a38be77f4',
   guard: '0x0000000000000000000000000000000000000000',
-  version: '1.5.0+L2',
-  singleton: '0xEdd160fEBBD92E350D4D398fb636302fccd67C7e'
+  version: '1.5.0',
+  singleton: '0xFf51A5898e281Db6DfC7855790607438dF2ca44b'
 }
 
 const SAFE_VERSIONS: Record<string, SafeInfo> = {
+  '1.3.0': API_TESTING_SAFE_1_3_0,
   '1.4.1': API_TESTING_SAFE_1_4_1,
   '1.5.0': API_TESTING_SAFE_1_5_0
+}
+
+const SAFE_VERSIONS_WITH_4337_MODULE: Record<string, Address> = {
+  '1.4.1': '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0'
 }
 
 /**
@@ -69,7 +79,7 @@ const SAFE_VERSIONS: Record<string, SafeInfo> = {
  * @returns SafeInfo object for the specified version
  */
 export function getSafe(): SafeInfo {
-  const version = process.env.SAFE_VERSION || '1.4.1'
+  const version = safeVersionDeployed || '1.4.1'
   const safe = SAFE_VERSIONS[version]
 
   if (!safe) {
@@ -80,3 +90,16 @@ export function getSafe(): SafeInfo {
 
   return safe
 }
+
+/**
+ * Returns the Safe contract address with ERC-4337 module enabled info based on the SAFE_VERSION environment variable.
+ * Defaults to v1.4.1 if no version is specified.
+ * @returns Address for the specified version, or undefined if version is not supported
+ */
+export function getSafeWith4337Module(): Address {
+  const version = process.env.SAFE_VERSION || '1.4.1'
+  return SAFE_VERSIONS_WITH_4337_MODULE[version]
+}
+
+export const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676' // Address: 0x56e2C102c664De6DfD7315d12c0178b61D16F171
+export const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44' // Address: 0x9ccbde03edd71074ea9c49e413fa9cdff16d263b

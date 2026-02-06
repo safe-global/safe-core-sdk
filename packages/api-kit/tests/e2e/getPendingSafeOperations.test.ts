@@ -2,15 +2,18 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getApiKit } from '../utils/setupKits'
+import { Address } from 'viem'
+import { getSafe, safeVersionDeployed } from 'tests/helpers/safe'
+import { describeif } from 'tests/utils/heplers'
 
 chai.use(chaiAsPromised)
 
-const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // v1.4.1
-
 let safeApiKit: SafeApiKit
 
-describe('getPendingSafeOperations', () => {
+describeif(safeVersionDeployed === '1.4.1')('getPendingSafeOperations', () => {
+  let SAFE_ADDRESS: Address
   before(async () => {
+    SAFE_ADDRESS = getSafe().address
     safeApiKit = getApiKit()
   })
 

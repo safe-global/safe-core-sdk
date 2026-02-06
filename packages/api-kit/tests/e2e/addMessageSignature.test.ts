@@ -9,12 +9,10 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getKits } from '../utils/setupKits'
-import { getSafe } from '../helpers/safe'
+import { getSafe, PRIVATE_KEY_1, PRIVATE_KEY_2, safeVersionDeployed } from '../helpers/safe'
+import { describeif } from 'tests/utils/heplers'
 
 chai.use(chaiAsPromised)
-
-const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44'
 
 let safeApiKit: SafeApiKit
 let protocolKit: Safe
@@ -32,7 +30,7 @@ const generateMessage = () => `${generateRandomUUID()}: I am the owner of the sa
 const { address: safeAddress, owners, version } = getSafe()
 const signerSafeAddress = owners[2]
 
-describe(`[${version}] addMessageSignature`, () => {
+describeif(safeVersionDeployed >= '1.4.1')(`[${version}] addMessageSignature`, () => {
   before(async () => {
     ;({ safeApiKit, protocolKit } = await getKits({
       safeAddress,

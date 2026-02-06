@@ -3,13 +3,15 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getKits } from '../utils/setupKits'
+import { getSafe, PRIVATE_KEY_1 as PRIVATE_KEY, safeVersionDeployed } from 'tests/helpers/safe'
+import { describeif } from 'tests/utils/heplers'
 
 chai.use(chaiAsPromised)
 
-const PRIVATE_KEY = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-
 let safeApiKit: SafeApiKit
 let protocolKit: Safe
+
+const { address: safeAddress, version } = getSafe()
 
 const generateRandomUUID = (): string => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -20,9 +22,7 @@ const generateRandomUUID = (): string => {
 }
 
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
-const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
-
-describe('addMessage', () => {
+describeif(safeVersionDeployed >= '1.4.1')(`[${version}] addMessage`, () => {
   before(async () => {
     ;({ safeApiKit, protocolKit } = await getKits({
       safeAddress,

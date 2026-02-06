@@ -6,18 +6,17 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
-import { API_TESTING_SAFE } from '../helpers/safe'
+import { getSafe, PRIVATE_KEY_1, PRIVATE_KEY_2 } from '../helpers/safe'
 
 chai.use(chaiAsPromised)
-
-const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-const PRIVATE_KEY_2 = '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
 
 let safeApiKit: SafeApiKit
 let signer: AddSafeDelegateProps['signer']
 let delegatorAddress: Address
 
-describe('addSafeDelegate', () => {
+const { address: safeAddress, version } = getSafe()
+
+describe(`[${version}] addSafeDelegate`, () => {
   before(() => {
     safeApiKit = getApiKit()
     signer = createWalletClient({
@@ -69,10 +68,10 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if Safe address is not checksummed', async () => {
-    const safeAddress = API_TESTING_SAFE.address.toLowerCase()
+    const lowercaseSafeAddress = safeAddress.toLowerCase()
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegateConfig: AddSafeDelegateProps = {
-      safeAddress,
+      safeAddress: lowercaseSafeAddress,
       delegateAddress,
       delegatorAddress,
       signer,
@@ -80,11 +79,10 @@ describe('addSafeDelegate', () => {
     }
     await chai
       .expect(safeApiKit.addSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Address ${safeAddress} is not checksumed`)
+      .to.be.rejectedWith(`Address ${lowercaseSafeAddress} is not checksumed`)
   })
 
   it('should fail if Safe delegate address is not checksummed', async () => {
-    const safeAddress = API_TESTING_SAFE.address
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
@@ -99,7 +97,6 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if Safe delegator address is not checksummed', async () => {
-    const safeAddress = API_TESTING_SAFE.address
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddressLowerCase = delegatorAddress.toLowerCase()
     const delegateConfig: AddSafeDelegateProps = {
@@ -130,7 +127,6 @@ describe('addSafeDelegate', () => {
   })
 
   it('should fail if the signer is not an owner of the Safe', async () => {
-    const safeAddress = API_TESTING_SAFE.address
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const nonOwnerSigner = createWalletClient({
       chain: sepolia,
@@ -153,7 +149,6 @@ describe('addSafeDelegate', () => {
   })
 
   it('should add a new delegate', async () => {
-    const safeAddress = API_TESTING_SAFE.address
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
@@ -202,7 +197,6 @@ describe('addSafeDelegate', () => {
   })
 
   it('should add a new delegate EIP-3770', async () => {
-    const safeAddress = API_TESTING_SAFE.address
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`

@@ -6,7 +6,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
-import { getSafe, PRIVATE_KEY_1, PRIVATE_KEY_2 } from '../helpers/safe'
+import { getSafe, PRIVATE_KEY_2 } from '../helpers/safe'
 
 chai.use(chaiAsPromised)
 
@@ -15,14 +15,14 @@ let signer: AddSafeDelegateProps['signer']
 let delegatorAddress: Address
 
 const { address: safeAddress, version } = getSafe()
-
+const PRIVATE_KEY = '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
 describe(`[${version}] addSafeDelegate`, () => {
   before(() => {
     safeApiKit = getApiKit()
     signer = createWalletClient({
       chain: sepolia,
       transport: http(),
-      account: privateKeyToAccount(PRIVATE_KEY_1)
+      account: privateKeyToAccount(PRIVATE_KEY_2)
     })
     delegatorAddress = signer.account.address
   })
@@ -131,7 +131,7 @@ describe(`[${version}] addSafeDelegate`, () => {
     const nonOwnerSigner = createWalletClient({
       chain: sepolia,
       transport: http(),
-      account: privateKeyToAccount(PRIVATE_KEY_2)
+      account: privateKeyToAccount(PRIVATE_KEY)
     })
     const delegatorAddress = nonOwnerSigner.account.address
     const delegateConfig: AddSafeDelegateProps = {
@@ -158,6 +158,7 @@ describe(`[${version}] addSafeDelegate`, () => {
       label: 'Label'
     }
     const { results: initialDelegates } = await safeApiKit.getSafeDelegates({ safeAddress })
+
     chai.expect(initialDelegates.length).to.be.eq(0)
     const delegateResponse = await safeApiKit.addSafeDelegate(delegateConfig)
     chai.expect(delegateResponse.safe).to.be.equal(delegateConfig.safeAddress)
@@ -211,6 +212,7 @@ describe(`[${version}] addSafeDelegate`, () => {
     const { results: initialDelegates } = await safeApiKit.getSafeDelegates({
       safeAddress: eip3770SafeAddress
     })
+
     chai.expect(initialDelegates.length).to.be.eq(0)
     const delegateResponse = await safeApiKit.addSafeDelegate(delegateConfig)
     chai.expect(delegateResponse.safe).to.be.equal(safeAddress)

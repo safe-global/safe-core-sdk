@@ -9,18 +9,16 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
-import { API_TESTING_SAFE } from '../helpers/safe'
+import { getSafe, PRIVATE_KEY_1 as PRIVATE_KEY } from 'tests/helpers/safe'
 
 chai.use(chaiAsPromised)
-
-const PRIVATE_KEY = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 
 let safeApiKit: SafeApiKit
 let signer: DeleteSafeDelegateProps['signer']
 let delegatorAddress: Address
 
 describe('getSafeDelegates', () => {
-  const safeAddress = API_TESTING_SAFE.address
+  const safeAddress = getSafe().address
 
   before(() => {
     safeApiKit = getApiKit()

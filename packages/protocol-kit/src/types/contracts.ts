@@ -5,23 +5,31 @@ import SafeContract_v1_1_1 from '@safe-global/protocol-kit/contracts/Safe/v1.1.1
 import SafeContract_v1_2_0 from '@safe-global/protocol-kit/contracts/Safe/v1.2.0/SafeContract_v1_2_0'
 import SafeContract_v1_3_0 from '@safe-global/protocol-kit/contracts/Safe/v1.3.0/SafeContract_v1_3_0'
 import SafeContract_v1_4_1 from '@safe-global/protocol-kit/contracts/Safe/v1.4.1/SafeContract_v1_4_1'
+import SafeContract_v1_5_0 from '@safe-global/protocol-kit/contracts/Safe/v1.5.0/SafeContract_v1_5_0'
 import MultiSendContract_v1_1_1 from '@safe-global/protocol-kit/contracts/MultiSend/v1.1.1/MultiSendContract_v1_1_1'
 import MultiSendContract_v1_3_0 from '@safe-global/protocol-kit/contracts/MultiSend/v1.3.0/MultiSendContract_v1_3_0'
 import MultiSendContract_v1_4_1 from '@safe-global/protocol-kit/contracts/MultiSend/v1.4.1/MultiSendContract_v1_4_1'
+import MultiSendContract_v1_5_0 from '@safe-global/protocol-kit/contracts/MultiSend/v1.5.0/MultiSendContract_v1_5_0'
+import MultiSendCallOnlyContract_v1_5_0 from '@safe-global/protocol-kit/contracts/MultiSend/v1.5.0/MultiSendCallOnlyContract_v1_5_0'
 import MultiSendCallOnlyContract_v1_4_1 from '@safe-global/protocol-kit/contracts/MultiSend/v1.4.1/MultiSendCallOnlyContract_v1_4_1'
 import MultiSendCallOnlyContract_v1_3_0 from '@safe-global/protocol-kit/contracts/MultiSend/v1.3.0/MultiSendCallOnlyContract_v1_3_0'
 import CompatibilityFallbackHandlerContract_v1_3_0 from '@safe-global/protocol-kit/contracts/CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
 import CompatibilityFallbackHandlerContract_v1_4_1 from '@safe-global/protocol-kit/contracts/CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
+import CompatibilityFallbackHandlerContract_v1_5_0 from '@safe-global/protocol-kit/contracts/CompatibilityFallbackHandler/v1.5.0/CompatibilityFallbackHandlerContract_v1_5_0'
 import SafeProxyFactoryContract_v1_0_0 from '@safe-global/protocol-kit/contracts/SafeProxyFactory/v1.0.0/SafeProxyFactoryContract_v1_0_0'
 import SafeProxyFactoryContract_v1_1_1 from '@safe-global/protocol-kit/contracts/SafeProxyFactory/v1.1.1/SafeProxyFactoryContract_v1_1_1'
 import SafeProxyFactoryContract_v1_3_0 from '@safe-global/protocol-kit/contracts/SafeProxyFactory/v1.3.0/SafeProxyFactoryContract_v1_3_0'
 import SafeProxyFactoryContract_v1_4_1 from '@safe-global/protocol-kit/contracts/SafeProxyFactory/v1.4.1/SafeProxyFactoryContract_v1_4_1'
+import SafeProxyFactoryContract_v1_5_0 from '@safe-global/protocol-kit/contracts/SafeProxyFactory/v1.5.0/SafeProxyFactoryContract_v1_5_0'
 import SignMessageLibContract_v1_3_0 from '@safe-global/protocol-kit/contracts/SignMessageLib/v1.3.0/SignMessageLibContract_v1_3_0'
 import SignMessageLibContract_v1_4_1 from '@safe-global/protocol-kit/contracts/SignMessageLib/v1.4.1/SignMessageLibContract_v1_4_1'
+import SignMessageLibContract_v1_5_0 from '@safe-global/protocol-kit/contracts/SignMessageLib/v1.5.0/SignMessageLibContract_v1_5_0'
 import SimulateTxAccessorContract_v1_3_0 from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/v1.3.0/SimulateTxAccessorContract_v1_3_0'
 import SimulateTxAccessorContract_v1_4_1 from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/v1.4.1/SimulateTxAccessorContract_v1_4_1'
+import SimulateTxAccessorContract_v1_5_0 from '@safe-global/protocol-kit/contracts/SimulateTxAccessor/v1.5.0/SimulateTxAccessorContract_v1_5_0'
 import CreateCallContract_v1_3_0 from '@safe-global/protocol-kit/contracts/CreateCall/v1.3.0/CreateCallContract_v1_3_0'
 import CreateCallContract_v1_4_1 from '@safe-global/protocol-kit/contracts/CreateCall/v1.4.1/CreateCallContract_v1_4_1'
+import CreateCallContract_v1_5_0 from '@safe-global/protocol-kit/contracts/CreateCall/v1.5.0/CreateCallContract_v1_5_0'
 import SafeWebAuthnSignerFactoryContract_v0_2_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSignerFactory/v0.2.1/SafeWebAuthnSignerFactoryContract_v0_2_1'
 import SafeWebAuthnSharedSignerContract_v0_2_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSharedSigner/v0.2.1/SafeWebAuthnSharedSignerContract_v0_2_1'
 
@@ -32,22 +40,27 @@ export type SafeContractImplementationType =
   | SafeContract_v1_2_0
   | SafeContract_v1_3_0
   | SafeContract_v1_4_1
+  | SafeContract_v1_5_0
 
 // MultiSend contract implementation types
 export type MultiSendContractImplementationType =
   | MultiSendContract_v1_1_1
   | MultiSendContract_v1_3_0
   | MultiSendContract_v1_4_1
+  | MultiSendContract_v1_5_0
 
 // MultiSendCallOnly contract implementation types
 export type MultiSendCallOnlyContractImplementationType =
   | MultiSendCallOnlyContract_v1_3_0
   | MultiSendCallOnlyContract_v1_4_1
+  | MultiSendCallOnlyContract_v1_5_0
 
 // CompatibilityFallbackHandler contract implementation types
 export type CompatibilityFallbackHandlerContractImplementationType =
   | CompatibilityFallbackHandlerContract_v1_3_0
   | CompatibilityFallbackHandlerContract_v1_4_1
+  | CompatibilityFallbackHandlerContract_v1_5_0
+  | CompatibilityFallbackHandlerContract_v1_5_0
 
 // SafeProxyFactory contract implementation types
 export type SafeProxyFactoryContractImplementationType =
@@ -55,21 +68,25 @@ export type SafeProxyFactoryContractImplementationType =
   | SafeProxyFactoryContract_v1_1_1
   | SafeProxyFactoryContract_v1_3_0
   | SafeProxyFactoryContract_v1_4_1
+  | SafeProxyFactoryContract_v1_5_0
 
 // SignMessageLib contract implementation types
 export type SignMessageLibContractImplementationType =
   | SignMessageLibContract_v1_3_0
   | SignMessageLibContract_v1_4_1
+  | SignMessageLibContract_v1_5_0
 
 // SimulateTxAccessor contract implementation types
 export type SimulateTxAccessorContractImplementationType =
   | SimulateTxAccessorContract_v1_3_0
   | SimulateTxAccessorContract_v1_4_1
+  | SimulateTxAccessorContract_v1_5_0
 
 // CreateCall contract implementation types
 export type CreateCallContractImplementationType =
   | CreateCallContract_v1_3_0
   | CreateCallContract_v1_4_1
+  | CreateCallContract_v1_5_0
 
 // SafeWebAuthnSignerFactory contract implementation types
 export type SafeWebAuthnSignerFactoryContractImplementationType =

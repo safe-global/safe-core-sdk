@@ -3,6 +3,8 @@ import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getApiKit } from '../utils/setupKits'
 import { zeroHash } from 'viem'
+import { safeVersionDeployed } from 'tests/helpers/safe'
+import { describeif } from 'tests/utils/heplers'
 
 chai.use(chaiAsPromised)
 
@@ -28,7 +30,7 @@ const EXPECTED_SAFE_OPERATION_CONFIRMATIONS = [
   }
 ]
 
-describe('getSafeOperationConfirmations', () => {
+describeif(safeVersionDeployed === '1.4.1')('getSafeOperationConfirmations', () => {
   before(() => {
     safeApiKit = getApiKit()
   })

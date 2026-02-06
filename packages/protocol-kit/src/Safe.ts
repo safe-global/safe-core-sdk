@@ -91,6 +91,7 @@ import createPasskeyDeploymentTransaction from './utils/passkeys/createPasskeyDe
 import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
 import { getProtocolKitVersion } from './utils/getProtocolKitVersion'
 
+const EQ_OR_GT_1_5_0 = '>=1.5.0'
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
@@ -730,8 +731,19 @@ class Safe {
       }
 
       let safeMessageHash: string
-
       if (
+        signingMethod === SigningMethod.SAFE_SIGNATURE &&
+        preimageSafeAddress &&
+        semverSatisfies(safeVersion, EQ_OR_GT_1_5_0)
+      ) {
+        const parentSafeMessageHash = calculateSafeMessageHash(
+          preimageSafeAddress,
+          hashSafeMessage(message.data),
+          safeVersion,
+          chainId
+        )
+        safeMessageHash = await this.getSafeMessageHash(parentSafeMessageHash)
+      } else if (
         signingMethod === SigningMethod.SAFE_SIGNATURE &&
         preimageSafeAddress &&
         semverSatisfies(safeVersion, EQ_OR_GT_1_4_1)
@@ -845,11 +857,23 @@ class Safe {
       }
 
       let txHash: string
-
+      if (
+        signingMethod === SigningMethod.SAFE_SIGNATURE &&
+        semverSatisfies(safeVersion, EQ_OR_GT_1_5_0) &&
+        preimageSafeAddress
+      ) {
+        const txHashData = calculateSafeTransactionHash(
+          preimageSafeAddress,
+          transaction.data,
+          safeVersion,
+          chainId
+        )
+        txHash = await this.getSafeMessageHash(txHashData)
+      }
       // IMPORTANT: because the safe uses the old EIP-1271 interface which uses `bytes` instead of `bytes32` for the message
       // we need to use the pre-image of the transaction hash to calculate the message hash
       // https://github.com/safe-global/safe-contracts/blob/192c7dc67290940fcbc75165522bb86a37187069/test/core/Safe.Signatures.spec.ts#L229-L233
-      if (
+      else if (
         signingMethod === SigningMethod.SAFE_SIGNATURE &&
         semverSatisfies(safeVersion, EQ_OR_GT_1_3_0) &&
         preimageSafeAddress

@@ -2,15 +2,19 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getApiKit } from '../utils/setupKits'
+import { getSafeWith4337Module, safeVersionDeployed } from 'tests/helpers/safe'
+import { describeif } from 'tests/utils/heplers'
+import { Address } from 'viem'
 
 chai.use(chaiAsPromised)
 
-const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // v1.4.1
-
 let safeApiKit: SafeApiKit
 
-describe('getSafeOperation', () => {
+describeif(safeVersionDeployed === '1.4.1')('getSafeOperation', () => {
+  let safeAddress: Address
+
   before(async () => {
+    safeAddress = getSafeWith4337Module()
     safeApiKit = getApiKit()
   })
 
@@ -27,7 +31,7 @@ describe('getSafeOperation', () => {
   })
 
   it('should get the SafeOperation', async () => {
-    const safeOperations = await safeApiKit.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperations = await safeApiKit.getSafeOperationsByAddress(safeAddress)
     chai.expect(safeOperations.results.length).to.have.above(0)
 
     const safeOperationHash = safeOperations.results[0].safeOperationHash

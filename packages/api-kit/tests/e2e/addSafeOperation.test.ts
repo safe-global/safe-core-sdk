@@ -6,11 +6,12 @@ import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperati
 import { Safe4337Pack } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
 import { getKits } from '../utils/setupKits'
+import { getSafeWith4337Module, PRIVATE_KEY_1, safeVersionDeployed } from 'tests/helpers/safe'
+import { describeif } from 'tests/utils/heplers'
+import { Address } from 'viem'
 
 chai.use(chaiAsPromised)
 
-const SIGNER_PK = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 1/2 Safe (v1.4.1) with signer above being an owner + 4337 module enabled
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 const BUNDLER_URL = 'https://api.pimlico.io/v2/sepolia/rpc?apikey=pim_Vjs7ohRqWdvsjUegngf9Bg'
 
@@ -18,15 +19,19 @@ let safeApiKit: SafeApiKit
 let protocolKit: Safe
 let safe4337Pack: Safe4337Pack
 
-describe('addSafeOperation', () => {
-  const transferUSDC = {
-    to: PAYMASTER_TOKEN_ADDRESS,
-    data: generateTransferCallData(SAFE_ADDRESS, 100_000n),
-    value: '0',
-    operation: 0
-  }
+describeif(safeVersionDeployed >= '1.4.1')('addSafeOperation', () => {
+  let SAFE_ADDRESS: Address
+  let transferUSDC: { to: string; data: string; value: string; operation: number }
+  const SIGNER_PK = PRIVATE_KEY_1
 
   before(async () => {
+    SAFE_ADDRESS = getSafeWith4337Module()
+    transferUSDC = {
+      to: PAYMASTER_TOKEN_ADDRESS,
+      data: generateTransferCallData(SAFE_ADDRESS, 100_000n),
+      value: '0',
+      operation: 0
+    }
     ;({ safeApiKit, protocolKit } = await getKits({
       safeAddress: SAFE_ADDRESS,
       signer: SIGNER_PK

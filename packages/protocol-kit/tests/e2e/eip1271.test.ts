@@ -219,16 +219,31 @@ describe('The EIP1271 implementation', () => {
           const typedDataSig = await safeSdk2.signTypedData(safeSdk2.createMessage(MESSAGE), 'v4')
 
           // Sign with the Smart contract
-          const shouldPreimageMessage = semverSatisfies(safeSdk1.getContractVersion(), '>=1.4.1')
-          const messageHashData = preimageSafeMessageHash(
-            safeAddress,
-            messageHash,
-            safeSdk1.getContractVersion(),
-            chainId
-          )
-          const safeSignerMessageHash = await safeSdk3.getSafeMessageHash(
-            shouldPreimageMessage ? messageHashData : messageHash
-          )
+          const safeVersion = safeSdk1.getContractVersion()
+          let safeSignerMessageHash: string
+
+          if (semverSatisfies(safeVersion, '>=1.5.0')) {
+            // For v1.5.0+: Parent safe's hash that will be verified
+            const parentSafeHash = calculateSafeMessageHash(
+              safeAddress,
+              messageHash,
+              Number(chainId)
+            )
+            // Signer safe wraps parent safe's hash
+            safeSignerMessageHash = await safeSdk3.getSafeMessageHash(parentSafeHash)
+          } else if (semverSatisfies(safeVersion, '>=1.4.1')) {
+            // For v1.4.1: Use preimage with getSafeMessageHash
+            const messageHashData = preimageSafeMessageHash(
+              safeAddress,
+              messageHash,
+              safeVersion,
+              chainId
+            )
+            safeSignerMessageHash = await safeSdk3.getSafeMessageHash(messageHashData)
+          } else {
+            // For v1.3.0: Use messageHash directly
+            safeSignerMessageHash = await safeSdk3.getSafeMessageHash(messageHash)
+          }
 
           const signerSafeSig = await buildContractSignature(
             [await safeSdk3.signHash(safeSignerMessageHash)],
@@ -264,17 +279,22 @@ describe('The EIP1271 implementation', () => {
           const safeMessageHash = await safeSdk1.getSafeMessageHash(txHash)
           const signature1 = await safeSdk1.signHash(safeMessageHash)
 
-          const shouldPreimageTxHash = semverSatisfies(safeSdk1.getContractVersion(), '>=1.4.1')
-          const txHashData = preimageSafeMessageHash(
-            safeAddress,
-            txHash,
-            safeSdk1.getContractVersion(),
-            chainId
-          )
+          const safeVersion = safeSdk1.getContractVersion()
+          let signerSafeMessageHash: string
 
-          const signerSafeMessageHash = await safeSdk3.getSafeMessageHash(
-            shouldPreimageTxHash ? txHashData : txHash
-          )
+          if (semverSatisfies(safeVersion, '>=1.5.0')) {
+            // For v1.5.0+: Parent safe's hash that will be verified
+            const parentSafeHash = calculateSafeMessageHash(safeAddress, txHash, Number(chainId))
+            // Signer safe wraps parent safe's hash
+            signerSafeMessageHash = await safeSdk3.getSafeMessageHash(parentSafeHash)
+          } else if (semverSatisfies(safeVersion, '>=1.4.1')) {
+            // For v1.4.1: Use preimage with getSafeMessageHash
+            const txHashData = preimageSafeMessageHash(safeAddress, txHash, safeVersion, chainId)
+            signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHashData)
+          } else {
+            // For v1.3.0: Use txHash directly
+            signerSafeMessageHash = await safeSdk3.getSafeMessageHash(txHash)
+          }
 
           const signature2 = await buildContractSignature(
             [await safeSdk3.signHash(signerSafeMessageHash)],

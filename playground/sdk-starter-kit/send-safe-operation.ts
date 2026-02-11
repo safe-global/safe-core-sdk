@@ -4,6 +4,7 @@ import { createPublicClient, Hex, http } from 'viem'
 import { sepolia } from 'viem/chains'
 import { SafeClientResult, createSafeClient, safeOperations } from '@safe-global/sdk-starter-kit'
 import { generateTransferCallData } from '../utils'
+import { SafeVersion } from '../../packages/types-kit/dist/src/types'
 
 dotenv.config({ path: './playground/sdk-starter-kit/.env' })
 
@@ -17,7 +18,9 @@ const {
   THRESHOLD,
   SALT_NONCE,
   BUNDLER_URL = '',
-  PAYMASTER_URL = ''
+  PAYMASTER_URL = '',
+  API_KEY = '',
+  SAFE_VERSION = '1.4.1'
 } = process.env
 
 const usdcTokenAddress = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // SEPOLIA
@@ -34,8 +37,11 @@ async function send(): Promise<SafeClientResult> {
     safeOptions: {
       owners: [owner1, owner2, owner3],
       threshold: Number(THRESHOLD),
-      saltNonce: SALT_NONCE
-    }
+      saltNonce: SALT_NONCE,
+      safeVersion: SAFE_VERSION as SafeVersion,
+      isL1SafeSingleton: true
+    },
+    apiKey: API_KEY
   })
 
   const safeClientWithSafeOperation = await safeClient.extend(

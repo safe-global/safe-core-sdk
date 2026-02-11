@@ -48,6 +48,19 @@ export type ContractInfo = {
 }
 
 export const safeDeploymentsVersions: SafeDeploymentsVersions = {
+  '1.5.0': {
+    safeSingletonVersion: '1.5.0',
+    safeSingletonL2Version: '1.5.0',
+    safeProxyFactoryVersion: '1.5.0',
+    compatibilityFallbackHandler: '1.5.0',
+    multiSendVersion: '1.5.0',
+    multiSendCallOnlyVersion: '1.5.0',
+    signMessageLibVersion: '1.5.0',
+    createCallVersion: '1.5.0',
+    simulateTxAccessorVersion: '1.5.0',
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
+  },
   '1.4.1': {
     safeSingletonVersion: '1.4.1',
     safeSingletonL2Version: '1.4.1',

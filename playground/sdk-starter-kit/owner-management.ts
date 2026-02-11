@@ -18,7 +18,8 @@ async function addOwner() {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
-    safeAddress: SAFE_ADDRESS
+    safeAddress: SAFE_ADDRESS,
+    apiKey: process.env.API_KEY
   })
 
   const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY as Hex)
@@ -37,13 +38,15 @@ async function removeOwner() {
   const safeClient1 = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
-    safeAddress: SAFE_ADDRESS
+    safeAddress: SAFE_ADDRESS,
+    apiKey: process.env.API_KEY
   })
 
   const safeClient2 = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_2_PRIVATE_KEY,
-    safeAddress: SAFE_ADDRESS
+    safeAddress: SAFE_ADDRESS,
+    apiKey: process.env.API_KEY
   })
 
   const owner2 = privateKeyToAddress(OWNER_2_PRIVATE_KEY as Hex)
@@ -64,7 +67,8 @@ async function safeInfo() {
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: OWNER_1_PRIVATE_KEY,
-    safeAddress: SAFE_ADDRESS
+    safeAddress: SAFE_ADDRESS,
+    apiKey: process.env.API_KEY
   })
 
   console.log('Safe Address', await safeClient.protocolKit.getAddress())

@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv'
 import { Hex } from 'viem'
 import { privateKeyToAddress } from 'viem/accounts'
 import { SafeClientResult, createSafeClient, onChainMessages } from '@safe-global/sdk-starter-kit'
+import { SafeVersion } from '../../packages/types-kit/dist/src/types'
 
 dotenv.config({ path: './playground/sdk-starter-kit/.env' })
 
@@ -13,7 +14,9 @@ const {
   OWNER_3_PRIVATE_KEY = '0x',
   RPC_URL = '',
   THRESHOLD,
-  SALT_NONCE
+  SALT_NONCE,
+  API_KEY = '',
+  SAFE_VERSION = '1.4.1'
 } = process.env
 
 const MESSAGE = "I'm the owner of this Safe"
@@ -75,8 +78,11 @@ async function send(): Promise<SafeClientResult> {
     safeOptions: {
       owners: [owner1, owner2, owner3],
       threshold: Number(THRESHOLD),
-      saltNonce: SALT_NONCE
-    }
+      saltNonce: SALT_NONCE,
+      safeVersion: SAFE_VERSION as SafeVersion,
+      isL1SafeSingleton: true
+    },
+    apiKey: API_KEY
   })
 
   const safeClientWithMessages = safeClient.extend(onChainMessages())
@@ -105,7 +111,8 @@ async function confirm({ safeAddress, transactions }: SafeClientResult, pk: stri
   const safeClient = await createSafeClient({
     provider: RPC_URL,
     signer: pk,
-    safeAddress
+    safeAddress,
+    apiKey: API_KEY
   })
 
   const signerAddress = (await safeClient.protocolKit.getSafeProvider().getSignerAddress()) || '0x'

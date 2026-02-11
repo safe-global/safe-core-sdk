@@ -70,7 +70,8 @@ const SAFE_VERSIONS: Record<string, SafeInfo> = {
 }
 
 const SAFE_VERSIONS_WITH_4337_MODULE: Record<string, Address> = {
-  '1.4.1': '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0'
+  '1.4.1': '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0',
+  '1.5.0': '0x654Dc108a4Ce3Ed111602c62ABdd3700cA66DE6b'
 }
 
 /**

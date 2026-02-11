@@ -23,7 +23,7 @@ let safe4337Pack: Safe4337Pack
 let safeOperation: SafeOperation
 let safeOpHash: string
 
-describeif(safeVersionDeployed == '1.4.1')('confirmSafeOperation', () => {
+describeif(safeVersionDeployed >= '1.4.1')('confirmSafeOperation', () => {
   let SAFE_ADDRESS: Address
   let transferUSDC: { to: string; data: string; value: string; operation: number }
 

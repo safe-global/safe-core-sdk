@@ -19,7 +19,7 @@ let safeApiKit: SafeApiKit
 let protocolKit: Safe
 let safe4337Pack: Safe4337Pack
 
-describeif(safeVersionDeployed === '1.4.1')('addSafeOperation', () => {
+describeif(safeVersionDeployed >= '1.4.1')('addSafeOperation', () => {
   let SAFE_ADDRESS: Address
   let transferUSDC: { to: string; data: string; value: string; operation: number }
   const SIGNER_PK = PRIVATE_KEY_1

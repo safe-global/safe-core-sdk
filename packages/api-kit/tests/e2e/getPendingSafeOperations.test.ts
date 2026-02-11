@@ -10,7 +10,7 @@ chai.use(chaiAsPromised)
 
 let safeApiKit: SafeApiKit
 
-describeif(safeVersionDeployed === '1.4.1')('getPendingSafeOperations', () => {
+describeif(safeVersionDeployed >= '1.4.1')('getPendingSafeOperations', () => {
   const SAFE_ADDRESS: Address = getSafeWith4337Module()
   before(async () => {
     safeApiKit = getApiKit()

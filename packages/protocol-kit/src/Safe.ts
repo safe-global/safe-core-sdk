@@ -1287,8 +1287,22 @@ class Safe {
     })
     serviceTransactionResponse.confirmations?.map(
       (confirmation: SafeMultisigConfirmationResponse) => {
-        const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
-        safeTransaction.addSignature(signature)
+        if (confirmation.signatureType === 'CONTRACT_SIGNATURE') {
+          // Contract signatures are stored as: r(32) + s(32) + v(1) + dataLen(32) + data(N)
+          // Extract just the inner signature data that isValidSignature expects.
+          const sig = confirmation.signature.startsWith('0x')
+            ? confirmation.signature.slice(2)
+            : confirmation.signature
+          // Read s (bytes 32-63) to find the byte offset to the length-prefixed data
+          const s = parseInt(sig.slice(64, 128), 16)
+          const dataLen = parseInt(sig.slice(s * 2, s * 2 + 64), 16)
+          const innerData = '0x' + sig.slice(s * 2 + 64, s * 2 + 64 + dataLen * 2)
+          const signature = new EthSafeSignature(confirmation.owner, innerData, true)
+          safeTransaction.addSignature(signature)
+        } else {
+          const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
+          safeTransaction.addSignature(signature)
+        }
       }
     )
     return safeTransaction

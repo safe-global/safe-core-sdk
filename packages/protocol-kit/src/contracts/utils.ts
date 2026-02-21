@@ -444,27 +444,64 @@ export function getSafeAddressFromDeploymentTx(
   txReceipt: FormattedTransactionReceipt,
   safeVersion: SafeVersion
 ): string {
-  const eventHash = toEventHash(getProxyCreationEvent(safeVersion))
-  const proxyCreationEvent = txReceipt?.logs.find((event) => event.topics[0] === eventHash)
-
-  if (!proxyCreationEvent) {
+  if (!txReceipt?.logs?.length) {
     throw new Error('SafeProxy was not deployed correctly')
   }
 
-  const { data, topics } = proxyCreationEvent
+  // Try to find the proxy creation event by topic first (fast path)
+  try {
+    const eventHash = toEventHash(getProxyCreationEvent(safeVersion))
+    const proxyCreationEvent = txReceipt?.logs.find((event) => event.topics?.[0] === eventHash)
 
-  const { args } = decodeEventLog({
-    abi: parseAbi([getProxyCreationEvent(safeVersion)]),
-    eventName: 'ProxyCreation',
-    data,
-    topics
-  })
+    if (proxyCreationEvent) {
+      const { data, topics } = proxyCreationEvent
 
-  if (!args || !args.length) {
-    throw new Error('SafeProxy was not deployed correctly')
+      const { args } = decodeEventLog({
+        abi: parseAbi([getProxyCreationEvent(safeVersion)]),
+        eventName: 'ProxyCreation',
+        data,
+        topics
+      })
+
+      if (args && args.length) return args[0] as string
+    }
+  } catch (e) {
+    console.log('Fast path failed:', e)
   }
 
-  return args[0] as string
+  // Fallback: some RPCs or chains may return logs in a slightly different format
+  // Try each log with manual address extraction first, then ABI decoding
+  for (const log of txReceipt.logs) {
+    // Skip obviously invalid logs
+    if (!log.data || log.data === '0x') continue
+
+      // Try to find the address in the data field, regardless of version
+    if (log.data !== '0x') {
+      // Slice out bytes 12-32 (20 bytes) which should contain the address
+      // This matches both v1.3.0+ with padding and v1.0.0 without padding
+      const proxyCreationAddress = '0x' + log.data.slice(26, 66).toLowerCase()
+      if (isAddress(proxyCreationAddress)) {
+        // Return extracted address if it matches the expected address format
+        return proxyCreationAddress
+      }
+    }
+
+    // Try ABI decoding as last resort
+    try {
+      const { args } = decodeEventLog({
+        abi: parseAbi([getProxyCreationEvent(safeVersion)]),
+        eventName: 'ProxyCreation',
+        data: log.data,
+        topics: log.topics || []
+      })
+
+      if (args && args.length) return args[0] as string
+    } catch (e) {
+      // ignore and continue trying other logs
+    }
+  }
+
+  throw new Error('SafeProxy was not deployed correctly')
 }
 
 /**

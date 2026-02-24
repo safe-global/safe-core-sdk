@@ -60,7 +60,6 @@ export type CompatibilityFallbackHandlerContractImplementationType =
   | CompatibilityFallbackHandlerContract_v1_3_0
   | CompatibilityFallbackHandlerContract_v1_4_1
   | CompatibilityFallbackHandlerContract_v1_5_0
-  | CompatibilityFallbackHandlerContract_v1_5_0
 
 // SafeProxyFactory contract implementation types
 export type SafeProxyFactoryContractImplementationType =

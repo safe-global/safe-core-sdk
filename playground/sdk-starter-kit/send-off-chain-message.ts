@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv'
 import { Hex } from 'viem'
 import { privateKeyToAddress } from 'viem/accounts'
 import { SafeClientResult, createSafeClient, offChainMessages } from '@safe-global/sdk-starter-kit'
-import { SafeVersion } from '../../packages/types-kit/dist/src/types'
+import { SafeVersion } from '@safe-global/types-kit'
 
 dotenv.config({ path: './playground/sdk-starter-kit/.env' })
 

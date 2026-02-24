@@ -3,7 +3,7 @@ import { Hex } from 'viem'
 import { privateKeyToAddress } from 'viem/accounts'
 import { SafeClientResult, createSafeClient } from '@safe-global/sdk-starter-kit'
 import { generateTransferCallData } from '../utils'
-import { SafeVersion } from '../../packages/types-kit/dist/src/types'
+import { SafeVersion } from '@safe-global/types-kit'
 
 dotenv.config({ path: './playground/sdk-starter-kit/.env' })
 

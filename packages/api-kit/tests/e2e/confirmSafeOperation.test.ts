@@ -13,6 +13,7 @@ import {
 } from 'tests/helpers/safe'
 import { describeif } from 'tests/utils/heplers'
 import { Address } from 'viem'
+import semverSatisfies from 'semver/functions/satisfies.js'
 
 chai.use(chaiAsPromised)
 const BUNDLER_URL = 'https://api.pimlico.io/v2/sepolia/rpc?apikey=pim_Vjs7ohRqWdvsjUegngf9Bg'
@@ -23,7 +24,7 @@ let safe4337Pack: Safe4337Pack
 let safeOperation: SafeOperation
 let safeOpHash: string
 
-describeif(safeVersionDeployed >= '1.4.1')('confirmSafeOperation', () => {
+describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('confirmSafeOperation', () => {
   let SAFE_ADDRESS: Address
   let transferUSDC: { to: string; data: string; value: string; operation: number }
 

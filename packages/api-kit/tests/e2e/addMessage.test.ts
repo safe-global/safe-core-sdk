@@ -5,6 +5,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { getKits } from '../utils/setupKits'
 import { getSafe, PRIVATE_KEY_1 as PRIVATE_KEY, safeVersionDeployed } from 'tests/helpers/safe'
 import { describeif } from 'tests/utils/heplers'
+import semverSatisfies from 'semver/functions/satisfies.js'
 
 chai.use(chaiAsPromised)
 
@@ -22,7 +23,7 @@ const generateRandomUUID = (): string => {
 }
 
 const generateMessage = () => `${generateRandomUUID()}: I am the owner of the safe`
-describeif(safeVersionDeployed >= '1.4.1')(`[${version}] addMessage`, () => {
+describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(`[${version}] addMessage`, () => {
   before(async () => {
     ;({ safeApiKit, protocolKit } = await getKits({
       safeAddress,

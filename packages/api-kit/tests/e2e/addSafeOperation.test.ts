@@ -9,6 +9,7 @@ import { getKits } from '../utils/setupKits'
 import { getSafeWith4337Module, PRIVATE_KEY_1, safeVersionDeployed } from 'tests/helpers/safe'
 import { describeif } from 'tests/utils/heplers'
 import { Address } from 'viem'
+import semverSatisfies from 'semver/functions/satisfies.js'
 
 chai.use(chaiAsPromised)
 
@@ -19,7 +20,7 @@ let safeApiKit: SafeApiKit
 let protocolKit: Safe
 let safe4337Pack: Safe4337Pack
 
-describeif(safeVersionDeployed >= '1.4.1')('addSafeOperation', () => {
+describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', () => {
   let SAFE_ADDRESS: Address
   let transferUSDC: { to: string; data: string; value: string; operation: number }
   const SIGNER_PK = PRIVATE_KEY_1

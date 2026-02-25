@@ -1,5 +1,5 @@
 import chai from 'chai'
-import { polygon, optimism, gnosis, base, avalanche } from 'viem/chains'
+import { optimism, gnosis, base, avalanche } from 'viem/chains'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   getSafeAddressFromDeploymentTx,
@@ -716,7 +716,7 @@ describe('Contract utils', () => {
         }
 
         const protocolKitPolygonMainnet = await Safe.init({
-          provider: polygon.rpcUrls.default.http[0],
+          provider: 'https://polygon.drpc.org', // polygon.rpcUrls.default.http[0],
           predictedSafe: {
             safeAccountConfig,
             safeDeploymentConfig

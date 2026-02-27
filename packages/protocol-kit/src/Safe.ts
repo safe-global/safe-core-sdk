@@ -496,6 +496,16 @@ class Safe {
   }
 
   /**
+   * Returns the enabled Safe module guard or 0x address if no module guard is enabled.
+   *
+   * @returns The address of the enabled Safe module guard
+   * @throws "Current version of the Safe does not support module guard functionality"
+   */
+  async getModuleGuard(): Promise<string> {
+    return this.#moduleManager.getModuleGuard()
+  }
+
+  /**
    * Checks if a specific address is an owner of the current Safe.
    *
    * @param ownerAddress - The account address
@@ -1060,6 +1070,55 @@ class Safe {
       to: await this.getAddress(),
       value: '0',
       data: await this.#guardManager.encodeDisableGuardData()
+    }
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
+    return safeTransaction
+  }
+
+  /**
+   * Returns the Safe transaction to enable a Safe module guard.
+   *
+   * @param moduleGuardAddress - The desired module guard address
+   * @param options - The transaction optional properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "Invalid module guard address provided"
+   * @throws "Module guard provided is already enabled"
+   * @throws "Current version of the Safe does not support module guard functionality"
+   */
+  async createEnableModuleGuardTx(
+    moduleGuardAddress: string,
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const safeTransactionData = {
+      to: await this.getAddress(),
+      value: '0',
+      data: await this.#moduleManager.encodeEnableModuleGuardData(moduleGuardAddress)
+    }
+    const safeTransaction = await this.createTransaction({
+      transactions: [safeTransactionData],
+      options
+    })
+    return safeTransaction
+  }
+
+  /**
+   * Returns the Safe transaction to disable a Safe module guard.
+   *
+   * @param options - The transaction optional properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "There is no module guard enabled yet"
+   * @throws "Current version of the Safe does not support module guard functionality"
+   */
+  async createDisableModuleGuardTx(
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const safeTransactionData = {
+      to: await this.getAddress(),
+      value: '0',
+      data: await this.#moduleManager.encodeDisableModuleGuardData()
     }
     const safeTransaction = await this.createTransaction({
       transactions: [safeTransactionData],

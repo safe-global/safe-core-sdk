@@ -58,6 +58,8 @@ export type SafeContractCompatibleWithModuleManager =
   | SafeContract_v1_4_1
   | SafeContract_v1_5_0
 
+export type SafeContractCompatibleWithModuleGuardManager = SafeContract_v1_5_0
+
 export type SafeContractCompatibleWithRequiredTxGas =
   | SafeContract_v1_0_0
   | SafeContract_v1_1_1

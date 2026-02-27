@@ -233,7 +233,21 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment): Promise<v
     deterministicDeployment: true
   })
 
+  await deploy('DebugTransactionGuard_SV1_5_0', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
   await deploy('TokenCallbackHandler_SV1_4_1', {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true
+  })
+
+  await deploy('TokenCallbackHandler_SV1_5_0', {
     from: deployer,
     args: [],
     log: true,

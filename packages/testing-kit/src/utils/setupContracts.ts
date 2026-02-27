@@ -264,16 +264,29 @@ export const getERC20Mintable = async (): Promise<GetContractReturnType<Abi, Wal
 export const getDebugTransactionGuard = async (): Promise<GetContractReturnType<Abi>> => {
   const contractName = semverSatisfies(safeVersionDeployed, '<=1.3.0')
     ? 'DebugTransactionGuard_SV1_3_0'
-    : 'DebugTransactionGuard_SV1_4_1'
+    : semverSatisfies(safeVersionDeployed, '>=1.5.0')
+      ? 'DebugTransactionGuard_SV1_5_0'
+      : 'DebugTransactionGuard_SV1_4_1'
   const debugTransactionGuardDeployment = await deployments.get(contractName)
   const debugTransactionGuardAddress = debugTransactionGuardDeployment.address
   return await viem.getContractAt(contractName, debugTransactionGuardAddress as Address)
 }
 
+export const getDebugModuleGuard = async (): Promise<GetContractReturnType<Abi>> => {
+  const debugModuleGuardDeployment = await deployments.get('DebugTransactionGuard_SV1_5_0')
+  const debugModuleGuardAddress = debugModuleGuardDeployment.address
+  return await viem.getContractAt(
+    'DebugTransactionGuard_SV1_5_0',
+    debugModuleGuardAddress as Address
+  )
+}
+
 export const getDefaultCallbackHandler = async (): Promise<GetContractReturnType<Abi>> => {
   const contractName = semverSatisfies(safeVersionDeployed, '<=1.3.0')
     ? 'DefaultCallbackHandler_SV1_3_0'
-    : 'TokenCallbackHandler_SV1_4_1'
+    : semverSatisfies(safeVersionDeployed, '>=1.5.0')
+      ? 'TokenCallbackHandler_SV1_5_0'
+      : 'TokenCallbackHandler_SV1_4_1'
   const defaultCallbackHandlerDeployment = await deployments.get(contractName)
   const defaultCallbackHandlerAddress = defaultCallbackHandlerDeployment.address
   return await viem.getContractAt(contractName, defaultCallbackHandlerAddress as Address)

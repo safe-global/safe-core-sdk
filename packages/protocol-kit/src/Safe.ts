@@ -1817,6 +1817,7 @@ class Safe {
   ): Promise<boolean> => {
     const safeAddress = await this.getAddress()
     const fallbackHandler = await this.#getFallbackHandlerContract()
+    const safeVersion = this.getContractVersion()
 
     const signatureToCheck =
       signature && Array.isArray(signature) ? buildSignatureBytes(signature) : signature
@@ -1829,31 +1830,26 @@ class Safe {
     ]
     const data = fallbackHandler.encode('isValidSignature', bytes32Tuple)
 
-    const bytesTuple: [_data: Hash, _signature: Hex] = [
-      asHash(messageHash),
-      asHex(signatureToCheck)
-    ]
-    const bytesData = fallbackHandler.encode('isValidSignature', bytesTuple)
+    const callParams = { from: safeAddress, to: safeAddress }
+
+    const calls: Promise<string>[] = [this.#safeProvider.call({ ...callParams, data })]
+
+    // The legacy isValidSignature(bytes, bytes) overload (0x20c13b0b) was removed in Safe v1.5.0.
+    // Only call it for older versions.
+    if (!semverSatisfies(safeVersion, EQ_OR_GT_1_5_0)) {
+      const bytesTuple: [_data: Hash, _signature: Hex] = [
+        asHash(messageHash),
+        asHex(signatureToCheck)
+      ]
+      const bytesData = fallbackHandler.encode('isValidSignature', bytesTuple)
+      calls.push(this.#safeProvider.call({ ...callParams, data: bytesData }))
+    }
 
     try {
-      const isValidSignatureResponse = await Promise.all([
-        this.#safeProvider.call({
-          from: safeAddress,
-          to: safeAddress,
-          data: data
-        }),
-        this.#safeProvider.call({
-          from: safeAddress,
-          to: safeAddress,
-          data: bytesData
-        })
-      ])
+      const responses = await Promise.all(calls)
+      const magicValues = [this.#MAGIC_VALUE, this.#MAGIC_VALUE_BYTES]
 
-      return (
-        !!isValidSignatureResponse.length &&
-        (isValidSignatureResponse[0].slice(0, 10).toLowerCase() === this.#MAGIC_VALUE ||
-          isValidSignatureResponse[1].slice(0, 10).toLowerCase() === this.#MAGIC_VALUE_BYTES)
-      )
+      return responses.some((response, i) => response.slice(0, 10).toLowerCase() === magicValues[i])
     } catch (error) {
       return false
     }

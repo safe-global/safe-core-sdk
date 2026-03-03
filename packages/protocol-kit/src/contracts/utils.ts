@@ -373,8 +373,12 @@ export async function predictSafeAddress({
 
   const from = safeProxyFactoryContract.getAddress()
 
-  // On the zkSync chains, the counterfactual deployment address is calculated differently
-  const isZkSyncChain = [ZKSYNC_MAINNET, ZKSYNC_TESTNET, ZKSYNC_LENS].includes(chainId)
+  // On the zkSync chains, the counterfactual deployment address is calculated differently.
+  // In Safe v1.5.1 support for zkSync EraVM is deprecated.
+  // See: https://github.com/safe-fndn/safe-smart-account/blob/main/CHANGELOG.md#deprecate-zksync-eravm-support
+  const isZkSyncChain =
+    [ZKSYNC_MAINNET, ZKSYNC_TESTNET, ZKSYNC_LENS].includes(chainId) &&
+    semverSatisfies(safeVersion, '<=1.4.1')
   if (isZkSyncChain) {
     const proxyAddress = zkSyncCreate2Address(from, safeVersion, salt, asHex(input))
 

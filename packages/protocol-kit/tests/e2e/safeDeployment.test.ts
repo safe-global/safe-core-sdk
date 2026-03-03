@@ -1,4 +1,5 @@
 import { DEFAULT_SAFE_VERSION } from '@safe-global/protocol-kit/contracts/config'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import {
   getCompatibilityFallbackHandler,
   getDefaultCallbackHandler,
@@ -643,7 +644,7 @@ describe('Safe Deployment', () => {
       chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
     })
 
-    itif(safeVersionDeployed == '1.3.0')(
+    itif(semverSatisfies(safeVersionDeployed, '=1.3.0'))(
       'should deploy the v1.3.0 Safe version by default',
       async () => {
         const { accounts, contractNetworks } = await setupTests()

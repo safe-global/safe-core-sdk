@@ -2,6 +2,7 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import { SafeOperationResponse } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { getApiKit } from '../utils/setupKits'
 import { getSafeWith4337Module, safeVersionDeployed } from 'tests/helpers/safe'
 import { describeif } from 'tests/utils/heplers'
@@ -11,7 +12,7 @@ chai.use(chaiAsPromised)
 
 let safeApiKit: SafeApiKit
 
-describeif(safeVersionDeployed === '1.4.1')('getSafeOperationsByAddress', () => {
+describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationsByAddress', () => {
   let safeAddress: Address
 
   before(async () => {

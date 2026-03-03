@@ -1,4 +1,5 @@
 import chai from 'chai'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { optimism, gnosis, base, avalanche } from 'viem/chains'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
@@ -547,7 +548,7 @@ describe('Contract utils', () => {
       }
     )
 
-    itif(safeVersionDeployed === '1.3.0')(
+    itif(semverSatisfies(safeVersionDeployed, '=1.3.0'))(
       'returns the predicted address for Safes deployed on zkSync EVM',
       async () => {
         const { contractNetworks } = await setupTests()
@@ -631,7 +632,7 @@ describe('Contract utils', () => {
       }
     )
 
-    itif(safeVersionDeployed === '1.3.0')(
+    itif(semverSatisfies(safeVersionDeployed, '=1.3.0'))(
       // see: https://github.com/safe-global/safe-core-sdk/issues/598
       'returns the correct predicted address for each chain',
       async () => {

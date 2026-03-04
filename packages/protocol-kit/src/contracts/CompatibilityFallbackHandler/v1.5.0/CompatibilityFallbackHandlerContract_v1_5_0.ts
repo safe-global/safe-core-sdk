@@ -4,7 +4,8 @@ import { DeploymentType } from '@safe-global/protocol-kit/types'
 import {
   compatibilityFallbackHandler_1_5_0_ContractArtifacts,
   CompatibilityFallbackHandlerContract_v1_5_0_Abi,
-  CompatibilityFallbackHandlerContract_v1_5_0_Contract
+  CompatibilityFallbackHandlerContract_v1_5_0_Contract,
+  CompatibilityFallbackHandlerContract_v1_5_0_Function
 } from '@safe-global/types-kit'
 
 /**
@@ -48,6 +49,17 @@ class CompatibilityFallbackHandlerContract_v1_5_0
       deploymentType
     )
   }
+
+  /**
+   * New in v1.5.0: encodeTransactionData was moved from the Safe contract to CompatibilityFallbackHandler
+   * to preserve backwards compatibility for existing integrations.
+   * @param args - Array[to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, nonce]
+   * @returns Array[encodedData]
+   */
+  encodeTransactionData: CompatibilityFallbackHandlerContract_v1_5_0_Function<'encodeTransactionData'> =
+    async (args) => {
+      return [await this.read('encodeTransactionData', args)]
+    }
 }
 
 export default CompatibilityFallbackHandlerContract_v1_5_0

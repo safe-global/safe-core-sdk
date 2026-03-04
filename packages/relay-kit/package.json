@@ -55,11 +55,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@gelatonetwork/relay-sdk": "^5.6.0",
+    "@gelatocloud/gasless": "^0.0.7",
     "@safe-global/protocol-kit": "^6.1.2",
     "@safe-global/safe-modules-deployments": "^2.2.21",
     "@safe-global/types-kit": "^3.0.0",
     "semver": "^7.7.2",
-    "viem": "^2.21.8"
+    "viem": "2.21.59"
   }
 }

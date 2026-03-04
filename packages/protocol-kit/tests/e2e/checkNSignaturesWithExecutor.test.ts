@@ -34,7 +34,7 @@ async function getTypedSafeContract(
   return safeContract as SafeContract_v1_5_0
 }
 
-describe.only('checkSignaturesWithExecutor and checkNSignaturesWithExecutor', () => {
+describe('checkSignaturesWithExecutor and checkNSignaturesWithExecutor', () => {
   const provider = getEip1193Provider()
 
   /**

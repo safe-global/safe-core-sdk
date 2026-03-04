@@ -66,7 +66,7 @@ import SimulateTxAccessorContract_v1_5_0 from './SimulateTxAccessor/v1.5.0/Simul
 import CompatibilityFallbackHandlerContract_v1_3_0 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
 import CompatibilityFallbackHandlerContract_v1_4_1 from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
 import CompatibilityFallbackHandlerContract_v1_5_0 from './CompatibilityFallbackHandler/v1.5.0/CompatibilityFallbackHandlerContract_v1_5_0'
-import ExtensibleFallbackHandlerContract_v1_5_0 from './ExtensibleFallbackHandler/v1.5.0/ExtensibleFallbackHandler'
+import ExtensibleFallbackHandlerContract_v1_5_0 from './ExtensibleFallbackHandler/v1.5.0/ExtensibleFallbackHandlerContract_v1_5_0'
 import SafeWebAuthnSignerFactoryContract_v0_2_1 from './SafeWebAuthnSignerFactory/v0.2.1/SafeWebAuthnSignerFactoryContract_v0_2_1'
 import SafeWebAuthnSharedSignerContract_v0_2_1 from './SafeWebAuthnSharedSigner/v0.2.1/SafeWebAuthnSharedSignerContract_v0_2_1'
 import SafeProvider from '../SafeProvider'

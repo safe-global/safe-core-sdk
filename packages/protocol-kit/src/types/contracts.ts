@@ -32,7 +32,7 @@ import CreateCallContract_v1_4_1 from '@safe-global/protocol-kit/contracts/Creat
 import CreateCallContract_v1_5_0 from '@safe-global/protocol-kit/contracts/CreateCall/v1.5.0/CreateCallContract_v1_5_0'
 import SafeWebAuthnSignerFactoryContract_v0_2_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSignerFactory/v0.2.1/SafeWebAuthnSignerFactoryContract_v0_2_1'
 import SafeWebAuthnSharedSignerContract_v0_2_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSharedSigner/v0.2.1/SafeWebAuthnSharedSignerContract_v0_2_1'
-import ExtensibleFallbackHandlerContract_v1_5_0 from '@safe-global/protocol-kit/contracts/ExtensibleFallbackHandler/v1.5.0/ExtensibleFallbackHandler'
+import ExtensibleFallbackHandlerContract_v1_5_0 from '@safe-global/protocol-kit/contracts/ExtensibleFallbackHandler/v1.5.0/ExtensibleFallbackHandlerContract_v1_5_0'
 
 // Safe contract implementation types
 export type SafeContractImplementationType =

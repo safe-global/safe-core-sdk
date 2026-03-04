@@ -28,4 +28,28 @@ export type SafeContract_v1_5_0_Function<
  *
  * @type {SafeContract_v1_5_0_Contract}
  */
-export type SafeContract_v1_5_0_Contract = SafeBaseContract<SafeContract_v1_5_0_Abi>
+export type SafeContract_v1_5_0_Contract = SafeBaseContract<SafeContract_v1_5_0_Abi> & {
+  /**
+   * New in v1.5.0: overload that accepts an explicit executor address.
+   * Allows modules to pass msg.sender explicitly rather than relying on the contract's own context.
+   * @param args - Array[executor, dataHash, signatures, requiredSignatures]
+   * @returns Empty array
+   */
+  checkNSignaturesWithExecutor: (
+    args: [
+      executor: `0x${string}`,
+      dataHash: `0x${string}`,
+      signatures: `0x${string}`,
+      requiredSignatures: bigint
+    ]
+  ) => Promise<[]>
+  /**
+   * New in v1.5.0: overload that accepts an explicit executor address.
+   * Allows modules to pass msg.sender explicitly rather than relying on the contract's own context.
+   * @param args - Array[executor, dataHash, signatures]
+   * @returns Empty array
+   */
+  checkSignaturesWithExecutor: (
+    args: [executor: `0x${string}`, dataHash: `0x${string}`, signatures: `0x${string}`]
+  ) => Promise<[]>
+}

@@ -1,4 +1,4 @@
-import { simulateContract } from 'viem/actions'
+import { readContract, simulateContract } from 'viem/actions'
 import SafeBaseContract from '@safe-global/protocol-kit/contracts/Safe/SafeBaseContract'
 import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import { toTxResult } from '@safe-global/protocol-kit/contracts/utils'
@@ -88,12 +88,86 @@ class SafeContract_v1_5_0
   }
 
   /**
+   * New in v1.5.0: overload of checkNSignatures that accepts an explicit executor address.
+   * Allows modules to pass msg.sender explicitly rather than relying on the contract's own context.
+   * Will revert otherwise.
+   * @param args - Array[executor, dataHash, signatures, requiredSignatures]
+   * @returns Empty array
+   */
+  checkNSignaturesWithExecutor = async (
+    args: [
+      executor: `0x${string}`,
+      dataHash: `0x${string}`,
+      signatures: `0x${string}`,
+      requiredSignatures: bigint
+    ]
+  ): Promise<[]> => {
+    // Use a single-entry ABI containing only the executor overload so that viem
+    // selects the correct function selector: checkNSignatures(address,bytes32,bytes,uint256)
+    // rather than the original: checkNSignatures(bytes32,bytes,bytes,uint256)
+    await readContract(this.runner, {
+      address: this.contractAddress as `0x${string}`,
+      functionName: 'checkNSignatures',
+      abi: [
+        {
+          inputs: [
+            { internalType: 'address', name: 'executor', type: 'address' },
+            { internalType: 'bytes32', name: 'dataHash', type: 'bytes32' },
+            { internalType: 'bytes', name: 'signatures', type: 'bytes' },
+            { internalType: 'uint256', name: 'requiredSignatures', type: 'uint256' }
+          ],
+          name: 'checkNSignatures',
+          outputs: [],
+          stateMutability: 'view',
+          type: 'function'
+        }
+      ] as const,
+      args
+    })
+    return []
+  }
+
+  /**
    * Checks whether the signature provided is valid for the provided data and hash. Will revert otherwise.
    * @param args - Array[dataHash, data, signatures]
    * @returns Empty array
    */
   checkSignatures: SafeContract_v1_5_0_Function<'checkSignatures'> = async (args) => {
     await this.read('checkSignatures', args)
+    return []
+  }
+
+  /**
+   * New in v1.5.0: overload of checkSignatures that accepts an explicit executor address.
+   * Allows modules to pass msg.sender explicitly rather than relying on the contract's own context.
+   * Will revert otherwise.
+   * @param args - Array[executor, dataHash, signatures]
+   * @returns Empty array
+   */
+  checkSignaturesWithExecutor = async (
+    args: [executor: `0x${string}`, dataHash: `0x${string}`, signatures: `0x${string}`]
+  ): Promise<[]> => {
+    // Use a single-entry ABI containing only the executor overload so that viem
+    // selects the correct function selector: checkSignatures(address,bytes32,bytes)
+    // rather than the original: checkSignatures(bytes32,bytes,bytes)
+    await readContract(this.runner, {
+      address: this.contractAddress as `0x${string}`,
+      functionName: 'checkSignatures',
+      abi: [
+        {
+          inputs: [
+            { internalType: 'address', name: 'executor', type: 'address' },
+            { internalType: 'bytes32', name: 'dataHash', type: 'bytes32' },
+            { internalType: 'bytes', name: 'signatures', type: 'bytes' }
+          ],
+          name: 'checkSignatures',
+          outputs: [],
+          stateMutability: 'view',
+          type: 'function'
+        }
+      ] as const,
+      args
+    })
     return []
   }
 

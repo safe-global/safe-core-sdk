@@ -1,5 +1,9 @@
 import { Abi } from 'abitype'
-import BaseContract from '../common/BaseContract'
+import BaseContract, {
+  ContractReadFunctionNames,
+  EstimateGasFunction,
+  SafeContractFunction
+} from '../common/BaseContract'
 
 /**
  * Represents the base contract type for an ExtensibleFallbackHandler contract.
@@ -8,6 +12,28 @@ import BaseContract from '../common/BaseContract'
  * @type {ExtensibleFallbackHandlerBaseContract}
  */
 type ExtensibleFallbackHandlerBaseContract<ExtensibleFallbackHandlerContractAbi extends Abi> =
-  BaseContract<ExtensibleFallbackHandlerContractAbi, never>
+  BaseContract<
+    ExtensibleFallbackHandlerContractAbi,
+    ContractReadFunctionNames<ExtensibleFallbackHandlerContractAbi>
+  > & {
+    estimateGas: EstimateGasFunction<ExtensibleFallbackHandlerContractAbi>
+    addSupportedInterfaceBatch: SafeContractFunction<
+      ExtensibleFallbackHandlerContractAbi,
+      'addSupportedInterfaceBatch'
+    >
+    removeSupportedInterfaceBatch: SafeContractFunction<
+      ExtensibleFallbackHandlerContractAbi,
+      'removeSupportedInterfaceBatch'
+    >
+    setDomainVerifier: SafeContractFunction<
+      ExtensibleFallbackHandlerContractAbi,
+      'setDomainVerifier'
+    >
+    setSafeMethod: SafeContractFunction<ExtensibleFallbackHandlerContractAbi, 'setSafeMethod'>
+    setSupportedInterface: SafeContractFunction<
+      ExtensibleFallbackHandlerContractAbi,
+      'setSupportedInterface'
+    >
+  }
 
 export default ExtensibleFallbackHandlerBaseContract

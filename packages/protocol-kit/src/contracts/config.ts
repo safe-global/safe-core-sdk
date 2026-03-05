@@ -20,7 +20,7 @@ import {
 import { SafeVersion } from '@safe-global/types-kit'
 import { DeploymentType } from '../types'
 
-export const DEFAULT_SAFE_VERSION: SafeVersion = '1.3.0'
+export const DEFAULT_SAFE_VERSION: SafeVersion = '1.4.1'
 export const SAFE_BASE_VERSION: SafeVersion = '1.0.0'
 
 type contractNames = {

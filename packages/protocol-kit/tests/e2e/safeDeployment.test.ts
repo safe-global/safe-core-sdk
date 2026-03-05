@@ -644,8 +644,8 @@ describe('Safe Deployment', () => {
       chai.expect(await safeSDKDeployed.getNonce()).to.be.eq(0)
     })
 
-    itif(semverSatisfies(safeVersionDeployed, '=1.3.0'))(
-      'should deploy the v1.3.0 Safe version by default',
+    itif(semverSatisfies(safeVersionDeployed, '=1.4.1'))(
+      'should deploy the v1.4.1 Safe version by default',
       async () => {
         const { accounts, contractNetworks } = await setupTests()
         const [account1, account2] = accounts

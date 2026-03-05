@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
-import { Safe4337Pack } from '@safe-global/relay-kit'
+import { Safe4337Pack, encodeNonce } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
 import { getKits } from '../utils/setupKits'
 import { getSafeWith4337Module, PRIVATE_KEY_1, safeVersionDeployed } from 'tests/helpers/safe'
@@ -118,7 +118,11 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', 
   })
 
   it('should add a new SafeOperation using an standard UserOperation and props', async () => {
-    const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
+    const customNonce = encodeNonce({ key: BigInt(Date.now()), sequence: 0n })
+    const safeOperation = await safe4337Pack.createTransaction({
+      transactions: [transferUSDC],
+      options: { customNonce }
+    })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
     const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
@@ -133,8 +137,10 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', 
   })
 
   it('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
+    const customNonce = encodeNonce({ key: BigInt(Date.now()), sequence: 0n })
     const safeOperation = await safe4337Pack.createTransaction({
-      transactions: [transferUSDC, transferUSDC]
+      transactions: [transferUSDC, transferUSDC],
+      options: { customNonce }
     })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
     // Get the number of SafeOperations before adding a new one

@@ -6,6 +6,8 @@ import createCall_1_3_0_ContractArtifacts from './CreateCall/v1.3.0/create_call'
 import createCall_1_4_1_ContractArtifacts from './CreateCall/v1.4.1/create_call'
 import createCall_1_5_0_ContractArtifacts from './CreateCall/v1.5.0/create_call'
 
+import extensibleFallbackHandler_1_5_0_ContractArtifacts from './ExtensibleFallbackHandler/v1.5.0/extensible_fallback_handler'
+
 import multisend_1_1_1_ContractArtifacts from './MultiSend/v1.1.1/multi_send'
 import multisend_1_3_0_ContractArtifacts from './MultiSend/v1.3.0/multi_send'
 import multisend_1_4_1_ContractArtifacts from './MultiSend/v1.4.1/multi_send'
@@ -46,6 +48,7 @@ export {
   createCall_1_3_0_ContractArtifacts,
   createCall_1_4_1_ContractArtifacts,
   createCall_1_5_0_ContractArtifacts,
+  extensibleFallbackHandler_1_5_0_ContractArtifacts,
   multisend_1_1_1_ContractArtifacts,
   multisend_1_3_0_ContractArtifacts,
   multiSendCallOnly_1_3_0_ContractArtifacts,

@@ -2,6 +2,7 @@ import { GetContractReturnType, Abi, WalletClient, Address, zeroAddress } from '
 import {
   compatibilityFallbackHandlerDeployed,
   createCallDeployed,
+  extensibleFallbackHandlerDeployed,
   multiSendCallOnlyDeployed,
   multiSendDeployed,
   proxyFactoryDeployed,
@@ -220,6 +221,28 @@ export const getSafeWebAuthnSharedSigner = async (): Promise<{
       safeWebAuthnSharedSignerDeployment.address as Address
     ),
     abi: safeWebAuthnSharedSignerDeployment.abi
+  }
+}
+
+export const getExtensibleFallbackHandler = async (): Promise<
+  | {
+      contract: GetContractReturnType
+      abi: Abi
+    }
+  | undefined
+> => {
+  if (!extensibleFallbackHandlerDeployed) return undefined
+  const extensibleFallbackHandlerDeployment = await deployments.get(
+    extensibleFallbackHandlerDeployed.name
+  )
+  const extensibleFallbackHandlerAddress = extensibleFallbackHandlerDeployment.address
+  const contract = await viem.getContractAt(
+    extensibleFallbackHandlerDeployed.name,
+    extensibleFallbackHandlerAddress as Address
+  )
+  return {
+    contract,
+    abi: extensibleFallbackHandlerDeployment.abi
   }
 }
 

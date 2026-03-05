@@ -4,6 +4,7 @@ import {
   SingletonDeploymentV2,
   getCompatibilityFallbackHandlerDeployments,
   getCreateCallDeployments,
+  getExtensibleFallbackHandlerDeployments,
   getMultiSendCallOnlyDeployments,
   getMultiSendDeployments,
   getProxyFactoryDeployments,
@@ -28,6 +29,7 @@ type contractNames = {
   safeSingletonL2Version?: string
   safeProxyFactoryVersion: string
   compatibilityFallbackHandler: string
+  extensibleFallbackHandler?: string
   multiSendVersion: string
   multiSendCallOnlyVersion?: string
   signMessageLibVersion?: string
@@ -53,6 +55,7 @@ export const safeDeploymentsVersions: SafeDeploymentsVersions = {
     safeSingletonL2Version: '1.5.0',
     safeProxyFactoryVersion: '1.5.0',
     compatibilityFallbackHandler: '1.5.0',
+    extensibleFallbackHandler: '1.5.0',
     multiSendVersion: '1.5.0',
     multiSendCallOnlyVersion: '1.5.0',
     signMessageLibVersion: '1.5.0',
@@ -137,6 +140,7 @@ const contractFunctions: Record<
   safeSingletonL2Version: getSafeL2SingletonDeployments,
   safeProxyFactoryVersion: getProxyFactoryDeployments,
   compatibilityFallbackHandler: getCompatibilityFallbackHandlerDeployments,
+  extensibleFallbackHandler: getExtensibleFallbackHandlerDeployments,
   multiSendVersion: getMultiSendDeployments,
   multiSendCallOnlyVersion: getMultiSendCallOnlyDeployments,
   signMessageLibVersion: getSignMessageLibDeployments,

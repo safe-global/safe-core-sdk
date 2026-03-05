@@ -11,6 +11,7 @@ import {
   CompatibilityFallbackHandlerContract_v1_5_0_Abi,
   CompatibilityFallbackHandlerContract_v1_4_1_Abi,
   CompatibilityFallbackHandlerContract_v1_3_0_Abi,
+  ExtensibleFallbackHandlerContract_v1_5_0_Abi,
   MultiSendContract_v1_5_0_Abi,
   MultiSendContract_v1_4_1_Abi,
   MultiSendContract_v1_3_0_Abi,
@@ -65,6 +66,7 @@ import SimulateTxAccessorContract_v1_5_0 from './SimulateTxAccessor/v1.5.0/Simul
 import CompatibilityFallbackHandlerContract_v1_3_0 from './CompatibilityFallbackHandler/v1.3.0/CompatibilityFallbackHandlerContract_v1_3_0'
 import CompatibilityFallbackHandlerContract_v1_4_1 from './CompatibilityFallbackHandler/v1.4.1/CompatibilityFallbackHandlerContract_v1_4_1'
 import CompatibilityFallbackHandlerContract_v1_5_0 from './CompatibilityFallbackHandler/v1.5.0/CompatibilityFallbackHandlerContract_v1_5_0'
+import ExtensibleFallbackHandlerContract_v1_5_0 from './ExtensibleFallbackHandler/v1.5.0/ExtensibleFallbackHandlerContract_v1_5_0'
 import SafeWebAuthnSignerFactoryContract_v0_2_1 from './SafeWebAuthnSignerFactory/v0.2.1/SafeWebAuthnSignerFactoryContract_v0_2_1'
 import SafeWebAuthnSharedSignerContract_v0_2_1 from './SafeWebAuthnSharedSigner/v0.2.1/SafeWebAuthnSharedSignerContract_v0_2_1'
 import SafeProvider from '../SafeProvider'
@@ -606,6 +608,35 @@ export async function getSafeWebAuthnSharedSignerContractInstance(
       await safeWebAuthnSharedSignerContractInstance.init()
 
       return safeWebAuthnSharedSignerContractInstance
+
+    default:
+      throw new Error('Invalid Safe version')
+  }
+}
+
+export async function getExtensibleFallbackHandlerContractInstance(
+  safeVersion: SafeVersion,
+  safeProvider: SafeProvider,
+  contractAddress?: string,
+  customContractAbi?: Abi,
+  deploymentType?: DeploymentType
+): Promise<ExtensibleFallbackHandlerContract_v1_5_0> {
+  const chainId = await safeProvider.getChainId()
+
+  switch (safeVersion) {
+    case '1.5.0':
+      const extensibleFallbackHandlerContractInstance =
+        new ExtensibleFallbackHandlerContract_v1_5_0(
+          chainId,
+          safeProvider,
+          contractAddress,
+          customContractAbi as ExtensibleFallbackHandlerContract_v1_5_0_Abi,
+          deploymentType
+        )
+
+      await extensibleFallbackHandlerContractInstance.init()
+
+      return extensibleFallbackHandlerContractInstance
 
     default:
       throw new Error('Invalid Safe version')

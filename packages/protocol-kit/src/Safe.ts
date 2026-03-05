@@ -78,6 +78,7 @@ import {
 import { isSafeConfigWithPredictedSafe } from './utils/types'
 import {
   getCompatibilityFallbackHandlerContract,
+  getExtensibleFallbackHandlerContract,
   getSafeProxyFactoryContract,
   getSafeContract
 } from './contracts/safeDeploymentContracts'
@@ -1029,6 +1030,235 @@ class Safe {
       options
     })
     return safeTransaction
+  }
+
+  // ---------------------------------------------------------------------------
+  // ExtensibleFallbackHandler helpers
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Returns an instance of the ExtensibleFallbackHandler contract for the current chain.
+   * Used internally to compose read queries and Safe transactions against the EFH.
+   * @throws "ExtensibleFallbackHandler is only available for Safe >= v1.5.0"
+   */
+  async #getExtensibleFallbackHandlerContract() {
+    const safeVersion = this.getContractVersion()
+    if (!semverSatisfies(safeVersion, EQ_OR_GT_1_5_0)) {
+      throw new Error('ExtensibleFallbackHandler is only available for Safe >= v1.5.0')
+    }
+    const chainId = await this.getChainId()
+    const customContracts = this.#contractManager.contractNetworks?.[chainId.toString()]
+    return getExtensibleFallbackHandlerContract({
+      safeProvider: this.#safeProvider,
+      safeVersion,
+      customContracts
+    })
+  }
+
+  // ----- Read helpers -----
+
+  /**
+   * Returns the bytes32-encoded handler registered for the given 4-byte selector on
+   * the ExtensibleFallbackHandler for this Safe.
+   * Only available for Safe >= v1.5.0.
+   *
+   * @param selector - The 4-byte function selector (e.g. '0xaabbccdd')
+   * @returns The bytes32 handler entry, or the zero bytes32 if unregistered
+   * @throws "ExtensibleFallbackHandler is only available for Safe >= v1.5.0"
+   */
+  async getSafeMethod(selector: string): Promise<string> {
+    const safeAddress = await this.getAddress()
+    const efhContract = await this.#getExtensibleFallbackHandlerContract()
+    const [method] = await efhContract.safeMethods([
+      safeAddress as `0x${string}`,
+      selector as `0x${string}`
+    ])
+    return method
+  }
+
+  /**
+   * Returns the ISafeSignatureVerifier address registered for the given domain separator
+   * on the ExtensibleFallbackHandler for this Safe.
+   * Only available for Safe >= v1.5.0.
+   *
+   * @param domainSeparator - 32-byte domain separator
+   * @returns The verifier address, or the zero address if unregistered
+   * @throws "ExtensibleFallbackHandler is only available for Safe >= v1.5.0"
+   */
+  async getDomainVerifier(domainSeparator: string): Promise<string> {
+    const safeAddress = await this.getAddress()
+    const efhContract = await this.#getExtensibleFallbackHandlerContract()
+    const [verifier] = await efhContract.domainVerifiers([
+      safeAddress as `0x${string}`,
+      domainSeparator as `0x${string}`
+    ])
+    return verifier
+  }
+
+  /**
+   * Returns whether the given ERC-165 interface ID is marked as supported for this Safe
+   * on the ExtensibleFallbackHandler.
+   * Only available for Safe >= v1.5.0.
+   *
+   * @param interfaceId - 4-byte ERC-165 interface ID
+   * @returns true if supported, false otherwise
+   * @throws "ExtensibleFallbackHandler is only available for Safe >= v1.5.0"
+   */
+  async isSafeInterfaceSupported(interfaceId: string): Promise<boolean> {
+    const safeAddress = await this.getAddress()
+    const efhContract = await this.#getExtensibleFallbackHandlerContract()
+    const [isSupported] = await efhContract.safeInterfaces([
+      safeAddress as `0x${string}`,
+      interfaceId as `0x${string}`
+    ])
+    return isSupported
+  }
+
+  // ----- Write transaction builders -----
+
+  /**
+   * Returns a Safe transaction that calls setSafeMethod on the ExtensibleFallbackHandler.
+   * Because the EFH uses msg.sender as the Safe address, this must be executed through
+   * the Safe itself.
+   * Only available for Safe >= v1.5.0.
+   *
+   * @param selector - The 4-byte function selector to handle
+   * @param newMethod - bytes32-packed handler address (address right-aligned, 12 leading zero bytes)
+   * @param options - Optional Safe transaction properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "ExtensibleFallbackHandler is only available for Safe >= v1.5.0"
+   */
+  async createSetSafeMethodTx(
+    selector: string,
+    newMethod: string,
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const efhContract = await this.#getExtensibleFallbackHandlerContract()
+    const safeAddress = await this.getAddress()
+    const data = efhContract.encode('setSafeMethod', [
+      selector as `0x${string}`,
+      newMethod as `0x${string}`
+    ])
+    return this.createTransaction({
+      transactions: [{ to: safeAddress, value: '0', data }],
+      options
+    })
+  }
+
+  /**
+   * Returns a Safe transaction that calls setDomainVerifier on the ExtensibleFallbackHandler.
+   * Registers an ISafeSignatureVerifier for EIP-712 domain-based signature validation.
+   * Only available for Safe >= v1.5.0.
+   *
+   * @param domainSeparator - 32-byte EIP-712 domain separator
+   * @param verifier - Address of the ISafeSignatureVerifier contract
+   * @param options - Optional Safe transaction properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "ExtensibleFallbackHandler is only available for Safe >= v1.5.0"
+   */
+  async createSetDomainVerifierTx(
+    domainSeparator: string,
+    verifier: string,
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const efhContract = await this.#getExtensibleFallbackHandlerContract()
+    const safeAddress = await this.getAddress()
+    const data = efhContract.encode('setDomainVerifier', [
+      domainSeparator as `0x${string}`,
+      verifier as `0x${string}`
+    ])
+    return this.createTransaction({
+      transactions: [{ to: safeAddress, value: '0', data }],
+      options
+    })
+  }
+
+  /**
+   * Returns a Safe transaction that calls setSupportedInterface on the ExtensibleFallbackHandler.
+   * Marks (or un-marks) an ERC-165 interface as supported for this Safe.
+   * Only available for Safe >= v1.5.0.
+   *
+   * @param interfaceId - 4-byte ERC-165 interface ID
+   * @param supported - true to add support, false to remove it
+   * @param options - Optional Safe transaction properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "ExtensibleFallbackHandler is only available for Safe >= v1.5.0"
+   */
+  async createSetSupportedInterfaceTx(
+    interfaceId: string,
+    supported: boolean,
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const efhContract = await this.#getExtensibleFallbackHandlerContract()
+    const safeAddress = await this.getAddress()
+    const data = efhContract.encode('setSupportedInterface', [
+      interfaceId as `0x${string}`,
+      supported
+    ])
+    return this.createTransaction({
+      transactions: [{ to: safeAddress, value: '0', data }],
+      options
+    })
+  }
+
+  /**
+   * Returns a Safe transaction that calls addSupportedInterfaceBatch on the ExtensibleFallbackHandler.
+   * Atomically registers an interface and multiple method handlers in a single call.
+   * Only available for Safe >= v1.5.0.
+   *
+   * Each entry in handlerWithSelectors is a bytes32 value encoding both the handler address
+   * and the 4-byte method selector: first 4 bytes = selector, next 8 bytes = zero padding,
+   * last 20 bytes = handler address.
+   *
+   * @param interfaceId - 4-byte ERC-165 interface ID to mark as supported
+   * @param handlerWithSelectors - Array of packed selector+handler bytes32 values
+   * @param options - Optional Safe transaction properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "ExtensibleFallbackHandler is only available for Safe >= v1.5.0"
+   */
+  async createAddSupportedInterfaceBatchTx(
+    interfaceId: string,
+    handlerWithSelectors: string[],
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const efhContract = await this.#getExtensibleFallbackHandlerContract()
+    const safeAddress = await this.getAddress()
+    const data = efhContract.encode('addSupportedInterfaceBatch', [
+      interfaceId as `0x${string}`,
+      handlerWithSelectors as `0x${string}`[]
+    ])
+    return this.createTransaction({
+      transactions: [{ to: safeAddress, value: '0', data }],
+      options
+    })
+  }
+
+  /**
+   * Returns a Safe transaction that calls removeSupportedInterfaceBatch on the ExtensibleFallbackHandler.
+   * Atomically un-registers an interface and removes the given method handlers in a single call.
+   * Only available for Safe >= v1.5.0.
+   *
+   * @param interfaceId - 4-byte ERC-165 interface ID to remove
+   * @param selectors - Array of 4-byte function selectors to un-register
+   * @param options - Optional Safe transaction properties
+   * @returns The Safe transaction ready to be signed
+   * @throws "ExtensibleFallbackHandler is only available for Safe >= v1.5.0"
+   */
+  async createRemoveSupportedInterfaceBatchTx(
+    interfaceId: string,
+    selectors: string[],
+    options?: SafeTransactionOptionalProps
+  ): Promise<SafeTransaction> {
+    const efhContract = await this.#getExtensibleFallbackHandlerContract()
+    const safeAddress = await this.getAddress()
+    const data = efhContract.encode('removeSupportedInterfaceBatch', [
+      interfaceId as `0x${string}`,
+      selectors as `0x${string}`[]
+    ])
+    return this.createTransaction({
+      transactions: [{ to: safeAddress, value: '0', data }],
+      options
+    })
   }
 
   /**

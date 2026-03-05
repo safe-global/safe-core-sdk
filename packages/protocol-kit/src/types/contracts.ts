@@ -32,6 +32,7 @@ import CreateCallContract_v1_4_1 from '@safe-global/protocol-kit/contracts/Creat
 import CreateCallContract_v1_5_0 from '@safe-global/protocol-kit/contracts/CreateCall/v1.5.0/CreateCallContract_v1_5_0'
 import SafeWebAuthnSignerFactoryContract_v0_2_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSignerFactory/v0.2.1/SafeWebAuthnSignerFactoryContract_v0_2_1'
 import SafeWebAuthnSharedSignerContract_v0_2_1 from '@safe-global/protocol-kit/contracts/SafeWebAuthnSharedSigner/v0.2.1/SafeWebAuthnSharedSignerContract_v0_2_1'
+import ExtensibleFallbackHandlerContract_v1_5_0 from '@safe-global/protocol-kit/contracts/ExtensibleFallbackHandler/v1.5.0/ExtensibleFallbackHandlerContract_v1_5_0'
 
 // Safe contract implementation types
 export type SafeContractImplementationType =
@@ -94,6 +95,10 @@ export type SafeWebAuthnSignerFactoryContractImplementationType =
 export type SafeWebAuthnSharedSignerContractImplementationType =
   SafeWebAuthnSharedSignerContract_v0_2_1
 
+// ExtensibleFallbackHandler contract implementation types
+export type ExtensibleFallbackHandlerContractImplementationType =
+  ExtensibleFallbackHandlerContract_v1_5_0
+
 export type GetContractProps = {
   safeVersion: SafeVersion
   customContractAddress?: string
@@ -142,6 +147,10 @@ export type ContractNetworkConfig = {
   safeWebAuthnSharedSignerAddress?: string
   /** safeWebAuthnSharedSignerAbi - Abi of the SafeWebAuthnSharedSigner contract deployed on a specific network */
   safeWebAuthnSharedSignerAbi?: Abi
+  /** extensibleFallbackHandlerAddress - Address of the ExtensibleFallbackHandler contract deployed on a specific network */
+  extensibleFallbackHandlerAddress?: string
+  /** extensibleFallbackHandlerAbi - Abi of the ExtensibleFallbackHandler contract deployed on a specific network */
+  extensibleFallbackHandlerAbi?: Abi
 }
 
 export type ContractNetworksConfig = {

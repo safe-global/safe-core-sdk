@@ -4,6 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 import { SafeProxyFactory } from "@safe-global/safe-contracts-v1.5.0/contracts/proxies/SafeProxyFactory.sol";
 import { Safe } from "@safe-global/safe-contracts-v1.5.0/contracts/Safe.sol";
 import { CompatibilityFallbackHandler } from "@safe-global/safe-contracts-v1.5.0/contracts/handler/CompatibilityFallbackHandler.sol";
+import { ExtensibleFallbackHandler } from "@safe-global/safe-contracts-v1.5.0/contracts/handler/ExtensibleFallbackHandler.sol";
 import { MultiSend } from "@safe-global/safe-contracts-v1.5.0/contracts/libraries/MultiSend.sol";
 import { MultiSendCallOnly } from "@safe-global/safe-contracts-v1.5.0/contracts/libraries/MultiSendCallOnly.sol";
 import { SignMessageLib } from "@safe-global/safe-contracts-v1.5.0/contracts/libraries/SignMessageLib.sol";
@@ -17,6 +18,7 @@ import { DebugTransactionGuard} from "@safe-global/safe-contracts-v1.5.0/contrac
 contract SafeProxyFactory_SV1_5_0 is SafeProxyFactory {}
 contract Safe_SV1_5_0 is Safe {}
 contract CompatibilityFallbackHandler_SV1_5_0 is CompatibilityFallbackHandler {}
+contract ExtensibleFallbackHandler_SV1_5_0 is ExtensibleFallbackHandler {}
 contract MultiSend_SV1_5_0 is MultiSend {}
 contract MultiSendCallOnly_SV1_5_0 is MultiSendCallOnly {}
 contract SignMessageLib_SV1_5_0 is SignMessageLib {}

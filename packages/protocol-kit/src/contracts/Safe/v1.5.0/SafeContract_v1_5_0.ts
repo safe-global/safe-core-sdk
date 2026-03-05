@@ -197,7 +197,7 @@ class SafeContract_v1_5_0
   }
 
   /**
-   * Reads `length` bytes of storage in the currents contract
+   * Reads `length` bytes of storage in the current contract
    * @param args - Array[offset, length]
    * @returns Array[storage]
    */

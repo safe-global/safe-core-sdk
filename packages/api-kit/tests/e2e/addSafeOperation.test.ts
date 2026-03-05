@@ -7,7 +7,7 @@ import { Safe4337Pack, encodeNonce } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
 import { getKits } from '../utils/setupKits'
 import { getSafeWith4337Module, PRIVATE_KEY_1, safeVersionDeployed } from 'tests/helpers/safe'
-import { describeif } from 'tests/utils/heplers'
+import { describeif } from 'tests/utils/helpers'
 import { Address } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies.js'
 

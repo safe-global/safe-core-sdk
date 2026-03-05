@@ -10,7 +10,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { getKits } from '../utils/setupKits'
 import { getSafe, PRIVATE_KEY_1, PRIVATE_KEY_2, safeVersionDeployed } from '../helpers/safe'
-import { describeif } from 'tests/utils/heplers'
+import { describeif } from 'tests/utils/helpers'
 import semverSatisfies from 'semver/functions/satisfies.js'
 
 chai.use(chaiAsPromised)

@@ -5,7 +5,7 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import { getApiKit } from '../utils/setupKits'
 import { zeroHash } from 'viem'
 import { safeVersionDeployed } from 'tests/helpers/safe'
-import { describeif } from 'tests/utils/heplers'
+import { describeif } from 'tests/utils/helpers'
 
 chai.use(chaiAsPromised)
 

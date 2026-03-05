@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised'
 import semverSatisfies from 'semver/functions/satisfies.js'
 import { getApiKit } from '../utils/setupKits'
 import { getSafeWith4337Module, safeVersionDeployed } from 'tests/helpers/safe'
-import { describeif } from 'tests/utils/heplers'
+import { describeif } from 'tests/utils/helpers'
 import { Address } from 'viem'
 
 chai.use(chaiAsPromised)

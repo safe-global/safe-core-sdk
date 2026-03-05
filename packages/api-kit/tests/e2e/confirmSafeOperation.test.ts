@@ -11,7 +11,7 @@ import {
   PRIVATE_KEY_2,
   safeVersionDeployed
 } from 'tests/helpers/safe'
-import { describeif } from 'tests/utils/heplers'
+import { describeif } from 'tests/utils/helpers'
 import { Address } from 'viem'
 import semverSatisfies from 'semver/functions/satisfies.js'
 

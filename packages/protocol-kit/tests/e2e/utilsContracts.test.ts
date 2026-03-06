@@ -1,5 +1,6 @@
 import chai from 'chai'
-import { polygon, optimism, gnosis, base, avalanche } from 'viem/chains'
+import semverSatisfies from 'semver/functions/satisfies.js'
+import { optimism, gnosis, base, avalanche } from 'viem/chains'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   getSafeAddressFromDeploymentTx,
@@ -547,7 +548,7 @@ describe('Contract utils', () => {
       }
     )
 
-    itif(safeVersionDeployed === '1.3.0')(
+    itif(semverSatisfies(safeVersionDeployed, '=1.3.0'))(
       'returns the predicted address for Safes deployed on zkSync EVM',
       async () => {
         const { contractNetworks } = await setupTests()
@@ -631,7 +632,7 @@ describe('Contract utils', () => {
       }
     )
 
-    itif(safeVersionDeployed === '1.3.0')(
+    itif(semverSatisfies(safeVersionDeployed, '=1.3.0'))(
       // see: https://github.com/safe-global/safe-core-sdk/issues/598
       'returns the correct predicted address for each chain',
       async () => {
@@ -695,7 +696,9 @@ describe('Contract utils', () => {
       }
     )
 
-    itif(safeVersionDeployed >= '1.3.0')(
+    // Note: v1.5.0 is excluded because it has not been yet added to chains
+    // (Polygon, Gnosis, BNB, Optimism, Base, Avalanche) yet according to @safe-global/safe-deployments.
+    itif(safeVersionDeployed >= '1.3.0' && safeVersionDeployed < '1.5.0')(
       'returns the same predicted address based on the deploymentType for different chains',
       async () => {
         const { accounts } = await setupTests()
@@ -714,7 +717,7 @@ describe('Contract utils', () => {
         }
 
         const protocolKitPolygonMainnet = await Safe.init({
-          provider: polygon.rpcUrls.default.http[0],
+          provider: 'https://polygon.drpc.org', // polygon.rpcUrls.default.http[0],
           predictedSafe: {
             safeAccountConfig,
             safeDeploymentConfig

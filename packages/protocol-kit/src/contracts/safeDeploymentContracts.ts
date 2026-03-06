@@ -2,6 +2,7 @@ import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   getCompatibilityFallbackHandlerContractInstance,
   getCreateCallContractInstance,
+  getExtensibleFallbackHandlerContractInstance,
   getMultiSendCallOnlyContractInstance,
   getMultiSendContractInstance,
   getSafeContractInstance,
@@ -16,6 +17,7 @@ import {
   ContractNetworkConfig,
   CreateCallContractImplementationType,
   DeploymentType,
+  ExtensibleFallbackHandlerContractImplementationType,
   MultiSendCallOnlyContractImplementationType,
   MultiSendContractImplementationType,
   SafeContractImplementationType,
@@ -264,4 +266,27 @@ export async function getSafeWebAuthnSharedSignerContract({
     throw new Error('safeWebAuthnSharedSigner contract is not deployed on the current network')
   }
   return safeWebAuthnSharedSignerContract
+}
+
+export async function getExtensibleFallbackHandlerContract({
+  safeProvider,
+  safeVersion,
+  customContracts,
+  deploymentType
+}: GetContractInstanceProps): Promise<ExtensibleFallbackHandlerContractImplementationType> {
+  const extensibleFallbackHandlerContract = await getExtensibleFallbackHandlerContractInstance(
+    safeVersion,
+    safeProvider,
+    customContracts?.extensibleFallbackHandlerAddress,
+    customContracts?.extensibleFallbackHandlerAbi,
+    deploymentType
+  )
+
+  const isContractDeployed = await safeProvider.isContractDeployed(
+    extensibleFallbackHandlerContract.getAddress()
+  )
+  if (!isContractDeployed) {
+    throw new Error('ExtensibleFallbackHandler contract is not deployed on the current network')
+  }
+  return extensibleFallbackHandlerContract
 }

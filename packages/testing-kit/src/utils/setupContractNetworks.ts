@@ -2,6 +2,7 @@ import { Abi } from 'viem'
 import {
   getCompatibilityFallbackHandler,
   getCreateCall,
+  getExtensibleFallbackHandler,
   getFactory,
   getMultiSend,
   getMultiSendCallOnly,
@@ -53,6 +54,10 @@ export type ContractNetworkConfig = {
   safeWebAuthnSharedSignerAddress?: string
   /** safeWebAuthnSharedSignerAbi - Abi of the SafeWebAuthnSharedSigner contract deployed on a specific network */
   safeWebAuthnSharedSignerAbi?: Abi
+  /** extensibleFallbackHandlerAddress - Address of the ExtensibleFallbackHandler contract deployed on a specific network */
+  extensibleFallbackHandlerAddress?: string
+  /** extensibleFallbackHandlerAbi - Abi of the ExtensibleFallbackHandler contract deployed on a specific network */
+  extensibleFallbackHandlerAbi?: Abi
 }
 
 export type ContractNetworksConfig = {
@@ -61,6 +66,7 @@ export type ContractNetworksConfig = {
 }
 
 export async function getContractNetworks(chainId: bigint): Promise<ContractNetworksConfig> {
+  const extensibleFallbackHandler = await getExtensibleFallbackHandler()
   return {
     [chainId.toString()]: {
       safeSingletonAddress: (await getSafeSingleton()).contract.address,
@@ -82,7 +88,11 @@ export async function getContractNetworks(chainId: bigint): Promise<ContractNetw
       safeWebAuthnSignerFactoryAddress: (await getSafeWebAuthnSignerFactory()).contract.address,
       safeWebAuthnSignerFactoryAbi: (await getSafeWebAuthnSignerFactory()).abi,
       safeWebAuthnSharedSignerAddress: (await getSafeWebAuthnSharedSigner()).contract.address,
-      safeWebAuthnSharedSignerAbi: (await getSafeWebAuthnSharedSigner()).abi
+      safeWebAuthnSharedSignerAbi: (await getSafeWebAuthnSharedSigner()).abi,
+      ...(extensibleFallbackHandler && {
+        extensibleFallbackHandlerAddress: extensibleFallbackHandler.contract.address,
+        extensibleFallbackHandlerAbi: extensibleFallbackHandler.abi
+      })
     }
   }
 }

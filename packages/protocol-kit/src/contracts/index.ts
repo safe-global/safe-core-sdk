@@ -1,4 +1,5 @@
 import CreateCallBaseContract from './CreateCall/CreateCallBaseContract'
+import ExtensibleFallbackHandlerBaseContract from './ExtensibleFallbackHandler/ExtensibleFallbackHandlerBaseContract'
 import MultiSendBaseContract from './MultiSend/MultiSendBaseContract'
 import MultiSendCallOnlyBaseContract from './MultiSend/MultiSendCallOnlyBaseContract'
 import SafeBaseContract from './Safe/SafeBaseContract'
@@ -7,6 +8,7 @@ import SignMessageLibBaseContract from './SignMessageLib/SignMessageLibBaseContr
 
 export {
   CreateCallBaseContract,
+  ExtensibleFallbackHandlerBaseContract,
   MultiSendCallOnlyBaseContract,
   MultiSendBaseContract,
   SafeBaseContract,

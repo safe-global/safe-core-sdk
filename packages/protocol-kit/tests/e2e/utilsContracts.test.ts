@@ -714,7 +714,7 @@ describe('Contract utils', () => {
         }
 
         const protocolKitPolygonMainnet = await Safe.init({
-          provider: 'https://polygon-rpc.publicnode.com', // polygon.rpcUrls.default.http[0] was deprecated
+          provider: 'https://polygon.drpc.org', // polygon.rpcUrls.default.http[0],
           predictedSafe: {
             safeAccountConfig,
             safeDeploymentConfig

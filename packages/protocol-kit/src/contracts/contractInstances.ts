@@ -122,7 +122,7 @@ export async function getSafeContractInstance(
       )
       break
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getSafeContractInstance ' + safeVersion)
   }
 
   await safeContractInstance.init()
@@ -164,7 +164,7 @@ export async function getCompatibilityFallbackHandlerContractInstance(
       )
       break
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getCompatibilityFallbackHandlerContractInstance ' + safeVersion)
   }
 
   await compatibilityFallbackHandlerInstance.init()
@@ -213,7 +213,7 @@ export async function getMultiSendContractInstance(
       )
       break
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getMultiSendContractInstance ' + safeVersion)
   }
 
   await multiSendContractInstance.init()
@@ -254,7 +254,7 @@ export async function getMultiSendCallOnlyContractInstance(
       )
       break
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getMultiSendCallOnlyContractInstance ' + safeVersion)
   }
 
   await multiSendCallOnlyContractInstance.init()
@@ -316,7 +316,7 @@ export async function getSafeProxyFactoryContractInstance(
       )
       break
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getSafeProxyFactoryContractInstance ' + safeVersion)
   }
 
   await safeProxyFactoryContractInstance.init()
@@ -354,7 +354,7 @@ export async function getSignMessageLibContractInstance(
       )
       break
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getSignMessageLibContractInstance ' + safeVersion)
   }
 
   await signMessageLibContractInstance.init()
@@ -395,7 +395,7 @@ export async function getCreateCallContractInstance(
       )
       break
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getCreateCallContractInstance ' + safeVersion)
   }
 
   await createCallContractInstance.init()
@@ -433,7 +433,7 @@ export async function getSimulateTxAccessorContractInstance(
       )
       break
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getSimulateTxAccessorContractInstance ' + safeVersion)
   }
 
   await simulateTxAccessorContractInstance.init()
@@ -468,7 +468,7 @@ export async function getSafeWebAuthnSignerFactoryContractInstance(
       return safeWebAuthnSignerFactoryContractInstance
 
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getSafeWebAuthnSignerFactoryContractInstance' + safeVersion)
   }
 }
 
@@ -498,6 +498,6 @@ export async function getSafeWebAuthnSharedSignerContractInstance(
       return safeWebAuthnSharedSignerContractInstance
 
     default:
-      throw new Error('Invalid Safe version')
+      throw new Error('Invalid Safe version getSafeWebAuthnSharedSignerContractInstance ' + safeVersion)
   }
 }

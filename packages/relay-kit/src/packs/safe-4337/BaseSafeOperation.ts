@@ -57,7 +57,7 @@ abstract class BaseSafeOperation implements SafeOperation {
     return hashTypedData({
       domain: {
         chainId: Number(this.options.chainId),
-        verifyingContract: this.options.moduleAddress
+        verifyingContract: this.options.moduleAddress as Hex
       },
       types: this.getEIP712Type(),
       primaryType: 'SafeOp',

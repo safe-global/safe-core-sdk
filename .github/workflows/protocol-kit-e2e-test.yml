@@ -13,7 +13,7 @@ jobs:
       matrix:
         node-version: [20.x]
         provider: [ethers, viem]
-        contract-version: [v1.0.0, v1.1.1, v1.2.0, v1.3.0, v1.4.1]
+        contract-version: [v1.0.0, v1.1.1, v1.2.0, v1.3.0, v1.4.1, v1.5.0]
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}

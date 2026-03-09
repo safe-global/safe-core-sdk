@@ -3,14 +3,16 @@ import chaiAsPromised from 'chai-as-promised'
 import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
-import { Safe4337Pack } from '@safe-global/relay-kit'
+import { Safe4337Pack, encodeNonce } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
 import { getKits } from '../utils/setupKits'
+import { getSafeWith4337Module, PRIVATE_KEY_1, safeVersionDeployed } from 'tests/helpers/safe'
+import { describeif } from 'tests/utils/helpers'
+import { Address } from 'viem'
+import semverSatisfies from 'semver/functions/satisfies.js'
 
 chai.use(chaiAsPromised)
 
-const SIGNER_PK = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
-const SAFE_ADDRESS = '0x60C4Ab82D06Fd7dFE9517e17736C2Dcc77443EF0' // 1/2 Safe (v1.4.1) with signer above being an owner + 4337 module enabled
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
 const BUNDLER_URL = 'https://api.pimlico.io/v2/sepolia/rpc?apikey=pim_Vjs7ohRqWdvsjUegngf9Bg'
 
@@ -18,15 +20,19 @@ let safeApiKit: SafeApiKit
 let protocolKit: Safe
 let safe4337Pack: Safe4337Pack
 
-describe('addSafeOperation', () => {
-  const transferUSDC = {
-    to: PAYMASTER_TOKEN_ADDRESS,
-    data: generateTransferCallData(SAFE_ADDRESS, 100_000n),
-    value: '0',
-    operation: 0
-  }
+describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', () => {
+  let SAFE_ADDRESS: Address
+  let transferUSDC: { to: string; data: string; value: string; operation: number }
+  const SIGNER_PK = PRIVATE_KEY_1
 
   before(async () => {
+    SAFE_ADDRESS = getSafeWith4337Module()
+    transferUSDC = {
+      to: PAYMASTER_TOKEN_ADDRESS,
+      data: generateTransferCallData(SAFE_ADDRESS, 100_000n),
+      value: '0',
+      operation: 0
+    }
     ;({ safeApiKit, protocolKit } = await getKits({
       safeAddress: SAFE_ADDRESS,
       signer: SIGNER_PK
@@ -112,7 +118,11 @@ describe('addSafeOperation', () => {
   })
 
   it('should add a new SafeOperation using an standard UserOperation and props', async () => {
-    const safeOperation = await safe4337Pack.createTransaction({ transactions: [transferUSDC] })
+    const customNonce = encodeNonce({ key: BigInt(Date.now()), sequence: 0n })
+    const safeOperation = await safe4337Pack.createTransaction({
+      transactions: [transferUSDC],
+      options: { customNonce }
+    })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
     const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
@@ -127,8 +137,10 @@ describe('addSafeOperation', () => {
   })
 
   it('should add a new SafeOperation using a SafeOperation object from the relay-kit', async () => {
+    const customNonce = encodeNonce({ key: BigInt(Date.now()), sequence: 0n })
     const safeOperation = await safe4337Pack.createTransaction({
-      transactions: [transferUSDC, transferUSDC]
+      transactions: [transferUSDC, transferUSDC],
+      options: { customNonce }
     })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
     // Get the number of SafeOperations before adding a new one

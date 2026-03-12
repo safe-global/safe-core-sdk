@@ -51,10 +51,10 @@ describe('Passkey', () => {
     const { accounts, chainId, contractNetworks } = await testingKitSetupTests()
 
     const webAuthnContract = await getWebAuthnContract()
-    const customVerifierAddress = webAuthnContract.address
+    const verifierAddress = webAuthnContract.address
 
-    const passkey1 = { ...(await createMockPasskey('chucknorris')), customVerifierAddress }
-    const passkey2 = { ...(await createMockPasskey('brucelee')), customVerifierAddress }
+    const passkey1 = { ...(await createMockPasskey('chucknorris')), verifierAddress }
+    const passkey2 = { ...(await createMockPasskey('brucelee')), verifierAddress }
 
     const provider = getEip1193Provider()
     const safeProvider = await SafeProvider.init({ provider })
@@ -163,7 +163,7 @@ describe('Passkey', () => {
         const [expectedPasskeyAddress] = await safeWebAuthnSignerFactoryContract.getSigner([
           BigInt(passkey1.coordinates.x),
           BigInt(passkey1.coordinates.y),
-          BigInt(passkey1.customVerifierAddress)
+          BigInt(passkey1.verifierAddress)
         ])
 
         chai.expect(passkeyAddress).to.equals(expectedPasskeyAddress)
@@ -194,7 +194,7 @@ describe('Passkey', () => {
 
         const passkeyOwnerConfiguration = {
           ...passkey1.coordinates,
-          verifiers: passkey1.customVerifierAddress
+          verifiers: passkey1.verifierAddress
         }
 
         const { data: addSharedSignerAddressOwner } = await safeSdk.createAddOwnerTx({
@@ -330,7 +330,7 @@ describe('Passkey', () => {
 
           const passkeyOwnerConfiguration = {
             ...passkey1.coordinates,
-            verifiers: passkey1.customVerifierAddress
+            verifiers: passkey1.verifierAddress
           }
 
           const { data: addSharedSignerAddressOwner } = await safeSdk.createAddOwnerTx({
@@ -391,7 +391,7 @@ describe('Passkey', () => {
 
           const passkeyOwnerConfiguration = {
             ...sharedSignerPasskey1.coordinates,
-            verifiers: sharedSignerPasskey1.customVerifierAddress
+            verifiers: sharedSignerPasskey1.verifierAddress
           }
 
           const { data: addSharedSignerAddressOwner } = await safeSdk.createAddOwnerTx({

@@ -70,6 +70,7 @@ import {
 } from './utils/eip-712'
 import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
+import { getP256VerifierAddress } from './utils/passkeys/extractPasskeyData'
 import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
 
 export {
@@ -78,6 +79,7 @@ export {
   estimateSafeTxGas,
   estimateSafeDeploymentGas,
   extractPasskeyData,
+  getP256VerifierAddress,
   ContractManager,
   CreateCallBaseContract,
   createERC20TokenTransferTransaction,

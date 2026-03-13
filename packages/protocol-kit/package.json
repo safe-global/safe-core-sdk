@@ -80,7 +80,7 @@
   },
   "dependencies": {
     "@safe-global/safe-deployments": "^1.37.49",
-    "@safe-global/safe-modules-deployments": "^2.2.21",
+    "@safe-global/safe-modules-deployments": "^3.0.0",
     "@safe-global/types-kit": "^3.0.0",
     "abitype": "^1.0.2",
     "semver": "^7.7.2",

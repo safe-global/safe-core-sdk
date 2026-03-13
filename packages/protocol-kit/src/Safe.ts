@@ -44,7 +44,7 @@ import {
   SwapOwnerTxParams,
   SafeModulesPaginated,
   RemovePasskeyOwnerTxParams,
-  PasskeyArgType
+  ExtractedPasskeyData
 } from './types'
 import {
   EthSafeSignature,
@@ -2100,9 +2100,9 @@ class Safe {
   /**
    * This method creates a signer to be used with the init method
    * @param {Credential} credential - The credential to be used to create the signer. Can be generated in the web with navigator.credentials.create
-   * @returns {PasskeyArgType} - The signer to be used with the init method
+   * @returns {ExtractedPasskeyData} - The extracted passkey data. Combine with a verifierAddress to build a PasskeyArgType.
    */
-  static createPasskeySigner = async (credential: Credential): Promise<PasskeyArgType> => {
+  static createPasskeySigner = async (credential: Credential): Promise<ExtractedPasskeyData> => {
     return extractPasskeyData(credential)
   }
 }

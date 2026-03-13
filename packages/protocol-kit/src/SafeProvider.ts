@@ -145,8 +145,7 @@ class SafeProvider {
           safeWebAuthnSharedSignerContract,
           safeProvider.getExternalProvider(),
           safeAddress || '',
-          owners || [],
-          chainId.toString()
+          owners || []
         )
       } else {
         // signer was already initialized and we pass a PasskeyClient instance (reconnecting)

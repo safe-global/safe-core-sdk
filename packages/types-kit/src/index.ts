@@ -1,4 +1,5 @@
 export * from './contracts/CompatibilityFallbackHandler'
+export * from './contracts/ExtensibleFallbackHandler'
 export * from './contracts/MultiSend'
 export * from './contracts/CreateCall'
 export * from './contracts/Safe'

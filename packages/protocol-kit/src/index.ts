@@ -11,6 +11,7 @@ import {
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
 import {
   getCompatibilityFallbackHandlerContract,
+  getExtensibleFallbackHandlerContract,
   getCreateCallContract,
   getMultiSendCallOnlyContract,
   getMultiSendContract,
@@ -98,6 +99,7 @@ export {
   decodeMultiSendData,
   encodeSetupCallData,
   getCompatibilityFallbackHandlerContract,
+  getExtensibleFallbackHandlerContract,
   getCreateCallContract,
   getERC20Decimals,
   getMultiSendCallOnlyContract,

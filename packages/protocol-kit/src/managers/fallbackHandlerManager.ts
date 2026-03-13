@@ -57,6 +57,18 @@ class FallbackHandlerManager {
     return this.#safeContract as SafeContractCompatibleWithFallbackHandler
   }
 
+  private encodeSetFallbackHandler(
+    safeContract: SafeContractCompatibleWithFallbackHandler,
+    handler: string
+  ): string {
+    const encode = safeContract.encode as unknown as (
+      method: 'setFallbackHandler',
+      args: [string]
+    ) => string
+
+    return encode('setFallbackHandler', [asHex(handler)])
+  }
+
   async getFallbackHandler(): Promise<string> {
     const safeContract = await this.isFallbackHandlerCompatible()
 
@@ -70,7 +82,7 @@ class FallbackHandlerManager {
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsNotEnabled(currentFallbackHandler, fallbackHandlerAddress)
 
-    return safeContract.encode('setFallbackHandler', [asHex(fallbackHandlerAddress)])
+    return this.encodeSetFallbackHandler(safeContract, fallbackHandlerAddress)
   }
 
   async encodeDisableFallbackHandlerData(): Promise<string> {
@@ -79,7 +91,7 @@ class FallbackHandlerManager {
     const currentFallbackHandler = await this.getFallbackHandler()
     this.validateFallbackHandlerIsEnabled(currentFallbackHandler)
 
-    return safeContract.encode('setFallbackHandler', [asHex(ZERO_ADDRESS)])
+    return this.encodeSetFallbackHandler(safeContract, ZERO_ADDRESS)
   }
 }
 

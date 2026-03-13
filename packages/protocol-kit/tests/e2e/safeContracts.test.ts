@@ -2,6 +2,7 @@ import {
   setupTests,
   getCompatibilityFallbackHandler,
   getCreateCall,
+  getExtensibleFallbackHandler,
   getFactory,
   getMultiSend,
   getMultiSendCallOnly,
@@ -9,11 +10,14 @@ import {
   getSignMessageLib,
   getSimulateTxAccessor,
   getSafeWebAuthnSignerFactory,
-  getSafeWebAuthnSharedSigner
+  getSafeWebAuthnSharedSigner,
+  itif,
+  safeVersionDeployed
 } from '@safe-global/testing-kit'
 import { SafeVersion } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import { getEip1193Provider, getSafeProviderFromNetwork } from './utils/setupProvider'
 import {
   getCompatibilityFallbackHandlerContract,
@@ -26,6 +30,7 @@ import {
   SafeProvider
 } from '@safe-global/protocol-kit/index'
 import {
+  getExtensibleFallbackHandlerContract,
   getSafeWebAuthnSharedSignerContract,
   getSafeWebAuthnSignerFactoryContract,
   getSimulateTxAccessorContract
@@ -348,5 +353,40 @@ describe('Safe contracts', () => {
         .expect(safeWebAuthnSharedSignerContract.getAddress())
         .to.be.eq((await getSafeWebAuthnSharedSigner()).contract.address)
     })
+  })
+
+  describe('getExtensibleFallbackHandlerContract', async () => {
+    itif(semverSatisfies(safeVersionDeployed, '>=1.5.0'))(
+      'should return an ExtensibleFallbackHandler contract from safe-deployments',
+      async () => {
+        const safeProvider = getSafeProviderFromNetwork('mainnet')
+        const safeVersion: SafeVersion = '1.5.0'
+        const extensibleFallbackHandlerContract = await getExtensibleFallbackHandlerContract({
+          safeProvider,
+          safeVersion
+        })
+        chai
+          .expect(extensibleFallbackHandlerContract.getAddress())
+          .to.be.eq('0x85a8ca358D388530ad0fB95D0cb89Dd44Fc242c3')
+      }
+    )
+
+    itif(semverSatisfies(safeVersionDeployed, '>=1.5.0'))(
+      'should return an ExtensibleFallbackHandler contract from the custom addresses',
+      async () => {
+        const { contractNetworks, chainId } = await setupTests()
+        const safeProvider = new SafeProvider({ provider })
+        const safeVersion: SafeVersion = '1.5.0'
+        const customContracts = contractNetworks[chainId.toString()]
+        const extensibleFallbackHandlerContract = await getExtensibleFallbackHandlerContract({
+          safeProvider,
+          safeVersion,
+          customContracts
+        })
+        chai
+          .expect(extensibleFallbackHandlerContract.getAddress())
+          .to.be.eq((await getExtensibleFallbackHandler())!.contract.address)
+      }
+    )
   })
 })

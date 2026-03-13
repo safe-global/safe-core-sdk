@@ -41,6 +41,7 @@ async function getProtocolKitInstance(config: SdkStarterKitConfig): Promise<Safe
     const initConfig: SafeConfig = {
       provider: config.provider,
       signer: config.signer,
+      isL1SafeSingleton: config.safeOptions.isL1SafeSingleton,
       predictedSafe: {
         safeAccountConfig: {
           owners: config.safeOptions.owners,
@@ -48,6 +49,7 @@ async function getProtocolKitInstance(config: SdkStarterKitConfig): Promise<Safe
         },
         safeDeploymentConfig: {
           saltNonce: config.safeOptions.saltNonce,
+          safeVersion: config.safeOptions.safeVersion,
           deploymentType: DEFAULT_DEPLOYMENT_TYPE
         }
       }

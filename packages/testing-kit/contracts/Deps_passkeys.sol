@@ -2,6 +2,11 @@
 pragma solidity 0.8.24;
 
 import {SafeWebAuthnSignerFactory} from '@safe-global/safe-passkey/contracts/SafeWebAuthnSignerFactory.sol';
+// FIXME: Replace FCL with a Daimo-compatible P256 verifier for local testing. The DaimoP256Verifier
+// is deployed at a deterministic address (0xc2b78104907F722DABAc4C69f826a522B2754De4) on all supported
+// chains but is not available in the local Hardhat environment. Options: copy the Daimo P256Verifier
+// source (pure Solidity, no precompile dependency), use hardhat_setCode to inject the bytecode at the
+// canonical address. See: https://github.com/daimo-eth/p256-verifier
 import {FCLP256Verifier} from '@safe-global/safe-passkey/contracts/verifiers/FCLP256Verifier.sol';
 import {SignatureValidator} from '@safe-global/safe-passkey/contracts/base/SignatureValidator.sol';
 import {P256, WebAuthn} from '@safe-global/safe-passkey/contracts/libraries/WebAuthn.sol';

@@ -743,6 +743,61 @@ describe('Safe4337Pack', () => {
       })
     })
 
+    it('should produce the same signature format for deployed and undeployed Safes', async () => {
+      const transferUSDC = {
+        to: fixtures.PAYMASTER_TOKEN_ADDRESS,
+        data: generateTransferCallData(fixtures.SAFE_ADDRESS_4337_PASSKEY, 100_000n),
+        value: '0',
+        operation: 0
+      }
+
+      const safe4337Pack = await createSafe4337Pack({
+        signer: passkey,
+        options: {
+          owners: [],
+          threshold: 1
+        }
+      })
+
+      const safeOperation = await safe4337Pack.createTransaction({
+        transactions: [transferUSDC]
+      })
+
+      // Undeployed Safe (nonce 0 scenario)
+      const signedUndeployed = await safe4337Pack.signSafeOperation(safeOperation)
+      const undeployedSig = signedUndeployed.getSignature(
+        SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS.toLowerCase()
+      )
+
+      expect(undeployedSig).toBeDefined()
+      expect(undeployedSig!.signer).toBe(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)
+      expect(undeployedSig!.isContractSignature).toBe(true)
+
+      // Deployed Safe (nonce 1+ scenario) - simulate by mocking isSafeDeployed
+      const isSafeDeployedSpy = jest
+        .spyOn(safe4337Pack.protocolKit, 'isSafeDeployed')
+        .mockResolvedValue(true)
+      const isOwnerSpy = jest
+        .spyOn(safe4337Pack.protocolKit, 'isOwner')
+        .mockResolvedValue(true)
+
+      const safeOperation2 = await safe4337Pack.createTransaction({
+        transactions: [transferUSDC]
+      })
+
+      const signedDeployed = await safe4337Pack.signSafeOperation(safeOperation2)
+      const deployedSig = signedDeployed.getSignature(
+        SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS.toLowerCase()
+      )
+
+      expect(deployedSig).toBeDefined()
+      expect(deployedSig!.signer).toBe(SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS)
+      expect(deployedSig!.isContractSignature).toBe(true)
+
+      isSafeDeployedSpy.mockRestore()
+      isOwnerSpy.mockRestore()
+    })
+
     it('should allow to send an UserOperation to a bundler', async () => {
       const transferUSDC = {
         to: fixtures.PAYMASTER_TOKEN_ADDRESS,

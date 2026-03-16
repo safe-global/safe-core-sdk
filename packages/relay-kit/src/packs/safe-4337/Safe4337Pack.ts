@@ -585,17 +585,13 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     if (isPasskeySigner) {
       const safeOpHash = safeOp.getHash()
+      const passkeySignature = await this.protocolKit.signHash(safeOpHash)
 
-      if (!isSafeDeployed) {
-        const passkeySignature = await this.protocolKit.signHash(safeOpHash)
-        safeSignature = new EthSafeSignature(
-          this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
-          passkeySignature.data,
-          true
-        )
-      } else {
-        safeSignature = await this.protocolKit.signHash(safeOpHash)
-      }
+      safeSignature = new EthSafeSignature(
+        this.#SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS,
+        passkeySignature.data,
+        true
+      )
     } else {
       if (
         [

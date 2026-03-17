@@ -2,7 +2,6 @@ import {
   PasskeyArgType,
   SafeWebAuthnSharedSignerContractImplementationType
 } from '@safe-global/protocol-kit/types'
-import { getDefaultFCLP256VerifierAddress } from './extractPasskeyData'
 import { asHex } from '@safe-global/protocol-kit/utils/types'
 
 /**
@@ -13,8 +12,7 @@ async function isSharedSigner(
   passkey: PasskeyArgType,
   safeWebAuthnSharedSignerContract: SafeWebAuthnSharedSignerContractImplementationType,
   safeAddress: string,
-  owners: string[],
-  chainId: string
+  owners: string[]
 ): Promise<boolean> {
   const sharedSignerContractAddress = safeWebAuthnSharedSignerContract.contractAddress
 
@@ -26,13 +24,10 @@ async function isSharedSigner(
 
     const { x, y, verifiers } = sharedSignerSlot
 
-    const verifierAddress =
-      passkey.customVerifierAddress || getDefaultFCLP256VerifierAddress(chainId)
-
     const isSharedSigner =
       BigInt(passkey.coordinates.x) === x &&
       BigInt(passkey.coordinates.y) === y &&
-      BigInt(verifierAddress) === verifiers
+      BigInt(passkey.verifierAddress) === verifiers
 
     return isSharedSigner
   }

@@ -1,4 +1,4 @@
-import { PasskeyArgType, PasskeyClient } from '../src'
+import { ExtractedPasskeyData, PasskeyClient } from '../src'
 import { WebAuthnCredentials } from './webauthnShim'
 import { WalletClient, keccak256, toBytes, Transport, Chain, Account } from 'viem'
 import { asHex } from '@safe-global/protocol-kit/utils/types'
@@ -53,7 +53,7 @@ export async function deployPasskeysContract(
 export async function createMockPasskey(
   name: string,
   webAuthnCredentials?: WebAuthnCredentials
-): Promise<PasskeyArgType> {
+): Promise<ExtractedPasskeyData> {
   const credentialsInstance = webAuthnCredentials ?? getWebAuthnCredentials()
   const passkeyCredential = credentialsInstance.create({
     publicKey: {
@@ -89,10 +89,5 @@ export async function createMockPasskey(
 
   const coordinates = await decodePublicKeyForWeb(exportedPublicKey)
 
-  const passkey: PasskeyArgType = {
-    rawId,
-    coordinates
-  }
-
-  return passkey
+  return { rawId, coordinates }
 }

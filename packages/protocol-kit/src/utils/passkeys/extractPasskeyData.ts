@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer'
-import { getFCLP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
-import { PasskeyArgType, PasskeyCoordinates } from '@safe-global/protocol-kit/types'
+import { getDaimoP256VerifierDeployment } from '@safe-global/safe-modules-deployments'
+import { ExtractedPasskeyData, PasskeyCoordinates } from '@safe-global/protocol-kit/types'
 
 /**
  * Converts a Base64 URL-encoded string to a Uint8Array.
@@ -177,7 +177,9 @@ export async function decodePublicKey(
  * as a signer (`Safe.init())
  * @throws {Error} Throws an error if the coordinates could not be extracted
  */
-export async function extractPasskeyData(passkeyCredential: Credential): Promise<PasskeyArgType> {
+export async function extractPasskeyData(
+  passkeyCredential: Credential
+): Promise<ExtractedPasskeyData> {
   const passkeyPublicKeyCredential = passkeyCredential as PublicKeyCredential
 
   const rawId = Buffer.from(passkeyPublicKeyCredential.rawId).toString('hex')
@@ -190,32 +192,28 @@ export async function extractPasskeyData(passkeyCredential: Credential): Promise
 }
 
 /**
- * Retrieves the default FCLP256 Verifier address for a given blockchain network.
+ * Returns the recommended P256 verifier address (DaimoP256Verifier) for the given chain ID.
+ * Use this when setting up new passkeys.
  *
- * This function fetches the deployment information for the FCLP256 Verifier and
- * returns the verifier address associated with the specified chain ID. It ensures
- * that the correct version and release status are used.
- *
- * @param {string} chainId - The ID of the blockchain network to retrieve the verifier address for.
- * @returns {string} The FCLP256 Verifier address for the specified chain ID.
- * @throws {Error} Throws an error if the deployment information or address cannot be found.
+ * @param {string} chainId - The ID of the blockchain network.
+ * @returns {string} The DaimoP256Verifier address for the specified chain ID.
+ * @throws {Error} Throws an error if the deployment is not found for the given chain ID.
  */
-
-export function getDefaultFCLP256VerifierAddress(chainId: string): string {
-  const FCLP256VerifierDeployment = getFCLP256VerifierDeployment({
+export function getP256VerifierAddress(chainId: string): string {
+  const deployment = getDaimoP256VerifierDeployment({
     version: '0.2.1',
     released: true,
     network: chainId
   })
 
-  if (!FCLP256VerifierDeployment) {
-    throw new Error(`Failed to load FCLP256Verifier deployment for chain ID ${chainId}`)
+  if (!deployment) {
+    throw new Error(`Failed to load DaimoP256Verifier deployment for chain ID ${chainId}`)
   }
 
-  const verifierAddress = FCLP256VerifierDeployment.networkAddresses[chainId]
+  const verifierAddress = deployment.networkAddresses[chainId]
 
   if (!verifierAddress) {
-    throw new Error(`FCLP256Verifier address not found for chain ID ${chainId}`)
+    throw new Error(`DaimoP256Verifier address not found for chain ID ${chainId}`)
   }
 
   return verifierAddress

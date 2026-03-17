@@ -601,9 +601,10 @@ describe('Safe4337Pack', () => {
 
       const webAuthnCredentials = new WebAuthnCredentials(PASSKEY_PRIVATE_KEY)
 
-      passkey = await createMockPasskey('chucknorris', webAuthnCredentials)
-
-      passkey.customVerifierAddress = CUSTOM_P256_VERIFIER_ADDRESS
+      passkey = {
+        ...(await createMockPasskey('chucknorris', webAuthnCredentials)),
+        verifierAddress: CUSTOM_P256_VERIFIER_ADDRESS
+      }
 
       Object.defineProperty(global, 'navigator', {
         value: {

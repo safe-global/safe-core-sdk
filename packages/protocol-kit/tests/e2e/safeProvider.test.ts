@@ -5,6 +5,7 @@ import { getEip1193Provider } from './utils/setupProvider'
 import { SafeProvider } from '@safe-global/protocol-kit/index'
 import sinon from 'sinon'
 import { createMockPasskey, getWebAuthnCredentials } from '@safe-global/protocol-kit/test-utils'
+import { getP256VerifierAddress } from '@safe-global/protocol-kit/index'
 import { publicActions, walletActions } from 'viem'
 
 chai.use(chaiAsPromised)
@@ -32,7 +33,10 @@ describe('Safe provider', () => {
     itif(safeVersionDeployed < '1.3.0')(
       'should fail for a passkey signer and Safe <v1.3.0',
       async () => {
-        const passKeySigner = await createMockPasskey('aName')
+        const passKeySigner = {
+          ...(await createMockPasskey('aName')),
+          verifierAddress: getP256VerifierAddress('1')
+        }
 
         chai
           .expect(

@@ -81,7 +81,7 @@
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
-    "@safe-global/safe-deployments": "^1.37.49",
+    "@safe-global/safe-deployments": "^1.37.52",
     "@safe-global/safe-modules-deployments": "^3.0.0",
     "@safe-global/types-kit": "^3.0.0",
     "abitype": "^1.0.2",

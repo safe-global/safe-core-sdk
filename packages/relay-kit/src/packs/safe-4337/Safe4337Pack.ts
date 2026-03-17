@@ -232,7 +232,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         data: encodeFunctionData({
           abi: ABI,
           functionName: 'enableModules',
-          args: [[safe4337ModuleAddress]]
+          args: [[safe4337ModuleAddress as Hex]]
         }),
         operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
       }
@@ -253,7 +253,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
           data: encodeFunctionData({
             abi: ABI,
             functionName: 'approve',
-            args: [paymasterAddress, amountToApprove]
+            args: [paymasterAddress as Hex, amountToApprove]
           }),
           value: '0',
           operation: OperationType.Call // Call for approve

@@ -1,7 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
 type RelayKitBasePackTypes = {
-  EstimateFeeProps?: unknown
-  EstimateFeeResult?: unknown
   CreateTransactionProps?: unknown
   CreateTransactionResult: unknown
   ExecuteTransactionProps: {
@@ -23,8 +21,6 @@ type DefaultRelayKitBasePackTypes = {
  * Abstract class. The base class for all RelayKit packs.
  * It provides the Safe SDK instance and the abstract methods to be implemented by the packs.
  * @abstract
- * @template EstimateFeeProps
- * @template EstimateFeeResult
  * @template CreateTransactionProps
  * @template CreateTransactionResult,
  * @template ExecuteTransactionProps
@@ -46,14 +42,6 @@ export abstract class RelayKitBasePack<
   constructor(protocolKit: Safe) {
     this.protocolKit = protocolKit
   }
-
-  /**
-   * Abstract function to get an estimate of the fee that will be paid for a transaction.
-   * @abstract
-   * @param {EstimateFeeProps} props - The props for fee estimation.
-   * @returns Promise<EstimateFeeResult> - The estimated fee result.
-   */
-  abstract getEstimateFee(props: T['EstimateFeeProps']): Promise<T['EstimateFeeResult']>
 
   /**
    * Abstract function to create a Safe transaction, designed to be executed using the relayer.

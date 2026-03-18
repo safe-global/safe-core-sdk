@@ -1736,10 +1736,10 @@
   dependencies:
     semver "^7.6.2"
 
-"@safe-global/safe-modules-deployments@^3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-3.0.1.tgz#56ad12ba2183385298a12b96a68207b5183ecb14"
-  integrity sha512-APySCnHzu5KOVqlIRJq8mg1oVKPPvoWp+Yq3GAtwSUp8QJ5OFBGBxlB8Sc+68bcr15YArAxXpCHU68R1Kpq1vw==
+"@safe-global/safe-modules-deployments@^2.2.25":
+  version "2.2.25"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-2.2.25.tgz#d0942c5d4f854a7221bcbf82bc13e15269c6822a"
+  integrity sha512-KjgenKhBRyFHEfo8xlBgNzKAy25vrmGyCGZwTjIuA81yOSRJRe85GE5Yfg/FBKeeyHqR2dD1WPZr6c2Uqd6C/g==
 
 "@safe-global/safe-passkey@0.2.0":
   version "0.2.0"

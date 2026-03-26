@@ -13,17 +13,16 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { toBytes, toHex } from 'viem'
 import { getKits } from '../utils/setupKits'
+import { getSafe, PRIVATE_KEY_1, PRIVATE_KEY_2 } from 'tests/helpers/safe'
 
 chai.use(chaiAsPromised)
-
-const PRIVATE_KEY_1 = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676' // Address: 0x56e2C102c664De6DfD7315d12c0178b61D16F171
-const PRIVATE_KEY_2 = '0xb88ad5789871315d0dab6fc5961d6714f24f35a6393f13a6f426dfecfc00ab44' // Address: 0x9ccbde03edd71074ea9c49e413fa9cdff16d263b
 
 let safeApiKit: SafeApiKit
 let protocolKit: Safe
 
-const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'
-const signerSafeAddress = '0xDa8dd250065F19f7A29564396D7F13230b9fC5A3'
+const safeInfo = getSafe()
+const safeAddress = safeInfo.address
+const signerSafeAddress = safeInfo.owners[2]
 
 describe('proposeTransaction', () => {
   before(async () => {

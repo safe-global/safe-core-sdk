@@ -16,6 +16,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * @extends BaseContract<MultiSendContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
+ * - MultiSendContract_v1_5_0  extends MultiSendBaseContract<MultiSendContract_v1_5_0_Abi>
  * - MultiSendContract_v1_4_1  extends MultiSendBaseContract<MultiSendContract_v1_4_1_Abi>
  * - MultiSendContract_v1_3_0  extends MultiSendBaseContract<MultiSendContract_v1_3_0_Abi>
  */

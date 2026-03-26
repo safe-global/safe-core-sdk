@@ -3,7 +3,8 @@ import {
   TransactionBase,
   TransactionOptions,
   EIP712TypedData,
-  MetaTransactionData
+  MetaTransactionData,
+  SafeVersion
 } from '@safe-global/types-kit'
 import { IFeeEstimator } from '@safe-global/relay-kit'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
@@ -44,6 +45,8 @@ export type SafeConfig = {
   owners: string[]
   threshold: number
   saltNonce?: string
+  safeVersion?: SafeVersion
+  isL1SafeSingleton?: boolean
 }
 
 export type ExistingSafeConfig = {

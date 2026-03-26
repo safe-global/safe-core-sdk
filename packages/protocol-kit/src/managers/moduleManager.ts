@@ -1,5 +1,13 @@
-import { isRestrictedAddress, sameString } from '@safe-global/protocol-kit/utils'
-import { SENTINEL_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import {
+  isRestrictedAddress,
+  sameString,
+  hasSafeFeature,
+  isZeroAddress,
+  SAFE_FEATURES,
+  SafeContractCompatibleWithModuleGuardManager
+} from '@safe-global/protocol-kit/utils'
+import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
+import { asHex } from '@safe-global/protocol-kit/utils/types'
 import {
   SafeContractImplementationType,
   SafeModulesPaginated
@@ -9,6 +17,8 @@ import SafeProvider from '../SafeProvider'
 class ModuleManager {
   #safeProvider: SafeProvider
   #safeContract?: SafeContractImplementationType
+  // keccak256("module_manager.module_guard.address")
+  #moduleGuardSlot = '0xb104e0b93118902c651344349b610029d694cfdec91c589c91ebafbcd0289947'
 
   constructor(safeProvider: SafeProvider, safeContract?: SafeContractImplementationType) {
     this.#safeProvider = safeProvider
@@ -87,6 +97,63 @@ class ModuleManager {
     const moduleIndex = this.validateModuleIsEnabled(moduleAddress, modules)
     const prevModuleAddress = moduleIndex === 0 ? SENTINEL_ADDRESS : modules[moduleIndex - 1]
     return this.#safeContract.encode('disableModule', [prevModuleAddress, moduleAddress])
+  }
+
+  private validateModuleGuardAddress(moduleGuardAddress: string): void {
+    const isValidAddress = this.#safeProvider.isAddress(moduleGuardAddress)
+    if (!isValidAddress || isZeroAddress(moduleGuardAddress)) {
+      throw new Error('Invalid module guard address provided')
+    }
+  }
+
+  private validateModuleGuardIsNotEnabled(
+    currentModuleGuard: string,
+    newModuleGuardAddress: string
+  ): void {
+    if (sameString(currentModuleGuard, newModuleGuardAddress)) {
+      throw new Error('Module guard provided is already enabled')
+    }
+  }
+
+  private validateModuleGuardIsEnabled(moduleGuardAddress: string): void {
+    if (isZeroAddress(moduleGuardAddress)) {
+      throw new Error('There is no module guard enabled yet')
+    }
+  }
+
+  private async isModuleGuardCompatible(): Promise<SafeContractCompatibleWithModuleGuardManager> {
+    if (!this.#safeContract) {
+      throw new Error('Safe is not deployed')
+    }
+    const safeVersion = this.#safeContract.safeVersion
+    if (!hasSafeFeature(SAFE_FEATURES.SAFE_MODULE_GUARD, safeVersion)) {
+      throw new Error('Current version of the Safe does not support module guard functionality')
+    }
+
+    return this.#safeContract as SafeContractCompatibleWithModuleGuardManager
+  }
+
+  async getModuleGuard(): Promise<string> {
+    const safeContract = await this.isModuleGuardCompatible()
+
+    return this.#safeProvider.getStorageAt(safeContract.getAddress(), this.#moduleGuardSlot)
+  }
+
+  async encodeEnableModuleGuardData(moduleGuardAddress: string): Promise<string> {
+    const safeContract = await this.isModuleGuardCompatible()
+
+    this.validateModuleGuardAddress(moduleGuardAddress)
+    const currentModuleGuard = await this.getModuleGuard()
+    this.validateModuleGuardIsNotEnabled(currentModuleGuard, moduleGuardAddress)
+    return safeContract.encode('setModuleGuard', [asHex(moduleGuardAddress)])
+  }
+
+  async encodeDisableModuleGuardData(): Promise<string> {
+    const safeContract = await this.isModuleGuardCompatible()
+
+    const currentModuleGuard = await this.getModuleGuard()
+    this.validateModuleGuardIsEnabled(currentModuleGuard)
+    return safeContract.encode('setModuleGuard', [asHex(ZERO_ADDRESS)])
   }
 }
 

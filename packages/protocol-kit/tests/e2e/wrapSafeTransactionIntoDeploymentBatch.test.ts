@@ -1,5 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import {
   safeVersionDeployed,
   setupTests,
@@ -45,7 +46,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
       .to.be.rejectedWith('Safe already deployed')
   })
 
-  itif(safeVersionDeployed == '1.4.1')(
+  itif(semverSatisfies(safeVersionDeployed, '=1.4.1'))(
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()
@@ -79,7 +80,7 @@ describe('wrapSafeTransactionIntoDeploymentBatch', () => {
     }
   )
 
-  itif(safeVersionDeployed == '1.3.0')(
+  itif(semverSatisfies(safeVersionDeployed, '=1.3.0'))(
     'should return a batch transaction with the Safe deployment Transaction and the Safe Transaction',
     async () => {
       const { accounts, contractNetworks, predictedSafe } = await setupTests()

@@ -16,6 +16,7 @@ import { contractName } from '@safe-global/protocol-kit/contracts/config'
  * @extends BaseContract<CreateCallContractAbiType> - Extends the generic BaseContract.
  *
  * Example subclasses:
+ * - CreateCallContract_v1_5_0  extends CreateCallBaseContract<CreateCallContract_v1_5_0_Abi>
  * - CreateCallContract_v1_4_1  extends CreateCallBaseContract<CreateCallContract_v1_4_1_Abi>
  * - CreateCallContract_v1_3_0  extends CreateCallBaseContract<CreateCallContract_v1_3_0_Abi>
  */

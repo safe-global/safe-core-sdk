@@ -3,14 +3,17 @@ import chaiAsPromised from 'chai-as-promised'
 import SafeApiKit from '@safe-global/api-kit/index'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
-import { API_TESTING_SAFE } from '../helpers/safe'
+import { getSafe, SafeInfo } from 'tests/helpers/safe'
 
 chai.use(chaiAsPromised)
 
 let safeApiKit: SafeApiKit
 
 describe('getIncomingTransactions', () => {
+  let API_TESTING_SAFE: SafeInfo
+
   before(async () => {
+    API_TESTING_SAFE = getSafe()
     safeApiKit = getApiKit()
   })
 

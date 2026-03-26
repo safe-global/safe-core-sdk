@@ -151,3 +151,54 @@ export async function getChainShortName(chainId: string): Promise<string> {
     }
   }
 }
+
+interface DuplicateCheckResult {
+  hasDuplicates: boolean
+  duplicates: Map<string, bigint[]>
+}
+
+/**
+ * Checks for duplicate shortNames in the networks array.
+ *
+ * @param {Array<{shortName: string, chainId: bigint}>} networks - Array of network configurations
+ * @returns {DuplicateCheckResult} Object containing duplicate information
+ */
+export function checkForDuplicateShortNames(
+  networks: Array<{ shortName: string; chainId: bigint }>
+): DuplicateCheckResult {
+  const shortNameMap = new Map<string, bigint[]>()
+
+  // Build a map of shortName to all chainIds using it
+  for (const network of networks) {
+    const existing = shortNameMap.get(network.shortName) || []
+    existing.push(network.chainId)
+    shortNameMap.set(network.shortName, existing)
+  }
+
+  // Filter to only duplicates (shortNames used by multiple chainIds)
+  const duplicates = new Map<string, bigint[]>()
+  for (const [shortName, chainIds] of shortNameMap.entries()) {
+    if (chainIds.length > 1) {
+      duplicates.set(shortName, chainIds)
+    }
+  }
+
+  return {
+    hasDuplicates: duplicates.size > 0,
+    duplicates
+  }
+}
+
+/**
+ * Formats a duplicate report message for logging.
+ *
+ * @param {Map<string, bigint[]>} duplicates - Map of duplicate shortNames to their chainIds
+ * @returns {string} Formatted report message
+ */
+export function formatDuplicateReport(duplicates: Map<string, bigint[]>): string {
+  const lines = ['Duplicate shortNames detected:']
+  for (const [shortName, chainIds] of duplicates.entries()) {
+    lines.push(`  - '${shortName}' is used by chainIds: ${chainIds.join(', ')}`)
+  }
+  return lines.join('\n')
+}

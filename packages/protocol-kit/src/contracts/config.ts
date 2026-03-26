@@ -4,6 +4,7 @@ import {
   SingletonDeploymentV2,
   getCompatibilityFallbackHandlerDeployments,
   getCreateCallDeployments,
+  getExtensibleFallbackHandlerDeployments,
   getMultiSendCallOnlyDeployments,
   getMultiSendDeployments,
   getProxyFactoryDeployments,
@@ -20,14 +21,14 @@ import {
 import { SafeVersion } from '@safe-global/types-kit'
 import { DeploymentType } from '../types'
 
-export const DEFAULT_SAFE_VERSION: SafeVersion = '1.3.0'
-export const SAFE_BASE_VERSION: SafeVersion = '1.0.0'
+export const DEFAULT_SAFE_VERSION: SafeVersion = '1.4.1'
 
 type contractNames = {
   safeSingletonVersion: string
   safeSingletonL2Version?: string
   safeProxyFactoryVersion: string
   compatibilityFallbackHandler: string
+  extensibleFallbackHandler?: string
   multiSendVersion: string
   multiSendCallOnlyVersion?: string
   signMessageLibVersion?: string
@@ -48,6 +49,20 @@ export type ContractInfo = {
 }
 
 export const safeDeploymentsVersions: SafeDeploymentsVersions = {
+  '1.5.0': {
+    safeSingletonVersion: '1.5.0',
+    safeSingletonL2Version: '1.5.0',
+    safeProxyFactoryVersion: '1.5.0',
+    compatibilityFallbackHandler: '1.5.0',
+    extensibleFallbackHandler: '1.5.0',
+    multiSendVersion: '1.5.0',
+    multiSendCallOnlyVersion: '1.5.0',
+    signMessageLibVersion: '1.5.0',
+    createCallVersion: '1.5.0',
+    simulateTxAccessorVersion: '1.5.0',
+    safeWebAuthnSignerFactoryVersion: '0.2.1',
+    safeWebAuthnSharedSignerVersion: '0.2.1'
+  },
   '1.4.1': {
     safeSingletonVersion: '1.4.1',
     safeSingletonL2Version: '1.4.1',
@@ -124,6 +139,7 @@ const contractFunctions: Record<
   safeSingletonL2Version: getSafeL2SingletonDeployments,
   safeProxyFactoryVersion: getProxyFactoryDeployments,
   compatibilityFallbackHandler: getCompatibilityFallbackHandlerDeployments,
+  extensibleFallbackHandler: getExtensibleFallbackHandlerDeployments,
   multiSendVersion: getMultiSendDeployments,
   multiSendCallOnlyVersion: getMultiSendCallOnlyDeployments,
   signMessageLibVersion: getSignMessageLibDeployments,

@@ -1,8 +1,11 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import semverSatisfies from 'semver/functions/satisfies.js'
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getApiKit } from '../utils/setupKits'
 import { zeroHash } from 'viem'
+import { safeVersionDeployed } from 'tests/helpers/safe'
+import { describeif } from 'tests/utils/helpers'
 
 chai.use(chaiAsPromised)
 
@@ -28,7 +31,7 @@ const EXPECTED_SAFE_OPERATION_CONFIRMATIONS = [
   }
 ]
 
-describe('getSafeOperationConfirmations', () => {
+describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationConfirmations', () => {
   before(() => {
     safeApiKit = getApiKit()
   })

@@ -60,7 +60,10 @@ import {
   buildContractSignature,
   buildSignatureBytes,
   preimageSafeTransactionHash,
-  preimageSafeMessageHash
+  preimageSafeMessageHash,
+  generatePreValidatedSignature,
+  adjustVInSignature,
+  calculateSafeTransactionHash
 } from './utils/signatures/utils'
 
 import {
@@ -73,6 +76,7 @@ import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import { getP256VerifierAddress } from './utils/passkeys/extractPasskeyData'
 import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
+import { SAFE_FEATURES, hasSafeFeature } from './utils/safeVersions'
 
 export {
   estimateTxBaseGas,
@@ -130,7 +134,12 @@ export {
   createPasskeyClient,
   EthSafeTransaction,
   EthSafeMessage,
-  getPasskeyOwnerAddress
+  getPasskeyOwnerAddress,
+  adjustVInSignature,
+  calculateSafeTransactionHash,
+  generatePreValidatedSignature,
+  SAFE_FEATURES,
+  hasSafeFeature
 }
 
 export * from './types'

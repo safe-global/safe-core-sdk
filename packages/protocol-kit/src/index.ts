@@ -65,6 +65,7 @@ import {
   preimageSafeMessageHash,
   generatePreValidatedSignature,
   adjustVInSignature,
+  calculateSafeMessageHash,
   calculateSafeTransactionHash
 } from './utils/signatures/utils'
 
@@ -138,6 +139,7 @@ export {
   EthSafeMessage,
   getPasskeyOwnerAddress,
   adjustVInSignature,
+  calculateSafeMessageHash,
   calculateSafeTransactionHash,
   generatePreValidatedSignature,
   SafeFeature,

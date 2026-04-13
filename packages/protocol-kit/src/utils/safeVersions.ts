@@ -7,7 +7,7 @@ import SafeContract_v1_3_0 from '@safe-global/protocol-kit/contracts/Safe/v1.3.0
 import SafeContract_v1_4_1 from '@safe-global/protocol-kit/contracts/Safe/v1.4.1/SafeContract_v1_4_1'
 import SafeContract_v1_5_0 from '@safe-global/protocol-kit/contracts/Safe/v1.5.0/SafeContract_v1_5_0'
 
-export enum SAFE_FEATURES {
+export enum SafeFeature {
   SAFE_TX_GAS_OPTIONAL = 'SAFE_TX_GAS_OPTIONAL',
   SAFE_TX_GUARDS = 'SAFE_TX_GUARDS',
   SAFE_FALLBACK_HANDLER = 'SAFE_FALLBACK_HANDLER',
@@ -20,20 +20,20 @@ export enum SAFE_FEATURES {
   SAFE_MODULE_GUARD = 'SAFE_MODULE_GUARD'
 }
 
-const SAFE_FEATURES_BY_VERSION: Record<SAFE_FEATURES, string> = {
-  [SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL]: '>=1.3.0',
-  [SAFE_FEATURES.SAFE_TX_GUARDS]: '>=1.3.0',
-  [SAFE_FEATURES.SAFE_FALLBACK_HANDLER]: '>=1.1.1',
-  [SAFE_FEATURES.ETH_SIGN]: '>=1.1.0',
-  [SAFE_FEATURES.ACCOUNT_ABSTRACTION]: '>=1.3.0',
-  [SAFE_FEATURES.REQUIRED_TXGAS]: '<=1.2.0',
-  [SAFE_FEATURES.SIMULATE_AND_REVERT]: '>=1.3.0',
-  [SAFE_FEATURES.PASSKEY_SIGNER]: '>=1.3.0',
-  [SAFE_FEATURES.SAFE_L2_CONTRACTS]: '>=1.3.0',
-  [SAFE_FEATURES.SAFE_MODULE_GUARD]: '>=1.5.0'
+const SAFE_FEATURES_BY_VERSION: Record<SafeFeature, string> = {
+  [SafeFeature.SAFE_TX_GAS_OPTIONAL]: '>=1.3.0',
+  [SafeFeature.SAFE_TX_GUARDS]: '>=1.3.0',
+  [SafeFeature.SAFE_FALLBACK_HANDLER]: '>=1.1.1',
+  [SafeFeature.ETH_SIGN]: '>=1.1.0',
+  [SafeFeature.ACCOUNT_ABSTRACTION]: '>=1.3.0',
+  [SafeFeature.REQUIRED_TXGAS]: '<=1.2.0',
+  [SafeFeature.SIMULATE_AND_REVERT]: '>=1.3.0',
+  [SafeFeature.PASSKEY_SIGNER]: '>=1.3.0',
+  [SafeFeature.SAFE_L2_CONTRACTS]: '>=1.3.0',
+  [SafeFeature.SAFE_MODULE_GUARD]: '>=1.5.0'
 }
 
-export const hasSafeFeature = (feature: SAFE_FEATURES, version: string): boolean => {
+export const hasSafeFeature = (feature: SafeFeature, version: string): boolean => {
   if (!(feature in SAFE_FEATURES_BY_VERSION)) {
     return false
   }
@@ -75,7 +75,7 @@ export async function isSafeContractCompatibleWithRequiredTxGas(
 ): Promise<SafeContractCompatibleWithRequiredTxGas> {
   const safeVersion = safeContract.safeVersion
 
-  if (!hasSafeFeature(SAFE_FEATURES.REQUIRED_TXGAS, safeVersion)) {
+  if (!hasSafeFeature(SafeFeature.REQUIRED_TXGAS, safeVersion)) {
     throw new Error('Current version of the Safe does not support the requiredTxGas functionality')
   }
 
@@ -87,7 +87,7 @@ export async function isSafeContractCompatibleWithSimulateAndRevert(
 ): Promise<SafeContractCompatibleWithSimulateAndRevert> {
   const safeVersion = safeContract.safeVersion
 
-  if (!hasSafeFeature(SAFE_FEATURES.SIMULATE_AND_REVERT, safeVersion)) {
+  if (!hasSafeFeature(SafeFeature.SIMULATE_AND_REVERT, safeVersion)) {
     throw new Error(
       'Current version of the Safe does not support the simulateAndRevert functionality'
     )

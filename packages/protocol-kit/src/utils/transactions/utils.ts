@@ -11,7 +11,7 @@ import {
   SwapOwnerTxParams,
   ExternalClient
 } from '@safe-global/protocol-kit/types'
-import { hasSafeFeature, SAFE_FEATURES } from '@safe-global/protocol-kit/utils'
+import { hasSafeFeature, SafeFeature } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import { asHex } from '../types'
 import {
@@ -92,7 +92,7 @@ export async function standardizeSafeTransactionData({
     safeVersion = safeContract.safeVersion
   }
 
-  const hasSafeTxGasOptional = hasSafeFeature(SAFE_FEATURES.SAFE_TX_GAS_OPTIONAL, safeVersion)
+  const hasSafeTxGasOptional = hasSafeFeature(SafeFeature.SAFE_TX_GAS_OPTIONAL, safeVersion)
   if (
     (hasSafeTxGasOptional && standardizedTxs.gasPrice === '0') ||
     (hasSafeTxGasOptional && predictedSafe)

@@ -48,7 +48,7 @@ import {
 } from './types'
 import {
   EthSafeSignature,
-  SAFE_FEATURES,
+  SafeFeature,
   calculateSafeMessageHash,
   calculateSafeTransactionHash,
   hasSafeFeature,
@@ -301,7 +301,7 @@ class Safe {
   async getAddress(): Promise<string> {
     if (this.#predictedSafe) {
       const safeVersion = this.getContractVersion()
-      if (!hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+      if (!hasSafeFeature(SafeFeature.ACCOUNT_ABSTRACTION, safeVersion)) {
         throw new Error(
           'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
         )
@@ -537,7 +537,7 @@ class Safe {
     options
   }: CreateTransactionProps): Promise<SafeTransaction> {
     const safeVersion = this.getContractVersion()
-    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+    if (this.#predictedSafe && !hasSafeFeature(SafeFeature.ACCOUNT_ABSTRACTION, safeVersion)) {
       throw new Error(
         'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
       )
@@ -737,7 +737,7 @@ class Safe {
       signature = await this.signTypedData(message, undefined)
     } else {
       const chainId = await this.getChainId()
-      if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
+      if (!hasSafeFeature(SafeFeature.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
 
@@ -863,7 +863,7 @@ class Safe {
     } else {
       const safeVersion = this.getContractVersion()
       const chainId = await this.getChainId()
-      if (!hasSafeFeature(SAFE_FEATURES.ETH_SIGN, safeVersion)) {
+      if (!hasSafeFeature(SafeFeature.ETH_SIGN, safeVersion)) {
         throw new Error('eth_sign is only supported by Safes >= v1.1.0')
       }
 
@@ -982,7 +982,7 @@ class Safe {
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeVersion = await this.getContractVersion()
-    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+    if (this.#predictedSafe && !hasSafeFeature(SafeFeature.ACCOUNT_ABSTRACTION, safeVersion)) {
       throw new Error(
         'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
       )
@@ -1014,7 +1014,7 @@ class Safe {
     options?: SafeTransactionOptionalProps
   ): Promise<SafeTransaction> {
     const safeVersion = await this.getContractVersion()
-    if (this.#predictedSafe && !hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+    if (this.#predictedSafe && !hasSafeFeature(SafeFeature.ACCOUNT_ABSTRACTION, safeVersion)) {
       throw new Error(
         'Account Abstraction functionality is not available for Safes with version lower than v1.3.0'
       )
@@ -1898,7 +1898,7 @@ class Safe {
     const saltNonce = safeDeploymentConfig?.saltNonce || getChainSpecificDefaultSaltNonce(chainId)
 
     // we only check if the safe is deployed if safeVersion >= 1.3.0
-    if (hasSafeFeature(SAFE_FEATURES.ACCOUNT_ABSTRACTION, safeVersion)) {
+    if (hasSafeFeature(SafeFeature.ACCOUNT_ABSTRACTION, safeVersion)) {
       const isSafeDeployed = await this.isSafeDeployed()
 
       // if the safe is already deployed throws an error

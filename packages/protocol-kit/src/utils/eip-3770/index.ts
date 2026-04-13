@@ -17,6 +17,14 @@ export function getEip3770NetworkPrefixFromChainId(chainId: bigint): string {
   return network.shortName
 }
 
+export function getChainIdFromEip3770NetworkPrefix(prefix: string): bigint {
+  const network = networks.find(({ shortName }) => shortName === prefix)
+  if (!network) {
+    throw new Error('No chainId found for the given network prefix')
+  }
+  return network.chainId
+}
+
 export function isValidEip3770NetworkPrefix(prefix: string): boolean {
   return networks.some(({ shortName }) => shortName === prefix)
 }

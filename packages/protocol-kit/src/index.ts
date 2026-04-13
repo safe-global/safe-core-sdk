@@ -77,6 +77,7 @@ import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import { getP256VerifierAddress } from './utils/passkeys/extractPasskeyData'
 import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
 import { SAFE_FEATURES, hasSafeFeature } from './utils/safeVersions'
+import { networks, type NetworkShortName } from './utils/eip-3770/config'
 
 export {
   estimateTxBaseGas,
@@ -139,7 +140,9 @@ export {
   calculateSafeTransactionHash,
   generatePreValidatedSignature,
   SAFE_FEATURES,
-  hasSafeFeature
+  hasSafeFeature,
+  networks,
+  type NetworkShortName
 }
 
 export * from './types'

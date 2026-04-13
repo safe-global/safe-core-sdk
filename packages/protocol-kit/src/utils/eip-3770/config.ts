@@ -1,4 +1,4 @@
-interface NetworkShortName {
+export interface NetworkShortName {
   shortName: string
   chainId: bigint
 }

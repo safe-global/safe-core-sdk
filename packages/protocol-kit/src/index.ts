@@ -78,7 +78,7 @@ import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import { getP256VerifierAddress } from './utils/passkeys/extractPasskeyData'
 import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
-import { SAFE_FEATURES, hasSafeFeature } from './utils/safeVersions'
+import { SafeFeature, hasSafeFeature } from './utils/safeVersions'
 
 export {
   estimateTxBaseGas,
@@ -140,7 +140,7 @@ export {
   adjustVInSignature,
   calculateSafeTransactionHash,
   generatePreValidatedSignature,
-  SAFE_FEATURES,
+  SafeFeature,
   hasSafeFeature,
   getEip3770NetworkPrefixFromChainId,
   getChainIdFromEip3770NetworkPrefix

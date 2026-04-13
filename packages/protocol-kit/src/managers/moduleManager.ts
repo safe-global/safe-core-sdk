@@ -3,7 +3,7 @@ import {
   sameString,
   hasSafeFeature,
   isZeroAddress,
-  SAFE_FEATURES,
+  SafeFeature,
   SafeContractCompatibleWithModuleGuardManager
 } from '@safe-global/protocol-kit/utils'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
@@ -126,7 +126,7 @@ class ModuleManager {
       throw new Error('Safe is not deployed')
     }
     const safeVersion = this.#safeContract.safeVersion
-    if (!hasSafeFeature(SAFE_FEATURES.SAFE_MODULE_GUARD, safeVersion)) {
+    if (!hasSafeFeature(SafeFeature.SAFE_MODULE_GUARD, safeVersion)) {
       throw new Error('Current version of the Safe does not support module guard functionality')
     }
 

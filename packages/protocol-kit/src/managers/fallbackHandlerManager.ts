@@ -1,7 +1,7 @@
 import {
   hasSafeFeature,
   isZeroAddress,
-  SAFE_FEATURES,
+  SafeFeature,
   SafeContractCompatibleWithFallbackHandler,
   sameString
 } from '@safe-global/protocol-kit/utils'
@@ -48,7 +48,7 @@ class FallbackHandlerManager {
       throw new Error('Safe is not deployed')
     }
     const safeVersion = this.#safeContract.safeVersion
-    if (!hasSafeFeature(SAFE_FEATURES.SAFE_FALLBACK_HANDLER, safeVersion)) {
+    if (!hasSafeFeature(SafeFeature.SAFE_FALLBACK_HANDLER, safeVersion)) {
       throw new Error(
         'Current version of the Safe does not support the fallback handler functionality'
       )

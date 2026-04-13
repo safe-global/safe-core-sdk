@@ -38,7 +38,9 @@ import {
   estimateSafeDeploymentGas,
   extractPasskeyData,
   validateEthereumAddress,
-  validateEip3770Address
+  validateEip3770Address,
+  getEip3770NetworkPrefixFromChainId,
+  getChainIdFromEip3770NetworkPrefix
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import EthSafeMessage from './utils/messages/SafeMessage'
@@ -77,7 +79,6 @@ import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import { getP256VerifierAddress } from './utils/passkeys/extractPasskeyData'
 import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
 import { SAFE_FEATURES, hasSafeFeature } from './utils/safeVersions'
-import { networks, type NetworkShortName } from './utils/eip-3770/config'
 
 export {
   estimateTxBaseGas,
@@ -141,8 +142,8 @@ export {
   generatePreValidatedSignature,
   SAFE_FEATURES,
   hasSafeFeature,
-  networks,
-  type NetworkShortName
+  getEip3770NetworkPrefixFromChainId,
+  getChainIdFromEip3770NetworkPrefix
 }
 
 export * from './types'

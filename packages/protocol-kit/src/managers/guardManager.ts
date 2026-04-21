@@ -1,7 +1,7 @@
 import {
   hasSafeFeature,
   isZeroAddress,
-  SAFE_FEATURES,
+  SafeFeature,
   SafeContractCompatibleWithGuardManager,
   sameString
 } from '@safe-global/protocol-kit/utils'
@@ -45,7 +45,7 @@ class GuardManager {
       throw new Error('Safe is not deployed')
     }
     const safeVersion = this.#safeContract.safeVersion
-    if (!hasSafeFeature(SAFE_FEATURES.SAFE_TX_GUARDS, safeVersion)) {
+    if (!hasSafeFeature(SafeFeature.SAFE_TX_GUARDS, safeVersion)) {
       throw new Error(
         'Current version of the Safe does not support Safe transaction guards functionality'
       )

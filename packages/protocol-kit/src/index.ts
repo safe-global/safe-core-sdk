@@ -38,7 +38,9 @@ import {
   estimateSafeDeploymentGas,
   extractPasskeyData,
   validateEthereumAddress,
-  validateEip3770Address
+  validateEip3770Address,
+  getEip3770NetworkPrefixFromChainId,
+  getChainIdFromEip3770NetworkPrefix
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import EthSafeMessage from './utils/messages/SafeMessage'
@@ -60,7 +62,11 @@ import {
   buildContractSignature,
   buildSignatureBytes,
   preimageSafeTransactionHash,
-  preimageSafeMessageHash
+  preimageSafeMessageHash,
+  generatePreValidatedSignature,
+  adjustVInSignature,
+  calculateSafeMessageHash,
+  calculateSafeTransactionHash
 } from './utils/signatures/utils'
 
 import {
@@ -73,6 +79,7 @@ import { createPasskeyClient } from './utils/passkeys/PasskeyClient'
 import getPasskeyOwnerAddress from './utils/passkeys/getPasskeyOwnerAddress'
 import { getP256VerifierAddress } from './utils/passkeys/extractPasskeyData'
 import generateOnChainIdentifier from './utils/on-chain-tracking/generateOnChainIdentifier'
+import { SafeFeature, hasSafeFeature } from './utils/safeVersions'
 
 export {
   estimateTxBaseGas,
@@ -130,7 +137,15 @@ export {
   createPasskeyClient,
   EthSafeTransaction,
   EthSafeMessage,
-  getPasskeyOwnerAddress
+  getPasskeyOwnerAddress,
+  adjustVInSignature,
+  calculateSafeMessageHash,
+  calculateSafeTransactionHash,
+  generatePreValidatedSignature,
+  SafeFeature,
+  hasSafeFeature,
+  getEip3770NetworkPrefixFromChainId,
+  getChainIdFromEip3770NetworkPrefix
 }
 
 export * from './types'

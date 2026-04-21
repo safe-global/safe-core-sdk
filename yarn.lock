@@ -1831,17 +1831,17 @@
   resolved "https://registry.yarnpkg.com/@safe-global/safe-contracts/-/safe-contracts-1.4.1.tgz#82605342f3289dc6b99818f599a3409ec2cb3fdc"
   integrity sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==
 
-"@safe-global/safe-deployments@^1.37.52":
-  version "1.37.52"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.52.tgz#a2957cf4598bb67e40e4bf16e83be200639ebcd6"
-  integrity sha512-BFwJWY7L4nB2T7grHmcPp/DNtwz3L1Iuydra1iaRg+WbqPTgsrS2Buf5bkKWD3AG5MdwuqqdTnClBfzQJs+6GA==
+"@safe-global/safe-deployments@^1.37.54":
+  version "1.37.54"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-deployments/-/safe-deployments-1.37.54.tgz#ff3ff7f80d92b2941a504bf5a82d1dc878a6b6b5"
+  integrity sha512-oE7lhHK5TpomnJcMO1aKjkEBDegXEE0FB1pPxRCtziRbEbcKDN+SPTxLKnbKMf3Ec6ZHYrl2PQC/BU+8sFODMQ==
   dependencies:
     semver "^7.6.2"
 
-"@safe-global/safe-modules-deployments@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-3.0.0.tgz#0bfbdd6d23c618094bf9be1dbc57f018cae69e36"
-  integrity sha512-WRPougZYGsPVJtYHWcdq0+SDMmB/gvfFQquZNAV8aZ4/ja12AwL5yiYGYWIzO+MetP2blg4zRncKx32YU/TdiA==
+"@safe-global/safe-modules-deployments@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@safe-global/safe-modules-deployments/-/safe-modules-deployments-3.0.2.tgz#dc03d81d3af875393d7b9770852d75f4e1f430e7"
+  integrity sha512-JE7Ak0+ylqqZFUakmWBo9BJRD74lvsd+OokQeoebKW02+Xy69ikHCRWiuo0M9iIEiY7BC/aEbXQzGYXhwFT75Q==
 
 "@safe-global/safe-passkey@0.2.0":
   version "0.2.0"
@@ -5037,9 +5037,9 @@ ignore@^5.0.4, ignore@^5.2.0, ignore@^5.3.1:
   integrity sha512-5Fytz/IraMjqpwfd34ke28PTVMjZjJG2MPn5t7OE4eUCUNf8BAa7b5WUS9/Qvr6mwOQS7Mk6vdsMno5he+T8Xw==
 
 immutable@^4.0.0-rc.12:
-  version "4.3.0"
-  resolved "https://registry.npmjs.org/immutable/-/immutable-4.3.0.tgz"
-  integrity sha512-0AOCmOip+xgJwEVTQj1EfiDDOkPmuyllDuTuEX+DDXUgapLAsBIfkg3sxCYyCEA8mQqZrrxPUGjcOQ2JS3WLkg==
+  version "4.3.8"
+  resolved "https://registry.yarnpkg.com/immutable/-/immutable-4.3.8.tgz#02d183c7727fb2bb1d5d0380da0d779dce9296a7"
+  integrity sha512-d/Ld9aLbKpNwyl0KiM2CT1WYvkitQ1TSvmRtkcV8FKStiDoA7Slzgjmb/1G2yhKM1p0XeNOieaTbFZmU1d3Xuw==
 
 import-fresh@^3.2.1, import-fresh@^3.3.0:
   version "3.3.0"
@@ -7316,14 +7316,14 @@ picocolors@^1.0.0, picocolors@^1.1.0, picocolors@^1.1.1:
   integrity sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==
 
 picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.3, picomatch@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.npmjs.org/picomatch/-/picomatch-2.3.1.tgz"
-  integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.2.tgz#5a942915e26b372dc0f0e6753149a16e6b1c5601"
+  integrity sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==
 
 picomatch@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-4.0.2.tgz#77c742931e8f3b8820946c76cd0c1f13730d1dab"
-  integrity sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-4.0.4.tgz#fd6f5e00a143086e074dffe4c924b8fb293b0589"
+  integrity sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==
 
 pidtree@^0.6.0:
   version "0.6.0"

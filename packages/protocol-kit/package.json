@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/protocol-kit",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "SDK that facilitates the interaction with Safe Smart Accounts",
   "types": "dist/src/index.d.ts",
   "main": "dist/cjs/src/index.cjs",
@@ -81,8 +81,8 @@
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
-    "@safe-global/safe-deployments": "^1.37.52",
-    "@safe-global/safe-modules-deployments": "^3.0.0",
+    "@safe-global/safe-deployments": "^1.37.54",
+    "@safe-global/safe-modules-deployments": "^3.0.2",
     "@safe-global/types-kit": "^3.1.0",
     "abitype": "^1.0.2",
     "semver": "^7.7.2",

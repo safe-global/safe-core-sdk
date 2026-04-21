@@ -1,6 +1,6 @@
 import {
   createPasskeyClient,
-  SAFE_FEATURES,
+  SafeFeature,
   generateTypedData,
   hasSafeFeature,
   validateEip3770Address,
@@ -111,7 +111,7 @@ class SafeProvider {
     const isPasskeySigner = signer && typeof signer !== 'string'
 
     if (isPasskeySigner) {
-      if (!hasSafeFeature(SAFE_FEATURES.PASSKEY_SIGNER, safeVersion)) {
+      if (!hasSafeFeature(SafeFeature.PASSKEY_SIGNER, safeVersion)) {
         throw new Error(
           'Current version of the Safe does not support the Passkey signer functionality'
         )

@@ -11,9 +11,9 @@ const ERC20_TOKEN = '0x3000000000000000000000000000000000000003'
 
 describe('estimateTxBaseGas', () => {
   beforeEach(() => {
-    sinon.stub(safeDeploymentContracts, 'getSafeContract').resolves({
-      encode: sinon.stub().returns('0x1234')
-    })
+    sinon
+      .stub(safeDeploymentContracts, 'getSafeContract')
+      .resolves({ encode: sinon.stub().returns('0x1234') } as any)
   })
 
   afterEach(() => {

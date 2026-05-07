@@ -11,9 +11,13 @@ const ERC20_TOKEN = '0x3000000000000000000000000000000000000003'
 
 describe('estimateTxBaseGas', () => {
   beforeEach(() => {
+    // Long enough to keep baseGas in the 3-byte range (>= 65_536) so the calldata-encoding
+    // adjustment for the final baseGas value contributes the same number of bytes for every
+    // test case — otherwise crossing the 2->3 byte boundary adds +12 gas to the delta.
+    const execTransactionDataStub = '0x' + '12'.repeat(500)
     sinon
       .stub(safeDeploymentContracts, 'getSafeContract')
-      .resolves({ encode: sinon.stub().returns('0x1234') } as any)
+      .resolves({ encode: sinon.stub().returns(execTransactionDataStub) } as any)
   })
 
   afterEach(() => {

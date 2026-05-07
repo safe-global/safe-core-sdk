@@ -124,8 +124,7 @@ function calculateExecTransactionEventsGas(
     const additionalInfoDynamicBytes = 32 + 3 * 32 // (nonce, msg.sender, threshold)
     const eventDataBytes =
       headBytes + dataDynamicBytes + signaturesDynamicBytes + additionalInfoDynamicBytes
-    gas +=
-      LOG_BASE_GAS_COST + LOG_TOPIC_GAS_COST + eventDataBytes * LOG_DATA_GAS_COST_PER_BYTE + 500 // additionalInfo abi.encode + memory expansion
+    gas += LOG_BASE_GAS_COST + LOG_TOPIC_GAS_COST + eventDataBytes * LOG_DATA_GAS_COST_PER_BYTE
   }
 
   return gas
@@ -163,7 +162,7 @@ async function hasExistingTokenBalance(
     args: [account as `0x${string}`]
   })
   try {
-    const response = await safeProvider.call({ to: gasToken, value: '0', data })
+    const response = await safeProvider.call({ to: gasToken, from: gasToken, value: '0', data })
     return BigInt(response || '0x0') > 0n
   } catch {
     // Reverts and empty responses are treated as "no balance" (conservative: higher cost)

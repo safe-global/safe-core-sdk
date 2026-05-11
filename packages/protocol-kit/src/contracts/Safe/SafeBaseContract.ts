@@ -5,7 +5,7 @@ import { SafeVersion } from '@safe-global/types-kit'
 import BaseContract from '@safe-global/protocol-kit/contracts/BaseContract'
 import { contractName, safeDeploymentsL1ChainIds } from '@safe-global/protocol-kit/contracts/config'
 import { DeploymentType } from '@safe-global/protocol-kit/types'
-import { SAFE_FEATURES, hasSafeFeature } from '@safe-global/protocol-kit/utils'
+import { SafeFeature, hasSafeFeature } from '@safe-global/protocol-kit/utils'
 
 /**
  * Abstract class SafeBaseContract extends BaseContract to specifically integrate with the Safe contract.
@@ -53,7 +53,7 @@ abstract class SafeBaseContract<
     deploymentType?: DeploymentType
   ) {
     const isL1Contract =
-      isL1SafeSingleton || !hasSafeFeature(SAFE_FEATURES.SAFE_L2_CONTRACTS, safeVersion)
+      isL1SafeSingleton || !hasSafeFeature(SafeFeature.SAFE_L2_CONTRACTS, safeVersion)
 
     const contractName = isL1Contract ? 'safeSingletonVersion' : 'safeSingletonL2Version'
 

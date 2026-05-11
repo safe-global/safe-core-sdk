@@ -37,7 +37,8 @@ const HASH_GENERATION_GAS_COST = 1_500
 const ECRECOVER_GAS_COST = 6_000
 
 // transfer gas cost
-const TRANSAFER_GAS_COST = 32_000
+const TRANSFER_GAS_COST = 32_000
+const NEW_ACCOUNT_GAS_COST = 25_000
 
 // numbers < 256 (0x00(31*2)..ff) are 192 -> 31 * 4 + 1 * CALL_DATA_BYTE_GAS_COST
 // numbers < 65535 (0x(30*2)..ffff) are 256 -> 30 * 4 + 2 * CALL_DATA_BYTE_GAS_COST
@@ -60,6 +61,27 @@ function estimateDataGasCosts(data: string): number {
 
     return gasCost + CALL_DATA_BYTE_GAS_COST
   }, 0)
+}
+
+async function isNewEthRefundReceiver(
+  safeProvider: SafeProvider,
+  gasToken: string,
+  refundReceiver: string
+): Promise<boolean> {
+  if (
+    gasToken.toLowerCase() !== ZERO_ADDRESS.toLowerCase() ||
+    refundReceiver.toLowerCase() === ZERO_ADDRESS.toLowerCase()
+  ) {
+    return false
+  }
+
+  const [contractCode, nonce, balance] = await Promise.all([
+    safeProvider.getContractCode(refundReceiver),
+    safeProvider.getNonce(refundReceiver),
+    safeProvider.getBalance(refundReceiver)
+  ])
+
+  return contractCode === '0x' && nonce === 0 && balance === 0n
 }
 
 export async function estimateGas(
@@ -159,23 +181,26 @@ export async function estimateTxBaseGas(
   const safeTransactionData = safeTransaction.data
   const { to, value, data, operation, safeTxGas, gasToken, refundReceiver } = safeTransactionData
 
-  const safeThreshold = await safe.getThreshold()
-  const safeNonce = await safe.getNonce()
-
-  const signaturesGasCost = safeThreshold * GAS_COST_PER_SIGNATURE
-
   const encodeSafeTxGas = safeTxGas || 0
   const encodeBaseGas = 0
   const gasPrice = 1
   const encodeGasToken = gasToken || ZERO_ADDRESS
   const encodeRefundReceiver = refundReceiver || ZERO_ADDRESS
   const signatures = '0x'
-
-  const safeVersion = safe.getContractVersion()
   const safeProvider = safe.getSafeProvider()
-  const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
-  const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
+  const safeVersion = safe.getContractVersion()
+  const contractManager = safe.getContractManager()
+  const isL1SafeSingleton = contractManager.isL1SafeSingleton
+
+  const [safeThreshold, safeNonce, chainId, isNewRefundReceiver] = await Promise.all([
+    safe.getThreshold(),
+    safe.getNonce(),
+    safe.getChainId(),
+    isNewEthRefundReceiver(safeProvider, encodeGasToken, encodeRefundReceiver)
+  ])
+
+  const signaturesGasCost = safeThreshold * GAS_COST_PER_SIGNATURE
+  const customContracts = contractManager.contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
     safeProvider,
@@ -213,7 +238,11 @@ export async function estimateTxBaseGas(
   baseGas > 65536 ? (baseGas += 64) : (baseGas += 128)
 
   // Base tx costs, transfer costs...
-  baseGas += TRANSAFER_GAS_COST
+  baseGas += TRANSFER_GAS_COST
+
+  if (isNewRefundReceiver) {
+    baseGas += NEW_ACCOUNT_GAS_COST
+  }
 
   return baseGas.toString()
 }

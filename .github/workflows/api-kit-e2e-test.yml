@@ -11,7 +11,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        node-version: [22.x]
+        node-version: [20.x]
         provider: [ethers, viem]
         safe-version: [v1.3.0, v1.4.1, v1.5.0]
     steps:

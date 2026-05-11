@@ -177,6 +177,9 @@ async function hasExistingTokenBalance(
  *   (EIP-161) when the receiver is a fresh account.
  * - ERC20 refund: typical transfer cost; adds extra gas (SSTORE 0->non-zero per EIP-2200)
  *   when the receiver has no prior balance for the token.
+ *
+ * Note: underestimations are expected if `gasToken` is set and ERC20
+ * contract is a proxy or includes additional logic
  */
 async function calculateRefundGas(
   safeProvider: SafeProvider,

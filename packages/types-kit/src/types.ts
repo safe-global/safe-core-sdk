@@ -1,4 +1,4 @@
-export { type Hex } from 'viem'
+export type Hex = `0x${string}`
 
 export type SafeVersion = '1.5.0' | '1.4.1' | '1.3.0' | '1.2.0' | '1.1.1' | '1.0.0'
 

@@ -13,7 +13,7 @@
     "generate-publish-info": "ts-node ./scripts/generate-publish-info.ts"
   },
   "engines": {
-    "node": ">=22.0.0",
+    "node": ">=20.0.0",
     "pnpm": ">=10.16.0"
   },
   "author": "Safe (https://safe.global)",

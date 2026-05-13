@@ -175,6 +175,9 @@ importers:
       axios:
         specifier: ^1.16.0
         version: 1.16.0
+      cbor:
+        specifier: ^9.0.2
+        version: 9.0.2
       chai:
         specifier: ^4.5.0
         version: 4.5.0

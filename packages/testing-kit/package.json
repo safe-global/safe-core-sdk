@@ -52,7 +52,9 @@
     "@safe-global/safe-passkey": "0.2.0",
     "@safe-global/types-kit": "^3.1.0",
     "@types/semver": "^7.7.0",
+    "dotenv": "^16.4.7",
     "hardhat": "^2.22.19",
+    "viem": "^2.21.8",
     "hardhat-deploy": "^0.12.4",
     "tsconfig-paths": "^4.2.0"
   },

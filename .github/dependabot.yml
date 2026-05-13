@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 7 # aligns with minimumReleaseAge in pnpm-workspace.yaml
+    groups:
+      typescript-toolchain:
+        patterns: ['typescript', 'ts-jest', 'ts-node', '@types/']
+        update-types: ['minor', 'patch']

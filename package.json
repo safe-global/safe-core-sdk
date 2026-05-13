@@ -2,20 +2,19 @@
   "name": "safe-core-sdk",
   "private": true,
   "scripts": {
-    "clean": "lerna clean",
-    "unbuild": "lerna run unbuild",
-    "build": "lerna run build --stream",
+    "clean": "pnpm -r exec -- rm -rf node_modules",
+    "unbuild": "pnpm -r run unbuild",
+    "build": "pnpm -r run build",
     "lint:check": "eslint './packages/**/*.{js,jsx,ts,tsx}'",
-    "test": "FORCE_COLOR=1 lerna run test --stream",
+    "test": "FORCE_COLOR=1 pnpm -r run test",
     "play": "ts-node ./playground/config/run.ts",
-    "format": "lerna run format && prettier --write \"playground/**/*.ts\"",
+    "format": "pnpm -r run format && prettier --write \"playground/**/*.ts\"",
     "prepare": "husky",
     "generate-publish-info": "ts-node ./scripts/generate-publish-info.ts"
   },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.16.0"
   },
   "author": "Safe (https://safe.global)",
   "license": "MIT",
@@ -48,5 +47,5 @@
       "prettier --write"
     ]
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
 }

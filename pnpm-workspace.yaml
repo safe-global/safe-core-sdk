@@ -1,0 +1,14 @@
+packages:
+  - 'packages/*'
+
+# Block packages published within the last 7 days.
+minimumReleaseAge: 10080 # minutes (7 days)
+
+# Only packages listed here are allowed to run install scripts.
+# esbuild and nx require native compilation.
+onlyBuiltDependencies:
+  - esbuild
+  - nx
+
+# Prevent sub-dependencies from using exotic specifiers without approval.
+blockExoticSubdeps: true

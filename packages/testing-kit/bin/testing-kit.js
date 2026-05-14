@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const { execSync } = require('child_process')
+const { execFileSync } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
@@ -40,9 +40,9 @@ try {
   process.env.TS_NODE_PROJECT = `${projectRoot}/tsconfig.json`
 
   if (command === 'test' && directory) {
-    execSync(`pnpm run ${command} ${path.join(projectRoot, directory)}`, { stdio: 'inherit' })
+    execFileSync('pnpm', ['run', command, path.join(projectRoot, directory)], { stdio: 'inherit' })
   } else {
-    execSync(`pnpm run ${command}`, { stdio: 'inherit' })
+    execFileSync('pnpm', ['run', command], { stdio: 'inherit' })
   }
 } catch (error) {
   console.error(`Failed to execute Hardhat command: ${error.message}`)

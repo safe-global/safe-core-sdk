@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const { execFileSync } = require('child_process')
+const { execFileSync, execSync } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
@@ -40,7 +40,10 @@ try {
   process.env.TS_NODE_PROJECT = `${projectRoot}/tsconfig.json`
 
   if (command === 'test' && directory) {
-    execFileSync('pnpm', ['run', command, path.join(projectRoot, directory)], { stdio: 'inherit' })
+    // Shell expansion is intentional here: directory may contain glob patterns (e.g. 'tests/e2e/*.test.*').
+    // command is validated against validCommands above; directory comes only from internal monorepo scripts.
+    // eslint-disable-next-line no-restricted-syntax
+    execSync(`pnpm run ${command} ${path.join(projectRoot, directory)}`, { stdio: 'inherit' })
   } else {
     execFileSync('pnpm', ['run', command], { stdio: 'inherit' })
   }

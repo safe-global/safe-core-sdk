@@ -69,11 +69,11 @@ importers:
   packages/api-kit:
     dependencies:
       '@safe-global/protocol-kit':
-        specifier: ^7.1.0
-        version: 7.1.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../protocol-kit
       '@safe-global/types-kit':
-        specifier: ^3.1.0
-        version: 3.1.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../types-kit
       node-fetch:
         specifier: ^2.7.0
         version: 2.7.0(encoding@0.1.13)
@@ -82,8 +82,8 @@ importers:
         version: 2.21.8(typescript@5.6.3)
     devDependencies:
       '@safe-global/relay-kit':
-        specifier: ^5.0.0
-        version: 5.0.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../relay-kit
       '@safe-global/testing-kit':
         specifier: workspace:^
         version: link:../testing-kit
@@ -145,8 +145,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       '@safe-global/types-kit':
-        specifier: ^3.1.0
-        version: 3.1.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../types-kit
       abitype:
         specifier: ^1.0.2
         version: 1.0.5(typescript@5.6.3)
@@ -219,14 +219,14 @@ importers:
         specifier: ^5.6.0
         version: 5.6.0
       '@safe-global/protocol-kit':
-        specifier: ^7.1.0
-        version: 7.1.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../protocol-kit
       '@safe-global/safe-modules-deployments':
         specifier: ^3.0.2
         version: 3.0.2
       '@safe-global/types-kit':
-        specifier: ^3.1.0
-        version: 3.1.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../types-kit
       semver:
         specifier: ^7.7.2
         version: 7.7.2
@@ -256,17 +256,17 @@ importers:
   packages/sdk-starter-kit:
     dependencies:
       '@safe-global/api-kit':
-        specifier: ^4.1.0
-        version: 4.1.0(encoding@0.1.13)(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../api-kit
       '@safe-global/protocol-kit':
-        specifier: ^7.1.0
-        version: 7.1.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../protocol-kit
       '@safe-global/relay-kit':
-        specifier: ^5.0.0
-        version: 5.0.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../relay-kit
       '@safe-global/types-kit':
-        specifier: ^3.1.0
-        version: 3.1.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../types-kit
       viem:
         specifier: ^2.21.8
         version: 2.21.8(typescript@5.6.3)
@@ -296,8 +296,8 @@ importers:
         specifier: 0.2.0
         version: 0.2.0(ethers@5.4.0)
       '@safe-global/types-kit':
-        specifier: ^3.1.0
-        version: 3.1.0(typescript@5.6.3)
+        specifier: workspace:^
+        version: link:../types-kit
       '@types/semver':
         specifier: ^7.7.0
         version: 7.7.0
@@ -1405,15 +1405,6 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@safe-global/api-kit@4.1.0':
-    resolution: {integrity: sha512-UlLG5bY1dR3zKKJxv0/d4bsR0zkFiC52aXJDg4/BTXGge51CZdG/d/5Z+V/IQX6fC09QiLPT1D3VquO0oc9Ecg==}
-
-  '@safe-global/protocol-kit@7.1.0':
-    resolution: {integrity: sha512-eFJ6SwxF9TIDpQkQj8bTP9ma1zpf1C1nhdhAwx16rUX749CWT6styg7e9dSmeV40zSleWFeQUWcqgLOaRnxj1g==}
-
-  '@safe-global/relay-kit@5.0.0':
-    resolution: {integrity: sha512-C4NPP9roOLwLuSBYeEaJ53yWg5GlG0Sn7fdvMv3JsfMmCNvTVR+ftOCuoOIWA8On2MaWdRKQBLZ5XsoaHbV7+A==}
-
   '@safe-global/safe-contracts@1.4.1':
     resolution: {integrity: sha512-fP1jewywSwsIniM04NsqPyVRFKPMAuirC3ftA/TA4X3Zc5EnwQp/UCJUU2PL/37/z/jMo8UUaJ+pnFNWmMU7dQ==}
     peerDependencies:
@@ -1430,9 +1421,6 @@ packages:
 
   '@safe-global/safe-smart-account@1.5.0':
     resolution: {integrity: sha512-VIMWxoeY/kNuZVsQVvAeOFKcQS3eojCXg0ecGnesBSLn5ypYshmBhVEEU5XiurJJGTs/MrcoLTbTxhs9W9GvdQ==}
-
-  '@safe-global/types-kit@3.1.0':
-    resolution: {integrity: sha512-uI6lFV8wOji4rb7juu0/LRMND0rq2NWaqH4zFzE2FUjO8lTvbCT+/5W/+flUUfkcaqyLDlJ1OPjasa2bEakrbw==}
 
   '@scure/base@1.1.8':
     resolution: {integrity: sha512-6CyAclxj3Nb0XT7GHK6K4zK6k2xJm6E4Ft0Ohjt4WgegiFUHEtFb2CGzmPmGBwoIhrLsqNLYfLr04Y1GePrzZg==}
@@ -6936,51 +6924,6 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@safe-global/api-kit@4.1.0(encoding@0.1.13)(typescript@5.6.3)':
-    dependencies:
-      '@safe-global/protocol-kit': 7.1.0(typescript@5.6.3)
-      '@safe-global/types-kit': 3.1.0(typescript@5.6.3)
-      node-fetch: 2.7.0(encoding@0.1.13)
-      viem: 2.21.8(typescript@5.6.3)
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - typescript
-      - utf-8-validate
-      - zod
-
-  '@safe-global/protocol-kit@7.1.0(typescript@5.6.3)':
-    dependencies:
-      '@safe-global/safe-deployments': 1.37.54
-      '@safe-global/safe-modules-deployments': 3.0.2
-      '@safe-global/types-kit': 3.1.0(typescript@5.6.3)
-      abitype: 1.0.5(typescript@5.6.3)
-      semver: 7.7.2
-      viem: 2.21.8(typescript@5.6.3)
-    optionalDependencies:
-      '@noble/curves': 1.6.0
-      '@peculiar/asn1-schema': 2.3.13
-    transitivePeerDependencies:
-      - bufferutil
-      - typescript
-      - utf-8-validate
-      - zod
-
-  '@safe-global/relay-kit@5.0.0(typescript@5.6.3)':
-    dependencies:
-      '@gelatonetwork/relay-sdk': 5.6.0
-      '@safe-global/protocol-kit': 7.1.0(typescript@5.6.3)
-      '@safe-global/safe-modules-deployments': 3.0.2
-      '@safe-global/types-kit': 3.1.0(typescript@5.6.3)
-      semver: 7.7.2
-      viem: 2.21.8(typescript@5.6.3)
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - typescript
-      - utf-8-validate
-      - zod
-
   '@safe-global/safe-contracts@1.4.1(ethers@5.4.0)':
     dependencies:
       ethers: 5.4.0
@@ -7001,13 +6944,6 @@ snapshots:
       - ethers
 
   '@safe-global/safe-smart-account@1.5.0': {}
-
-  '@safe-global/types-kit@3.1.0(typescript@5.6.3)':
-    dependencies:
-      abitype: 1.0.5(typescript@5.6.3)
-    transitivePeerDependencies:
-      - typescript
-      - zod
 
   '@scure/base@1.1.8': {}
 

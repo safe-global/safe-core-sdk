@@ -65,7 +65,7 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@safe-global/testing-kit": "^0.3.0",
+    "@safe-global/testing-kit": "workspace:^",
     "axios": "^1.16.0",
     "cbor": "^9.0.2",
     "@types/chai": "^4.3.20",

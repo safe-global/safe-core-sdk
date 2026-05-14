@@ -82,8 +82,8 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0(typescript@5.6.3)
       '@safe-global/testing-kit':
-        specifier: ^0.3.0
-        version: 0.3.0(hardhat@2.22.19(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.6.3))(typescript@5.6.3))
+        specifier: workspace:^
+        version: link:../testing-kit
       '@types/chai':
         specifier: ^4.3.20
         version: 4.3.20
@@ -155,8 +155,8 @@ importers:
         version: 2.21.8(typescript@5.6.3)
     devDependencies:
       '@safe-global/testing-kit':
-        specifier: ^0.3.0
-        version: 0.3.0(hardhat@2.22.19(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.6.3))(typescript@5.6.3))
+        specifier: workspace:^
+        version: link:../testing-kit
       '@types/chai':
         specifier: ^4.3.20
         version: 4.3.20
@@ -1415,12 +1415,6 @@ packages:
 
   '@safe-global/safe-smart-account@1.5.0':
     resolution: {integrity: sha512-VIMWxoeY/kNuZVsQVvAeOFKcQS3eojCXg0ecGnesBSLn5ypYshmBhVEEU5XiurJJGTs/MrcoLTbTxhs9W9GvdQ==}
-
-  '@safe-global/testing-kit@0.3.0':
-    resolution: {integrity: sha512-fVq5v+owt/PTq7i4L5KhsIBBUkM9MPSPVBSpMcCwCUyXXrRrkYGbUD1K3mKC6w6qlDMYNXNrBiZ/61JqS5dBiA==}
-    hasBin: true
-    peerDependencies:
-      hardhat: ^2.19.3
 
   '@safe-global/types-kit@3.1.0':
     resolution: {integrity: sha512-uI6lFV8wOji4rb7juu0/LRMND0rq2NWaqH4zFzE2FUjO8lTvbCT+/5W/+flUUfkcaqyLDlJ1OPjasa2bEakrbw==}
@@ -6491,7 +6485,7 @@ snapshots:
       read-cmd-shim: 4.0.0
       resolve-from: 5.0.0
       rimraf: 4.4.1
-      semver: 7.8.0
+      semver: 7.7.2
       set-blocking: 2.0.0
       signal-exit: 3.0.7
       slash: 3.0.0
@@ -6715,7 +6709,7 @@ snapshots:
       promise-all-reject-late: 1.0.1
       promise-call-limit: 3.0.2
       read-package-json-fast: 3.0.2
-      semver: 7.8.0
+      semver: 7.7.2
       ssri: 10.0.6
       treeverse: 3.0.0
       walk-up-path: 3.0.1
@@ -6725,7 +6719,7 @@ snapshots:
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.8.0
+      semver: 7.7.2
 
   '@npmcli/git@5.0.8':
     dependencies:
@@ -6736,7 +6730,7 @@ snapshots:
       proc-log: 4.2.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.8.0
+      semver: 7.7.2
       which: 4.0.0
     transitivePeerDependencies:
       - bluebird
@@ -6759,7 +6753,7 @@ snapshots:
       json-parse-even-better-errors: 3.0.2
       pacote: 18.0.6
       proc-log: 4.2.0
-      semver: 7.8.0
+      semver: 7.7.2
     transitivePeerDependencies:
       - bluebird
       - supports-color
@@ -6776,7 +6770,7 @@ snapshots:
       json-parse-even-better-errors: 3.0.2
       normalize-package-data: 6.0.2
       proc-log: 4.2.0
-      semver: 7.8.0
+      semver: 7.7.2
     transitivePeerDependencies:
       - bluebird
 
@@ -6809,7 +6803,7 @@ snapshots:
       ignore: 5.3.2
       minimatch: 9.0.3
       nx: 20.8.4
-      semver: 7.8.0
+      semver: 7.7.2
       tmp: 0.2.5
       tslib: 2.8.1
       yargs-parser: 21.1.1
@@ -6992,11 +6986,6 @@ snapshots:
       - ethers
 
   '@safe-global/safe-smart-account@1.5.0': {}
-
-  '@safe-global/testing-kit@0.3.0(hardhat@2.22.19(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.6.3))(typescript@5.6.3))':
-    dependencies:
-      hardhat: 2.22.19(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.6.3))(typescript@5.6.3)
-      semver: 7.7.2
 
   '@safe-global/types-kit@3.1.0(typescript@5.6.3)':
     dependencies:
@@ -7956,7 +7945,7 @@ snapshots:
       handlebars: 4.7.9
       json-stringify-safe: 5.0.1
       meow: 8.1.2
-      semver: 7.8.0
+      semver: 7.7.2
       split: 1.0.1
 
   conventional-commits-filter@3.0.0:
@@ -8767,7 +8756,7 @@ snapshots:
   git-semver-tags@5.0.1:
     dependencies:
       meow: 8.1.2
-      semver: 7.8.0
+      semver: 7.7.2
 
   git-up@7.0.0:
     dependencies:
@@ -9102,7 +9091,7 @@ snapshots:
       npm-package-arg: 11.0.2
       promzard: 1.0.2
       read: 3.0.1
-      semver: 7.8.0
+      semver: 7.7.2
       validate-npm-package-license: 3.0.4
       validate-npm-package-name: 5.0.1
     transitivePeerDependencies:
@@ -9826,7 +9815,7 @@ snapshots:
       npm-package-arg: 11.0.2
       npm-registry-fetch: 17.1.0
       proc-log: 4.2.0
-      semver: 7.8.0
+      semver: 7.7.2
       sigstore: 2.3.1
       ssri: 10.0.6
     transitivePeerDependencies:
@@ -9943,7 +9932,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.8.0
+      semver: 7.7.2
 
   make-error@1.3.6: {}
 
@@ -10232,7 +10221,7 @@ snapshots:
       make-fetch-happen: 13.0.1
       nopt: 7.2.1
       proc-log: 4.2.0
-      semver: 7.8.0
+      semver: 7.7.2
       tar: 6.2.1
       which: 4.0.0
     transitivePeerDependencies:
@@ -10265,13 +10254,13 @@ snapshots:
     dependencies:
       hosted-git-info: 4.1.0
       is-core-module: 2.16.2
-      semver: 7.8.0
+      semver: 7.7.2
       validate-npm-package-license: 3.0.4
 
   normalize-package-data@6.0.2:
     dependencies:
       hosted-git-info: 7.0.2
-      semver: 7.8.0
+      semver: 7.7.2
       validate-npm-package-license: 3.0.4
 
   normalize-path@3.0.0: {}
@@ -10282,7 +10271,7 @@ snapshots:
 
   npm-install-checks@6.3.0:
     dependencies:
-      semver: 7.8.0
+      semver: 7.7.2
 
   npm-normalize-package-bin@3.0.1: {}
 
@@ -10290,7 +10279,7 @@ snapshots:
     dependencies:
       hosted-git-info: 7.0.2
       proc-log: 4.2.0
-      semver: 7.8.0
+      semver: 7.7.2
       validate-npm-package-name: 5.0.1
 
   npm-packlist@8.0.2:
@@ -10302,7 +10291,7 @@ snapshots:
       npm-install-checks: 6.3.0
       npm-normalize-package-bin: 3.0.1
       npm-package-arg: 11.0.2
-      semver: 7.8.0
+      semver: 7.7.2
 
   npm-registry-fetch@17.1.0:
     dependencies:
@@ -10352,7 +10341,7 @@ snapshots:
       open: 8.4.2
       ora: 5.3.0
       resolve.exports: 2.0.3
-      semver: 7.8.0
+      semver: 7.7.2
       string-width: 4.2.3
       tar-stream: 2.2.0
       tmp: 0.2.5

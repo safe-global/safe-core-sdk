@@ -40,9 +40,9 @@ try {
   process.env.TS_NODE_PROJECT = `${projectRoot}/tsconfig.json`
 
   if (command === 'test' && directory) {
-    execSync(`pnpm ${command} ${path.join(projectRoot, directory)}`, { stdio: 'inherit' })
+    execSync(`pnpm run ${command} ${path.join(projectRoot, directory)}`, { stdio: 'inherit' })
   } else {
-    execSync(`pnpm ${command}`, { stdio: 'inherit' })
+    execSync(`pnpm run ${command}`, { stdio: 'inherit' })
   }
 } catch (error) {
   console.error(`Failed to execute Hardhat command: ${error.message}`)

@@ -20,6 +20,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^7.18.0
         version: 7.18.0(eslint@8.57.1)(typescript@5.6.3)
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
       esbuild:
         specifier: ^0.25.0
         version: 0.25.12
@@ -231,12 +234,24 @@ importers:
         specifier: ^2.21.8
         version: 2.21.8(typescript@5.6.3)
     devDependencies:
+      '@types/jest':
+        specifier: ^29.5.14
+        version: 29.5.14
       '@types/semver':
         specifier: ^7.7.0
         version: 7.7.0
       abitype:
         specifier: ^1.0.2
         version: 1.0.5(typescript@5.6.3)
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@22.15.35)(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.6.3))
+      ts-jest:
+        specifier: ^29.2.5
+        version: 29.4.9(@babel/core@7.29.0)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.29.0))(esbuild@0.25.12)(jest-util@29.7.0)(jest@29.7.0(@types/node@22.15.35)(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.6.3)))(typescript@5.6.3)
 
   packages/sdk-starter-kit:
     dependencies:

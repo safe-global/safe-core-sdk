@@ -6,6 +6,14 @@ on:
     branches:
       - main
       - development
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/development' }}
+
 jobs:
   test:
     runs-on: ubuntu-latest

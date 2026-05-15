@@ -7,6 +7,7 @@
     },
     "outDir": "dist"
   },
+  "files": ["abitype-config.d.ts"],
   "include": ["src/**/*", "tests/**/*"],
   "exclude": ["dist"]
 }

@@ -183,7 +183,7 @@ async function hasExistingTokenBalance(
  */
 async function calculateRefundGas(
   safeProvider: SafeProvider,
-  gasPrice: number | string,
+  gasPrice: string,
   gasToken: string,
   refundReceiver: string
 ): Promise<number> {

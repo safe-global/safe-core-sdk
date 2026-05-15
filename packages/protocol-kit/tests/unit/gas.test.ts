@@ -11,9 +11,13 @@ const ERC20_TOKEN = '0x3000000000000000000000000000000000000003'
 
 describe('estimateTxBaseGas', () => {
   beforeEach(() => {
+    // Long enough to keep baseGas in the 3-byte range (>= 65_536) so the calldata-encoding
+    // adjustment for the final baseGas value contributes the same number of bytes for every
+    // test case — otherwise crossing the 2->3 byte boundary adds +12 gas to the delta.
+    const execTransactionDataStub = '0x' + '12'.repeat(500)
     sinon
       .stub(safeDeploymentContracts, 'getSafeContract')
-      .resolves({ encode: sinon.stub().returns('0x1234') } as any)
+      .resolves({ encode: sinon.stub().returns(execTransactionDataStub) } as any)
   })
 
   afterEach(() => {
@@ -23,16 +27,25 @@ describe('estimateTxBaseGas', () => {
   function buildSafe({
     contractCode = '0x',
     nonce = 0,
-    balance = 0n
+    balance = 0n,
+    tokenBalance = 0n,
+    tokenBalanceReverts = false
   }: {
     contractCode?: string
     nonce?: number
     balance?: bigint
+    tokenBalance?: bigint
+    tokenBalanceReverts?: boolean
   } = {}) {
+    const balanceOfResponse = '0x' + tokenBalance.toString(16).padStart(64, '0')
+    const callStub = tokenBalanceReverts
+      ? sinon.stub().rejects(new Error('reverted'))
+      : sinon.stub().resolves(balanceOfResponse)
     const safeProvider = {
       getContractCode: sinon.stub().resolves(contractCode),
       getNonce: sinon.stub().resolves(nonce),
-      getBalance: sinon.stub().resolves(balance)
+      getBalance: sinon.stub().resolves(balance),
+      call: callStub
     }
 
     return {
@@ -86,22 +99,36 @@ describe('estimateTxBaseGas', () => {
     chai.expect(Number(newRefundBaseGas) - Number(existingRefundBaseGas)).to.eq(25_000)
   })
 
-  it('does not add the account creation cost for token refunds', async () => {
-    const safe = buildSafe()
+  it('adds extra ERC20 transfer cost when refund receiver has no prior token balance', async () => {
+    const existingHolderSafe = buildSafe({ tokenBalance: 1n })
+    const newHolderSafe = buildSafe({ tokenBalance: 0n })
 
-    const ethRefundBaseGas = await estimateTxBaseGas(
-      safe,
-      buildTransaction({ refundReceiver: NEW_REFUND_RECEIVER })
+    const existingHolderBaseGas = await estimateTxBaseGas(
+      existingHolderSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
     )
-    const tokenRefundBaseGas = await estimateTxBaseGas(
-      safe,
-      buildTransaction({
-        gasToken: ERC20_TOKEN,
-        refundReceiver: NEW_REFUND_RECEIVER
-      })
+    const newHolderBaseGas = await estimateTxBaseGas(
+      newHolderSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
     )
 
-    chai.expect(Number(ethRefundBaseGas) - Number(tokenRefundBaseGas)).to.eq(25_000)
+    chai.expect(Number(newHolderBaseGas) - Number(existingHolderBaseGas)).to.eq(17_000)
+  })
+
+  it('treats a reverting balanceOf call as a new token holder (conservative)', async () => {
+    const existingHolderSafe = buildSafe({ tokenBalance: 1n })
+    const revertingSafe = buildSafe({ tokenBalanceReverts: true })
+
+    const existingHolderBaseGas = await estimateTxBaseGas(
+      existingHolderSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+    const revertingBaseGas = await estimateTxBaseGas(
+      revertingSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+
+    chai.expect(Number(revertingBaseGas) - Number(existingHolderBaseGas)).to.eq(17_000)
   })
 
   it('does not add the account creation cost when refundReceiver is the zero address', async () => {

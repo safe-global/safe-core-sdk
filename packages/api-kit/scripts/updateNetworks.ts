@@ -2,7 +2,9 @@ import fs from 'fs'
 import fetch from 'node-fetch'
 import { networks } from '../src/utils/config'
 
-const SAFE_CONFIG_URL = 'https://safe-config.safe.global/api/v1/chains/'
+const SAFE_CONFIG_ORIGIN = 'https://safe-config.safe.global'
+const SAFE_CONFIG_URL = `${SAFE_CONFIG_ORIGIN}/api/v1/chains/`
+const SHORT_NAME_RE = /^[a-z0-9][a-z0-9-]{0,63}$/i
 
 type ChainConfig = {
   chainId: string
@@ -26,6 +28,9 @@ async function fetchAllChains(): Promise<ChainConfig[]> {
     }
     const data = (await response.json()) as ChainResponse
     chains.push(...data.results)
+    if (data.next !== null && new URL(data.next).origin !== SAFE_CONFIG_ORIGIN) {
+      throw new Error(`Unexpected pagination URL origin: ${data.next}`)
+    }
     url = data.next
   }
 
@@ -38,6 +43,9 @@ function extractTxServiceLabel(transactionService: string): string {
   const label = transactionService.replace(/\/$/, '').split('/').pop()
   if (!label) {
     throw new Error(`Could not extract label from transactionService URL: ${transactionService}`)
+  }
+  if (!SHORT_NAME_RE.test(label)) {
+    throw new Error(`Unsafe shortName rejected: ${label}`)
   }
   return label
 }

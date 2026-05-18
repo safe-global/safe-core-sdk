@@ -49,15 +49,20 @@ let delegatorAddress: string
 let eip3770DelegatorAddress: string
 
 describe('Endpoint tests', () => {
+  let fetchData: sinon.SinonStub
+
   before(async () => {
     ;({ safeApiKit, protocolKit } = await getKits({ signer: PRIVATE_KEY_1, safeAddress }))
     delegatorAddress = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'
     eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
+    fetchData = sinon
+      .stub(httpRequests, 'sendRequest')
+      .returns(Promise.resolve({ data: { success: true } }))
   })
 
-  const fetchData = sinon
-    .stub(httpRequests, 'sendRequest')
-    .returns(Promise.resolve({ data: { success: true } }))
+  after(() => {
+    sinon.restore()
+  })
 
   afterEach(() => {
     sinon.resetHistory()

@@ -5,8 +5,12 @@ on:
   pull_request_target:
     types: [opened, closed, synchronize]
 
+permissions: {}
+
 jobs:
   CLAAssistant:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: 'CLA Assistant'

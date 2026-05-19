@@ -10,6 +10,18 @@ export interface HttpRequest {
   body?: any
 }
 
+export class HttpError extends Error {
+  statusCode: number
+  data: unknown
+
+  constructor(statusCode: number, message: string, data: unknown) {
+    super(message)
+    this.name = 'HttpError'
+    this.statusCode = statusCode
+    this.data = data
+  }
+}
+
 export async function sendRequest<T>(
   { url, method, body }: HttpRequest,
   apiKey?: string
@@ -33,38 +45,42 @@ export async function sendRequest<T>(
     body: JSON.stringify(body)
   })
 
-  let jsonResponse: any
-  try {
-    jsonResponse = await response.json()
-  } catch (error) {
-    if (!response.ok) {
-      throw new Error(response.statusText)
+  const text = await response.text()
+
+  if (!response.ok) {
+    let jsonResponse: any
+    try {
+      jsonResponse = JSON.parse(text)
+    } catch {
+      throw new HttpError(response.status, response.statusText, undefined)
     }
+    if (jsonResponse.data) {
+      throw new HttpError(response.status, jsonResponse.data, jsonResponse)
+    }
+    if (jsonResponse.detail) {
+      throw new HttpError(response.status, jsonResponse.detail, jsonResponse)
+    }
+    if (jsonResponse.message) {
+      throw new HttpError(response.status, jsonResponse.message, jsonResponse)
+    }
+    if (jsonResponse.nonFieldErrors) {
+      throw new HttpError(response.status, jsonResponse.nonFieldErrors, jsonResponse)
+    }
+    if (jsonResponse.delegate) {
+      throw new HttpError(response.status, jsonResponse.delegate, jsonResponse)
+    }
+    if (jsonResponse.safe) {
+      throw new HttpError(response.status, jsonResponse.safe, jsonResponse)
+    }
+    if (jsonResponse.delegator) {
+      throw new HttpError(response.status, jsonResponse.delegator, jsonResponse)
+    }
+    throw new HttpError(response.status, response.statusText, jsonResponse)
   }
 
-  if (response.ok) {
-    return jsonResponse as T
+  if (!text) {
+    return undefined as unknown as T
   }
-  if (jsonResponse.data) {
-    throw new Error(jsonResponse.data)
-  }
-  if (jsonResponse.detail) {
-    throw new Error(jsonResponse.detail)
-  }
-  if (jsonResponse.message) {
-    throw new Error(jsonResponse.message)
-  }
-  if (jsonResponse.nonFieldErrors) {
-    throw new Error(jsonResponse.nonFieldErrors)
-  }
-  if (jsonResponse.delegate) {
-    throw new Error(jsonResponse.delegate)
-  }
-  if (jsonResponse.safe) {
-    throw new Error(jsonResponse.safe)
-  }
-  if (jsonResponse.delegator) {
-    throw new Error(jsonResponse.delegator)
-  }
-  throw new Error(response.statusText)
+
+  return JSON.parse(text) as T
 }

@@ -6,9 +6,7 @@ on:
       - main
       - development
 
-permissions:
-  contents: read
-  checks: write
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,6 +14,9 @@ concurrency:
 
 jobs:
   test:
+    permissions:
+      contents: read
+      checks: write
     runs-on: ubuntu-latest
     strategy:
       matrix:

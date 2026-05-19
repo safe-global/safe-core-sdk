@@ -5,12 +5,13 @@ on:
   pull_request_target:
     types: [opened, closed, synchronize]
 
-permissions:
-  pull-requests: write
-  statuses: write
+permissions: {}
 
 jobs:
   CLAAssistant:
+    permissions:
+      pull-requests: write
+      statuses: write
     runs-on: ubuntu-latest
     steps:
       - name: 'CLA Assistant'

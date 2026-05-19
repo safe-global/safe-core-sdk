@@ -3,10 +3,11 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
+      "@safe-global/relay-kit/test-utils": ["./test-utils"],
       "@safe-global/relay-kit/*": ["./src/*"]
     },
     "outDir": "dist"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "test-utils/**/*"],
   "exclude": ["dist"]
 }

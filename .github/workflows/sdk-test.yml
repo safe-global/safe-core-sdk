@@ -5,35 +5,43 @@ on:
     branches:
       - main
       - development
+
 permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/development' }}
 
 jobs:
   test:
     permissions:
       contents: read
+      checks: write
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [20.x]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v5.0.0
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: ${{ matrix.node-version }}
-          cache: yarn
+          cache: pnpm
 
-      - name: Yarn install
-        run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: yarn build
+        run: pnpm build
 
       - name: Test
         env:
           PRIVATE_KEY: ${{ secrets.TESTING_PRIVATE_KEY }}
           PASSKEY_PRIVATE_KEY: ${{ secrets.TESTING_PASSKEY_PRIVATE_KEY }}
-        run: yarn test
+        run: pnpm test
 
       - name: Upload coverage report
         uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7

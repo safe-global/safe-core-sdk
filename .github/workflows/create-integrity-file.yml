@@ -8,11 +8,12 @@ on:
     branches:
       - prepare-release
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   generate-publish-info:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     strategy:
       matrix:

@@ -6,8 +6,12 @@ on:
     branches:
       - main
       - development
+permissions: {}
+
 jobs:
   test:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     strategy:
       matrix:

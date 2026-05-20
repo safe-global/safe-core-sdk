@@ -1,4 +1,10 @@
-import { BaseError, CallExecutionErrorType, RawContractErrorType } from 'viem'
+import {
+  BaseError,
+  CallExecutionErrorType,
+  RawContractErrorType,
+  encodeFunctionData,
+  parseAbi
+} from 'viem'
 import { OperationType, SafeVersion, SafeTransaction } from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies.js'
 import Safe from '@safe-global/protocol-kit/Safe'
@@ -24,8 +30,8 @@ const CALL_DATA_ZERO_BYTE_GAS_COST = 4
 // Every byte != 00 -> 16 Gas cost (68 before Istanbul)
 const CALL_DATA_BYTE_GAS_COST = 16
 
-// gas cost initialization of a Safe
-const INITIZATION_GAS_COST = 20_000
+// gas cost initialization of a Safe (SSTORE 0→non-zero on a cold slot = 20 000 + 2 100 cold-load surcharge per EIP-2929)
+const INITIALIZATION_GAS_COST = 22_100
 
 // increment nonce gas cost
 const INCREMENT_NONCE_GAS_COST = 5_000
@@ -36,11 +42,44 @@ const HASH_GENERATION_GAS_COST = 1_500
 // ecrecover gas cost for ecdsa ~= 4K gas, we use 6K
 const ECRECOVER_GAS_COST = 6_000
 
-// transfer gas cost
-const TRANSAFER_GAS_COST = 32_000
+// Intrinsic transaction fee charged by the EVM (always paid by the relayer)
+const INTRINSIC_TX_GAS_COST = 21_000
 
-// numbers < 256 (0x00(31*2)..ff) are 192 -> 31 * 4 + 1 * CALL_DATA_BYTE_GAS_COST
-// numbers < 65535 (0x(30*2)..ffff) are 256 -> 30 * 4 + 2 * CALL_DATA_BYTE_GAS_COST
+// Cold SLOADs always paid in execTransaction: `threshold` (in checkSignatures) + `getGuard()` slot
+const PRE_EXEC_STORAGE_GAS_COST = 2 * 2_100
+
+// Headroom for SafeMath wrappers, memory expansion, control-flow checks, and the cold owners
+// SLOAD on the first signature. Rounded up to leave slack for dynamic signature types and misc.
+const MISC_OVERHEAD_GAS_COST = 3_000
+
+// Base operations always paid on top of the contract-counted gas (not in safeTxGas / refundGas / events)
+const EXTRA_BASE_GAS_COST =
+  INTRINSIC_TX_GAS_COST + PRE_EXEC_STORAGE_GAS_COST + MISC_OVERHEAD_GAS_COST
+
+// New account creation cost (EIP-161)
+const NEW_ACCOUNT_GAS_COST = 25_000
+
+// Cold address access (EIP-2929) — first touch of the refund receiver in this tx
+const COLD_ACCOUNT_ACCESS_GAS_COST = 2_600
+
+// Extra gas charged when CALL forwards a non-zero value
+const CALL_VALUE_GAS_COST = 9_000
+
+// Approximate ERC20 transfer gas:
+//  - existing token holder: cold token + dispatch + 2 SSTOREs + LOG3 + Safe wrapper (~21k)
+//  - new token holder: extra ~17k from SSTORE 0->non-zero on receiver balance (EIP-2200)
+const ERC20_TRANSFER_GAS_COST = 21_000
+const ERC20_NEW_HOLDER_TRANSFER_GAS_COST = 38_000
+
+// LOG opcode gas costs (yellow paper)
+const LOG_BASE_GAS_COST = 375
+const LOG_TOPIC_GAS_COST = 375
+const LOG_DATA_GAS_COST_PER_BYTE = 8
+
+// ExecutionSuccess/ExecutionFailure event: ~1262 gas pre-1.3.0 (LOG1 + 64 bytes),
+// ~1381 gas from 1.3.0 onwards (LOG2 with indexed txHash + 32 bytes). Flat estimate.
+const EXECUTION_RESULT_EVENT_GAS_COST = 1_500
+
 // Calculate gas for signatures
 // (array count (3 -> r, s, v) + ecrecover costs) * signature count
 const GAS_COST_PER_SIGNATURE =
@@ -60,6 +99,108 @@ function estimateDataGasCosts(data: string): number {
 
     return gasCost + CALL_DATA_BYTE_GAS_COST
   }, 0)
+}
+
+/**
+ * Estimates the gas cost of the events emitted during execTransaction.
+ * - The Safe singleton always emits ExecutionSuccess or ExecutionFailure.
+ * - The SafeL2 singleton (>= 1.3.0) additionally emits SafeMultiSigTransaction
+ *   in its onBeforeExecTransaction hook.
+ */
+function calculateExecTransactionEventsGas(
+  isL1SafeSingleton: boolean,
+  data: string,
+  threshold: number
+): number {
+  let gas = EXECUTION_RESULT_EVENT_GAS_COST
+
+  if (!isL1SafeSingleton) {
+    // `SafeMultiSigTransaction` event for SafeL2
+    const dataBytes = (data.length - 2) / 2
+    const signaturesBytes = threshold * 65
+    const headBytes = 11 * 32 // 11 top-level event params
+    const dataDynamicBytes = 32 + Math.ceil(dataBytes / 32) * 32
+    const signaturesDynamicBytes = 32 + Math.ceil(signaturesBytes / 32) * 32
+    const additionalInfoDynamicBytes = 32 + 3 * 32 // (nonce, msg.sender, threshold)
+    const eventDataBytes =
+      headBytes + dataDynamicBytes + signaturesDynamicBytes + additionalInfoDynamicBytes
+    gas += LOG_BASE_GAS_COST + LOG_TOPIC_GAS_COST + eventDataBytes * LOG_DATA_GAS_COST_PER_BYTE
+  }
+
+  return gas
+}
+
+async function isNewEthRefundReceiver(
+  safeProvider: SafeProvider,
+  gasToken: string,
+  refundReceiver: string
+): Promise<boolean> {
+  if (
+    gasToken.toLowerCase() !== ZERO_ADDRESS.toLowerCase() ||
+    refundReceiver.toLowerCase() === ZERO_ADDRESS.toLowerCase()
+  ) {
+    return false
+  }
+
+  const [contractCode, nonce, balance] = await Promise.all([
+    safeProvider.getContractCode(refundReceiver),
+    safeProvider.getNonce(refundReceiver),
+    safeProvider.getBalance(refundReceiver)
+  ])
+
+  return contractCode === '0x' && nonce === 0 && balance === 0n
+}
+
+async function hasExistingTokenBalance(
+  safeProvider: SafeProvider,
+  gasToken: string,
+  account: string
+): Promise<boolean> {
+  const data = encodeFunctionData({
+    abi: parseAbi(['function balanceOf(address account) view returns (uint256)']),
+    functionName: 'balanceOf',
+    args: [account as `0x${string}`]
+  })
+  try {
+    const response = await safeProvider.call({ to: gasToken, from: gasToken, value: '0', data })
+    return BigInt(response || '0x0') > 0n
+  } catch {
+    // Reverts and empty responses are treated as "no balance" (conservative: higher cost)
+    return false
+  }
+}
+
+/**
+ * Estimates the gas cost of `handlePayment` in `execTransaction`.
+ * - Returns 0 when `gasPrice` is 0 — `handlePayment` is gated by `if (gasPrice > 0)`.
+ * - Native ETH refund: cold account access (EIP-2929) + value transfer; adds NEWACCOUNT
+ *   (EIP-161) when the receiver is a fresh account.
+ * - ERC20 refund: typical transfer cost; adds extra gas (SSTORE 0->non-zero per EIP-2200)
+ *   when the receiver has no prior balance for the token.
+ *
+ * Note: underestimations are expected if `gasToken` is set and ERC20
+ * contract is a proxy or includes additional logic
+ */
+async function calculateRefundGas(
+  safeProvider: SafeProvider,
+  gasPrice: string,
+  gasToken: string,
+  refundReceiver: string
+): Promise<number> {
+  if (BigInt(gasPrice) === 0n) {
+    return 0
+  }
+
+  if (gasToken.toLowerCase() === ZERO_ADDRESS.toLowerCase()) {
+    let gas = COLD_ACCOUNT_ACCESS_GAS_COST + CALL_VALUE_GAS_COST
+    if (await isNewEthRefundReceiver(safeProvider, gasToken, refundReceiver)) {
+      gas += NEW_ACCOUNT_GAS_COST
+    }
+    return gas
+  }
+
+  const hasBalance = await hasExistingTokenBalance(safeProvider, gasToken, refundReceiver)
+  return hasBalance ? ERC20_TRANSFER_GAS_COST : ERC20_NEW_HOLDER_TRANSFER_GAS_COST
 }
 
 export async function estimateGas(
@@ -157,25 +298,33 @@ export async function estimateTxBaseGas(
   safeTransaction: SafeTransaction
 ): Promise<string> {
   const safeTransactionData = safeTransaction.data
-  const { to, value, data, operation, safeTxGas, gasToken, refundReceiver } = safeTransactionData
-
-  const safeThreshold = await safe.getThreshold()
-  const safeNonce = await safe.getNonce()
-
-  const signaturesGasCost = safeThreshold * GAS_COST_PER_SIGNATURE
+  const { to, value, data, operation, safeTxGas, gasPrice, gasToken, refundReceiver } =
+    safeTransactionData
 
   const encodeSafeTxGas = safeTxGas || 0
   const encodeBaseGas = 0
-  const gasPrice = 1
+  const encodeGasPrice = 1
   const encodeGasToken = gasToken || ZERO_ADDRESS
   const encodeRefundReceiver = refundReceiver || ZERO_ADDRESS
   const signatures = '0x'
-
-  const safeVersion = safe.getContractVersion()
   const safeProvider = safe.getSafeProvider()
-  const isL1SafeSingleton = safe.getContractManager().isL1SafeSingleton
-  const chainId = await safe.getChainId()
-  const customContracts = safe.getContractManager().contractNetworks?.[chainId.toString()]
+  const safeVersion = safe.getContractVersion()
+  const contractManager = safe.getContractManager()
+  const isL1SafeSingleton = contractManager.isL1SafeSingleton
+
+  const [safeThreshold, safeNonce, chainId, refundGas] = await Promise.all([
+    safe.getThreshold(),
+    safe.getNonce(),
+    safe.getChainId(),
+    calculateRefundGas(safeProvider, gasPrice, encodeGasToken, encodeRefundReceiver)
+  ])
+
+  const signaturesGasCost = safeThreshold * GAS_COST_PER_SIGNATURE
+
+  // TODO: Account for transaction guard hooks (checkTransaction, checkAfterExecution)
+  // when a guard is set on the Safe — cost depends on the guard implementation.
+
+  const customContracts = contractManager.contractNetworks?.[chainId.toString()]
 
   const safeSingletonContract = await getSafeContract({
     safeProvider,
@@ -193,7 +342,7 @@ export async function estimateTxBaseGas(
     operation,
     encodeSafeTxGas,
     encodeBaseGas,
-    gasPrice,
+    encodeGasPrice,
     encodeGasToken,
     encodeRefundReceiver,
     signatures
@@ -201,7 +350,9 @@ export async function estimateTxBaseGas(
 
   // If nonce == 0, nonce storage has to be initialized
   const isSafeInitialized = safeNonce !== 0
-  const incrementNonceGasCost = isSafeInitialized ? INCREMENT_NONCE_GAS_COST : INITIZATION_GAS_COST
+  const incrementNonceGasCost = isSafeInitialized
+    ? INCREMENT_NONCE_GAS_COST
+    : INITIALIZATION_GAS_COST
 
   let baseGas =
     signaturesGasCost +
@@ -209,11 +360,18 @@ export async function estimateTxBaseGas(
     incrementNonceGasCost +
     HASH_GENERATION_GAS_COST
 
-  // Add additional gas costs
-  baseGas > 65536 ? (baseGas += 64) : (baseGas += 128)
+  // handlePayment refund gas
+  baseGas += refundGas
 
-  // Base tx costs, transfer costs...
-  baseGas += TRANSAFER_GAS_COST
+  // Add events gas
+  baseGas += calculateExecTransactionEventsGas(isL1SafeSingleton ?? false, data, safeThreshold)
+
+  // Extra costs
+  baseGas += EXTRA_BASE_GAS_COST
+
+  // Base gas encoding gas costs. Base gas was already encoded as `0` with `32 bytes (uint256)`, so we only need to add the data needed
+  const baseGasUsedBytes = Math.ceil(baseGas.toString(16).length / 2)
+  baseGas += baseGasUsedBytes * (CALL_DATA_BYTE_GAS_COST - CALL_DATA_ZERO_BYTE_GAS_COST)
 
   return baseGas.toString()
 }

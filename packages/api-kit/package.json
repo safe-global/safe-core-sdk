@@ -27,6 +27,7 @@
     "test:ci:viem:v1.3.0": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=viem && export SAFE_VERSION=1.3.0 && nyc --reporter=lcov testing-kit test 'tests/e2e/*.test.*'",
     "test:ci:viem:v1.4.1": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=viem && export SAFE_VERSION=1.4.1 && nyc --reporter=lcov testing-kit test 'tests/e2e/*.test.*'",
     "test:ci:viem:v1.5.0": "export HARDHAT_NETWORK=sepolia && export ETH_LIB=viem && export SAFE_VERSION=1.5.0 && nyc --reporter=lcov testing-kit test 'tests/e2e/*.test.*'",
+    "update-networks": "ts-node scripts/updateNetworks.ts",
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist coverage .nyc_output",

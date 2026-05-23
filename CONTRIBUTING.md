@@ -13,7 +13,7 @@ See our [support guidelines](https://github.com/safe-global/safe-core-sdk/tree/m
 
 ## <a name="i-want-to-contribute">I Want to Contribute</a>
 ### Legal Notice
-You will need to agree to [our CLA](https://safe.global/cla) in order to be possible to consider your contribution.
+You will need to agree to [our CLA](https://safe.global/cla) in order for us to consider your contribution.
 
 ### Starting Guide
 

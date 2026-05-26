@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "SDK that facilitates the interaction with the Safe Transaction Service API",
   "types": "dist/src/index.d.ts",
   "main": "dist/cjs/index.cjs",
@@ -69,7 +69,7 @@
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
-    "@safe-global/protocol-kit": "^7.1.0",
+    "@safe-global/protocol-kit": "^7.2.0",
     "@safe-global/types-kit": "^3.1.0",
     "node-fetch": "^2.7.0",
     "viem": "^2.21.8"

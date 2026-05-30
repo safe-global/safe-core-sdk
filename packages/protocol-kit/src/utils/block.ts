@@ -4,8 +4,8 @@ export function asBlockId(blockId: number | string | undefined) {
   return typeof blockId === 'number' ? blockNumber(blockId) : blockTag(blockId)
 }
 
-function blockNumber(blockNumber: any) {
-  return { blockNumber: blockNumber.toNumber() }
+function blockNumber(blockNumber: number) {
+  return { blockNumber }
 }
 
 function blockTag(blockTag: any) {

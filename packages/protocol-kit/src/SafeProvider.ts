@@ -49,6 +49,7 @@ import {
   toBytes,
   Chain,
   Abi,
+  BlockTag,
   ReadContractParameters,
   ContractFunctionName,
   ContractFunctionArgs,
@@ -228,14 +229,14 @@ class SafeProvider {
     return validateEip3770Address(fullAddress, chainId)
   }
 
-  async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
+  async getBalance(address: string, blockTag?: BlockTag | number): Promise<bigint> {
     return getBalance(this.#externalProvider, {
       address,
       ...asBlockId(blockTag)
     })
   }
 
-  async getNonce(address: string, blockTag?: string | number): Promise<number> {
+  async getNonce(address: string, blockTag?: BlockTag | number): Promise<number> {
     return getTransactionCount(this.#externalProvider, {
       address,
       ...asBlockId(blockTag)
@@ -251,7 +252,7 @@ class SafeProvider {
     return getAddress(address)
   }
 
-  async getContractCode(address: string, blockTag?: string | number): Promise<string> {
+  async getContractCode(address: string, blockTag?: BlockTag | number): Promise<string> {
     const res = await getCode(this.#externalProvider, {
       address,
       ...asBlockId(blockTag)
@@ -260,7 +261,7 @@ class SafeProvider {
     return res ?? '0x'
   }
 
-  async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
+  async isContractDeployed(address: string, blockTag?: BlockTag | number): Promise<boolean> {
     const contractCode = await getCode(this.#externalProvider, {
       address,
       ...asBlockId(blockTag)
@@ -344,7 +345,7 @@ class SafeProvider {
     return (await estimateGas(this.#externalProvider, converted)).toString()
   }
 
-  async call(transaction: SafeProviderTransaction, blockTag?: string | number): Promise<string> {
+  async call(transaction: SafeProviderTransaction, blockTag?: BlockTag | number): Promise<string> {
     const converted = toTransactionRequest(transaction)
     const { data } = await call(this.#externalProvider, {
       ...converted,

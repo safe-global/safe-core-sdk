@@ -46,7 +46,7 @@
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist coverage .nyc_output meta-cjs.json meta-esm.json *.tsbuildinfo",
     "prebuild": "node -p \"'export const getProtocolKitVersion = () => \\'' + require('./package.json').version.split('-')[0] + '\\''\" > src/utils/getProtocolKitVersion.ts",
-    "build": "yarn unbuild && yarn check-safe-deployments &&  yarn build:esm && yarn build:cjs && yarn build:types",
+    "build": "pnpm unbuild && pnpm check-safe-deployments &&  pnpm build:esm && pnpm build:cjs && pnpm build:types",
     "build:esm": "esbuild ./src/index ./test-utils/index --format=esm --bundle --metafile=meta-esm.json --packages=external --outdir=dist/esm --out-extension:.js=.mjs",
     "build:cjs": "esbuild ./src/index ./test-utils/index --format=cjs --bundle --metafile=meta-cjs.json --packages=external --outdir=dist/cjs --out-extension:.js=.cjs",
     "build:types": "NODE_OPTIONS=--max-old-space-size=8192 tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
@@ -65,12 +65,14 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "devDependencies": {
-    "@safe-global/testing-kit": "^0.3.0",
+    "@safe-global/testing-kit": "workspace:^",
     "@types/chai": "^4.3.20",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.10",
-    "@types/semver": "^7.7.0",
+    "@types/semver": "^7.7.1",
     "@types/sinon": "^17.0.4",
+    "axios": "^1.16.0",
+    "cbor": "^9.0.2",
     "chai": "^4.5.0",
     "chai-as-promised": "^7.1.2",
     "dotenv": "^16.4.7",
@@ -83,9 +85,9 @@
   "dependencies": {
     "@safe-global/safe-deployments": "^1.37.56",
     "@safe-global/safe-modules-deployments": "^3.0.4",
-    "@safe-global/types-kit": "^3.1.0",
+    "@safe-global/types-kit": "workspace:^",
     "abitype": "^1.0.2",
-    "semver": "^7.7.2",
+    "semver": "^7.8.0",
     "viem": "^2.21.8"
   },
   "optionalDependencies": {

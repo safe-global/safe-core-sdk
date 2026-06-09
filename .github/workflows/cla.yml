@@ -10,7 +10,8 @@ permissions: {}
 jobs:
   CLAAssistant:
     permissions:
-      contents: read
+      pull-requests: write
+      statuses: write
     runs-on: ubuntu-latest
     steps:
       - name: 'CLA Assistant'

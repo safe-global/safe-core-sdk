@@ -19,7 +19,7 @@ You will need to agree to [our CLA](https://safe.global/cla) in order to be poss
 
 By following the steps below you will understand the development process and workflow.
 1. [Forking the repository](#forking-the-repository)
-2. [Installing Node and Yarn](#installing-node-and-yarn)
+2. [Installing Node and pnpm](#installing-node-and-pnpm)
 3. [Installing dependencies](#installing-dependencies)
 4. [Running the tests](#running-the-tests)
 5. [Using the playground](#using-the-playground)
@@ -31,42 +31,42 @@ The first step would be to [fork the repository](https://docs.github.com/en/pull
 
 For active development we use the `development` branch. Our `main` branch contains only the currently published code. All new branches should be created from `development`.
 
-#### Installing Node and Yarn
+#### Installing Node and pnpm
 
-The Safe{Core} SDK uses [Node](https://nodejs.org) as development environment and Yarn to manage the dependencies. You will need to make sure you are using the [latest Node LTS version](https://nodejs.org/en/about/previous-releases) and that you have available Yarn v1.
+The Safe{Core} SDK uses [Node](https://nodejs.org) as development environment and pnpm to manage the dependencies. You will need to make sure you are using the [latest Node LTS version](https://nodejs.org/en/about/previous-releases) and that you have available pnpm 10.16+.
 
 You can check which versions you are using with:
 
 ```bash
 node -v
-yarn -v
+pnpm -v
 ```
 
 #### Installing dependencies    
 
-The Safe{Core} SDK uses a mono-repository structure managed by [Yarn Workspaces](https://classic.yarnpkg.com/lang/en/docs/workspaces/) and [Lerna](https://lerna.js.org). From the root of the repository you will need to install the whole dependency stack and do the project build. Some packages depend on each other, so even when modifying only one package it's better to run the full build.
+The Safe{Core} SDK uses a mono-repository structure managed by [pnpm workspaces](https://pnpm.io/workspaces) and [Lerna](https://lerna.js.org). From the root of the repository you will need to install the whole dependency stack and do the project build. Some packages depend on each other, so even when modifying only one package it's better to run the full build.
 
 Install all dependencies and build the whole project by using the following commands at the project root.
 
 ```bash
-yarn install
-yarn build
+pnpm install
+pnpm build
 ```
 
 #### Running the tests
 
-There is already a test script that can be launched from the root of the repository and will use [Lerna](https://lerna.js.org) to run all the tests from all the packages.
+There is already a test script that can be launched from the root of the repository and will run all the tests from all the packages.
 
 ```bash
-yarn test
+pnpm test
 ```
 
 If you would like to test individual packages, **once you make sure you did the build from the root**, you can:
 
 ```bash
-yarn test --scope=<package-name>
-yarn test --scope=@safe-global/protocol-kit
-yarn test --scope=@safe-global/api-kit
+pnpm --filter <package-name> test
+pnpm --filter @safe-global/protocol-kit test
+pnpm --filter @safe-global/api-kit test
 ```
 
 For some packages you may need to fill a .env file with some configuration. In those packages you will be able to find a `.env.example` file specifying the necessary parameters.
@@ -76,7 +76,7 @@ For some packages you may need to fill a .env file with some configuration. In t
 You can use the playground section to do some manual testing using a specific Safe or configuration. The playground can be run from the root of the project as follow:
 
 ```bash
-yarn play <playground-command>
+pnpm play <playground-command>
 ```
 
 You can find more information about the available commands [in the specific section.](https://github.com/safe-global/safe-core-sdk/tree/main/playground)

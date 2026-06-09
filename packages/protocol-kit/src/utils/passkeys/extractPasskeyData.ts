@@ -25,9 +25,8 @@ function base64ToUint8Array(base64: string): Uint8Array {
 async function importLibs() {
   const { p256 } = await import('@noble/curves/p256')
 
-  const { AsnParser, AsnProp, AsnPropTypes, AsnType, AsnTypeTypes } = await import(
-    '@peculiar/asn1-schema'
-  )
+  const { AsnParser, AsnProp, AsnPropTypes, AsnType, AsnTypeTypes } =
+    await import('@peculiar/asn1-schema')
 
   @AsnType({ type: AsnTypeTypes.Sequence })
   class AlgorithmIdentifier {

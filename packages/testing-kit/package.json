@@ -22,7 +22,7 @@
     "format:check": "prettier --check \"*/**/*.{js,json,md,ts}\"",
     "format": "prettier --write \"*/**/*.{js,json,md,ts}\"",
     "unbuild": "rimraf dist artifacts deployments cache .nyc_output *.tsbuildinfo",
-    "build": "yarn unbuild && hardhat compile && yarn build:esm && yarn build:cjs && yarn build:types",
+    "build": "pnpm unbuild && hardhat compile && pnpm build:esm && pnpm build:cjs && pnpm build:types",
     "build:esm": "esbuild ./src/index --format=esm --bundle --packages=external --outdir=dist/esm --out-extension:.js=.mjs",
     "build:cjs": "esbuild ./src/index --format=cjs --bundle --packages=external --outdir=dist/cjs --out-extension:.js=.cjs",
     "build:types": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
@@ -50,14 +50,17 @@
     "@safe-global/safe-contracts-v1.4.1": "npm:@safe-global/safe-contracts@1.4.1",
     "@safe-global/safe-contracts-v1.5.0": "npm:@safe-global/safe-smart-account@v1.5.0",
     "@safe-global/safe-passkey": "0.2.0",
-    "@safe-global/types-kit": "^3.1.0",
-    "@types/semver": "^7.7.0",
+    "@safe-global/types-kit": "workspace:^",
+    "@types/semver": "^7.7.1",
+    "dotenv": "^16.4.7",
     "hardhat": "^2.22.19",
     "hardhat-deploy": "^0.12.4",
-    "tsconfig-paths": "^4.2.0"
+    "tsconfig-paths": "^4.2.0",
+    "viem": "^2.21.8"
   },
   "dependencies": {
-    "semver": "^7.7.2"
+    "glob": "^10.4.5",
+    "semver": "^7.8.0"
   },
   "bin": {
     "testing-kit": "./bin/testing-kit.js"

@@ -38,8 +38,8 @@ export type ContractWriteFunctionNames<ContractAbi extends Abi> = ExtractAbiFunc
  */
 export type ExtractFunctionArgs<
   ContractAbi extends Abi,
-  ContractFunctionName extends
-    ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>,
+  ContractFunctionName extends ExtractAbiFunctionNames<ContractAbi> =
+    ExtractAbiFunctionNames<ContractAbi>,
   ArgType extends 'inputs' | 'outputs' = 'inputs'
 > = AbiParametersToPrimitiveTypes<
   ExtractAbiFunction<ContractAbi, ContractFunctionName>[ArgType],
@@ -54,8 +54,8 @@ export type ExtractFunctionArgs<
  */
 export type EncodeFunction<
   ContractAbi extends Abi,
-  ContractFunctionName extends
-    ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
+  ContractFunctionName extends ExtractAbiFunctionNames<ContractAbi> =
+    ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
   args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>
@@ -69,8 +69,8 @@ export type EncodeFunction<
  */
 export type EstimateGasFunction<
   ContractAbi extends Abi,
-  ContractFunctionName extends
-    ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
+  ContractFunctionName extends ExtractAbiFunctionNames<ContractAbi> =
+    ExtractAbiFunctionNames<ContractAbi>
 > = (
   functionToEncode: ContractFunctionName,
   args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>,
@@ -87,8 +87,8 @@ export type GetAddressFunction = () => string
  */
 export type ContractFunction<
   ContractAbi extends Abi,
-  ContractFunctionName extends
-    ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
+  ContractFunctionName extends ExtractAbiFunctionNames<ContractAbi> =
+    ExtractAbiFunctionNames<ContractAbi>
 > = (
   // input parameters (only if function has inputs, otherwise no parameters)
   ...args: ExtractFunctionArgs<ContractAbi, ContractFunctionName>['length'] extends 0
@@ -105,8 +105,8 @@ export type ContractFunction<
  */
 export type SafeContractFunction<
   ContractAbi extends Abi,
-  ContractFunctionName extends
-    ExtractAbiFunctionNames<ContractAbi> = ExtractAbiFunctionNames<ContractAbi>
+  ContractFunctionName extends ExtractAbiFunctionNames<ContractAbi> =
+    ExtractAbiFunctionNames<ContractAbi>
 > = (
   args: AbiParametersToPrimitiveTypes<
     ExtractAbiFunction<ContractAbi, ContractFunctionName>['inputs']

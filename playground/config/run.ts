@@ -48,7 +48,7 @@ const path =
 function printPlaygrounds(playgroundPaths: Record<string, string>) {
   const playgroundKits = Object.keys(playgroundPaths)
   playgroundKits.forEach((name) => {
-    console.log(`> yarn play ${name}`)
+    console.log(`> pnpm play ${name}`)
   })
   console.log('')
 }

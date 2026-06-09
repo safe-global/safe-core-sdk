@@ -19,7 +19,7 @@ function checkConfigDiff() {
 
   const chainIdsMissing = safeDeployments.filter((chainId) => !localNetworks.includes(chainId))
   if (chainIdsMissing.length > 0) {
-    const errorMessage = `EIP-3770 local config is missing chainIds: ${chainIdsMissing}\nPlease run 'yarn workspace @safe-global/protocol-kit update-safe-deployments`
+    const errorMessage = `EIP-3770 local config is missing chainIds: ${chainIdsMissing}\nPlease run 'pnpm --filter @safe-global/protocol-kit update-safe-deployments`
     throw new Error(errorMessage)
   }
 

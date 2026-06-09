@@ -3,11 +3,12 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
+      "@safe-global/relay-kit/test-utils": ["./test-utils"],
       "@safe-global/relay-kit/*": ["./src/*"]
     },
     "outDir": "dist"
   },
   "files": ["abitype-config.d.ts"],
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "test-utils/**/*"],
   "exclude": ["dist"]
 }

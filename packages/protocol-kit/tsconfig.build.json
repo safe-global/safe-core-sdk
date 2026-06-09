@@ -6,6 +6,7 @@
     "declarationMap": true,
     "outDir": "dist"
   },
+  "files": ["abitype-config.d.ts"],
   "include": ["src/**/*", "test-utils/**/*"],
   "exclude": ["dist", "test"]
 }

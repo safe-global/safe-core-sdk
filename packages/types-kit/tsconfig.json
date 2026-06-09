@@ -6,6 +6,7 @@
       "@safe-global/types-kit/*": ["./src/*"]
     }
   },
+  "files": ["abitype-config.d.ts"],
   "include": ["src/**/*"],
   "exclude": ["dist"]
 }

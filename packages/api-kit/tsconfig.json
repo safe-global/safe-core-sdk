@@ -6,6 +6,7 @@
       "@safe-global/api-kit/*": ["./src/*"]
     }
   },
+  "files": ["abitype-config.d.ts"],
   "include": ["src/**/*", "tests/**/*"],
   "exclude": ["dist"]
 }

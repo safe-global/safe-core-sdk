@@ -29,7 +29,7 @@ export const sendTransaction = async ({
     throw new Error('SafeProvider must be initialized with a signer to use this function')
 
   const hash = await signer.sendTransaction({
-    to: transaction.to,
+    to: transaction.to as Hex,
     data: transaction.data as Hex,
     value: BigInt(transaction.value),
     account: signer.account

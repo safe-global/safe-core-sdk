@@ -151,9 +151,3 @@ export {
 export * from './types'
 
 export default Safe
-
-declare module 'abitype' {
-  export interface Register {
-    AddressType: string
-  }
-}

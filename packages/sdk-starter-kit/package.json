@@ -49,6 +49,6 @@
     "@safe-global/protocol-kit": "workspace:^",
     "@safe-global/relay-kit": "workspace:^",
     "@safe-global/types-kit": "workspace:^",
-    "viem": "^2.21.8"
+    "viem": "^2.52.0"
   }
 }

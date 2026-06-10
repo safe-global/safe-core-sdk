@@ -8,7 +8,6 @@ import { MultiSend } from "./safe_V1_2_0/libraries/MultiSend.sol";
 // Testing contracts
 import { DailyLimitModule } from "./safe_V1_2_0/modules/DailyLimitModule.sol";
 import { SocialRecoveryModule } from "./safe_V1_2_0/modules/SocialRecoveryModule.sol";
-import { ERC20Mintable } from "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 
 contract SafeProxyFactory_SV1_2_0 is GnosisSafeProxyFactory {}
 contract Safe_SV1_2_0 is GnosisSafe {}

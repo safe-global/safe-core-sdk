@@ -90,6 +90,10 @@ const LOG_DATA_GAS_COST_PER_BYTE = 8
 // ~1381 gas from 1.3.0 onwards (LOG2 with indexed txHash + 32 bytes). Flat estimate.
 const EXECUTION_RESULT_EVENT_GAS_COST = 1_500
 
+// SafeL2 `onBeforeExecTransaction` overhead beyond the LOG opcode cost: hook dispatch,
+// `additionalInfo` build, head/length mstores, CALLDATACOPY, and memory expansion.
+const L2_EVENT_ENCODING_OVERHEAD_GAS_COST = 600
+
 // Calculate gas for signatures
 // calldata bytes (v + r + s = 65) + ecrecover + cold owner SLOAD, charged per signature
 const GAS_COST_PER_SIGNATURE =
@@ -138,6 +142,7 @@ function calculateExecTransactionEventsGas(
     const eventDataBytes =
       headBytes + dataDynamicBytes + signaturesDynamicBytes + additionalInfoDynamicBytes
     gas += LOG_BASE_GAS_COST + LOG_TOPIC_GAS_COST + eventDataBytes * LOG_DATA_GAS_COST_PER_BYTE
+    gas += L2_EVENT_ENCODING_OVERHEAD_GAS_COST
   }
 
   return gas

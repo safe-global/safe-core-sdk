@@ -45,10 +45,13 @@ describe('estimateTxBaseGas', () => {
       getContractCode: sinon.stub().resolves(contractCode),
       getNonce: sinon.stub().resolves(nonce),
       getBalance: sinon.stub().resolves(balance),
-      call: callStub
+      call: callStub,
+      // Default: probe reverts, falling back to the static constants the delta tests rely on.
+      estimateGas: sinon.stub().rejects(new Error('probe reverted'))
     }
 
     return {
+      getAddress: sinon.stub().resolves('0x5000000000000000000000000000000000000005'),
       getThreshold: sinon.stub().resolves(1),
       getNonce: sinon.stub().resolves(1),
       getContractVersion: sinon.stub().returns('1.3.0'),

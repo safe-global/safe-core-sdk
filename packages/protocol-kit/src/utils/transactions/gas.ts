@@ -189,20 +189,51 @@ async function hasExistingTokenBalance(
 }
 
 /**
+ * Probes the actual gas cost of an ERC20 `transfer` from the Safe to the refund receiver.
+ * Captures proxied tokens (UChildERC20Proxy, transparent proxies) and tokens with hooks
+ * (fee-on-transfer, blacklist checks) that the flat constants don't reflect.
+ *
+ * Returns null when the probe reverts (e.g. Safe has no token balance) so the caller can
+ * fall back to the static constants.
+ */
+async function probeErc20TransferGas(
+  safeProvider: SafeProvider,
+  gasToken: string,
+  safeAddress: string,
+  refundReceiver: string
+): Promise<number | null> {
+  const data = encodeFunctionData({
+    abi: parseAbi(['function transfer(address to, uint256 amount) returns (bool)']),
+    functionName: 'transfer',
+    args: [refundReceiver as `0x${string}`, 1n]
+  })
+  try {
+    const gas = await safeProvider.estimateGas({
+      to: gasToken,
+      from: safeAddress,
+      value: '0',
+      data
+    })
+    return Number(gas)
+  } catch {
+    return null
+  }
+}
+
+/**
  * Estimates the gas cost of `handlePayment` in `execTransaction`.
  * - Returns 0 when `gasPrice` is 0 — `handlePayment` is gated by `if (gasPrice > 0)`.
  * - Native ETH refund: cold account access (EIP-2929) + value transfer; adds NEWACCOUNT
  *   (EIP-161) when the receiver is a fresh account.
- * - ERC20 refund: typical transfer cost; adds extra gas (SSTORE 0->non-zero per EIP-2200)
- *   when the receiver has no prior balance for the token.
- *
- * Note: underestimations are expected if `gasToken` is set and ERC20
- * contract is a proxy or includes additional logic
+ * - ERC20 refund: probes the actual `transfer` cost via `eth_estimateGas` to capture proxied
+ *   tokens and tokens with hooks, falling back to a static constant on probe revert. A new-holder
+ *   adjustment (extra SSTORE 0->non-zero per EIP-2200) is applied to the fallback only.
  */
 async function calculateRefundGas(
   safeProvider: SafeProvider,
   gasPrice: string,
   gasToken: string,
+  safeAddress: string,
   refundReceiver: string
 ): Promise<number> {
   if (BigInt(gasPrice) === 0n) {
@@ -217,8 +248,12 @@ async function calculateRefundGas(
     return gas
   }
 
-  const hasBalance = await hasExistingTokenBalance(safeProvider, gasToken, refundReceiver)
-  return hasBalance ? ERC20_TRANSFER_GAS_COST : ERC20_NEW_HOLDER_TRANSFER_GAS_COST
+  const [hasBalance, probedGas] = await Promise.all([
+    hasExistingTokenBalance(safeProvider, gasToken, refundReceiver),
+    probeErc20TransferGas(safeProvider, gasToken, safeAddress, refundReceiver)
+  ])
+  const fallback = hasBalance ? ERC20_TRANSFER_GAS_COST : ERC20_NEW_HOLDER_TRANSFER_GAS_COST
+  return probedGas !== null ? Math.max(probedGas, fallback) : fallback
 }
 
 export async function estimateGas(
@@ -330,11 +365,13 @@ export async function estimateTxBaseGas(
   const contractManager = safe.getContractManager()
   const isL1SafeSingleton = contractManager.isL1SafeSingleton
 
+  const safeAddress = await safe.getAddress()
+
   const [safeThreshold, safeNonce, chainId, refundGas] = await Promise.all([
     safe.getThreshold(),
     safe.getNonce(),
     safe.getChainId(),
-    calculateRefundGas(safeProvider, gasPrice, encodeGasToken, encodeRefundReceiver)
+    calculateRefundGas(safeProvider, gasPrice, encodeGasToken, safeAddress, encodeRefundReceiver)
   ])
 
   const signaturesGasCost = safeThreshold * GAS_COST_PER_SIGNATURE

@@ -45,6 +45,10 @@ const ECRECOVER_GAS_COST = 6_000
 // Intrinsic transaction fee charged by the EVM (always paid by the relayer)
 const INTRINSIC_TX_GAS_COST = 21_000
 
+// SafeProxy fallback: cold SLOAD of singleton slot (2_100) + cold DELEGATECALL surcharge
+// (2_500) + calldatacopy/returndatacopy/control flow (~400).
+const SAFE_PROXY_FALLBACK_GAS_COST = 5_000
+
 // Cold SLOADs always paid in execTransaction: `threshold` (in checkSignatures) + `getGuard()` slot
 const PRE_EXEC_STORAGE_GAS_COST = 2 * 2_100
 
@@ -57,7 +61,10 @@ const MISC_OVERHEAD_GAS_COST = 900
 
 // Base operations always paid on top of the contract-counted gas (not in safeTxGas / refundGas / events)
 const EXTRA_BASE_GAS_COST =
-  INTRINSIC_TX_GAS_COST + PRE_EXEC_STORAGE_GAS_COST + MISC_OVERHEAD_GAS_COST
+  INTRINSIC_TX_GAS_COST +
+  SAFE_PROXY_FALLBACK_GAS_COST +
+  PRE_EXEC_STORAGE_GAS_COST +
+  MISC_OVERHEAD_GAS_COST
 
 // New account creation cost (EIP-161)
 const NEW_ACCOUNT_GAS_COST = 25_000

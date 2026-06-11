@@ -2,4 +2,7 @@
 '@safe-global/protocol-kit': patch
 ---
 
-Fix `estimateTxBaseGas` undercounting the cold `owners[signer]` SLOAD performed by `checkSignatures` for every signature. Each signer hashes to a distinct storage slot and pays the EIP-2929 cold surcharge (2,100 gas) on first touch — previously only the first signature was accounted for, leading to a `2,100 × (threshold − 1)` underestimation that scaled linearly with the Safe's threshold.
+Tighten `estimateTxBaseGas` to better cover the gas the relayer actually spends executing `execTransaction`, with the largest impact on high-gas-price chains. Improvements include:
+
+- Per-signer cold `owners[signer]` SLOAD (EIP-2929) is now charged for every signature instead of only the first, fixing a linear undercount for Safes with threshold > 1.
+- `SafeProxy` fallback overhead (cold singleton SLOAD, cold DELEGATECALL surcharge, calldata/returndata shuffling) is now modelled as a flat ~5,000 gas paid before the singleton runs.

@@ -48,9 +48,12 @@ const INTRINSIC_TX_GAS_COST = 21_000
 // Cold SLOADs always paid in execTransaction: `threshold` (in checkSignatures) + `getGuard()` slot
 const PRE_EXEC_STORAGE_GAS_COST = 2 * 2_100
 
-// Headroom for SafeMath wrappers, memory expansion, control-flow checks, and the cold owners
-// SLOAD on the first signature. Rounded up to leave slack for dynamic signature types and misc.
-const MISC_OVERHEAD_GAS_COST = 3_000
+// Cold SLOAD of `owners[signer]` performed in checkSignatures for every signature
+// (EIP-2929: 2_100). Each signer hashes to a distinct mapping slot.
+const OWNER_LOOKUP_GAS_COST = 2_100
+
+// Headroom for SafeMath wrappers, memory expansion, and control-flow checks.
+const MISC_OVERHEAD_GAS_COST = 900
 
 // Base operations always paid on top of the contract-counted gas (not in safeTxGas / refundGas / events)
 const EXTRA_BASE_GAS_COST =
@@ -81,9 +84,12 @@ const LOG_DATA_GAS_COST_PER_BYTE = 8
 const EXECUTION_RESULT_EVENT_GAS_COST = 1_500
 
 // Calculate gas for signatures
-// (array count (3 -> r, s, v) + ecrecover costs) * signature count
+// calldata bytes (v + r + s = 65) + ecrecover + cold owner SLOAD, charged per signature
 const GAS_COST_PER_SIGNATURE =
-  1 * CALL_DATA_BYTE_GAS_COST + 2 * 32 * CALL_DATA_BYTE_GAS_COST + ECRECOVER_GAS_COST
+  1 * CALL_DATA_BYTE_GAS_COST +
+  2 * 32 * CALL_DATA_BYTE_GAS_COST +
+  ECRECOVER_GAS_COST +
+  OWNER_LOOKUP_GAS_COST
 
 function estimateDataGasCosts(data: string): number {
   const bytes = data.match(/.{2}/g) as string[]

@@ -194,6 +194,14 @@ async function hasExistingTokenBalance(
  * Captures proxied tokens (UChildERC20Proxy, transparent proxies) and tokens with hooks
  * (fee-on-transfer, blacklist checks) that the flat constants don't reflect.
  *
+ * `eth_estimateGas` returns total tx gas (intrinsic + calldata + execution). We only want what
+ * the Safe pays inside `handlePayment` (cold CALL into `gasToken` + the token's execution), so:
+ *  - subtract intrinsic + the probe call's calldata gas (paid by the simulated outer tx, not by
+ *    handlePayment), and
+ *  - add the cold-CALL surcharge (the probe's `tx.to = gasToken` pre-warms gasToken via EIP-2929,
+ *    but in the real execTransaction `tx.to = Safe`, so gasToken is cold when handlePayment
+ *    touches it).
+ *
  * Returns null when the probe reverts (e.g. Safe has no token balance) so the caller can
  * fall back to the static constants.
  */
@@ -209,13 +217,15 @@ async function probeErc20TransferGas(
     args: [refundReceiver as `0x${string}`, 1n]
   })
   try {
-    const gas = await safeProvider.estimateGas({
+    const totalGas = await safeProvider.estimateGas({
       to: gasToken,
       from: safeAddress,
       value: '0',
       data
     })
-    return Number(gas)
+    const probeFraming = INTRINSIC_TX_GAS_COST + estimateDataGasCosts(data)
+    const adjusted = Number(totalGas) - probeFraming + COLD_ACCOUNT_ACCESS_GAS_COST
+    return adjusted > 0 ? adjusted : null
   } catch {
     return null
   }

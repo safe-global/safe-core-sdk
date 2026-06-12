@@ -24,34 +24,41 @@ describe('estimateTxBaseGas', () => {
     sinon.restore()
   })
 
+  const SAFE_ADDRESS = '0x5000000000000000000000000000000000000005'
+
   function buildSafe({
     contractCode = '0x',
     nonce = 0,
     balance = 0n,
     tokenBalance = 0n,
-    tokenBalanceReverts = false
+    tokenBalanceReverts = false,
+    probeReturnGas
   }: {
     contractCode?: string
     nonce?: number
     balance?: bigint
     tokenBalance?: bigint
     tokenBalanceReverts?: boolean
+    probeReturnGas?: bigint
   } = {}) {
     const balanceOfResponse = '0x' + tokenBalance.toString(16).padStart(64, '0')
     const callStub = tokenBalanceReverts
       ? sinon.stub().rejects(new Error('reverted'))
       : sinon.stub().resolves(balanceOfResponse)
+    const estimateGasStub =
+      probeReturnGas !== undefined
+        ? sinon.stub().resolves(probeReturnGas.toString())
+        : sinon.stub().rejects(new Error('probe reverted'))
     const safeProvider = {
       getContractCode: sinon.stub().resolves(contractCode),
       getNonce: sinon.stub().resolves(nonce),
       getBalance: sinon.stub().resolves(balance),
       call: callStub,
-      // Default: probe reverts, falling back to the static constants the delta tests rely on.
-      estimateGas: sinon.stub().rejects(new Error('probe reverted'))
+      estimateGas: estimateGasStub
     }
 
     return {
-      getAddress: sinon.stub().resolves('0x5000000000000000000000000000000000000005'),
+      getAddress: sinon.stub().resolves(SAFE_ADDRESS),
       getThreshold: sinon.stub().resolves(1),
       getNonce: sinon.stub().resolves(1),
       getContractVersion: sinon.stub().returns('1.3.0'),
@@ -196,5 +203,44 @@ describe('estimateTxBaseGas', () => {
     )
 
     chai.expect(Number(newReceiverBaseGas) - Number(contractReceiverBaseGas)).to.eq(25_000)
+  })
+
+  describe('ERC20 refund probe', () => {
+    // probeReturnGas - 21_000 (intrinsic) - 356 (transfer calldata) + 2_600 (cold CALL) = -18_756
+    const PROBE_FRAMING_ADJUSTMENT = 18_756
+    const ERC20_TRANSFER_FALLBACK = 21_000
+    const buildErc20Tx = () =>
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+
+    it('uses the probed gas when it exceeds the static fallback', async () => {
+      const probedSafe = buildSafe({ tokenBalance: 1n, probeReturnGas: 50_000n })
+      const fallbackSafe = buildSafe({ tokenBalance: 1n })
+
+      const probedBaseGas = await estimateTxBaseGas(probedSafe, buildErc20Tx())
+      const fallbackBaseGas = await estimateTxBaseGas(fallbackSafe, buildErc20Tx())
+
+      const expectedDelta = 50_000 - PROBE_FRAMING_ADJUSTMENT - ERC20_TRANSFER_FALLBACK
+      chai.expect(Number(probedBaseGas) - Number(fallbackBaseGas)).to.eq(expectedDelta)
+    })
+
+    it('falls back to the static constant when the adjusted probe is below the floor', async () => {
+      const probedSafe = buildSafe({ tokenBalance: 1n, probeReturnGas: 30_000n })
+      const fallbackSafe = buildSafe({ tokenBalance: 1n })
+
+      const probedBaseGas = await estimateTxBaseGas(probedSafe, buildErc20Tx())
+      const fallbackBaseGas = await estimateTxBaseGas(fallbackSafe, buildErc20Tx())
+
+      chai.expect(Number(probedBaseGas) - Number(fallbackBaseGas)).to.eq(0)
+    })
+
+    it('probes with transfer(refundReceiver, 1) from the Safe to the gasToken', async () => {
+      const safe = buildSafe({ tokenBalance: 1n, probeReturnGas: 50_000n })
+      await estimateTxBaseGas(safe, buildErc20Tx())
+
+      const args = (safe.getSafeProvider().estimateGas as sinon.SinonStub).firstCall.args[0]
+      chai.expect(args.to.toLowerCase()).to.eq(ERC20_TOKEN.toLowerCase())
+      chai.expect(args.from.toLowerCase()).to.eq(SAFE_ADDRESS.toLowerCase())
+      chai.expect(args.data.startsWith('0xa9059cbb')).to.eq(true)
+    })
   })
 })

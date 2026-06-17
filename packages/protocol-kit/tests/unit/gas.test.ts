@@ -194,4 +194,53 @@ describe('estimateTxBaseGas', () => {
 
     chai.expect(Number(newReceiverBaseGas) - Number(contractReceiverBaseGas)).to.eq(25_000)
   })
+
+  // --- Per-chain cold-storage repricing (PLA-1651) ---------------------------------------------
+  // Polygon PoS (137) raises COLD_SLOAD_COST 2_100 -> 5_460 and COLD_SSTORE_COST 2_100 -> 2_940
+  // (PIP-88 / Chicago hard fork). baseGas must scale the cold SLOADs/SSTOREs it counts.
+
+  function buildSafeOnChain(chainId: bigint, overrides = {}) {
+    const safe = buildSafe(overrides)
+    safe.getChainId = sinon.stub().resolves(chainId)
+    return safe
+  }
+
+  it('scales the cold SLOADs counted in baseGas for Polygon (PIP-88) vs an EIP-2929 chain', async () => {
+    // Initialized Safe (nonce != 0): the only per-chain difference is the cold SLOAD price,
+    // applied to the 3 cold SLOADs counted in EXTRA_BASE (threshold + getGuard + owners lookup).
+    const ethereumSafe = buildSafeOnChain(1n)
+    const polygonSafe = buildSafeOnChain(137n)
+
+    const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
+    const polygonBaseGas = await estimateTxBaseGas(polygonSafe, buildTransaction())
+
+    // 3 cold SLOADs * (5_460 - 2_100) = 3 * 3_360 = 10_080
+    chai.expect(Number(polygonBaseGas) - Number(ethereumBaseGas)).to.eq(10_080)
+  })
+
+  it('scales the cold SSTORE nonce initialization for Polygon when the Safe is uninitialized', async () => {
+    // Uninitialized Safe (nonce == 0): adds the cold SSTORE set surcharge difference on top of
+    // the 3 cold SLOAD difference.
+    const ethereumSafe = buildSafeOnChain(1n)
+    const polygonSafe = buildSafeOnChain(137n)
+    ethereumSafe.getNonce = sinon.stub().resolves(0)
+    polygonSafe.getNonce = sinon.stub().resolves(0)
+
+    const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
+    const polygonBaseGas = await estimateTxBaseGas(polygonSafe, buildTransaction())
+
+    // cold SLOAD delta (10_080) + cold SSTORE set delta (2_940 - 2_100 = 840) = 10_920
+    chai.expect(Number(polygonBaseGas) - Number(ethereumBaseGas)).to.eq(10_920)
+  })
+
+  it('uses the EIP-2929 default for chains without a repricing entry', async () => {
+    // A chain with no entry in the lookup must behave exactly like Ethereum mainnet.
+    const ethereumSafe = buildSafeOnChain(1n)
+    const arbitrumSafe = buildSafeOnChain(42161n)
+
+    const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
+    const arbitrumBaseGas = await estimateTxBaseGas(arbitrumSafe, buildTransaction())
+
+    chai.expect(Number(arbitrumBaseGas)).to.eq(Number(ethereumBaseGas))
+  })
 })

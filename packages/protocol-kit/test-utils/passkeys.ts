@@ -1,7 +1,7 @@
 import { ExtractedPasskeyData, PasskeyClient } from '../src'
 import { WebAuthnCredentials } from './webauthnShim'
 import { WalletClient, keccak256, toBytes, Transport, Chain, Account } from 'viem'
-import { asHex } from '@safe-global/protocol-kit/utils/types'
+import { asAddress, asHex } from '@safe-global/protocol-kit/utils/types'
 import { decodePublicKeyForWeb } from '@safe-global/protocol-kit/utils'
 
 let singleInstance: WebAuthnCredentials
@@ -33,7 +33,7 @@ export async function deployPasskeysContract(
   const toDeploy = passkeys.map(async (client) => {
     const { data, to, value } = client.createDeployTxRequest()
     const createPasskeySignerTransaction = {
-      to,
+      to: asAddress(to),
       value: BigInt(value),
       data: asHex(data)
     }

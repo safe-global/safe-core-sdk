@@ -1,5 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
-import { encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex, toHex } from 'viem'
+import { Address, encodeFunctionData, getAddress, Hex, hexToBytes, sliceHex, toHex } from 'viem'
 import {
   MetaTransactionData,
   OperationType,
@@ -30,7 +30,7 @@ function encodeExecuteUserOpCallData(transaction: MetaTransactionData): string {
     abi: ABI,
     functionName: 'executeUserOp',
     args: [
-      transaction.to,
+      transaction.to as Address,
       BigInt(transaction.value),
       transaction.data as Hex,
       transaction.operation || OperationType.Call
@@ -58,7 +58,7 @@ async function getCallData(
       data: encodeFunctionData({
         abi: ABI,
         functionName: 'approve',
-        args: [paymasterOptions.paymasterAddress, amountToApprove]
+        args: [paymasterOptions.paymasterAddress as Address, amountToApprove]
       }),
       value: '0',
       operation: OperationType.Call // Call for approve

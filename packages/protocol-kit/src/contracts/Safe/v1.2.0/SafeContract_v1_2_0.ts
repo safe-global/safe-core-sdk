@@ -12,7 +12,7 @@ import {
   TransactionOptions,
   TransactionResult
 } from '@safe-global/types-kit'
-import { asHash, asHex } from '@safe-global/protocol-kit/utils/types'
+import { asAddress, asHash, asHex } from '@safe-global/protocol-kit/utils/types'
 import { ContractFunctionArgs } from 'viem'
 
 /**
@@ -217,30 +217,30 @@ class SafeContract_v1_2_0
       (await this.estimateGas(
         'execTransaction',
         [
-          safeTransaction.data.to,
+          asAddress(safeTransaction.data.to),
           BigInt(safeTransaction.data.value),
           asHex(safeTransaction.data.data),
           safeTransaction.data.operation,
           BigInt(safeTransaction.data.safeTxGas),
           BigInt(safeTransaction.data.baseGas),
           BigInt(safeTransaction.data.gasPrice),
-          safeTransaction.data.gasToken,
-          safeTransaction.data.refundReceiver,
+          asAddress(safeTransaction.data.gasToken),
+          asAddress(safeTransaction.data.refundReceiver),
           asHex(safeTransaction.encodedSignatures())
         ],
         options
       ))
 
     const args: ContractFunctionArgs<SafeContract_v1_2_0_Abi, 'payable', 'execTransaction'> = [
-      safeTransaction.data.to,
+      asAddress(safeTransaction.data.to),
       BigInt(safeTransaction.data.value),
       asHex(safeTransaction.data.data),
       safeTransaction.data.operation,
       BigInt(safeTransaction.data.safeTxGas),
       BigInt(safeTransaction.data.baseGas),
       BigInt(safeTransaction.data.gasPrice),
-      safeTransaction.data.gasToken,
-      safeTransaction.data.refundReceiver,
+      asAddress(safeTransaction.data.gasToken),
+      asAddress(safeTransaction.data.refundReceiver),
       asHex(safeTransaction.encodedSignatures())
     ]
 
@@ -272,15 +272,15 @@ class SafeContract_v1_2_0
         (await this.estimateGas(
           'execTransaction',
           [
-            safeTransaction.data.to,
+            asAddress(safeTransaction.data.to),
             BigInt(safeTransaction.data.value),
             asHex(safeTransaction.data.data),
             safeTransaction.data.operation,
             BigInt(safeTransaction.data.safeTxGas),
             BigInt(safeTransaction.data.baseGas),
             BigInt(safeTransaction.data.gasPrice),
-            safeTransaction.data.gasToken,
-            safeTransaction.data.refundReceiver,
+            asAddress(safeTransaction.data.gasToken),
+            asAddress(safeTransaction.data.refundReceiver),
             asHex(safeTransaction.encodedSignatures())
           ],
           options
@@ -288,19 +288,19 @@ class SafeContract_v1_2_0
 
       const converted = this.convertOptions({ ...options, gasLimit })
       const txResult = await simulateContract(this.runner, {
-        address: this.contractAddress,
+        address: asAddress(this.contractAddress),
         functionName: 'execTransaction',
         abi: this.contractAbi,
         args: [
-          safeTransaction.data.to,
+          asAddress(safeTransaction.data.to),
           BigInt(safeTransaction.data.value),
           asHex(safeTransaction.data.data),
           safeTransaction.data.operation,
           BigInt(safeTransaction.data.safeTxGas),
           BigInt(safeTransaction.data.baseGas),
           BigInt(safeTransaction.data.gasPrice),
-          safeTransaction.data.gasToken,
-          safeTransaction.data.refundReceiver,
+          asAddress(safeTransaction.data.gasToken),
+          asAddress(safeTransaction.data.refundReceiver),
           asHex(safeTransaction.encodedSignatures())
         ],
         ...converted

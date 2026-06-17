@@ -26,7 +26,7 @@ import {
   TransactionResult
 } from '@safe-global/types-kit'
 import semverSatisfies from 'semver/functions/satisfies.js'
-import { asHex } from '../utils/types'
+import { asAddress, asHex } from '../utils/types'
 import {
   GetContractInstanceProps,
   GetSafeContractInstanceProps,
@@ -236,7 +236,7 @@ export async function getSafeContractVersion(
   safeAddress: string
 ): Promise<SafeVersion> {
   return (await safeProvider.readContract({
-    address: safeAddress,
+    address: asAddress(safeAddress),
     abi: parseAbi(['function VERSION() view returns (string)']),
     functionName: 'VERSION'
   })) as SafeVersion
@@ -388,7 +388,7 @@ export async function predictSafeAddress({
   const initCode = concat([proxyCreationCode, asHex(input)])
 
   const proxyAddress = getContractAddress({
-    from,
+    from: asAddress(from),
     bytecode: initCode,
     opcode: 'CREATE2',
     salt

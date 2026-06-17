@@ -60,7 +60,7 @@
     "@safe-global/safe-modules-deployments": "^3.0.4",
     "@safe-global/types-kit": "workspace:^",
     "semver": "^7.8.0",
-    "viem": "^2.21.8"
+    "viem": "^2.52.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

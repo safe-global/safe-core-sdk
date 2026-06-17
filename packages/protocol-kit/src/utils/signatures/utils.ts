@@ -196,7 +196,7 @@ export const preimageSafeTransactionHash = (
 
   const message = safeTx as unknown as Record<string, unknown>
   return encodeTypedData({
-    domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
+    domain: { verifyingContract: safeAddress, chainId },
     types: { SafeTx: safeTxTypes.SafeTx },
     message
   })
@@ -211,7 +211,7 @@ export const preimageSafeMessageHash = (
   const safeMessageTypes = getEip712MessageTypes(safeVersion)
 
   return encodeTypedData({
-    domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
+    domain: { verifyingContract: safeAddress, chainId },
     types: { SafeMessage: safeMessageTypes.SafeMessage },
     message: { message }
   })
@@ -227,12 +227,12 @@ export const calculateSafeTransactionHash = (
 ): string => {
   const safeTxTypes = getEip712TxTypes(safeVersion)
   const domain: {
-    chainId?: number
+    chainId?: bigint
     verifyingContract: string
   } = { verifyingContract: safeAddress }
 
   if (semverSatisfies(safeVersion, EQ_OR_GT_1_3_0)) {
-    domain.chainId = Number(chainId)
+    domain.chainId = chainId
   }
 
   const message = safeTx as unknown as Record<string, unknown>
@@ -249,7 +249,7 @@ export const calculateSafeMessageHash = (
   const safeMessageTypes = getEip712MessageTypes(safeVersion)
 
   return hashTypedData({
-    domain: { verifyingContract: safeAddress, chainId: Number(chainId) },
+    domain: { verifyingContract: safeAddress, chainId },
     types: { SafeMessage: safeMessageTypes.SafeMessage },
     message: { message }
   })

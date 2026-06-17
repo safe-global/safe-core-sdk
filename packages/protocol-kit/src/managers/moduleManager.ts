@@ -7,7 +7,7 @@ import {
   SafeContractCompatibleWithModuleGuardManager
 } from '@safe-global/protocol-kit/utils'
 import { SENTINEL_ADDRESS, ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
-import { asHex } from '@safe-global/protocol-kit/utils/types'
+import { asAddress, asHex } from '@safe-global/protocol-kit/utils/types'
 import {
   SafeContractImplementationType,
   SafeModulesPaginated
@@ -64,7 +64,10 @@ class ModuleManager {
       throw new Error('Safe is not deployed')
     }
 
-    const [modules, next] = await this.#safeContract.getModulesPaginated([start, BigInt(pageSize)])
+    const [modules, next] = await this.#safeContract.getModulesPaginated([
+      asAddress(start),
+      BigInt(pageSize)
+    ])
     return { modules: modules as string[], next }
   }
 
@@ -73,7 +76,7 @@ class ModuleManager {
       throw new Error('Safe is not deployed')
     }
 
-    const [isModuleEnabled] = await this.#safeContract.isModuleEnabled([moduleAddress])
+    const [isModuleEnabled] = await this.#safeContract.isModuleEnabled([asAddress(moduleAddress)])
 
     return isModuleEnabled
   }

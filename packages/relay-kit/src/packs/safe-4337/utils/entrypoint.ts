@@ -1,3 +1,4 @@
+import { Address } from 'viem'
 import Safe from '@safe-global/protocol-kit'
 import {
   ENTRYPOINT_ABI,
@@ -38,10 +39,10 @@ export async function getSafeNonceFromEntrypoint(
   const safeProvider = protocolKit.getSafeProvider()
 
   const newNonce = await safeProvider.readContract({
-    address: entryPointAddress || '0x',
+    address: (entryPointAddress || '0x') as Address,
     abi: ENTRYPOINT_ABI,
     functionName: 'getNonce',
-    args: [safeAddress, 0n]
+    args: [safeAddress as Address, 0n]
   })
 
   return newNonce

@@ -33,7 +33,7 @@ import {
   PasskeyClient
 } from '@safe-global/protocol-kit/types'
 import { DEFAULT_SAFE_VERSION } from './contracts/config'
-import { asHash, asHex, getChainById } from './utils/types'
+import { asAddress, asHash, asHex, getChainById } from './utils/types'
 import { asBlockId } from './utils/block'
 import {
   createPublicClient,
@@ -184,7 +184,7 @@ class SafeProvider {
     // If we have a signer and its not a PK, it might be a delegate on the rpc levels and this should work with eth_requestAcc
     if (this.signer && typeof this.signer === 'string') {
       return createWalletClient({
-        account: this.signer,
+        account: asAddress(this.signer),
         chain,
         transport: custom(transport)
       })
@@ -230,14 +230,14 @@ class SafeProvider {
 
   async getBalance(address: string, blockTag?: string | number): Promise<bigint> {
     return getBalance(this.#externalProvider, {
-      address,
+      address: asAddress(address),
       ...asBlockId(blockTag)
     })
   }
 
   async getNonce(address: string, blockTag?: string | number): Promise<number> {
     return getTransactionCount(this.#externalProvider, {
-      address,
+      address: asAddress(address),
       ...asBlockId(blockTag)
     })
   }
@@ -253,7 +253,7 @@ class SafeProvider {
 
   async getContractCode(address: string, blockTag?: string | number): Promise<string> {
     const res = await getCode(this.#externalProvider, {
-      address,
+      address: asAddress(address),
       ...asBlockId(blockTag)
     })
 
@@ -262,7 +262,7 @@ class SafeProvider {
 
   async isContractDeployed(address: string, blockTag?: string | number): Promise<boolean> {
     const contractCode = await getCode(this.#externalProvider, {
-      address,
+      address: asAddress(address),
       ...asBlockId(blockTag)
     })
     // https://github.com/wevm/viem/blob/963877cd43083260a4399d6f0bbf142ccede53b4/src/actions/public/getCode.ts#L71
@@ -271,7 +271,7 @@ class SafeProvider {
 
   async getStorageAt(address: string, position: string): Promise<string> {
     const content = await getStorageAt(this.#externalProvider, {
-      address,
+      address: asAddress(address),
       slot: asHex(position)
     })
     const decodedContent = this.decodeParameters('address', asHex(content))
@@ -305,7 +305,7 @@ class SafeProvider {
       })
     } else {
       return await signer?.signMessage!({
-        account: account,
+        account: asAddress(account),
         message: { raw: toBytes(message) }
       })
     }
@@ -321,8 +321,7 @@ class SafeProvider {
     if (isTypedDataSigner(signer)) {
       const typedData = generateTypedData(safeEIP712Args)
       const { chainId, verifyingContract } = typedData.domain
-      const chain = chainId ? Number(chainId) : undefined // ensure empty string becomes undefined
-      const domain = { verifyingContract: verifyingContract, chainId: chain }
+      const domain = { verifyingContract: asAddress(verifyingContract), chainId }
 
       const signature = await signer.signTypedData({
         domain,

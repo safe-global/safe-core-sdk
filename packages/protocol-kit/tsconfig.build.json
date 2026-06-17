@@ -4,7 +4,9 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "declarationMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "module": "esnext",
+    "moduleResolution": "bundler"
   },
   "files": ["abitype-config.d.ts"],
   "include": ["src/**/*", "test-utils/**/*"],

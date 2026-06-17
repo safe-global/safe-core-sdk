@@ -74,6 +74,6 @@
     "@safe-global/protocol-kit": "workspace:^",
     "@safe-global/types-kit": "workspace:^",
     "node-fetch": "^2.7.0",
-    "viem": "^2.21.8"
+    "viem": "^2.52.2"
   }
 }

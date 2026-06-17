@@ -177,7 +177,7 @@ export type SigningMethodType = SigningMethod | string
 export interface TypedDataDomain {
   name?: string
   version?: string
-  chainId?: number
+  chainId?: number | bigint
   verifyingContract?: string
   salt?: ArrayLike<number> | string
 }

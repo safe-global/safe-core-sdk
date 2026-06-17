@@ -4,7 +4,6 @@ import {
   concat,
   AbiParameter,
   encodeAbiParameters,
-  getTypesForEIP712Domain,
   validateTypedData,
   hashDomain,
   toHex,
@@ -12,6 +11,36 @@ import {
   HashTypedDataParameters
 } from 'viem'
 import { asHex } from '../types'
+
+/*
+ * Local copy of viem's `getTypesForEIP712Domain`. The `chainId` is a `bigint` to
+ * avoid precision loss for large chain IDs (> Number.MAX_SAFE_INTEGER), but the
+ * version of viem we are pinned to (2.21.8) only includes `chainId` in the domain
+ * when it is a `number`, so a `bigint` is silently dropped from the hash.
+ *
+ * viem 2.23.0 fixed this (it now accepts `number | bigint`), but we cannot upgrade
+ * yet: newer viem tightens address/calldata params to the `0x${string}` template
+ * type, which the contracts layer (addresses stored as `string`) does not satisfy
+ * and would require a separate, larger migration.
+ *
+ * This shim can be removed once viem is bumped to >= 2.23.0.
+ */
+function getTypesForEIP712Domain({
+  domain
+}: {
+  domain?: Record<string, unknown>
+}): TypedDataTypes[] {
+  return [
+    typeof domain?.name === 'string' && { name: 'name', type: 'string' },
+    domain?.version && { name: 'version', type: 'string' },
+    (typeof domain?.chainId === 'number' || typeof domain?.chainId === 'bigint') && {
+      name: 'chainId',
+      type: 'uint256'
+    },
+    domain?.verifyingContract && { name: 'verifyingContract', type: 'address' },
+    domain?.salt && { name: 'salt', type: 'bytes32' }
+  ].filter(Boolean) as TypedDataTypes[]
+}
 
 /*
  * This whole file was copied (and softly adapted) from viem in order to expose the function that provides just the encoding. The purpose is to expose `encodeTypedData` (viem only exports the hashTypedData)

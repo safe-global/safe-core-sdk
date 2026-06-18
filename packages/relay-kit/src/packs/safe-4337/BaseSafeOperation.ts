@@ -1,4 +1,4 @@
-import { Address, Hex, encodePacked, hashTypedData } from 'viem'
+import { Hex, encodePacked, hashTypedData } from 'viem'
 import {
   EstimateGasData,
   SafeOperation,
@@ -57,7 +57,7 @@ abstract class BaseSafeOperation implements SafeOperation {
     return hashTypedData({
       domain: {
         chainId: this.options.chainId,
-        verifyingContract: this.options.moduleAddress as Address
+        verifyingContract: this.options.moduleAddress
       },
       types: this.getEIP712Type(),
       primaryType: 'SafeOp',

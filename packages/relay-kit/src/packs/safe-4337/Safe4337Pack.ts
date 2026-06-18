@@ -21,7 +21,7 @@ import {
   getSafe4337ModuleDeployment,
   getSafeWebAuthnShareSignerDeployment
 } from '@safe-global/safe-modules-deployments'
-import { Address, Hash, encodeFunctionData, zeroAddress, Hex, concat } from 'viem'
+import { Hash, encodeFunctionData, zeroAddress, Hex, concat } from 'viem'
 import BaseSafeOperation from '@safe-global/relay-kit/packs/safe-4337/BaseSafeOperation'
 import SafeOperationFactory from '@safe-global/relay-kit/packs/safe-4337/SafeOperationFactory'
 import {
@@ -232,7 +232,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         data: encodeFunctionData({
           abi: ABI,
           functionName: 'enableModules',
-          args: [[safe4337ModuleAddress as Address]]
+          args: [[safe4337ModuleAddress]]
         }),
         operation: OperationType.DelegateCall // DelegateCall required for enabling the 4337 module
       }
@@ -253,7 +253,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
           data: encodeFunctionData({
             abi: ABI,
             functionName: 'approve',
-            args: [paymasterAddress as Address, amountToApprove]
+            args: [paymasterAddress, amountToApprove]
           }),
           value: '0',
           operation: OperationType.Call // Call for approve
@@ -615,7 +615,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         const signature = await signer.signTypedData({
           domain: {
             chainId: this.#chainId,
-            verifyingContract: this.#SAFE_4337_MODULE_ADDRESS as Address
+            verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
           },
           types: safeOp.getEIP712Type(),
           message: {

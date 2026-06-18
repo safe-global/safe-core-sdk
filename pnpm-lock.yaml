@@ -127,8 +127,8 @@ importers:
         specifier: ^17.0.4
         version: 17.0.4
       abitype:
-        specifier: ^1.0.2
-        version: 1.0.5(typescript@5.6.3)
+        specifier: ^1.2.3
+        version: 1.2.3(typescript@5.6.3)
       chai:
         specifier: ^4.5.0
         version: 4.5.0
@@ -172,8 +172,8 @@ importers:
         specifier: workspace:^
         version: link:../types-kit
       abitype:
-        specifier: ^1.0.2
-        version: 1.0.5(typescript@5.6.3)
+        specifier: ^1.2.3
+        version: 1.2.3(typescript@5.6.3)
       semver:
         specifier: ^7.8.0
         version: 7.8.0
@@ -265,8 +265,8 @@ importers:
         specifier: ^7.7.1
         version: 7.7.1
       abitype:
-        specifier: ^1.0.2
-        version: 1.0.5(typescript@5.6.3)
+        specifier: ^1.2.3
+        version: 1.2.3(typescript@5.6.3)
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
@@ -347,8 +347,8 @@ importers:
   packages/types-kit:
     dependencies:
       abitype:
-        specifier: ^1.0.2
-        version: 1.0.5(typescript@5.6.3)
+        specifier: ^1.2.3
+        version: 1.2.3(typescript@5.6.3)
 
 packages:
 
@@ -1552,17 +1552,6 @@ packages:
 
   abitype@0.9.10:
     resolution: {integrity: sha512-FIS7U4n7qwAT58KibwYig5iFG4K61rbhAqaQh/UWj8v1Y8mjX3F8TC9gd8cz9yT1TYel9f8nS5NO5kZp2RW0jQ==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3 >=3.22.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-
-  abitype@1.0.5:
-    resolution: {integrity: sha512-YzDhti7cjlfaBhHutMaboYB21Ha3rXR9QTkNJFzYC4kC8YclaiwPBBBJY8ejFdu2wnJeZCVZSMlQJ7fi8S6hsw==}
     peerDependencies:
       typescript: '>=5.0.4'
       zod: ^3 >=3.22.0
@@ -5947,10 +5936,6 @@ snapshots:
       base64-sol: 1.0.1
 
   abitype@0.9.10(typescript@5.6.3):
-    optionalDependencies:
-      typescript: 5.6.3
-
-  abitype@1.0.5(typescript@5.6.3):
     optionalDependencies:
       typescript: 5.6.3
 

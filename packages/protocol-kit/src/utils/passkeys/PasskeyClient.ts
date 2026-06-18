@@ -25,7 +25,7 @@ import {
   SafeWebAuthnSharedSignerContractImplementationType,
   GetPasskeyCredentialFn
 } from '@safe-global/protocol-kit/types'
-import { asAddress, asHex } from '../types'
+import { asHex } from '../types'
 import isSharedSigner from './isSharedSigner'
 
 export const PASSKEY_CLIENT_KEY = 'passkeyWallet'
@@ -101,7 +101,7 @@ export const createPasskeyClient = async (
   }
 
   return createClient({
-    account: asAddress(signerAddress),
+    account: signerAddress,
     name: PASSKEY_CLIENT_NAME,
     key: PASSKEY_CLIENT_KEY,
     transport: custom(provider.transport)

@@ -86,7 +86,7 @@
     "@safe-global/safe-deployments": "^1.37.56",
     "@safe-global/safe-modules-deployments": "^3.0.4",
     "@safe-global/types-kit": "workspace:^",
-    "abitype": "^1.0.2",
+    "abitype": "^1.2.3",
     "semver": "^7.8.0",
     "viem": "^2.52.2"
   },

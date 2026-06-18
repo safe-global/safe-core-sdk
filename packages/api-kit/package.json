@@ -58,7 +58,7 @@
     "@types/node-fetch": "^2.6.12",
     "@types/semver": "^7.7.1",
     "@types/sinon": "^17.0.4",
-    "abitype": "^1.0.2",
+    "abitype": "^1.2.3",
     "chai": "^4.5.0",
     "chai-as-promised": "^7.1.2",
     "dotenv": "^16.4.7",

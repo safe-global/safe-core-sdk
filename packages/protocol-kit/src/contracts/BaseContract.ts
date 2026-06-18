@@ -17,12 +17,11 @@ import SafeProvider from '@safe-global/protocol-kit/SafeProvider'
 import {
   EncodeFunction,
   EstimateGasFunction,
-  ExtractFunctionArgs,
   GetAddressFunction,
   SafeVersion,
   TransactionOptions
 } from '@safe-global/types-kit'
-import { asAddress, getChainById } from '../utils/types'
+import { getChainById } from '../utils/types'
 import {
   WalletTransactionOptions,
   WalletLegacyTransactionOptions,
@@ -198,7 +197,7 @@ class BaseContract<ContractAbiType extends Abi> {
     return estimateContractGas(this.runner, {
       abi,
       functionName: functionToEstimate,
-      address: asAddress(this.getAddress()),
+      address: this.getAddress(),
       args: params,
       ...contractOptions
     })
@@ -215,37 +214,28 @@ class BaseContract<ContractAbiType extends Abi> {
       ContractAbiType,
       'payable' | 'nonpayable',
       functionName
-    > = ContractFunctionArgs<ContractAbiType, 'payable' | 'nonpayable', functionName>
-  >(
-    functionName: functionName,
-    // The SDK's public API types addresses/bytes as `string` (via the abitype `AddressType`
-    // override), while viem's ABI types expect `0x${string}`. Accept the SDK-typed args and
-    // cast to viem's type at this boundary; the call is still validated against the ABI.
-    args: ExtractFunctionArgs<ContractAbiType, functionName>,
-    options?: TransactionOptions
-  ) {
+    >
+  >(functionName: functionName, args: functionArgs, options?: TransactionOptions) {
     const converted = this.convertOptions(options) as any
 
     return await this.getWallet().writeContract({
-      address: asAddress(this.contractAddress),
+      address: this.contractAddress,
       abi: this.contractAbi,
       functionName,
-      args: args as unknown as functionArgs,
+      args,
       ...converted
     })
   }
 
   async read<
     functionName extends ContractFunctionName<ContractAbiType, 'pure' | 'view'>,
-    functionArgs extends ContractFunctionArgs<ContractAbiType, 'pure' | 'view', functionName> =
-      ContractFunctionArgs<ContractAbiType, 'pure' | 'view', functionName>
-  >(functionName: functionName, args?: ExtractFunctionArgs<ContractAbiType, functionName>) {
+    functionArgs extends ContractFunctionArgs<ContractAbiType, 'pure' | 'view', functionName>
+  >(functionName: functionName, args?: functionArgs) {
     return await this.runner.readContract({
       functionName,
       abi: this.contractAbi,
-      address: asAddress(this.contractAddress),
-      // See note in `write`: cast the SDK's `string`-typed args to viem's ABI arg types.
-      args: args as unknown as functionArgs
+      address: this.contractAddress,
+      args
     })
   }
 }

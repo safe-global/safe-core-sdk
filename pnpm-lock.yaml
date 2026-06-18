@@ -86,6 +86,9 @@ importers:
       viem:
         specifier: ^2.52.2
         version: 2.52.2(typescript@5.6.3)
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
 
   packages/api-kit:
     dependencies:

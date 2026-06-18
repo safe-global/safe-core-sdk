@@ -60,12 +60,12 @@
     "@safe-global/safe-modules-deployments": "^3.0.4",
     "@safe-global/types-kit": "workspace:^",
     "semver": "^7.8.0",
-    "viem": "^2.21.8"
+    "viem": "^2.52.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/semver": "^7.7.1",
-    "abitype": "^1.0.2",
+    "abitype": "^1.2.3",
     "dotenv": "^16.4.7",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.5"

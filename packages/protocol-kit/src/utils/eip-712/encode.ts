@@ -196,7 +196,8 @@ export function encodeTypedData(typedData: EIP712TypedData): string {
   if (domain)
     parts.push(
       hashDomain({
-        domain,
+        // domain uses the SDK's `string`-based address types; viem expects `0x${string}`
+        domain: domain as any,
         types: types
       })
     )

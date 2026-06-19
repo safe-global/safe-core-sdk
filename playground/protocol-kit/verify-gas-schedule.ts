@@ -2,41 +2,39 @@
 /**
  * verify-gas-schedule
  *
- * Empirically measures, per chain, the gas cost of every EVM operation that shows up in a Safe
- * `execTransaction` and flags any deviation from the EIP-2929 (Berlin) standard. This is the
- * reproducible backing for PLA-1651: only Polygon PoS deviates (PIP-88 / "Chicago" hard fork),
- * which raises cold SLOAD to 5460 and the cold-SSTORE surcharge to 2940.
+ * Checks, per chain, what each EVM operation used inside a Safe `execTransaction` actually costs in
+ * gas, and flags anything that differs from the EIP-2929 (Berlin) standard. It's the reproducible
+ * backing for PLA-1651: the only chain that deviates is Polygon PoS (after the "Chicago" hard fork /
+ * PIP-88), which makes a cold SLOAD cost 5460 and raises the cold-SSTORE surcharge to 2940.
  *
- * How it works: it calls `debug_traceTransaction` on a real Safe `execTransaction` per chain and,
- * because a single Safe tx doesn't exercise every opcode, additionally scans a few recent contract
- * transactions to capture cold account-access / cold-SSTORE-set / cold-SSTORE-reset / LOG. Each cell
- * is labelled `measured`, `derived` or `not found (standard)`.
+ * The idea is simple: instead of trusting docs, we ask the node to replay real transactions and read
+ * the true per-opcode gas cost (`debug_traceTransaction`). A single Safe tx doesn't use every opcode,
+ * so we also peek at a few nearby contract txs to measure the rest (gas costs are the same for any
+ * contract on a chain). Every value is labelled by where it came from: `measured`, `derived`, or
+ * `UNVERIFIED` (we never print a standard value as if we'd checked it).
  *
- * Usage (one chain at a time; you always pass the RPC as an argument):
- *   pnpm play verify-gas-schedule <chain> <rpcUrl>
- *
- *   <chain>   one of: polygon, arbitrum, optimism, base, bnb, avalanche
- *   <rpcUrl>  a debug-enabled RPC for that chain (must expose debug_traceTransaction):
- *             Tenderly, dRPC, Alchemy, QuickNode, your own node… (args are order-independent).
- *
- * Example:
- *   pnpm play verify-gas-schedule polygon https://my-debug-rpc/...
+ * To run it:
+ *   1) Fill in `rpcUrl` for each chain below with your own debug-enabled RPC (it must support
+ *      `debug_traceTransaction` — Tenderly, dRPC, Alchemy, QuickNode, your own node…). Your API key
+ *      stays on your machine. Chains left with the placeholder are skipped.
+ *   2) pnpm play verify-gas-schedule
  */
 
-// EIP-2929 / Berlin standard reference (gas)
-const STD = {
+// The EIP-2929 / Berlin standard we compare every chain against.
+const STANDARD_GAS = {
   coldSload: 2100,
   warmSload: 100,
   coldAccountAccess: 2600,
-  delegatecallSurcharge: 2500, // coldAccountAccess - warmAccess(100)
+  delegatecallSurcharge: 2500, // cold account access (2600) - warm access (100)
   warmSstoreReset: 2900, // SSTORE_RESET_GAS = 5000 - 2100
-  coldSstoreSet: 22100, // SSTORE_SET_GAS(20000) + cold surcharge(2100)
+  coldSstoreSet: 22100, // SSTORE_SET_GAS (20000) + cold surcharge (2100)
   coldSstoreReset: 5000 // warm reset + cold surcharge
 }
 
-// One real Safe execTransaction per chain. Set `rpcUrl` for each chain you want to check with your
-// OWN debug-enabled RPC (must expose debug_traceTransaction — Tenderly, dRPC, Alchemy, QuickNode,
-// your own node…). The script iterates over every chain; any chain with an empty rpcUrl is skipped.
+const SSTORE_SET_GAS = 20000 // base cost of a 0 -> non-zero store, before any cold surcharge
+
+// with your own debug-enabled endpoint before running. Use a recent tx to check the current schedule
+// (the scan is anchored to the tx's block, so a pre-hard-fork tx reports the old schedule).
 const CHAINS = [
   {
     name: 'polygon',
@@ -76,238 +74,289 @@ const CHAINS = [
   }
 ]
 
-// JS tracer (fallback for nodes that reject the default struct logger or have a broken getCost):
-// attributes (gasBefore - gasAfter) to the previous opcode -> the true per-op cost.
-const GAS_DELTA_TRACER =
-  '{last:null,d:{},step:function(log){if(this.last){var c=this.last.g-log.getGas();' +
-  'var k=this.last.o+":"+c;this.d[k]=(this.d[k]||0)+1}' +
-  'this.last={o:log.op.toString(),g:log.getGas()};},result:function(){return this.d},fault:function(){}}'
+// A small JS tracer used only as a fallback for nodes that don't return reliable `gasCost` in their
+// struct logs (e.g. some dRPC nodes). It works out each opcode's cost as "gas before - gas after".
+const FALLBACK_GAS_DELTA_TRACER =
+  '{prev:null,costs:{},step:function(log){if(this.prev){var cost=this.prev.gas-log.getGas();' +
+  'var key=this.prev.op+":"+cost;this.costs[key]=(this.costs[key]||0)+1}' +
+  'this.prev={op:log.op.toString(),gas:log.getGas()};},result:function(){return this.costs},fault:function(){}}'
 
-async function rpc(url, method, params) {
-  const res = await fetch(url, {
+// Tiny JSON-RPC helper.
+async function callRpc(rpcUrl, method, params) {
+  const response = await fetch(rpcUrl, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
   })
-  const json = await res.json()
-  if (json.error) throw new Error(`${method}: ${json.error.message || JSON.stringify(json.error)}`)
-  return json.result
+  const body = await response.json()
+  if (body.error) throw new Error(`${method}: ${body.error.message || JSON.stringify(body.error)}`)
+  return body.result
 }
 
-// Returns a map { 'SLOAD:2100': count, 'SSTORE:5000': count, 'EXTCODESIZE:2600': count, ... }
-async function traceOpCosts(url, txHash) {
-  // 1) Preferred: struct logger (Tenderly gateway, geth). gasCost is reliable.
+// Trace a transaction and count how often each (opcode, gasCost) pair occurs.
+// Returns e.g. { 'SLOAD:2100': 9, 'SLOAD:100': 7, 'SSTORE:2900': 3, 'EXTCODESIZE:2600': 1 }.
+async function traceOpcodeCosts(rpcUrl, txHash) {
+  // Preferred path: the standard struct logger (Tenderly, geth…), where `gasCost` is reliable.
   try {
-    const r = await rpc(url, 'debug_traceTransaction', [
+    const trace = await callRpc(rpcUrl, 'debug_traceTransaction', [
       txHash,
       { disableStack: true, disableMemory: true, disableStorage: true }
     ])
-    if (r && Array.isArray(r.structLogs)) {
-      const buckets = {}
-      for (const s of r.structLogs) {
-        const k = `${s.op}:${s.gasCost}`
-        buckets[k] = (buckets[k] || 0) + 1
+    if (trace && Array.isArray(trace.structLogs)) {
+      const costsByOpcode = {}
+      for (const step of trace.structLogs) {
+        const key = `${step.op}:${step.gasCost}`
+        costsByOpcode[key] = (costsByOpcode[key] || 0) + 1
       }
-      return buckets
+      return costsByOpcode
     }
-  } catch (e) {
-    if (!/tracer|structLog|not (available|enabled|exist|supported)/i.test(e.message)) throw e
+  } catch (error) {
+    const looksLikeUnsupported = /tracer|structLog|not (available|enabled|exist|supported)/i.test(
+      error.message
+    )
+    if (!looksLikeUnsupported) throw error
   }
-  // 2) Fallback: JS gas-delta tracer (dRPC etc.)
-  return await rpc(url, 'debug_traceTransaction', [txHash, { tracer: GAS_DELTA_TRACER }])
+  // Fallback: the gas-delta JS tracer (for nodes that reject struct logs).
+  return await callRpc(rpcUrl, 'debug_traceTransaction', [
+    txHash,
+    { tracer: FALLBACK_GAS_DELTA_TRACER }
+  ])
 }
 
-// Pull the cost(s) of an opcode from the buckets, split into warm (==100) and cold (>200).
-function opCosts(buckets, op) {
-  const costs = Object.keys(buckets)
-    .filter((k) => k.startsWith(op + ':'))
-    .map((k) => Number(k.split(':')[1]))
+// From the (opcode, cost) counts, return the distinct costs seen for one opcode, split by warm/cold.
+// Warm access is 100; cold access is always > 200 (so this cleanly separates the two).
+function getWarmAndColdCosts(costsByOpcode, opcode) {
+  const costs = Object.keys(costsByOpcode)
+    .filter((key) => key.startsWith(opcode + ':'))
+    .map((key) => Number(key.split(':')[1]))
   return {
-    warm: costs.filter((c) => c <= 100),
-    cold: costs.filter((c) => c > 200)
+    warm: costs.filter((cost) => cost <= 100),
+    cold: costs.filter((cost) => cost > 200)
   }
 }
 
-async function findContractTxs(url, max) {
-  const latest = parseInt(await rpc(url, 'eth_blockNumber', []), 16)
-  const hashes = []
-  for (let off = 2; off <= 40 && hashes.length < max; off++) {
-    const blk = await rpc(url, 'eth_getBlockByNumber', ['0x' + (latest - off).toString(16), true])
-    if (!blk || !blk.transactions) continue
-    for (const t of blk.transactions) {
-      if (t.input && t.input.length > 800) hashes.push(t.hash)
-      if (hashes.length >= max) break
+// Collect a handful of "real" contract-call tx hashes from blocks just before `anchorBlock`, so the
+// extra measurements come from the same gas era as the Safe tx we're checking.
+async function findNearbyContractTxs(rpcUrl, maxTxs, anchorBlock) {
+  const startBlock = anchorBlock ?? parseInt(await callRpc(rpcUrl, 'eth_blockNumber', []), 16)
+  const txHashes = []
+  for (let depth = 1; depth <= 60 && txHashes.length < maxTxs; depth++) {
+    const block = await callRpc(rpcUrl, 'eth_getBlockByNumber', [
+      '0x' + (startBlock - depth).toString(16),
+      true
+    ])
+    if (!block || !block.transactions) continue
+    for (const tx of block.transactions) {
+      if (tx.input && tx.input.length > 800) txHashes.push(tx.hash) // skip plain transfers
+      if (txHashes.length >= maxTxs) break
     }
   }
-  return hashes
+  return txHashes
 }
-
-const RPC_PLACEHOLDER = '<Add RPC with debug_traceTransaction support>'
 
 async function verifyChain(chain) {
-  const url = chain.rpcUrl
-  console.log(`\n=== ${chain.name} (chainId ${chain.chainId}) ===`)
-  if (!url || url === RPC_PLACEHOLDER) {
+  const { name, chainId, rpcUrl, safeTx } = chain
+  console.log(`\n=== ${name} (chainId ${chainId}) ===`)
+  if (!rpcUrl) {
     console.log('  - skipped: no rpcUrl set for this chain (edit CHAINS in this file).')
     return
   }
-  console.log(`RPC: ${url}`)
-  console.log(`Safe execTransaction: ${chain.safeTx}`)
+  console.log(`RPC: ${rpcUrl}`)
+  console.log(`Safe execTransaction: ${safeTx}`)
 
-  // Aggregate opcode costs from the Safe tx + a few recent contract txs (protocol constants are
-  // chain-global, so any tx that exercises an opcode measures it).
-  const buckets = {}
-  const add = (b) => {
-    for (const k in b) buckets[k] = (buckets[k] || 0) + b[k]
+  // Anchor the extra-tx scan to the Safe tx's block, so we don't mix gas eras (e.g. a pre-hard-fork
+  // Safe tx with current post-fork blocks).
+  let anchorBlock
+  try {
+    const tx = await callRpc(rpcUrl, 'eth_getTransactionByHash', [safeTx])
+    if (tx && tx.blockNumber) anchorBlock = parseInt(tx.blockNumber, 16)
+  } catch {
+    /* if this fails we just scan from the chain tip */
+  }
+
+  // Merge opcode costs from the Safe tx and the nearby txs into one set of counts.
+  const opcodeCosts = {}
+  const mergeCosts = (more) => {
+    for (const key in more) opcodeCosts[key] = (opcodeCosts[key] || 0) + more[key]
   }
   try {
-    add(await traceOpCosts(url, chain.safeTx))
-  } catch (e) {
-    console.log(`  ! could not trace the Safe tx: ${e.message}`)
+    mergeCosts(await traceOpcodeCosts(rpcUrl, safeTx))
+  } catch (error) {
+    console.log(`  ! could not trace the Safe tx: ${error.message}`)
   }
 
-  // A Safe execTransaction doesn't exercise every opcode (no EXT*, no cold-SSTORE-set). These are
-  // chain-global protocol constants, so we scan recent contract txs until we've also captured a
-  // cold account-access op AND a cold SSTORE set. (Cold SSTORE reset is then derived — see below.)
-  const hasColdAccess = () =>
+  // A Safe execTransaction doesn't touch every opcode we care about (no EXT*, no cold SSTORE set),
+  // so scan nearby contract txs until we've also seen a cold account access and a cold SSTORE set.
+  const sawColdAccountAccess = () =>
     ['EXTCODESIZE', 'EXTCODEHASH', 'BALANCE', 'EXTCODECOPY'].some(
-      (op) => opCosts(buckets, op).cold.length > 0
+      (opcode) => getWarmAndColdCosts(opcodeCosts, opcode).cold.length > 0
     )
-  const hasColdSet = () =>
-    Object.keys(buckets).some((k) => k === 'SSTORE:' + STD.coldSstoreSet || k === 'SSTORE:22940')
-  if (!hasColdAccess() || !hasColdSet()) {
+  const sawColdSstoreSet = () =>
+    Object.keys(opcodeCosts).some(
+      (key) => key === 'SSTORE:' + STANDARD_GAS.coldSstoreSet || key === 'SSTORE:22940'
+    )
+  if (!sawColdAccountAccess() || !sawColdSstoreSet()) {
     try {
-      const extra = await findContractTxs(url, 30) // tx budget
-      for (const h of extra) {
+      const candidateTxs = await findNearbyContractTxs(rpcUrl, 30, anchorBlock)
+      for (const txHash of candidateTxs) {
         try {
-          add(await traceOpCosts(url, h))
+          mergeCosts(await traceOpcodeCosts(rpcUrl, txHash))
         } catch {
           /* skip individual tx errors */
         }
-        if (hasColdAccess() && hasColdSet()) break
+        if (sawColdAccountAccess() && sawColdSstoreSet()) break
       }
-    } catch (e) {
-      console.log(`  ! scan for auxiliary txs failed: ${e.message}`)
+    } catch (error) {
+      console.log(`  ! scan for nearby txs failed: ${error.message}`)
     }
   }
 
-  if (Object.keys(buckets).length === 0) {
+  if (Object.keys(opcodeCosts).length === 0) {
     console.log(
       '  ⚠️  No trace data — CANNOT verify. The RPC failed or does not expose debug_traceTransaction.'
     )
-    console.log(`       Try another debug-enabled RPC for ${chain.name}.`)
+    console.log(`       Try another debug-enabled RPC for ${name}.`)
     return
   }
 
-  const sload = opCosts(buckets, 'SLOAD')
-  const acct = ['EXTCODESIZE', 'EXTCODEHASH', 'BALANCE', 'EXTCODECOPY'].flatMap(
-    (op) => opCosts(buckets, op).cold
+  // Pull out the cost of each operation we care about (null = not seen in any traced tx).
+  const sload = getWarmAndColdCosts(opcodeCosts, 'SLOAD')
+  const coldAccountAccessCosts = ['EXTCODESIZE', 'EXTCODEHASH', 'BALANCE', 'EXTCODECOPY'].flatMap(
+    (opcode) => getWarmAndColdCosts(opcodeCosts, opcode).cold
   )
-  const sstoreCosts = Object.keys(buckets)
-    .filter((k) => k.startsWith('SSTORE:'))
-    .map((k) => Number(k.split(':')[1]))
+  const sstoreCosts = Object.keys(opcodeCosts)
+    .filter((key) => key.startsWith('SSTORE:'))
+    .map((key) => Number(key.split(':')[1]))
 
   const coldSload = sload.cold.length ? Math.max(...sload.cold) : null
   const warmSload = sload.warm.length ? 100 : null
-  const coldAcct = acct.length ? acct[0] : null
-  const warmReset = sstoreCosts.find((c) => c === 2900 || c === 2060) ?? null
-  const coldSet = sstoreCosts.find((c) => c === 22100 || c === 22940) ?? null
-  const coldReset = sstoreCosts.find((c) => c === 5000) ?? null
-  // LOG base = 375 confirmed when a LOGn with zero data appears (cost == 375*(n+1)).
-  let logBase = null
-  for (const k of Object.keys(buckets)) {
-    const m = /^LOG([0-4]):(\d+)$/.exec(k)
-    if (m && Number(m[2]) === 375 * (Number(m[1]) + 1)) logBase = 375
-  }
-  const anyLog = Object.keys(buckets).some((k) => /^LOG[0-4]:/.test(k))
+  const coldAccountAccess = coldAccountAccessCosts.length ? coldAccountAccessCosts[0] : null
+  const warmSstoreReset = sstoreCosts.find((cost) => cost === 2900 || cost === 2060) ?? null
+  const coldSstoreSet = sstoreCosts.find((cost) => cost === 22100 || cost === 22940) ?? null
+  const coldSstoreReset = sstoreCosts.find((cost) => cost === 5000) ?? null
 
-  // Builds a row. If `measured` is null -> the operation wasn't seen in any traced tx, so we do NOT
-  // claim it's verified: it's shown as the EIP-2929 expected value with verdict UNVERIFIED.
-  const row = (name, measured, std) =>
+  // LOG base = 375 is confirmed when we see a LOGn with no data (its cost is exactly 375 * (n + 1)).
+  let logBaseGas = null
+  for (const key of Object.keys(opcodeCosts)) {
+    const match = /^LOG([0-4]):(\d+)$/.exec(key)
+    if (match && Number(match[2]) === 375 * (Number(match[1]) + 1)) logBaseGas = 375
+  }
+  const sawAnyLog = Object.keys(opcodeCosts).some((key) => /^LOG[0-4]:/.test(key))
+
+  // Build a table row. A null measured value means we never saw the op, so we don't claim it's
+  // verified: we show the expected (standard) value with an UNVERIFIED verdict.
+  const makeRow = (label, measured, standard) =>
     measured == null
-      ? [name, `${std} (expected)`, 'not measured', 'UNVERIFIED']
-      : [name, String(measured), 'measured', measured !== std ? `DEVIATES (std ${std})` : 'ok']
+      ? [label, `${standard} (expected)`, 'not measured', 'UNVERIFIED']
+      : [
+          label,
+          String(measured),
+          'measured',
+          measured !== standard ? `DEVIATES (std ${standard})` : 'ok'
+        ]
 
   const rows = []
-  rows.push(row('Cold SLOAD', coldSload, STD.coldSload))
-  rows.push(row('Warm SLOAD', warmSload, STD.warmSload))
-  rows.push(row('Cold account access', coldAcct, STD.coldAccountAccess))
-  // DELEGATECALL surcharge is never isolable from a trace (63/64 gas forwarding); always derived.
+  rows.push(makeRow('Cold SLOAD', coldSload, STANDARD_GAS.coldSload))
+  rows.push(makeRow('Warm SLOAD', warmSload, STANDARD_GAS.warmSload))
+  rows.push(makeRow('Cold account access', coldAccountAccess, STANDARD_GAS.coldAccountAccess))
+
+  // The DELEGATECALL surcharge can never be read straight from a trace (a CALL's gasCost bundles the
+  // gas forwarded to the sub-call, the 63/64 rule), so we always derive it: cold access - warm (100).
   rows.push(
-    coldAcct != null
+    coldAccountAccess != null
       ? [
           'Cold DELEGATECALL surcharge',
-          String(coldAcct - 100),
+          String(coldAccountAccess - 100),
           'derived',
-          coldAcct - 100 !== STD.delegatecallSurcharge
-            ? `DEVIATES (std ${STD.delegatecallSurcharge})`
+          coldAccountAccess - 100 !== STANDARD_GAS.delegatecallSurcharge
+            ? `DEVIATES (std ${STANDARD_GAS.delegatecallSurcharge})`
             : 'ok'
         ]
       : [
           'Cold DELEGATECALL surcharge',
-          `${STD.delegatecallSurcharge} (expected)`,
+          `${STANDARD_GAS.delegatecallSurcharge} (expected)`,
           'derived',
           'UNVERIFIED'
         ]
   )
-  rows.push(row('Warm SSTORE reset (!=0->!=0)', warmReset, STD.warmSstoreReset))
-  rows.push(row('Cold SSTORE set (0->!=0)', coldSet, STD.coldSstoreSet))
-  // Cold SSTORE reset = warm reset + cold surcharge. A cold !=0->!=0 overwrite is rare in real txs,
-  // so prefer a direct measurement but fall back to deriving it from the two measured components
-  // (warm reset, and cold surcharge = cold-set - SSTORE_SET_GAS 20000). Both are measured above.
-  const coldSurcharge = coldSet != null ? coldSet - 20_000 : null
-  if (coldReset != null) {
-    rows.push(row('Cold SSTORE reset (!=0->!=0)', coldReset, STD.coldSstoreReset))
-  } else if (warmReset != null && coldSurcharge != null) {
-    const v = warmReset + coldSurcharge
+
+  rows.push(makeRow('Warm SSTORE reset (!=0->!=0)', warmSstoreReset, STANDARD_GAS.warmSstoreReset))
+  rows.push(makeRow('Cold SSTORE set (0->!=0)', coldSstoreSet, STANDARD_GAS.coldSstoreSet))
+
+  // A cold !=0->!=0 overwrite is rare in real txs, so prefer a direct measurement but fall back to
+  // deriving it from two values we did measure: warm reset + cold surcharge (cold set - 20000).
+  const coldSstoreSurcharge = coldSstoreSet != null ? coldSstoreSet - SSTORE_SET_GAS : null
+  if (coldSstoreReset != null) {
+    rows.push(
+      makeRow('Cold SSTORE reset (!=0->!=0)', coldSstoreReset, STANDARD_GAS.coldSstoreReset)
+    )
+  } else if (warmSstoreReset != null && coldSstoreSurcharge != null) {
+    const derivedColdReset = warmSstoreReset + coldSstoreSurcharge
     rows.push([
       'Cold SSTORE reset (!=0->!=0)',
-      String(v),
+      String(derivedColdReset),
       'derived (warm reset + cold surcharge)',
-      v !== STD.coldSstoreReset ? `DEVIATES (std ${STD.coldSstoreReset})` : 'ok'
+      derivedColdReset !== STANDARD_GAS.coldSstoreReset
+        ? `DEVIATES (std ${STANDARD_GAS.coldSstoreReset})`
+        : 'ok'
     ])
   } else {
-    rows.push(row('Cold SSTORE reset (!=0->!=0)', null, STD.coldSstoreReset))
+    rows.push(makeRow('Cold SSTORE reset (!=0->!=0)', null, STANDARD_GAS.coldSstoreReset))
   }
+
   rows.push(
-    logBase === 375
+    logBaseGas === 375
       ? ['LOG (base gas)', '375', 'measured', 'ok']
-      : anyLog
+      : sawAnyLog
         ? ['LOG (base/topic/byte)', '375/375/8', 'observed (base not isolated)', 'ok']
         : ['LOG (base/topic/byte)', '375/375/8 (expected)', 'not measured', 'UNVERIFIED']
   )
   rows.push(['System overhead per tx', 'none', 'n/a', 'not an opcode (no baseGas impact)'])
 
-  // padEnd, but always keep >=2 spaces between columns even when a value overflows the width.
-  const pad = (s, n) => {
-    s = String(s)
-    return s.length >= n ? s + '  ' : s.padEnd(n)
+  // padEnd, but keep at least 2 spaces between columns even when a value is wider than its column.
+  const padColumn = (value, width) => {
+    value = String(value)
+    return value.length >= width ? value + '  ' : value.padEnd(width)
   }
-  console.log('  ' + pad('Operation', 30) + pad('Gas', 22) + pad('Source', 40) + 'vs EIP-2929')
-  for (const [op, gas, source, flag] of rows) {
-    console.log('  ' + pad(op, 30) + pad(gas, 22) + pad(source, 40) + flag)
+  console.log(
+    '  ' +
+      padColumn('Operation', 30) +
+      padColumn('Gas', 22) +
+      padColumn('Source', 40) +
+      'vs EIP-2929'
+  )
+  for (const [label, gas, source, verdict] of rows) {
+    console.log('  ' + padColumn(label, 30) + padColumn(gas, 22) + padColumn(source, 40) + verdict)
   }
 }
 
 async function main() {
-  const configured = CHAINS.filter((c) => c.rpcUrl && c.rpcUrl !== RPC_PLACEHOLDER)
-  if (!configured.length) {
+  const chainsWithRpc = CHAINS.filter((chain) => chain.rpcUrl)
+  if (chainsWithRpc.length === 0) {
     console.log('No rpcUrl set. Edit CHAINS in this file and add a debug-enabled RPC per chain:')
-    console.log(`  rpcUrl: 'https://<your-debug-rpc>/...'  (must expose debug_traceTransaction)`)
+    console.log(`  rpcUrl: 'https://<your-debug-rpc>/...'  (must support debug_traceTransaction)`)
     process.exit(1)
   }
 
-  console.log('Verifying EVM gas schedule vs EIP-2929 (Berlin). See PLA-1651.')
+  console.log('Verifying the EVM gas schedule against EIP-2929 (Berlin). See PLA-1651.')
   for (const chain of CHAINS) {
     try {
       await verifyChain(chain)
-    } catch (e) {
-      console.log(`\n=== ${chain.name} ===\n  ! failed: ${e.message}`)
+    } catch (error) {
+      console.log(`\n=== ${chain.name} ===\n  ! failed: ${error.message}`)
     }
   }
   console.log(
-    '\nReminder: only Polygon (137) deviates (cold SLOAD 5460, cold-SSTORE surcharge 2940). All other chains should be EIP-2929 standard.'
+    '\nReminder: only Polygon (137) deviates (cold SLOAD 5460, cold-SSTORE surcharge 2940). ' +
+      'Every other chain should match the EIP-2929 standard.'
   )
 }
 
+// `fetch` keeps sockets alive, which stops Node from exiting on its own (the terminal looks "stuck"
+// until you press enter). Exit explicitly once we're done.
 main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })

@@ -166,21 +166,25 @@ async function verifyChain(chain) {
     console.log(`  ! could not trace the Safe tx: ${e.message}`)
   }
 
-  const need = () =>
-    opCosts(buckets, 'EXTCODESIZE').cold.length === 0 &&
-    opCosts(buckets, 'EXTCODEHASH').cold.length === 0 &&
-    opCosts(buckets, 'BALANCE').cold.length === 0
-  // Scan extra txs until we capture a cold account-access op (and more SSTORE variants), bounded.
-  if (need()) {
+  // A Safe execTransaction doesn't exercise every opcode (no EXT*, no cold-SSTORE-set). These are
+  // chain-global protocol constants, so we scan recent contract txs until we've also captured a
+  // cold account-access op AND a cold SSTORE set. (Cold SSTORE reset is then derived — see below.)
+  const hasColdAccess = () =>
+    ['EXTCODESIZE', 'EXTCODEHASH', 'BALANCE', 'EXTCODECOPY'].some(
+      (op) => opCosts(buckets, op).cold.length > 0
+    )
+  const hasColdSet = () =>
+    Object.keys(buckets).some((k) => k === 'SSTORE:' + STD.coldSstoreSet || k === 'SSTORE:22940')
+  if (!hasColdAccess() || !hasColdSet()) {
     try {
-      const extra = await findContractTxs(url, 12)
+      const extra = await findContractTxs(url, 30) // tx budget
       for (const h of extra) {
         try {
           add(await traceOpCosts(url, h))
         } catch {
           /* skip individual tx errors */
         }
-        if (!need() && Object.keys(buckets).some((k) => k === 'SSTORE:' + STD.coldSstoreSet)) break
+        if (hasColdAccess() && hasColdSet()) break
       }
     } catch (e) {
       console.log(`  ! scan for auxiliary txs failed: ${e.message}`)
@@ -248,7 +252,23 @@ async function verifyChain(chain) {
   )
   rows.push(row('Warm SSTORE reset (!=0->!=0)', warmReset, STD.warmSstoreReset))
   rows.push(row('Cold SSTORE set (0->!=0)', coldSet, STD.coldSstoreSet))
-  rows.push(row('Cold SSTORE reset (!=0->!=0)', coldReset, STD.coldSstoreReset))
+  // Cold SSTORE reset = warm reset + cold surcharge. A cold !=0->!=0 overwrite is rare in real txs,
+  // so prefer a direct measurement but fall back to deriving it from the two measured components
+  // (warm reset, and cold surcharge = cold-set - SSTORE_SET_GAS 20000). Both are measured above.
+  const coldSurcharge = coldSet != null ? coldSet - 20_000 : null
+  if (coldReset != null) {
+    rows.push(row('Cold SSTORE reset (!=0->!=0)', coldReset, STD.coldSstoreReset))
+  } else if (warmReset != null && coldSurcharge != null) {
+    const v = warmReset + coldSurcharge
+    rows.push([
+      'Cold SSTORE reset (!=0->!=0)',
+      String(v),
+      'derived (warm reset + cold surcharge)',
+      v !== STD.coldSstoreReset ? `DEVIATES (std ${STD.coldSstoreReset})` : 'ok'
+    ])
+  } else {
+    rows.push(row('Cold SSTORE reset (!=0->!=0)', null, STD.coldSstoreReset))
+  }
   rows.push(
     logBase === 375
       ? ['LOG (base gas)', '375', 'measured', 'ok']
@@ -258,10 +278,14 @@ async function verifyChain(chain) {
   )
   rows.push(['System overhead per tx', 'none', 'n/a', 'not an opcode (no baseGas impact)'])
 
-  const pad = (s, n) => String(s).padEnd(n)
-  console.log('  ' + pad('Operation', 30) + pad('Gas', 22) + pad('Source', 28) + 'vs EIP-2929')
+  // padEnd, but always keep >=2 spaces between columns even when a value overflows the width.
+  const pad = (s, n) => {
+    s = String(s)
+    return s.length >= n ? s + '  ' : s.padEnd(n)
+  }
+  console.log('  ' + pad('Operation', 30) + pad('Gas', 22) + pad('Source', 40) + 'vs EIP-2929')
   for (const [op, gas, source, flag] of rows) {
-    console.log('  ' + pad(op, 30) + pad(gas, 22) + pad(source, 28) + flag)
+    console.log('  ' + pad(op, 30) + pad(gas, 22) + pad(source, 40) + flag)
   }
 }
 

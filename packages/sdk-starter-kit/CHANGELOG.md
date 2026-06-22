@@ -1,5 +1,16 @@
 # @safe-global/sdk-starter-kit
 
+## 4.1.1
+
+### Patch Changes
+
+- fix workspace pin resolution on package.json for each package
+- Updated dependencies
+  - @safe-global/api-kit@5.0.1
+  - @safe-global/protocol-kit@8.0.1
+  - @safe-global/relay-kit@6.0.1
+  - @safe-global/types-kit@4.0.1
+
 ## 4.1.0
 
 ### Minor Changes

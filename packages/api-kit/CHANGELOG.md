@@ -1,5 +1,14 @@
 # @safe-global/api-kit
 
+## 5.0.1
+
+### Patch Changes
+
+- fix workspace pin resolution on package.json for each package
+- Updated dependencies
+  - @safe-global/protocol-kit@8.0.1
+  - @safe-global/types-kit@4.0.1
+
 ## 5.0.0
 
 ### Major Changes

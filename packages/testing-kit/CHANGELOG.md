@@ -1,5 +1,11 @@
 # @safe-global/testing-kit
 
+## 0.4.1
+
+### Patch Changes
+
+- fix workspace pin resolution on package.json for each package
+
 ## 0.4.0
 
 ### Minor Changes

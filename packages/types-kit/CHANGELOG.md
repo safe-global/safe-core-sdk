@@ -1,5 +1,11 @@
 # @safe-global/types-kit
 
+## 4.0.1
+
+### Patch Changes
+
+- fix workspace pin resolution on package.json for each package
+
 ## 4.0.0
 
 ### Major Changes

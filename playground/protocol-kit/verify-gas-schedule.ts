@@ -3,9 +3,7 @@
  * verify-gas-schedule
  *
  * Checks, per chain, what each EVM operation used inside a Safe `execTransaction` actually costs in
- * gas, and flags anything that differs from the EIP-2929 (Berlin) standard. It's the reproducible
- * backing for PLA-1651: the only chain that deviates is Polygon PoS (after the "Chicago" hard fork /
- * PIP-88), which makes a cold SLOAD cost 5460 and raises the cold-SSTORE surcharge to 2940.
+ * gas, and flags anything that differs from the EIP-2929 (Berlin) standard.
  *
  * The idea is simple: instead of trusting docs, we ask the node to replay real transactions and read
  * the true per-opcode gas cost (`debug_traceTransaction`). A single Safe tx doesn't use every opcode,
@@ -15,8 +13,7 @@
  *
  * To run it:
  *   1) Fill in `rpcUrl` for each chain below with your own debug-enabled RPC (it must support
- *      `debug_traceTransaction` — Tenderly, dRPC, Alchemy, QuickNode, your own node…). Your API key
- *      stays on your machine. Chains left with the placeholder are skipped.
+ *      `debug_traceTransaction` — Tenderly, dRPC, Alchemy, QuickNode, your own node…). Chains left with the placeholder are skipped.
  *   2) pnpm play verify-gas-schedule
  */
 

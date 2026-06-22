@@ -195,10 +195,8 @@ describe('estimateTxBaseGas', () => {
     chai.expect(Number(newReceiverBaseGas) - Number(contractReceiverBaseGas)).to.eq(25_000)
   })
 
-  // --- Per-chain cold-storage repricing (PLA-1651) ---------------------------------------------
   // Polygon PoS (137) raises COLD_SLOAD_COST 2_100 -> 5_460 and COLD_SSTORE_COST 2_100 -> 2_940
   // (PIP-88 / Chicago hard fork). baseGas must scale the cold SLOADs/SSTOREs it counts.
-
   function buildSafeOnChain(chainId: bigint, overrides = {}) {
     const safe = buildSafe(overrides)
     safe.getChainId = sinon.stub().resolves(chainId)

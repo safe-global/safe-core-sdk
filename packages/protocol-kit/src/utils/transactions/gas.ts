@@ -39,22 +39,33 @@ const INCREMENT_NONCE_GAS_COST = 5_000
 // Keccak gas cost for the hash of the Safe transaction
 const HASH_GENERATION_GAS_COST = 1_500
 
-// ecrecover gas cost for ecdsa ~= 4K gas, we use 6K
-const ECRECOVER_GAS_COST = 6_000
+// ecrecover precompile (3_000, fixed since Frontier) + STATICCALL warm opcode (100, precompiles
+// are pre-warmed per EIP-2929)
+const ECRECOVER_GAS_COST = 3_100
 
 // Intrinsic transaction fee charged by the EVM (always paid by the relayer)
 const INTRINSIC_TX_GAS_COST = 21_000
 
+// SafeProxy fallback: cold SLOAD of singleton slot (2_100) + cold DELEGATECALL surcharge
+// (2_500) + calldatacopy/returndatacopy/control flow (~400).
+const SAFE_PROXY_FALLBACK_GAS_COST = 5_000
+
 // Cold SLOADs always paid in execTransaction: `threshold` (in checkSignatures) + `getGuard()` slot
 const PRE_EXEC_STORAGE_GAS_COST = 2 * 2_100
 
-// Headroom for SafeMath wrappers, memory expansion, control-flow checks, and the cold owners
-// SLOAD on the first signature. Rounded up to leave slack for dynamic signature types and misc.
-const MISC_OVERHEAD_GAS_COST = 3_000
+// Cold SLOAD of `owners[signer]` performed in checkSignatures for every signature
+// (EIP-2929: 2_100). Each signer hashes to a distinct mapping slot.
+const OWNER_LOOKUP_GAS_COST = 2_100
+
+// Headroom for SafeMath wrappers, memory expansion, and control-flow checks.
+const MISC_OVERHEAD_GAS_COST = 900
 
 // Base operations always paid on top of the contract-counted gas (not in safeTxGas / refundGas / events)
 const EXTRA_BASE_GAS_COST =
-  INTRINSIC_TX_GAS_COST + PRE_EXEC_STORAGE_GAS_COST + MISC_OVERHEAD_GAS_COST
+  INTRINSIC_TX_GAS_COST +
+  SAFE_PROXY_FALLBACK_GAS_COST +
+  PRE_EXEC_STORAGE_GAS_COST +
+  MISC_OVERHEAD_GAS_COST
 
 // New account creation cost (EIP-161)
 const NEW_ACCOUNT_GAS_COST = 25_000
@@ -80,10 +91,17 @@ const LOG_DATA_GAS_COST_PER_BYTE = 8
 // ~1381 gas from 1.3.0 onwards (LOG2 with indexed txHash + 32 bytes). Flat estimate.
 const EXECUTION_RESULT_EVENT_GAS_COST = 1_500
 
+// SafeL2 `onBeforeExecTransaction` overhead beyond the LOG opcode cost: hook dispatch,
+// `additionalInfo` build, head/length mstores, CALLDATACOPY, and memory expansion.
+const L2_EVENT_ENCODING_OVERHEAD_GAS_COST = 600
+
 // Calculate gas for signatures
-// (array count (3 -> r, s, v) + ecrecover costs) * signature count
+// calldata bytes (v + r + s = 65) + ecrecover + cold owner SLOAD, charged per signature
 const GAS_COST_PER_SIGNATURE =
-  1 * CALL_DATA_BYTE_GAS_COST + 2 * 32 * CALL_DATA_BYTE_GAS_COST + ECRECOVER_GAS_COST
+  1 * CALL_DATA_BYTE_GAS_COST +
+  2 * 32 * CALL_DATA_BYTE_GAS_COST +
+  ECRECOVER_GAS_COST +
+  OWNER_LOOKUP_GAS_COST
 
 function estimateDataGasCosts(data: string): number {
   const bytes = data.match(/.{2}/g) as string[]
@@ -125,6 +143,7 @@ function calculateExecTransactionEventsGas(
     const eventDataBytes =
       headBytes + dataDynamicBytes + signaturesDynamicBytes + additionalInfoDynamicBytes
     gas += LOG_BASE_GAS_COST + LOG_TOPIC_GAS_COST + eventDataBytes * LOG_DATA_GAS_COST_PER_BYTE
+    gas += L2_EVENT_ENCODING_OVERHEAD_GAS_COST
   }
 
   return gas
@@ -171,20 +190,61 @@ async function hasExistingTokenBalance(
 }
 
 /**
+ * Probes the actual gas cost of an ERC20 `transfer` from the Safe to the refund receiver.
+ * Captures proxied tokens (UChildERC20Proxy, transparent proxies) and tokens with hooks
+ * (fee-on-transfer, blacklist checks) that the flat constants don't reflect.
+ *
+ * `eth_estimateGas` returns total tx gas (intrinsic + calldata + execution). We only want what
+ * the Safe pays inside `handlePayment` (cold CALL into `gasToken` + the token's execution), so:
+ *  - subtract intrinsic + the probe call's calldata gas (paid by the simulated outer tx, not by
+ *    handlePayment), and
+ *  - add the cold-CALL surcharge (the probe's `tx.to = gasToken` pre-warms gasToken via EIP-2929,
+ *    but in the real execTransaction `tx.to = Safe`, so gasToken is cold when handlePayment
+ *    touches it).
+ *
+ * Returns null when the probe reverts (e.g. Safe has no token balance) so the caller can
+ * fall back to the static constants.
+ */
+async function probeErc20TransferGas(
+  safeProvider: SafeProvider,
+  gasToken: string,
+  safeAddress: string,
+  refundReceiver: string
+): Promise<number | null> {
+  const data = encodeFunctionData({
+    abi: parseAbi(['function transfer(address to, uint256 amount) returns (bool)']),
+    functionName: 'transfer',
+    args: [refundReceiver as `0x${string}`, 1n]
+  })
+  try {
+    const totalGas = await safeProvider.estimateGas({
+      to: gasToken,
+      from: safeAddress,
+      value: '0',
+      data
+    })
+    const probeFraming = INTRINSIC_TX_GAS_COST + estimateDataGasCosts(data)
+    const adjusted = Number(totalGas) - probeFraming + COLD_ACCOUNT_ACCESS_GAS_COST
+    return adjusted > 0 ? adjusted : null
+  } catch {
+    return null
+  }
+}
+
+/**
  * Estimates the gas cost of `handlePayment` in `execTransaction`.
  * - Returns 0 when `gasPrice` is 0 — `handlePayment` is gated by `if (gasPrice > 0)`.
  * - Native ETH refund: cold account access (EIP-2929) + value transfer; adds NEWACCOUNT
  *   (EIP-161) when the receiver is a fresh account.
- * - ERC20 refund: typical transfer cost; adds extra gas (SSTORE 0->non-zero per EIP-2200)
- *   when the receiver has no prior balance for the token.
- *
- * Note: underestimations are expected if `gasToken` is set and ERC20
- * contract is a proxy or includes additional logic
+ * - ERC20 refund: probes the actual `transfer` cost via `eth_estimateGas` to capture proxied
+ *   tokens and tokens with hooks, falling back to a static constant on probe revert. A new-holder
+ *   adjustment (extra SSTORE 0->non-zero per EIP-2200) is applied to the fallback only.
  */
 async function calculateRefundGas(
   safeProvider: SafeProvider,
   gasPrice: string,
   gasToken: string,
+  safeAddress: string,
   refundReceiver: string
 ): Promise<number> {
   if (BigInt(gasPrice) === 0n) {
@@ -199,8 +259,12 @@ async function calculateRefundGas(
     return gas
   }
 
-  const hasBalance = await hasExistingTokenBalance(safeProvider, gasToken, refundReceiver)
-  return hasBalance ? ERC20_TRANSFER_GAS_COST : ERC20_NEW_HOLDER_TRANSFER_GAS_COST
+  const [hasBalance, probedGas] = await Promise.all([
+    hasExistingTokenBalance(safeProvider, gasToken, refundReceiver),
+    probeErc20TransferGas(safeProvider, gasToken, safeAddress, refundReceiver)
+  ])
+  const fallback = hasBalance ? ERC20_TRANSFER_GAS_COST : ERC20_NEW_HOLDER_TRANSFER_GAS_COST
+  return probedGas !== null ? Math.max(probedGas, fallback) : fallback
 }
 
 export async function estimateGas(
@@ -312,11 +376,13 @@ export async function estimateTxBaseGas(
   const contractManager = safe.getContractManager()
   const isL1SafeSingleton = contractManager.isL1SafeSingleton
 
+  const safeAddress = await safe.getAddress()
+
   const [safeThreshold, safeNonce, chainId, refundGas] = await Promise.all([
     safe.getThreshold(),
     safe.getNonce(),
     safe.getChainId(),
-    calculateRefundGas(safeProvider, gasPrice, encodeGasToken, encodeRefundReceiver)
+    calculateRefundGas(safeProvider, gasPrice, encodeGasToken, safeAddress, encodeRefundReceiver)
   ])
 
   const signaturesGasCost = safeThreshold * GAS_COST_PER_SIGNATURE

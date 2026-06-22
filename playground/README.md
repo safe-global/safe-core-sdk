@@ -47,7 +47,7 @@ Measures, per chain, the real gas cost of each EVM operation used in a Safe `exe
 Edit the `CHAINS` array at the top of `playground/protocol-kit/verify-gas-schedule.ts` and set `rpcUrl` for each chain you want to check, using your own debug-enabled RPC (Tenderly, dRPC, Alchemy, QuickNode, your own node…). The API key stays on your machine. Then run:
 
 ```bash
-pnpm play verify-gas-schedule
+pnpm play verify-gas-schedule        # add -v to also print the raw debug_traceTransaction JSON
 ```
 
 The script iterates over every chain; any chain left with the placeholder `rpcUrl` is skipped. The RPC must expose `debug_traceTransaction`. Each operation is reported as `measured` (read from a trace), `derived` (the cold DELEGATECALL surcharge, never isolable due to 63/64 gas forwarding), or — if the RPC fails or the opcode isn't in the sampled txs — `UNVERIFIED` (it does **not** silently show standard values as if checked).

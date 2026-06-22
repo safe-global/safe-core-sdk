@@ -130,8 +130,8 @@ importers:
         specifier: ^17.0.4
         version: 17.0.4
       abitype:
-        specifier: ^1.2.3
-        version: 1.2.3(typescript@5.6.3)
+        specifier: ^1.2.4
+        version: 1.2.4(typescript@5.6.3)
       chai:
         specifier: ^4.5.0
         version: 4.5.0
@@ -175,8 +175,8 @@ importers:
         specifier: workspace:^
         version: link:../types-kit
       abitype:
-        specifier: ^1.2.3
-        version: 1.2.3(typescript@5.6.3)
+        specifier: ^1.2.4
+        version: 1.2.4(typescript@5.6.3)
       semver:
         specifier: ^7.8.0
         version: 7.8.0
@@ -268,8 +268,8 @@ importers:
         specifier: ^7.7.1
         version: 7.7.1
       abitype:
-        specifier: ^1.2.3
-        version: 1.2.3(typescript@5.6.3)
+        specifier: ^1.2.4
+        version: 1.2.4(typescript@5.6.3)
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
@@ -350,8 +350,8 @@ importers:
   packages/types-kit:
     dependencies:
       abitype:
-        specifier: ^1.2.3
-        version: 1.2.3(typescript@5.6.3)
+        specifier: ^1.2.4
+        version: 1.2.4(typescript@5.6.3)
 
 packages:
 
@@ -1567,6 +1567,17 @@ packages:
 
   abitype@1.2.3:
     resolution: {integrity: sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3.22.0 || ^4.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+
+  abitype@1.2.4:
+    resolution: {integrity: sha512-dpKH+N27vRjarMVTFFkeY445VTKftzGWpL0FiT7xmVmzQRKazZexzC5uHG0f6XKsVLAuUlndnbGau6lRejClxg==}
     peerDependencies:
       typescript: '>=5.0.4'
       zod: ^3.22.0 || ^4.0.0
@@ -5947,6 +5958,10 @@ snapshots:
     optionalDependencies:
       typescript: 5.6.3
 
+  abitype@1.2.4(typescript@5.6.3):
+    optionalDependencies:
+      typescript: 5.6.3
+
   acorn-jsx@5.3.2(acorn@8.16.0):
     dependencies:
       acorn: 8.16.0
@@ -8176,7 +8191,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.6.3)
+      abitype: 1.2.4(typescript@5.6.3)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.6.3

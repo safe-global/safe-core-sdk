@@ -1,5 +1,13 @@
 # @safe-global/protocol-kit
 
+## 8.0.1
+
+### Patch Changes
+
+- deploy resolving pnpm workspace
+- Updated dependencies
+  - @safe-global/types-kit@4.0.1
+
 ## 8.0.0
 
 ### Major Changes

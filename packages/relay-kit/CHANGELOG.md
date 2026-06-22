@@ -1,5 +1,14 @@
 # @safe-global/relay-kit
 
+## 6.0.1
+
+### Patch Changes
+
+- deploy resolving pnpm workspace
+- Updated dependencies
+  - @safe-global/protocol-kit@8.0.1
+  - @safe-global/types-kit@4.0.1
+
 ## 6.0.0
 
 ### Major Changes

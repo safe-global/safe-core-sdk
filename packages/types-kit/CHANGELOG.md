@@ -1,5 +1,11 @@
 # @safe-global/types-kit
 
+## 4.0.1
+
+### Patch Changes
+
+- deploy resolving pnpm workspace
+
 ## 4.0.0
 
 ### Major Changes

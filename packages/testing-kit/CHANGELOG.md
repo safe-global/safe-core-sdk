@@ -1,5 +1,11 @@
 # @safe-global/testing-kit
 
+## 0.4.1
+
+### Patch Changes
+
+- deploy resolving pnpm workspace
+
 ## 0.4.0
 
 ### Minor Changes

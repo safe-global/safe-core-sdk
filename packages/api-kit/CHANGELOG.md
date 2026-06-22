@@ -1,5 +1,14 @@
 # @safe-global/api-kit
 
+## 5.0.1
+
+### Patch Changes
+
+- deploy resolving pnpm workspace
+- Updated dependencies
+  - @safe-global/protocol-kit@8.0.1
+  - @safe-global/types-kit@4.0.1
+
 ## 5.0.0
 
 ### Major Changes

@@ -72,4 +72,6 @@ if (!path) {
   process.exit()
 }
 
-execSync(`ts-node ./playground/${path}`, { stdio: 'inherit' })
+// Forward extra args (after the playground name) to the script, e.g. flags like `-v`.
+const extraArgs = process.argv.slice(3).join(' ')
+execSync(`ts-node ./playground/${path}${extraArgs ? ' ' + extraArgs : ''}`, { stdio: 'inherit' })

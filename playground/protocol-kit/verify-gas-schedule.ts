@@ -14,7 +14,7 @@
  * To run it:
  *   1) Fill in `rpcUrl` for each chain below with your own debug-enabled RPC (it must support
  *      `debug_traceTransaction` — Tenderly, dRPC, Alchemy, QuickNode, your own node…). Chains left with the placeholder are skipped.
- *   2) pnpm play verify-gas-schedule
+ *   2) pnpm play verify-gas-schedule          (add -v to also print the raw trace JSON)
  */
 
 // The EIP-2929 / Berlin standard we compare every chain against.
@@ -90,9 +90,20 @@ async function callRpc(rpcUrl, method, params) {
   return body.result
 }
 
+// Pass `-v` (or `--verbose`) to print the raw debug_traceTransaction JSON response, so you can copy
+// it into another tool to analyze it.
+const VERBOSE = process.argv.includes('-v') || process.argv.includes('--verbose')
+
 // Trace a transaction and count how often each (opcode, gasCost) pair occurs.
 // Returns e.g. { 'SLOAD:2100': 9, 'SLOAD:100': 7, 'SSTORE:2900': 3, 'EXTCODESIZE:2600': 1 }.
-async function traceOpcodeCosts(rpcUrl, txHash) {
+// When `dumpRaw` is set and -v is passed, it also prints the raw JSON response (copy/paste-friendly).
+async function traceOpcodeCosts(rpcUrl, txHash, dumpRaw = false) {
+  const printRaw = (response) => {
+    if (!dumpRaw || !VERBOSE) return
+    console.log(`\n----- raw debug_traceTransaction ${txHash} -----`)
+    console.log(JSON.stringify(response))
+    console.log('----- end raw -----\n')
+  }
   // Preferred path: the standard struct logger (Tenderly, geth…), where `gasCost` is reliable.
   try {
     const trace = await callRpc(rpcUrl, 'debug_traceTransaction', [
@@ -100,6 +111,7 @@ async function traceOpcodeCosts(rpcUrl, txHash) {
       { disableStack: true, disableMemory: true, disableStorage: true }
     ])
     if (trace && Array.isArray(trace.structLogs)) {
+      printRaw(trace)
       const costsByOpcode = {}
       for (const step of trace.structLogs) {
         const key = `${step.op}:${step.gasCost}`
@@ -114,10 +126,12 @@ async function traceOpcodeCosts(rpcUrl, txHash) {
     if (!looksLikeUnsupported) throw error
   }
   // Fallback: the gas-delta JS tracer (for nodes that reject struct logs).
-  return await callRpc(rpcUrl, 'debug_traceTransaction', [
+  const fallback = await callRpc(rpcUrl, 'debug_traceTransaction', [
     txHash,
     { tracer: FALLBACK_GAS_DELTA_TRACER }
   ])
+  printRaw(fallback)
+  return fallback
 }
 
 // From the (opcode, cost) counts, return the distinct costs seen for one opcode, split by warm/cold.
@@ -177,7 +191,7 @@ async function verifyChain(chain) {
     for (const key in more) opcodeCosts[key] = (opcodeCosts[key] || 0) + more[key]
   }
   try {
-    mergeCosts(await traceOpcodeCosts(rpcUrl, safeTx))
+    mergeCosts(await traceOpcodeCosts(rpcUrl, safeTx, true /* dump raw JSON with -v */))
   } catch (error) {
     console.log(`  ! could not trace the Safe tx: ${error.message}`)
   }

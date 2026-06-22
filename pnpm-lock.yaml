@@ -166,8 +166,8 @@ importers:
   packages/protocol-kit:
     dependencies:
       '@safe-global/safe-deployments':
-        specifier: ^1.37.56
-        version: 1.37.56
+        specifier: ^1.37.57
+        version: 1.37.57
       '@safe-global/safe-modules-deployments':
         specifier: ^3.0.4
         version: 3.0.4
@@ -1298,8 +1298,9 @@ packages:
     peerDependencies:
       ethers: 5.4.0
 
-  '@safe-global/safe-deployments@1.37.56':
-    resolution: {integrity: sha512-HF3ETre/KSP3nCOZ72XEbq5U56gOGgYLJ22LxOAnR8+YzMjzZ8cpnHpx5Z31Zt1xkUTGSCMi9XF950lJt6WbsQ==}
+  '@safe-global/safe-deployments@1.37.57':
+    resolution: {integrity: sha512-Wt6/ewNbibalOAe90ZOg7F4AQTgs52xcw7ZYuw3iGY8+UIbwsFUT5Bp9A1HOrTm2c5aB1hLt7GOTbdy5G2ulAA==}
+    engines: {node: '>=22.0.0', pnpm: '>=10.16.0'}
 
   '@safe-global/safe-modules-deployments@3.0.4':
     resolution: {integrity: sha512-aOFcv5tLPA/CS50Lknuo0QyB+zbwTCLKhnwzOoHRU9az6YDhB1q7ppq3jYk7+xhvzluhpPEfDd8HGKAOxHpLoQ==}
@@ -5618,7 +5619,7 @@ snapshots:
     dependencies:
       ethers: 5.4.0
 
-  '@safe-global/safe-deployments@1.37.56':
+  '@safe-global/safe-deployments@1.37.57':
     dependencies:
       semver: 7.8.0
 

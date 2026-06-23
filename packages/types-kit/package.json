@@ -40,6 +40,6 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "dependencies": {
-    "abitype": "^1.2.3"
+    "abitype": "^1.2.4"
   }
 }

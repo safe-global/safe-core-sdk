@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- fix workspace pin resolution on package.json for each package
+- deploy resolving pnpm workspace
 - Updated dependencies
   - @safe-global/protocol-kit@8.0.1
   - @safe-global/types-kit@4.0.1

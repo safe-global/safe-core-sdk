@@ -30,10 +30,53 @@ const CALL_DATA_ZERO_BYTE_GAS_COST = 4
 // Every byte != 00 -> 16 Gas cost (68 before Istanbul)
 const CALL_DATA_BYTE_GAS_COST = 16
 
-// gas cost initialization of a Safe (SSTORE 0→non-zero on a cold slot = 20 000 + 2 100 cold-load surcharge per EIP-2929)
-const INITIALIZATION_GAS_COST = 22_100
+// --- Per-chain cold-storage gas costs (EIP-2929) ----------------------------------------------
+//
+// EIP-2929 (Berlin) prices the first ("cold") access to a storage slot in a transaction. The same
+// 2_100 constant is reused for SLOAD and for the cold surcharge of SSTORE. Some chains reprice
+// these away from the Ethereum-mainnet defaults, so the values used by baseGas estimation are
+// resolved per chain via a lookup. Warm access (100) is unchanged on every chain we have traced.
+//
+// Default = EIP-2929 / Berlin standard.
+const DEFAULT_COLD_SLOAD_GAS_COST = 2_100
+const DEFAULT_COLD_SSTORE_GAS_COST = 2_100
 
-// increment nonce gas cost
+// Chains that deviate from the EIP-2929 default. Keyed by chainId (decimal string).
+//
+// Polygon PoS (137) — PIP-88 "Cold-Storage and Precompile Gas Repricing", activated by the
+// "Chicago" hard fork (mainnet block 87_218_600, 2026-05-21). It splits EIP-2929's single
+// COLD_SLOAD_COST into two independent constants and raises both:
+//   COLD_SLOAD_COST : 2_100 -> 5_460 (2.6x)
+//   COLD_SSTORE_COST: 2_100 -> 2_940 (1.4x)  => warm SSTORE reset = 5_000 - 2_940 = 2_060
+// The `cold + (RESET - cold) == 5_000` invariant is preserved, so the cold SSTORE reset stays
+// 5_000. Confirmed empirically via debug_traceTransaction on Polygon mainnet (see PLA-1651).
+const COLD_SLOAD_GAS_COST_BY_CHAIN: Record<string, number> = {
+  '137': 5_460
+}
+const COLD_SSTORE_GAS_COST_BY_CHAIN: Record<string, number> = {
+  '137': 2_940
+}
+
+function getColdSloadGasCost(chainId: bigint): number {
+  return COLD_SLOAD_GAS_COST_BY_CHAIN[chainId.toString()] ?? DEFAULT_COLD_SLOAD_GAS_COST
+}
+
+function getColdSstoreGasCost(chainId: bigint): number {
+  return COLD_SSTORE_GAS_COST_BY_CHAIN[chainId.toString()] ?? DEFAULT_COLD_SSTORE_GAS_COST
+}
+// ----------------------------------------------------------------------------------------------
+
+// SSTORE 0 -> non-zero (EIP-2200 SSTORE_SET_GAS); the cold surcharge is added per chain.
+const SSTORE_SET_GAS_COST = 20_000
+
+// gas cost initialization of a Safe nonce slot: SSTORE 0->non-zero on a cold slot
+// = SSTORE_SET_GAS_COST + cold SSTORE surcharge (chain-aware).
+function getInitializationGasCost(coldSstoreGasCost: number): number {
+  return SSTORE_SET_GAS_COST + coldSstoreGasCost
+}
+
+// increment nonce gas cost (cold SSTORE reset, non-zero -> non-zero). The `cold + (RESET - cold)`
+// invariant keeps this at 5_000 on every chain we have traced, including post-Chicago Polygon.
 const INCREMENT_NONCE_GAS_COST = 5_000
 
 // Keccak gas cost for the hash of the Safe transaction
@@ -45,16 +88,26 @@ const ECRECOVER_GAS_COST = 6_000
 // Intrinsic transaction fee charged by the EVM (always paid by the relayer)
 const INTRINSIC_TX_GAS_COST = 21_000
 
-// Cold SLOADs always paid in execTransaction: `threshold` (in checkSignatures) + `getGuard()` slot
-const PRE_EXEC_STORAGE_GAS_COST = 2 * 2_100
+// Cold SLOADs always paid in execTransaction outside safeTxGas:
+//   - `threshold` (in checkSignatures) + `getGuard()` slot  -> PRE_EXEC_COLD_SLOAD_COUNT
+//   - `owners[...]` lookup on the first signature (checkNSignatures) -> OWNER_LOOKUP_COLD_SLOAD_COUNT
+// They are counted explicitly (rather than baked into a flat overhead) so they scale with the
+// chain's cold SLOAD price.
+const PRE_EXEC_COLD_SLOAD_COUNT = 2
+const OWNER_LOOKUP_COLD_SLOAD_COUNT = 1
 
-// Headroom for SafeMath wrappers, memory expansion, control-flow checks, and the cold owners
-// SLOAD on the first signature. Rounded up to leave slack for dynamic signature types and misc.
-const MISC_OVERHEAD_GAS_COST = 3_000
+// Headroom for SafeMath wrappers, memory expansion and control-flow checks. Slack to leave room
+// for dynamic signature types and misc. (The cold SLOADs above are accounted for separately.)
+const MISC_OVERHEAD_GAS_COST = 900
 
 // Base operations always paid on top of the contract-counted gas (not in safeTxGas / refundGas / events)
-const EXTRA_BASE_GAS_COST =
-  INTRINSIC_TX_GAS_COST + PRE_EXEC_STORAGE_GAS_COST + MISC_OVERHEAD_GAS_COST
+function getExtraBaseGasCost(coldSloadGasCost: number): number {
+  return (
+    INTRINSIC_TX_GAS_COST +
+    (PRE_EXEC_COLD_SLOAD_COUNT + OWNER_LOOKUP_COLD_SLOAD_COUNT) * coldSloadGasCost +
+    MISC_OVERHEAD_GAS_COST
+  )
+}
 
 // New account creation cost (EIP-161)
 const NEW_ACCOUNT_GAS_COST = 25_000
@@ -348,11 +401,15 @@ export async function estimateTxBaseGas(
     signatures
   ])
 
+  // Resolve the chain's cold-storage gas costs (EIP-2929 default unless the chain reprices them).
+  const coldSloadGasCost = getColdSloadGasCost(chainId)
+  const coldSstoreGasCost = getColdSstoreGasCost(chainId)
+
   // If nonce == 0, nonce storage has to be initialized
   const isSafeInitialized = safeNonce !== 0
   const incrementNonceGasCost = isSafeInitialized
     ? INCREMENT_NONCE_GAS_COST
-    : INITIALIZATION_GAS_COST
+    : getInitializationGasCost(coldSstoreGasCost)
 
   let baseGas =
     signaturesGasCost +
@@ -366,8 +423,8 @@ export async function estimateTxBaseGas(
   // Add events gas
   baseGas += calculateExecTransactionEventsGas(isL1SafeSingleton ?? false, data, safeThreshold)
 
-  // Extra costs
-  baseGas += EXTRA_BASE_GAS_COST
+  // Extra costs (chain-aware: cold SLOADs scale with the chain's COLD_SLOAD_COST)
+  baseGas += getExtraBaseGasCost(coldSloadGasCost)
 
   // Base gas encoding gas costs. Base gas was already encoded as `0` with `32 bytes (uint256)`, so we only need to add the data needed
   const baseGasUsedBytes = Math.ceil(baseGas.toString(16).length / 2)

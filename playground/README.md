@@ -40,6 +40,18 @@ Showcase how to estimate the `gas` (The complete transaction gas cost) and `safe
 pnpm play estimate-gas
 ```
 
+#### Verify the per-chain gas schedule
+
+Measures, per chain, the real gas cost of each EVM operation used in a Safe `execTransaction` (via `debug_traceTransaction`) and flags any deviation from the EIP-2929 (Berlin) standard. This is the reproducible backing for the chain-aware `baseGas` lookup: only Polygon PoS deviates (PIP-88 / "Chicago" hard fork — cold `SLOAD` 5460, cold-`SSTORE` surcharge 2940).
+
+Edit the `CHAINS` array at the top of `playground/protocol-kit/verify-gas-schedule.ts` and set `rpcUrl` for each chain you want to check, using your own debug-enabled RPC (Tenderly, dRPC, Alchemy, QuickNode, your own node…). The API key stays on your machine. Then run:
+
+```bash
+pnpm play verify-gas-schedule        # add -v to also print the raw debug_traceTransaction JSON
+```
+
+The script iterates over every chain; any chain left with the placeholder `rpcUrl` is skipped. The RPC must expose `debug_traceTransaction`. Each operation is reported as `measured` (read from a trace), `derived` (the cold DELEGATECALL surcharge, never isolable due to 63/64 gas forwarding), or — if the RPC fails or the opcode isn't in the sampled txs — `UNVERIFIED` (it does **not** silently show standard values as if checked).
+
 #### Create and execute a transaction
 
 This script allows you to create and execute a transaction. It demonstrates the typical flow for a Safe transaction using the `protocol-kit`, including how to create, sign, and execute a transaction.

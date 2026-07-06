@@ -229,6 +229,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 4509n, shortName: 'SC' },
   { chainId: 4653n, shortName: 'gold' },
   { chainId: 4661n, shortName: 'appchaintestnet' },
+  { chainId: 4663n, shortName: 'robinhoodchain' },
   { chainId: 4689n, shortName: 'iotex-mainnet' },
   { chainId: 4801n, shortName: 'wcsep' },
   { chainId: 4918n, shortName: 'txvm' },

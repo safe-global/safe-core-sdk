@@ -109,6 +109,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 595n, shortName: 'maca' },
   { chainId: 599n, shortName: 'metis-goerli' },
   { chainId: 648n, shortName: 'ace' },
+  { chainId: 677n, shortName: 'bot' },
   { chainId: 686n, shortName: 'kar' },
   { chainId: 690n, shortName: 'redstone' },
   { chainId: 698n, shortName: 'Matchain' },

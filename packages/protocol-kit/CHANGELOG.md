@@ -1,5 +1,11 @@
 # @safe-global/protocol-kit
 
+## 8.0.3
+
+### Patch Changes
+
+- 9e74bd4: chore: add botchain (bot) chain support and bump safe-deployments and safe-modules-deployments
+
 ## 8.0.2
 
 ### Patch Changes

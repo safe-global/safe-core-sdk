@@ -57,7 +57,7 @@
   "dependencies": {
     "@gelatonetwork/relay-sdk": "^5.6.0",
     "@safe-global/protocol-kit": "workspace:^",
-    "@safe-global/safe-modules-deployments": "^3.0.5",
+    "@safe-global/safe-modules-deployments": "^3.0.7",
     "@safe-global/types-kit": "workspace:^",
     "semver": "^7.8.0",
     "viem": "^2.52.2"

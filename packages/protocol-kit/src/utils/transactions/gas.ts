@@ -30,8 +30,11 @@ const CALL_DATA_ZERO_BYTE_GAS_COST = 4
 // Every byte != 00 -> 16 Gas cost (68 before Istanbul)
 const CALL_DATA_BYTE_GAS_COST = 16
 
+// Cold SLOAD surcharge (EIP-2929) — first access to a storage slot in a transaction
+const COLD_SLOAD_GAS_COST = 2_100
+
 // gas cost initialization of a Safe (SSTORE 0→non-zero on a cold slot = 20 000 + 2 100 cold-load surcharge per EIP-2929)
-const INITIALIZATION_GAS_COST = 22_100
+const INITIALIZATION_GAS_COST = 20_000 + COLD_SLOAD_GAS_COST
 
 // increment nonce gas cost
 const INCREMENT_NONCE_GAS_COST = 5_000
@@ -46,11 +49,11 @@ const ECRECOVER_GAS_COST = 6_000
 const INTRINSIC_TX_GAS_COST = 21_000
 
 // Cold SLOADs always paid in execTransaction: `threshold` (in checkSignatures) + `getGuard()` slot
-const PRE_EXEC_STORAGE_GAS_COST = 2 * 2_100
+const PRE_EXEC_STORAGE_GAS_COST = 2 * COLD_SLOAD_GAS_COST
 
-// Headroom for SafeMath wrappers, memory expansion, control-flow checks, and the cold owners
-// SLOAD on the first signature. Rounded up to leave slack for dynamic signature types and misc.
-const MISC_OVERHEAD_GAS_COST = 3_000
+// Headroom for SafeMath wrappers, memory expansion, and control-flow checks.
+// Rounded up to leave slack for dynamic signature types and misc.
+const MISC_OVERHEAD_GAS_COST = 900
 
 // Base operations always paid on top of the contract-counted gas (not in safeTxGas / refundGas / events)
 const EXTRA_BASE_GAS_COST =
@@ -81,9 +84,13 @@ const LOG_DATA_GAS_COST_PER_BYTE = 8
 const EXECUTION_RESULT_EVENT_GAS_COST = 1_500
 
 // Calculate gas for signatures
-// (array count (3 -> r, s, v) + ecrecover costs) * signature count
+// (array count (3 -> r, s, v) + ecrecover costs + cold owners[signer] SLOAD) * signature count
+// Each signer reads a distinct `owners` mapping slot in checkNSignatures (EIP-2929 cold)
 const GAS_COST_PER_SIGNATURE =
-  1 * CALL_DATA_BYTE_GAS_COST + 2 * 32 * CALL_DATA_BYTE_GAS_COST + ECRECOVER_GAS_COST
+  1 * CALL_DATA_BYTE_GAS_COST +
+  2 * 32 * CALL_DATA_BYTE_GAS_COST +
+  ECRECOVER_GAS_COST +
+  COLD_SLOAD_GAS_COST
 
 function estimateDataGasCosts(data: string): number {
   const bytes = data.match(/.{2}/g) as string[]

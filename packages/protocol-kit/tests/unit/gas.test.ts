@@ -29,13 +29,17 @@ describe('estimateTxBaseGas', () => {
     nonce = 0,
     balance = 0n,
     tokenBalance = 0n,
-    tokenBalanceReverts = false
+    tokenBalanceReverts = false,
+    threshold = 1,
+    isL1SafeSingleton = false
   }: {
     contractCode?: string
     nonce?: number
     balance?: bigint
     tokenBalance?: bigint
     tokenBalanceReverts?: boolean
+    threshold?: number
+    isL1SafeSingleton?: boolean
   } = {}) {
     const balanceOfResponse = '0x' + tokenBalance.toString(16).padStart(64, '0')
     const callStub = tokenBalanceReverts
@@ -49,12 +53,12 @@ describe('estimateTxBaseGas', () => {
     }
 
     return {
-      getThreshold: sinon.stub().resolves(1),
+      getThreshold: sinon.stub().resolves(threshold),
       getNonce: sinon.stub().resolves(1),
       getContractVersion: sinon.stub().returns('1.3.0'),
       getSafeProvider: sinon.stub().returns(safeProvider),
       getContractManager: sinon.stub().returns({
-        isL1SafeSingleton: false,
+        isL1SafeSingleton,
         contractNetworks: {}
       }),
       getChainId: sinon.stub().resolves(1n)
@@ -193,5 +197,20 @@ describe('estimateTxBaseGas', () => {
     )
 
     chai.expect(Number(newReceiverBaseGas) - Number(contractReceiverBaseGas)).to.eq(25_000)
+  })
+
+  // Marginal cost per signature: 65 non-zero calldata bytes * 16 + 6_000 ecrecover
+  // + 2_100 cold owners[signer] SLOAD (EIP-2929, one slot per signer)
+  const GAS_COST_PER_SIGNATURE = 9_140
+
+  it('scales signature cost with threshold', async () => {
+    // L1 singleton: no SafeMultiSigTransaction event, so the delta is the signature cost alone
+    const singleOwnerSafe = buildSafe({ threshold: 1, isL1SafeSingleton: true })
+    const twoOwnerSafe = buildSafe({ threshold: 2, isL1SafeSingleton: true })
+
+    const singleOwnerBaseGas = await estimateTxBaseGas(singleOwnerSafe, buildTransaction())
+    const twoOwnerBaseGas = await estimateTxBaseGas(twoOwnerSafe, buildTransaction())
+
+    chai.expect(Number(twoOwnerBaseGas) - Number(singleOwnerBaseGas)).to.eq(GAS_COST_PER_SIGNATURE)
   })
 })

@@ -88,6 +88,13 @@ const LOG_DATA_GAS_COST_PER_BYTE = 8
 // ~1381 gas from 1.3.0 onwards (LOG2 with indexed txHash + 32 bytes). Flat estimate.
 const EXECUTION_RESULT_EVENT_GAS_COST = 1_500
 
+// SafeL2 SafeMultiSigTransaction: compute overhead beyond the raw LOG opcode cost — building
+// additionalInfo = abi.encode(nonce, msg.sender, threshold), ABI-encoding the 11-field tuple
+// into memory (head/length mstores, calldatacopy of data & signatures, memory expansion) and,
+// on >= 1.5.0, the internal onBeforeExecTransaction hook dispatch. Measured ~1,127-1,149 gas
+// (flat across payload size) via an L2-vs-L1 gasUsed diff on hardhat; rounded up.
+const L2_EVENT_ENCODING_GAS_COST = 354
+
 // Calculate gas for signatures
 // (array count (3 -> r, s, v) + ecrecover costs + cold owners[signer] SLOAD) * signature count
 // Each signer reads a distinct `owners` mapping slot in checkNSignatures (EIP-2929 cold)
@@ -117,7 +124,8 @@ function estimateDataGasCosts(data: string): number {
  * Estimates the gas cost of the events emitted during execTransaction.
  * - The Safe singleton always emits ExecutionSuccess or ExecutionFailure.
  * - The SafeL2 singleton (>= 1.3.0) additionally emits SafeMultiSigTransaction
- *   in its onBeforeExecTransaction hook.
+ *   in its onBeforeExecTransaction hook. This accounts for both the LOG byte cost and the
+ *   compute to assemble the event data (abi.encode build, copies, memory expansion).
  */
 function calculateExecTransactionEventsGas(
   isL1SafeSingleton: boolean,
@@ -137,6 +145,9 @@ function calculateExecTransactionEventsGas(
     const eventDataBytes =
       headBytes + dataDynamicBytes + signaturesDynamicBytes + additionalInfoDynamicBytes
     gas += LOG_BASE_GAS_COST + LOG_TOPIC_GAS_COST + eventDataBytes * LOG_DATA_GAS_COST_PER_BYTE
+    // Compute to assemble the event data before the LOG opcode (abi.encode build, copies,
+    // memory expansion, hook dispatch) — not captured by the LOG byte cost above.
+    gas += L2_EVENT_ENCODING_GAS_COST
   }
 
   return gas

@@ -65,6 +65,11 @@ const NEW_ACCOUNT_GAS_COST = 25_000
 // Cold address access (EIP-2929) — first touch of the refund receiver in this tx
 const COLD_ACCOUNT_ACCESS_GAS_COST = 2_600
 
+// SafeProxy to Safe Singleton delegatecall cost: cold SLOAD of the singleton slot
+// (2_100) + cold DELEGATECALL to the singleton address (full EIP-2929 cold access 2_600, since
+// the singleton is first touched here) + calldatacopy/returndatacopy/control-flow (~400).
+const PROXY_FALLBACK_GAS_COST = COLD_SLOAD_GAS_COST + COLD_ACCOUNT_ACCESS_GAS_COST + 400
+
 // Extra gas charged when CALL forwards a non-zero value
 const CALL_VALUE_GAS_COST = 9_000
 
@@ -375,6 +380,9 @@ export async function estimateTxBaseGas(
 
   // Extra costs
   baseGas += EXTRA_BASE_GAS_COST
+
+  // SafeProxy fallback hop (not counted by the singleton's gasUsed)
+  baseGas += PROXY_FALLBACK_GAS_COST
 
   // Base gas encoding gas costs. Base gas was already encoded as `0` with `32 bytes (uint256)`, so we only need to add the data needed
   const baseGasUsedBytes = Math.ceil(baseGas.toString(16).length / 2)

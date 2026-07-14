@@ -24,6 +24,8 @@ describe('estimateTxBaseGas', () => {
     sinon.restore()
   })
 
+  const SAFE_ADDRESS = '0x5000000000000000000000000000000000000005'
+
   function buildSafe({
     contractCode = '0x',
     nonce = 0,
@@ -31,7 +33,9 @@ describe('estimateTxBaseGas', () => {
     tokenBalance = 0n,
     tokenBalanceReverts = false,
     threshold = 1,
-    isL1SafeSingleton = false
+    isL1SafeSingleton = false,
+    transferProbeGas,
+    transferProbeReverts = true
   }: {
     contractCode?: string
     nonce?: number
@@ -40,21 +44,31 @@ describe('estimateTxBaseGas', () => {
     tokenBalanceReverts?: boolean
     threshold?: number
     isL1SafeSingleton?: boolean
+    // Raw eth_estimateGas value the transfer probe resolves to (the helper then strips intrinsic
+    // + calldata). Defaults to reverting, so tests fall back to the flat ERC20 constants.
+    transferProbeGas?: number
+    transferProbeReverts?: boolean
   } = {}) {
     const balanceOfResponse = '0x' + tokenBalance.toString(16).padStart(64, '0')
     const callStub = tokenBalanceReverts
       ? sinon.stub().rejects(new Error('reverted'))
       : sinon.stub().resolves(balanceOfResponse)
+    const estimateGasStub =
+      transferProbeReverts || transferProbeGas === undefined
+        ? sinon.stub().rejects(new Error('reverted'))
+        : sinon.stub().resolves(transferProbeGas.toString())
     const safeProvider = {
       getContractCode: sinon.stub().resolves(contractCode),
       getNonce: sinon.stub().resolves(nonce),
       getBalance: sinon.stub().resolves(balance),
-      call: callStub
+      call: callStub,
+      estimateGas: estimateGasStub
     }
 
     return {
       getThreshold: sinon.stub().resolves(threshold),
       getNonce: sinon.stub().resolves(1),
+      getAddress: sinon.stub().resolves(SAFE_ADDRESS),
       getContractVersion: sinon.stub().returns('1.3.0'),
       getSafeProvider: sinon.stub().returns(safeProvider),
       getContractManager: sinon.stub().returns({
@@ -212,5 +226,53 @@ describe('estimateTxBaseGas', () => {
     const twoOwnerBaseGas = await estimateTxBaseGas(twoOwnerSafe, buildTransaction())
 
     chai.expect(Number(twoOwnerBaseGas) - Number(singleOwnerBaseGas)).to.eq(GAS_COST_PER_SIGNATURE)
+  })
+
+  it('uses the ERC20 transfer probe when it exceeds the flat floor', async () => {
+    const TRANSFER_PROBE_CALLDATA_GAS = 356
+    const INTRINSIC_TX_GAS_COST = 21_000
+    const ERC20_TRANSFER_GAS_COST = 21_000
+    const flooredSafe = buildSafe({ tokenBalance: 1n })
+    const probedSafe = buildSafe({
+      tokenBalance: 1n,
+      transferProbeGas: 90_000,
+      transferProbeReverts: false
+    })
+
+    const flooredBaseGas = await estimateTxBaseGas(
+      flooredSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+    const probedBaseGas = await estimateTxBaseGas(
+      probedSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+
+    const executionGas = 90_000 - INTRINSIC_TX_GAS_COST - TRANSFER_PROBE_CALLDATA_GAS
+    chai
+      .expect(Number(probedBaseGas) - Number(flooredBaseGas))
+      .to.eq(executionGas - ERC20_TRANSFER_GAS_COST)
+  })
+
+  it('ignores the ERC20 transfer probe when it is below the flat floor', async () => {
+    // Raw probe 30_000 -> execution-only 30_000 - 21_000 - 356 = 8_644 < 21_000 floor, so the
+    // flat constant wins and baseGas matches the reverting-probe (floor) case.
+    const flooredSafe = buildSafe({ tokenBalance: 1n })
+    const lowProbeSafe = buildSafe({
+      tokenBalance: 1n,
+      transferProbeGas: 30_000,
+      transferProbeReverts: false
+    })
+
+    const flooredBaseGas = await estimateTxBaseGas(
+      flooredSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+    const lowProbeBaseGas = await estimateTxBaseGas(
+      lowProbeSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+
+    chai.expect(Number(lowProbeBaseGas) - Number(flooredBaseGas)).to.eq(0)
   })
 })

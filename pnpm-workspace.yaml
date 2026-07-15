@@ -3,6 +3,11 @@ packages:
 
 # Block packages published within the last 7 days.
 minimumReleaseAge: 10080 # minutes (7 days)
+minimumReleaseAgeExclude:
+# We skip the minimumReleaseAge for this version specifically
+# containing a update to latest chains
+  - "@safe-global/safe-deployments@1.37.59"
+  - "@safe-global/safe-modules-deployments@3.0.7"
 
 # Only packages listed here are allowed to run install scripts.
 # esbuild and nx require native compilation; keccak and secp256k1 are native

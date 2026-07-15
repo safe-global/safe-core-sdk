@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/sdk-starter-kit",
-  "version": "4.0.0",
+  "version": "4.1.1",
   "description": "SDK that provides the basic tools to interact with the Safe Smart Account.",
   "types": "dist/src/index.d.ts",
   "main": "dist/cjs/index.cjs",
@@ -49,6 +49,6 @@
     "@safe-global/protocol-kit": "workspace:^",
     "@safe-global/relay-kit": "workspace:^",
     "@safe-global/types-kit": "workspace:^",
-    "viem": "^2.21.8"
+    "viem": "^2.52.2"
   }
 }

@@ -27,6 +27,20 @@ describe(`[${version}] addSafeDelegate`, () => {
     delegatorAddress = signer.account.address
   })
 
+  // Always runs (even on failure), so a failed assertion can't orphan the delegate.
+  // The Safe self-recovers after one run.
+  afterEach(async () => {
+    try {
+      await safeApiKit.removeSafeDelegate({
+        delegateAddress: '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B',
+        delegatorAddress,
+        signer
+      })
+    } catch {
+      // nothing to remove (e.g. a validation test that added no delegate)
+    }
+  })
+
   it('should fail if Label is empty', async () => {
     const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegateConfig: AddSafeDelegateProps = {

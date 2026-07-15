@@ -4,7 +4,12 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "declarationMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    // Needed for viem/ox `exports`-based types (declaration emit only); kept out of the
+    // base config since the test runners run on CommonJS.
+    // TODO(node-bump): revisit this drift once Node v22-24 + ESM-aware runners land. PLA-1668
+    "module": "esnext",
+    "moduleResolution": "bundler"
   },
   "files": ["abitype-config.d.ts"],
   "include": ["src/**/*", "test-utils/**/*"],

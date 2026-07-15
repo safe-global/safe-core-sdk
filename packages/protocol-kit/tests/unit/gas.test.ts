@@ -213,9 +213,9 @@ describe('estimateTxBaseGas', () => {
     chai.expect(Number(newReceiverBaseGas) - Number(contractReceiverBaseGas)).to.eq(25_000)
   })
 
-  // Marginal cost per signature: 65 non-zero calldata bytes * 16 + 6_000 ecrecover
-  // + 2_100 cold owners[signer] SLOAD (EIP-2929, one slot per signer)
-  const GAS_COST_PER_SIGNATURE = 9_140
+  // Marginal cost per signature: 65 non-zero calldata bytes * 16 + 3_100 ecrecover
+  // (3_000 precompile + 100 warm STATICCALL) + 2_100 cold owners[signer] SLOAD (EIP-2929)
+  const GAS_COST_PER_SIGNATURE = 6_240
 
   it('scales signature cost with threshold', async () => {
     // L1 singleton: no SafeMultiSigTransaction event, so the delta is the signature cost alone

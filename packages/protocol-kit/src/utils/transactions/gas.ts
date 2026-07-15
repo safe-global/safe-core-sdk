@@ -42,8 +42,9 @@ const INCREMENT_NONCE_GAS_COST = 5_000
 // Keccak gas cost for the hash of the Safe transaction
 const HASH_GENERATION_GAS_COST = 1_500
 
-// ecrecover gas cost for ecdsa ~= 4K gas, we use 6K
-const ECRECOVER_GAS_COST = 6_000
+// ecrecover per-signature cost: 3_000 precompile gas cost +
+// 100 for STATICCALL to the 0x01 precompile.
+const ECRECOVER_GAS_COST = 3_100
 
 // Intrinsic transaction fee charged by the EVM (always paid by the relayer)
 const INTRINSIC_TX_GAS_COST = 21_000

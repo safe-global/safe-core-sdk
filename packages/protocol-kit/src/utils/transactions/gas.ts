@@ -92,8 +92,7 @@ const EXECUTION_RESULT_EVENT_GAS_COST = 1_500
 // SafeL2 SafeMultiSigTransaction: compute overhead beyond the raw LOG opcode cost — building
 // additionalInfo = abi.encode(nonce, msg.sender, threshold), ABI-encoding the 11-field tuple
 // into memory (head/length mstores, calldatacopy of data & signatures, memory expansion) and,
-// on >= 1.5.0, the internal onBeforeExecTransaction hook dispatch. Measured ~1,127-1,149 gas
-// (flat across payload size) via an L2-vs-L1 gasUsed diff on hardhat; rounded up.
+// on >= 1.5.0, the internal onBeforeExecTransaction hook dispatch.
 const L2_EVENT_ENCODING_GAS_COST = 354
 
 // Calculate gas for signatures
@@ -254,9 +253,11 @@ async function calculateRefundGas(
     return gas
   }
 
-  const hasBalance = await hasExistingTokenBalance(safeProvider, gasToken, refundReceiver)
+  const [hasBalance, probe] = await Promise.all([
+    hasExistingTokenBalance(safeProvider, gasToken, refundReceiver),
+    probeErc20TransferGas(safeProvider, gasToken, safeAddress, refundReceiver)
+  ])
   const fallback = hasBalance ? ERC20_TRANSFER_GAS_COST : ERC20_NEW_HOLDER_TRANSFER_GAS_COST
-  const probe = await probeErc20TransferGas(safeProvider, gasToken, safeAddress, refundReceiver)
   return probe === undefined ? fallback : Math.max(probe, fallback)
 }
 

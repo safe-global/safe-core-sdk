@@ -1,5 +1,11 @@
 # @safe-global/protocol-kit
 
+## 8.0.4
+
+### Patch Changes
+
+- c265183: Add Whitechain Sepolia (wch-sepolia) chain support and bump @safe-global/safe-deployments and @safe-global/safe-modules-deployments to the latest versions
+
 ## 8.0.3
 
 ### Patch Changes

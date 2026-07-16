@@ -157,8 +157,8 @@ importers:
         specifier: ^19.0.2
         version: 19.0.2
       sinon-chai:
-        specifier: 3.7.0
-        version: 3.7.0(chai@4.5.0)(sinon@19.0.2)
+        specifier: 4.0.1
+        version: 4.0.1(chai@4.5.0)(sinon@19.0.2)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -1752,6 +1752,9 @@ packages:
 
   bn.js@4.12.3:
     resolution: {integrity: sha512-fGTi3gxV/23FTYdAoUtLYp6qySe2KE3teyZitipKNRuVYcBkoP/bB3guXN/XVKUe9mxCHXnc9C4ocyz8OmgN0g==}
+
+  bn.js@4.12.4:
+    resolution: {integrity: sha512-njR1b+ixG2ufvL9Zn9JGneW+b5GV6jqpYyPPpg4QVt723b5kJPGUczkUyWEH9BwEA74UakJZ43I4FDLBF7ci0g==}
 
   bn.js@5.2.3:
     resolution: {integrity: sha512-EAcmnPkxpntVL+DS7bO1zhcZNvCkxqtkd0ZY53h06GNQ3DEkkGZ/gKgmDv6DdZQGj9BgfSPKtJJ7Dp1GPP8f7w==}
@@ -3687,10 +3690,10 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
-  sinon-chai@3.7.0:
-    resolution: {integrity: sha512-mf5NURdUaSdnatJx3uhoBOrY9dtL19fiOtAdT1Azxg3+lNJFiuN0uzaU3xX1LeAfL17kHQhTAJgpsfhbMJMY2g==}
+  sinon-chai@4.0.1:
+    resolution: {integrity: sha512-xMKEEV3cYHC1G+boyr7QEqi80gHznYsxVdC9CdjP5JnCWz/jPGuXQzJz3PtBcb0CcHAxar15Y5sjLBoAs6a0yA==}
     peerDependencies:
-      chai: ^4.0.0
+      chai: ^5.0.0 || ^6.0.0
       sinon: '>=4.0.0'
 
   sinon@19.0.2:
@@ -4786,7 +4789,7 @@ snapshots:
     dependencies:
       '@ethersproject/bytes': 5.7.0
       '@ethersproject/logger': 5.7.0
-      bn.js: 4.12.3
+      bn.js: 4.12.4
 
   '@ethersproject/bignumber@5.7.0':
     dependencies:
@@ -5049,7 +5052,7 @@ snapshots:
       '@ethersproject/bytes': 5.7.0
       '@ethersproject/logger': 5.7.0
       '@ethersproject/properties': 5.7.0
-      bn.js: 4.12.3
+      bn.js: 4.12.4
       elliptic: 6.5.4
       hash.js: 1.1.7
 
@@ -6145,6 +6148,8 @@ snapshots:
   blakejs@1.2.1: {}
 
   bn.js@4.12.3: {}
+
+  bn.js@4.12.4: {}
 
   bn.js@5.2.3: {}
 
@@ -8534,7 +8539,7 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  sinon-chai@3.7.0(chai@4.5.0)(sinon@19.0.2):
+  sinon-chai@4.0.1(chai@4.5.0)(sinon@19.0.2):
     dependencies:
       chai: 4.5.0
       sinon: 19.0.2

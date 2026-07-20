@@ -24,7 +24,7 @@ jobs:
         provider: [ethers, viem]
         contract-version: [v1.0.0, v1.1.1, v1.2.0, v1.3.0, v1.4.1, v1.5.0]
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271  # v6.0.9
       - name: Use Node.js ${{ matrix.node-version }}

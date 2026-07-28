@@ -169,6 +169,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 1807n, shortName: 'rana' },
   { chainId: 1811n, shortName: 'lif3-testnet' },
   { chainId: 1868n, shortName: 'soneium' },
+  { chainId: 1874n, shortName: 'wch-sepolia' },
   { chainId: 1890n, shortName: 'lightlink_phoenix' },
   { chainId: 1891n, shortName: 'lightlink_pegasus' },
   { chainId: 1923n, shortName: 'swellchain' },

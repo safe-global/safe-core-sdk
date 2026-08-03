@@ -444,6 +444,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 103454n, shortName: 'masatest' },
   { chainId: 105105n, shortName: 'stratis' },
   { chainId: 111188n, shortName: 're-al' },
+  { chainId: 127001n, shortName: 'grav' },
   { chainId: 127823n, shortName: 'etls' },
   { chainId: 128123n, shortName: 'etlt' },
   { chainId: 167000n, shortName: 'tko-mainnet' },

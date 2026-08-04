@@ -1,5 +1,14 @@
 # @safe-global/relay-kit
 
+## 6.0.5
+
+### Patch Changes
+
+- da2a340: chore: add Gravity (grav) chain support and bump `@safe-global/safe-deployments` and `@safe-global/safe-modules-deployments` to the latest versions
+- Updated dependencies [da2a340]
+- Updated dependencies [4aaa5d2]
+  - @safe-global/protocol-kit@8.0.5
+
 ## 6.0.4
 
 ### Patch Changes

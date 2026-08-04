@@ -1,5 +1,14 @@
 # @safe-global/api-kit
 
+## 5.0.2
+
+### Patch Changes
+
+- 17b3be5: Update the list of supported chains to match the Safe config service. Added `bot` (677), `kairos` (1001), `wch-sepolia` (1874), `robinhood` (4663), `arc` (5042) and `kaia` (8217), and removed the deprecated `zkevm` (1101).
+- Updated dependencies [da2a340]
+- Updated dependencies [4aaa5d2]
+  - @safe-global/protocol-kit@8.0.5
+
 ## 5.0.1
 
 ### Patch Changes

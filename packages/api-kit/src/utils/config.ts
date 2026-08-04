@@ -27,7 +27,6 @@ export const networks: NetworkShortName[] = [
   { chainId: 1672n, shortName: 'pharos' },
   { chainId: 1874n, shortName: 'wch-sepolia' },
   { chainId: 3338n, shortName: 'peaq' },
-  { chainId: 3637n, shortName: 'btc' },
   { chainId: 4217n, shortName: 'tempo' },
   { chainId: 4326n, shortName: 'mega' },
   { chainId: 4663n, shortName: 'robinhood' },

@@ -215,6 +215,29 @@ export class Safe4337Pack extends RelayKitBasePack<{
           `Incompatibility detected: The EIP-4337 fallbackhandler is not attached to the Safe Account. Attach this fallbackhandler (address: ${safe4337ModuleAddress}) to ensure compatibility.`
         )
       }
+
+      // Resolve the WebAuthn shared signer address when the signer is a passkey, in the same way
+      // it is resolved when using a predicted Safe. Otherwise it is left as the zero address and
+      // the dummy signature used for gas estimation is invalid (bundlers reject it with AA33).
+      // https://github.com/safe-global/safe-core-sdk/issues/1251
+      const safeProvider = protocolKit.getSafeProvider()
+      const isPasskeySigner = await safeProvider.isPasskeySigner()
+
+      if (isPasskeySigner) {
+        if (!safeWebAuthnSharedSignerAddress) {
+          const safeWebAuthnSharedSignerDeployment = getSafeWebAuthnShareSignerDeployment({
+            released: true,
+            version: '0.2.1',
+            network
+          })
+          safeWebAuthnSharedSignerAddress =
+            safeWebAuthnSharedSignerDeployment?.networkAddresses[network]
+        }
+
+        if (!safeWebAuthnSharedSignerAddress) {
+          throw new Error(`safeWebAuthnSharedSignerAddress not available for chain ${network}`)
+        }
+      }
     } else {
       // New Safe will be created based on the provided configuration when bundling a new UserOperation
       if (!options.owners || !options.threshold) {

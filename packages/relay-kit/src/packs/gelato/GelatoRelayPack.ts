@@ -36,6 +36,28 @@ import {
   GelatoOptions
 } from './types'
 
+// TODO: Remove @deprecated Gelato code when the pack is removed in the next major version
+let hasWarnedGelatoDeprecation = false
+
+function warnGelatoDeprecation(): void {
+  if (hasWarnedGelatoDeprecation) {
+    return
+  }
+
+  hasWarnedGelatoDeprecation = true
+
+  console.warn(
+    '@safe-global/relay-kit: `GelatoRelayPack` is deprecated and will be removed in the next major version. Migrate to `Safe4337Pack`: https://docs.safe.global/sdk/relay-kit/guides/gelato-relay'
+  )
+}
+// END of @deprecated Gelato code
+
+/**
+ * @deprecated `GelatoRelayPack` will be removed in the next major version of
+ * `@safe-global/relay-kit`. Migrate to `Safe4337Pack`, which supports both sponsored and
+ * ERC-20-paid transaction execution.
+ * @see https://docs.safe.global/sdk/relay-kit/guides/gelato-relay
+ */
 export class GelatoRelayPack extends RelayKitBasePack<{
   EstimateFeeProps: GelatoEstimateFeeProps
   EstimateFeeResult: GelatoEstimateFeeResult
@@ -49,6 +71,7 @@ export class GelatoRelayPack extends RelayKitBasePack<{
 
   constructor({ apiKey, protocolKit }: GelatoOptions) {
     super(protocolKit)
+    warnGelatoDeprecation()
     this.#gelatoRelay = new GelatoNetworkRelay()
 
     this.#apiKey = apiKey

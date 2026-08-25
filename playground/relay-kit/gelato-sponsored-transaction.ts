@@ -11,6 +11,9 @@ import {
   SafeTransaction
 } from '@safe-global/types-kit'
 
+// DEPRECATED: `GelatoRelayPack` will be removed in the next major version of the relay-kit.
+// See the userop-*.ts playground scripts for the Safe4337Pack equivalents.
+
 // Fund the 1Balance account that will sponsor the transaction and get the API key:
 // https://relay.gelato.network/
 

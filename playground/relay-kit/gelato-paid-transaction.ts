@@ -11,6 +11,9 @@ import {
   SafeTransaction
 } from '@safe-global/types-kit'
 
+// DEPRECATED: `GelatoRelayPack` will be removed in the next major version of the relay-kit.
+// See the userop-*.ts playground scripts for the Safe4337Pack equivalents.
+
 // Check the status of a transaction after it is relayed:
 // https://relay.gelato.digital/tasks/status/<TASK_ID>
 

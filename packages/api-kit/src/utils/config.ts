@@ -50,7 +50,6 @@ export const networks: NetworkShortName[] = [
   { chainId: 59144n, shortName: 'linea' },
   { chainId: 80069n, shortName: 'bep' },
   { chainId: 80094n, shortName: 'berachain' },
-  { chainId: 81224n, shortName: 'codex' },
   { chainId: 84532n, shortName: 'basesep' },
   { chainId: 102030n, shortName: 'ctc' },
   { chainId: 534352n, shortName: 'scr' },

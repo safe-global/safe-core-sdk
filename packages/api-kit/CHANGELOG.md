@@ -1,5 +1,11 @@
 # @safe-global/api-kit
 
+## 5.0.3
+
+### Patch Changes
+
+- 2190e91: Remove the deprecated Codex chain (`codex`, 81224) from the list of supported chains.
+
 ## 5.0.2
 
 ### Patch Changes

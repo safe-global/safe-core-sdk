@@ -55,7 +55,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@gelatonetwork/relay-sdk": "^5.6.0",
     "@safe-global/protocol-kit": "workspace:^",
     "@safe-global/safe-modules-deployments": "^3.0.9",
     "@safe-global/types-kit": "workspace:^",

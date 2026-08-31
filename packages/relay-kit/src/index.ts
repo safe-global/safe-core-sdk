@@ -1,8 +1,5 @@
 export * from './deprecated'
 
-export * from './packs/gelato/GelatoRelayPack'
-export * from './packs/gelato/types'
-
 export * from './packs/safe-4337/Safe4337Pack'
 export { default as BaseSafeOperation } from './packs/safe-4337/BaseSafeOperation'
 export { default as SafeOperationV07 } from './packs/safe-4337/SafeOperationV07'

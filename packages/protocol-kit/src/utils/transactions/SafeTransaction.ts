@@ -17,6 +17,10 @@ class EthSafeTransaction implements SafeTransaction {
     this.signatures.set(signature.signer.toLowerCase(), signature)
   }
 
+  isSignedBy(signer: string): boolean {
+    return this.signatures.has(signer.toLowerCase())
+  }
+
   encodedSignatures(): string {
     return buildSignatureBytes(Array.from(this.signatures.values()))
   }

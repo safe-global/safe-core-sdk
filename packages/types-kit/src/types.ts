@@ -57,6 +57,7 @@ export interface SafeTransaction {
   getSignature(signer: string): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
+  isSignedBy(signer: string): boolean
 }
 
 export interface SafeMessage {
@@ -65,6 +66,7 @@ export interface SafeMessage {
   getSignature(signer: string): SafeSignature | undefined
   addSignature(signature: SafeSignature): void
   encodedSignatures(): string
+  isSignedBy(signer: string): boolean
 }
 
 export type Transaction = TransactionBase & TransactionOptions

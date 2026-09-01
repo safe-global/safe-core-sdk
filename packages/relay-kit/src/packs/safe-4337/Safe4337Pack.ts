@@ -355,6 +355,11 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
     if (customContracts?.entryPointAddress) {
       const requiredSafeModulesVersion = entryPointToSafeModules(customContracts?.entryPointAddress)
+      if (!requiredSafeModulesVersion) {
+        throw new Error(
+          `The selected entrypoint ${customContracts?.entryPointAddress} is not a recognized entrypoint`
+        )
+      }
       if (!semverSatisfies(safeModulesVersion, requiredSafeModulesVersion))
         throw new Error(
           `The selected entrypoint ${customContracts?.entryPointAddress} is not compatible with version ${safeModulesVersion} of Safe modules`
@@ -372,7 +377,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
 
       selectedEntryPoint = supportedEntryPoints.find((entryPoint: string) => {
         const requiredSafeModulesVersion = entryPointToSafeModules(entryPoint)
-        return semverSatisfies(safeModulesVersion, requiredSafeModulesVersion)
+        return requiredSafeModulesVersion
+          ? semverSatisfies(safeModulesVersion, requiredSafeModulesVersion)
+          : false
       })
 
       if (!selectedEntryPoint) {

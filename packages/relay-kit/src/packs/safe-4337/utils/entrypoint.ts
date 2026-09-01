@@ -13,13 +13,19 @@ export function sameString(str1: string, str2: string): boolean {
   return str1.toLowerCase() === str2.toLowerCase()
 }
 
-export function entryPointToSafeModules(entryPoint: string) {
+export function entryPointToSafeModules(
+  entryPoint: string
+): typeof EQ_0_2_0 | typeof EQ_OR_GT_0_3_0 | undefined {
   const moduleVersionToEntryPoint: Record<string, typeof EQ_0_2_0 | typeof EQ_OR_GT_0_3_0> = {
     [ENTRYPOINT_ADDRESS_V06]: EQ_0_2_0,
     [ENTRYPOINT_ADDRESS_V07]: EQ_OR_GT_0_3_0
   }
 
-  return moduleVersionToEntryPoint[entryPoint]
+  const matchingEntryPoint = Object.keys(moduleVersionToEntryPoint).find((candidate) =>
+    sameString(candidate, entryPoint)
+  )
+
+  return matchingEntryPoint ? moduleVersionToEntryPoint[matchingEntryPoint] : undefined
 }
 
 export function isEntryPointV6(address: string): boolean {

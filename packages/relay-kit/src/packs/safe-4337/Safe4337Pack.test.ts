@@ -219,6 +219,38 @@ describe('Safe4337Pack', () => {
       )
     })
 
+    it('should recognize a custom entrypoint address regardless of its casing', async () => {
+      const safe4337Pack = await createSafe4337Pack({
+        options: {
+          owners: [fixtures.OWNER_1],
+          threshold: 1
+        },
+        customContracts: {
+          entryPointAddress: fixtures.ENTRYPOINT_ADDRESS_V07.toLowerCase()
+        },
+        safeModulesVersion: '0.3.0'
+      })
+
+      expect(await safe4337Pack.protocolKit.getAddress()).toBe(fixtures.PREDICTED_SAFE_ADDRESS)
+    })
+
+    it('should throw a clear error if the custom entrypoint address is not a recognized entrypoint', async () => {
+      const unknownEntryPointAddress = '0x0000000000000000000000000000000000000000'
+
+      await expect(
+        createSafe4337Pack({
+          options: {
+            owners: [fixtures.OWNER_1],
+            threshold: 1
+          },
+          customContracts: { entryPointAddress: unknownEntryPointAddress },
+          safeModulesVersion: '0.3.0'
+        })
+      ).rejects.toThrow(
+        `The selected entrypoint ${unknownEntryPointAddress} is not a recognized entrypoint`
+      )
+    })
+
     it('should throw an error if the owners or threshold are not specified', async () => {
       await expect(
         createSafe4337Pack({

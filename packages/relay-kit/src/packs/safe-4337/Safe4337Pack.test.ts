@@ -189,6 +189,22 @@ describe('Safe4337Pack', () => {
 
       expect(await safe4337Pack.protocolKit.getFallbackHandler()).toEqual(safe4337ModuleAddress)
     })
+
+    it('should recognize an already-enabled custom 4337 module and fallback handler regardless of casing', async () => {
+      const safe4337Pack = await createSafe4337Pack({
+        customContracts: {
+          safe4337ModuleAddress: safe4337ModuleAddress.toLowerCase() as viem.Hash
+        },
+        options: {
+          safeAddress: fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+        },
+        safeModulesVersion: '0.3.0'
+      })
+
+      expect(await safe4337Pack.protocolKit.getAddress()).toBe(
+        fixtures.SAFE_ADDRESS_v1_4_1_WITH_0_3_0_MODULE
+      )
+    })
   })
 
   describe('When the Safe Account does not exists', () => {
@@ -216,6 +232,38 @@ describe('Safe4337Pack', () => {
         })
       ).rejects.toThrow(
         `The selected entrypoint ${fixtures.ENTRYPOINT_ADDRESS_V06} is not compatible with version 0.3.0 of Safe modules`
+      )
+    })
+
+    it('should recognize a custom entrypoint address regardless of its casing', async () => {
+      const safe4337Pack = await createSafe4337Pack({
+        options: {
+          owners: [fixtures.OWNER_1],
+          threshold: 1
+        },
+        customContracts: {
+          entryPointAddress: fixtures.ENTRYPOINT_ADDRESS_V07.toLowerCase()
+        },
+        safeModulesVersion: '0.3.0'
+      })
+
+      expect(await safe4337Pack.protocolKit.getAddress()).toBe(fixtures.PREDICTED_SAFE_ADDRESS)
+    })
+
+    it('should throw a clear error if the custom entrypoint address is not a recognized entrypoint', async () => {
+      const unknownEntryPointAddress = '0x0000000000000000000000000000000000000000'
+
+      await expect(
+        createSafe4337Pack({
+          options: {
+            owners: [fixtures.OWNER_1],
+            threshold: 1
+          },
+          customContracts: { entryPointAddress: unknownEntryPointAddress },
+          safeModulesVersion: '0.3.0'
+        })
+      ).rejects.toThrow(
+        `The selected entrypoint ${unknownEntryPointAddress} is not a recognized entrypoint`
       )
     })
 

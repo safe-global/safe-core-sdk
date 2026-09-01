@@ -47,7 +47,8 @@ import {
   createBundlerClient,
   userOperationToHexValues,
   getRelayKitVersion,
-  createUserOperation
+  createUserOperation,
+  sameString
 } from '@safe-global/relay-kit/packs/safe-4337/utils'
 import { PimlicoFeeEstimator } from '@safe-global/relay-kit/packs/safe-4337/estimators/pimlico/PimlicoFeeEstimator'
 
@@ -199,7 +200,9 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
 
       const safeModules = (await protocolKit.getModules()) as string[]
-      const is4337ModulePresent = safeModules.some((module) => module === safe4337ModuleAddress)
+      const is4337ModulePresent = safeModules.some((module) =>
+        sameString(module, safe4337ModuleAddress)
+      )
 
       if (!is4337ModulePresent) {
         throw new Error(
@@ -208,7 +211,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
       }
 
       const safeFallbackhandler = await protocolKit.getFallbackHandler()
-      const is4337FallbackhandlerPresent = safeFallbackhandler === safe4337ModuleAddress
+      const is4337FallbackhandlerPresent = sameString(safeFallbackhandler, safe4337ModuleAddress)
 
       if (!is4337FallbackhandlerPresent) {
         throw new Error(

@@ -204,7 +204,9 @@ function extractClientDataFields(clientDataJSON: ArrayBuffer): Hex {
  * @returns {[bigint, bigint]} A tuple containing two BigInt values, r and s, which are the numeric values extracted from the signature.
  * @throws {Error} Throws an error if the signature encoding is invalid or does not meet expected conditions.
  */
-function extractSignature(signature: ArrayBuffer | Uint8Array | Array<number>): [bigint, bigint] {
+export function extractSignature(
+  signature: ArrayBuffer | Uint8Array | Array<number>
+): [bigint, bigint] {
   const check = (x: boolean) => {
     if (!x) {
       throw new Error('invalid signature encoding')
@@ -214,25 +216,29 @@ function extractSignature(signature: ArrayBuffer | Uint8Array | Array<number>): 
   // Decode the DER signature. Note that we assume that all lengths fit into 8-bit integers,
   // which is true for the kinds of signatures we are decoding but generally false. I.e. this
   // code should not be used in any serious application.
-  const view = new DataView(
-    signature instanceof ArrayBuffer
+  //
+  // Normalize to a single Uint8Array up front and read from it directly (rather than wrapping
+  // it in a DataView backed by `.buffer`), so a Uint8Array/Buffer view with a non-zero
+  // byteOffset (e.g. Buffer.from(base64, 'base64'), which is commonly pooled) is decoded
+  // correctly instead of reading past its bounds into unrelated memory.
+  const bytes =
+    signature instanceof Uint8Array
       ? signature
-      : signature instanceof Uint8Array
-        ? signature.buffer
-        : new Uint8Array(signature).buffer
-  )
+      : signature instanceof ArrayBuffer
+        ? new Uint8Array(signature)
+        : new Uint8Array(signature)
 
   // check that the sequence header is valid
-  check(view.getUint8(0) === 0x30)
-  check(view.getUint8(1) === view.byteLength - 2)
+  check(bytes[0] === 0x30)
+  check(bytes[1] === bytes.byteLength - 2)
 
   // read r and s
   const readInt = (offset: number) => {
-    check(view.getUint8(offset) === 0x02)
-    const len = view.getUint8(offset + 1)
+    check(bytes[offset] === 0x02)
+    const len = bytes[offset + 1]
     const start = offset + 2
     const end = start + len
-    const n = fromBytes(new Uint8Array(view.buffer.slice(start, end)), 'bigint')
+    const n = fromBytes(bytes.slice(start, end), 'bigint')
     check(n < maxUint256)
     return [n, end] as const
   }

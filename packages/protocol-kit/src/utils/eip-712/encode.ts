@@ -161,10 +161,46 @@ function hashStruct({
   return keccak256(encoded)
 }
 
-function deducePrimaryType(types: TypedMessageTypes) {
-  // In ethers the primaryType is assumed to be the first yielded by a forEach of the types keys
-  // https://github.com/ethers-io/ethers.js/blob/a4b1d1f43fca14f2e826e3c60e0d45f5b6ef3ec4/src.ts/hash/typed-data.ts#L278C13-L278C20
-  return Object.keys(types)[0]
+/**
+ * Deduces the `primaryType` of an EIP-712 typed data payload when one is not explicitly
+ * provided, by finding the root of the type dependency graph — the one non-domain type
+ * that is not itself referenced as a field type by any other type.
+ *
+ * This mirrors ethers' actual deduction algorithm (encodeType/getPrimaryType in
+ * https://github.com/ethers-io/ethers.js/blob/main/src.ts/hash/typed-data.ts), NOT the
+ * naive "first key in the object" approach this function previously used. Object key
+ * order is not part of the EIP-712 spec and, for the conventional `{ EIP712Domain, ... }`
+ * ordering, taking the first key silently resolved to `'EIP712Domain'` itself — which
+ * causes the caller to skip hashing the message struct entirely (see `encodeTypedData`
+ * below), producing a hash that is identical for every message under the same domain
+ * regardless of content.
+ *
+ * Throws if the graph has zero or more than one root, since primaryType is then
+ * genuinely ambiguous and guessing would silently produce a wrong hash.
+ */
+function deducePrimaryType(types: TypedMessageTypes): string {
+  const referencedTypes = new Set<string>()
+  for (const typeName of Object.keys(types)) {
+    if (typeName === 'EIP712Domain') continue
+    for (const field of types[typeName]) {
+      const baseType = field.type.replace(/\[.*$/u, '')
+      if (types[baseType] !== undefined) referencedTypes.add(baseType)
+    }
+  }
+
+  const candidates = Object.keys(types).filter(
+    (typeName) => typeName !== 'EIP712Domain' && !referencedTypes.has(typeName)
+  )
+
+  if (candidates.length !== 1) {
+    throw new Error(
+      `Unable to deduce primaryType: ambiguous or unused types (candidates: ${
+        candidates.join(', ') || 'none'
+      }). Please provide an explicit primaryType.`
+    )
+  }
+
+  return candidates[0]
 }
 
 export function hashTypedData(typedData: EIP712TypedData): string {

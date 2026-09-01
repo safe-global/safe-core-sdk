@@ -12,7 +12,6 @@ import {
   MetaTransactionData,
   Transaction,
   EIP712TypedData,
-  SafeTransactionData,
   CompatibilityFallbackHandlerContractType,
   SigningMethod,
   SigningMethodType
@@ -891,7 +890,7 @@ class Safe {
       ) {
         const txHashData = preimageSafeTransactionHash(
           preimageSafeAddress,
-          safeTransaction.data as SafeTransactionData,
+          transaction.data,
           safeVersion,
           chainId
         )

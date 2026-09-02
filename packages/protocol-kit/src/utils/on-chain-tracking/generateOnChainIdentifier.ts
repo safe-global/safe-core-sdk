@@ -3,13 +3,25 @@ import { keccak256, toHex } from 'viem'
 /**
  * Generates a hash from the given input string and truncates it to the specified size.
  *
+ * NOTE: for the `size` values actually used by identifier version `00` (3 and 20, see
+ * generateOnChainIdentifier below), `size` is the number of hex CHARACTERS (nibbles) taken
+ * from the end of the keccak256 digest, not bytes. `fullHash` is a hex string, so
+ * `.slice(-size)` takes `size` characters, and the subsequent `toHex()` call re-encodes those
+ * ASCII characters (i.e. '0'-'9', 'a'-'f') as bytes rather than reinterpreting the underlying
+ * hash bytes. For those `size` values the returned string is `size` bytes long, but each byte
+ * only ever takes one of 16 possible ASCII hex-digit values, so the result has at most
+ * `16 ** size` possible values, not the `256 ** size` a byte-accurate truncation would allow.
+ * This is the current, already-shipped, already-on-chain behavior and must not change without
+ * a new `identifierVersion` (see generateOnChainIdentifier below) to avoid altering the format
+ * of previously-published on-chain identifiers.
+ *
  * @param {string} input - The input string to be hashed.
- * @param {number} size - The number of bytes to take from the end of the hash.
+ * @param {number} size - The number of hex characters (not bytes) to take from the end of the hash.
  * @returns {string} A hexadecimal string representation of the truncated hash, without the `0x` prefix.
  */
 export function generateHash(input: string, size: number): string {
   const fullHash = keccak256(toHex(input))
-  return toHex(fullHash.slice(-size)).replace('0x', '') // Take the last X bytes
+  return toHex(fullHash.slice(-size)).replace('0x', '') // Take the last `size` hex characters
 }
 
 export type OnChainIdentifierParamsType = {
@@ -46,10 +58,10 @@ function generateOnChainIdentifier({
 }: OnChainIdentifierParamsType): string {
   const identifierPrefix = '5afe'
   const identifierVersion = '00' // first version
-  const projectHash = generateHash(project, 20) // Take the last 20 bytes
-  const platformHash = generateHash(platform, 3) // Take the last 3 bytes
-  const toolHash = generateHash(tool, 3) // Take the last 3 bytes
-  const toolVersionHash = generateHash(toolVersion, 3) // Take the last 3 bytes
+  const projectHash = generateHash(project, 20) // Take the last 20 hex characters
+  const platformHash = generateHash(platform, 3) // Take the last 3 hex characters
+  const toolHash = generateHash(tool, 3) // Take the last 3 hex characters
+  const toolVersionHash = generateHash(toolVersion, 3) // Take the last 3 hex characters
 
   return `${identifierPrefix}${identifierVersion}${projectHash}${platformHash}${toolHash}${toolVersionHash}`
 }

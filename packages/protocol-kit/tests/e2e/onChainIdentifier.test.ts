@@ -32,12 +32,38 @@ describe('On-chain analytics', () => {
       const identifierPrefix = '5afe'
       const identifierVersion = '00'
 
+      // These are pinned as hard-coded constants (independently computed from the real
+      // keccak256 digest) rather than by re-calling generateHash, which would make this
+      // assertion vacuous against its own implementation and unable to catch a regression
+      // in generateHash's behavior. See generateHash's doc comment for why these values look
+      // like ASCII hex digits rather than raw hash bytes: that's a known, already-shipped
+      // (not byte-accurate) truncation behavior this test intentionally pins as-is.
+      const projectHash = '3861653435366632366138366164643038373864'
+      const platformHash = '646561'
+      const toolHash = '393238'
+      const toolVersionHash = '373263'
+
       chai.expect(onChainIdentifier.startsWith(identifierPrefix)).to.be.true
       chai.expect(onChainIdentifier.substring(4, 6)).to.equals(identifierVersion)
-      chai.expect(onChainIdentifier.substring(6, 46)).to.equals(generateHash(project, 20))
-      chai.expect(onChainIdentifier.substring(46, 52)).to.equals(generateHash(platform, 3))
-      chai.expect(onChainIdentifier.substring(52, 58)).to.equals(generateHash(tool, 3))
-      chai.expect(onChainIdentifier.substring(58, 64)).to.equals(generateHash(toolVersion, 3))
+      chai.expect(onChainIdentifier.substring(6, 46)).to.equals(projectHash)
+      chai.expect(onChainIdentifier.substring(46, 52)).to.equals(platformHash)
+      chai.expect(onChainIdentifier.substring(52, 58)).to.equals(toolHash)
+      chai.expect(onChainIdentifier.substring(58, 64)).to.equals(toolVersionHash)
+
+      // Exact aggregate equality pins the complete format (including that there's no
+      // trailing data beyond what the substring assertions above check individually).
+      chai
+        .expect(onChainIdentifier)
+        .to.equals(
+          `${identifierPrefix}${identifierVersion}${projectHash}${platformHash}${toolHash}${toolVersionHash}`
+        )
+
+      // Cross-check against generateHash directly, so a change to either the aggregate
+      // identifier assembly or the hash function itself is caught by at least one assertion.
+      chai.expect(generateHash(project, 20)).to.equals(projectHash)
+      chai.expect(generateHash(platform, 3)).to.equals(platformHash)
+      chai.expect(generateHash(tool, 3)).to.equals(toolHash)
+      chai.expect(generateHash(toolVersion, 3)).to.equals(toolVersionHash)
     })
   })
 

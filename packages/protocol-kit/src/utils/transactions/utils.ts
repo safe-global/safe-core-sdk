@@ -285,7 +285,7 @@ export function createLegacyTxOptions(
     converted.gasPrice = BigInt(options.gasPrice)
   }
 
-  if (options?.nonce) {
+  if (typeof options?.nonce !== 'undefined') {
     converted.nonce = options.nonce
   }
 
@@ -310,7 +310,7 @@ export function createTxOptions(options?: TransactionOptions): Partial<WalletTra
     converted.maxPriorityFeePerGas = BigInt(options.maxPriorityFeePerGas)
   }
 
-  if (options?.nonce) {
+  if (typeof options?.nonce !== 'undefined') {
     converted.nonce = options.nonce
   }
 

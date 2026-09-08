@@ -166,11 +166,11 @@ importers:
   packages/protocol-kit:
     dependencies:
       '@safe-global/safe-deployments':
-        specifier: ^1.37.62
-        version: 1.37.62
+        specifier: ^1.37.63
+        version: 1.37.63
       '@safe-global/safe-modules-deployments':
-        specifier: ^3.0.9
-        version: 3.0.9
+        specifier: ^3.0.10
+        version: 3.0.10
       '@safe-global/types-kit':
         specifier: workspace:^
         version: link:../types-kit
@@ -249,8 +249,8 @@ importers:
         specifier: workspace:^
         version: link:../protocol-kit
       '@safe-global/safe-modules-deployments':
-        specifier: ^3.0.9
-        version: 3.0.9
+        specifier: ^3.0.10
+        version: 3.0.10
       '@safe-global/types-kit':
         specifier: workspace:^
         version: link:../types-kit
@@ -1314,12 +1314,12 @@ packages:
     peerDependencies:
       ethers: 5.4.0
 
-  '@safe-global/safe-deployments@1.37.62':
-    resolution: {integrity: sha512-EJMdtIsK0g89hedZDNhbQiyWGfLACKjeOLMlSOpMA7drIgAkht6wva/Qfv3DeJT7tAMFQAkgkwMnPxKZWn/6Pw==}
+  '@safe-global/safe-deployments@1.37.63':
+    resolution: {integrity: sha512-dH4V3iHH5tZdxx3DBvvBzmnlOZpKMXUx6CBFGUwlARnUa9MEVVyg8Sbpc3DplsaPB5fLh0J97+WB5ylxhLWCRA==}
     engines: {node: '>=22.0.0', pnpm: '>=10.16.0'}
 
-  '@safe-global/safe-modules-deployments@3.0.9':
-    resolution: {integrity: sha512-tgW/ln4if6dLohAQVUT51/a+tTUMuTm3dKvGPgXmHaLUFS8P3f28+cs671rsyMlMa4A/zXJKOdFgBsfCTyfw0A==}
+  '@safe-global/safe-modules-deployments@3.0.10':
+    resolution: {integrity: sha512-6TWp62j4MxQxTttL7WehrQMI3irMeQo3/mKUuSWb0+oE7fzioQWZ+QYT3sD92cfsKITFIWJ2rHyeyXIbSq0qMg==}
 
   '@safe-global/safe-passkey@0.2.0':
     resolution: {integrity: sha512-B9IpVvwXLvK3m+BRhn9z8kCbEizFmua4YmaUBZ9yr0xM9YsX2PRTnxbFvC7pLph1OQ2u+9O2V3FEmPiS10YEIw==}
@@ -5684,11 +5684,11 @@ snapshots:
     dependencies:
       ethers: 5.4.0
 
-  '@safe-global/safe-deployments@1.37.62':
+  '@safe-global/safe-deployments@1.37.63':
     dependencies:
       semver: 7.8.0
 
-  '@safe-global/safe-modules-deployments@3.0.9': {}
+  '@safe-global/safe-modules-deployments@3.0.10': {}
 
   '@safe-global/safe-passkey@0.2.0(ethers@5.4.0)':
     dependencies:

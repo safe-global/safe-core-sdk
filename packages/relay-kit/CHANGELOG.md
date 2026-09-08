@@ -1,5 +1,13 @@
 # @safe-global/relay-kit
 
+## 6.1.1
+
+### Patch Changes
+
+- c754070: Add Mizuhiki (mizuhiki), ADI Testnet (adi-testnet) and Zenith EVM Testnet (zenith-evm-testnet) chain support and bump safe-deployments and safe-modules-deployments
+- Updated dependencies [c754070]
+  - @safe-global/protocol-kit@8.0.7
+
 ## 6.1.0
 
 ### Minor Changes

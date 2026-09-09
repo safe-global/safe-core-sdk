@@ -15,6 +15,10 @@ import { encodeTypedData } from '../eip-712/encode'
 import { asHash, asHex } from '../types'
 import { EMPTY_DATA } from '../constants'
 
+const SIGNATURE_LENGTH_BYTES = 65
+const WORD_HEX_LENGTH = 64
+const BYTE_HEX_LENGTH = 2
+
 export function generatePreValidatedSignature(ownerAddress: string): SafeSignature {
   const signature =
     '0x000000000000000000000000' +
@@ -147,9 +151,49 @@ export const buildContractSignature = async (
   return contractSignature
 }
 
-export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
-  const SIGNATURE_LENGTH_BYTES = 65
+export const extractContractSignatureData = (signature: string): string => {
+  const signatureData = signature.startsWith('0x') ? signature.slice(2) : signature
+  const staticPartHexLength = SIGNATURE_LENGTH_BYTES * BYTE_HEX_LENGTH
 
+  if (signatureData.length < staticPartHexLength + WORD_HEX_LENGTH) {
+    throw new Error('Invalid contract signature')
+  }
+
+  const signatureType = signatureData.slice(
+    staticPartHexLength - BYTE_HEX_LENGTH,
+    staticPartHexLength
+  )
+
+  if (signatureType !== '00') {
+    throw new Error('Invalid contract signature')
+  }
+
+  const dynamicPartOffset = Number(
+    BigInt(`0x${signatureData.slice(WORD_HEX_LENGTH, WORD_HEX_LENGTH * 2)}`)
+  )
+  const dynamicPartOffsetHexLength = dynamicPartOffset * BYTE_HEX_LENGTH
+  const dynamicPartLengthHex = signatureData.slice(
+    dynamicPartOffsetHexLength,
+    dynamicPartOffsetHexLength + WORD_HEX_LENGTH
+  )
+
+  if (dynamicPartLengthHex.length !== WORD_HEX_LENGTH) {
+    throw new Error('Invalid contract signature')
+  }
+
+  const dynamicPartLength = Number(BigInt(`0x${dynamicPartLengthHex}`))
+  const signatureStart = dynamicPartOffsetHexLength + WORD_HEX_LENGTH
+  const signatureEnd = signatureStart + dynamicPartLength * BYTE_HEX_LENGTH
+  const contractSignatureData = signatureData.slice(signatureStart, signatureEnd)
+
+  if (contractSignatureData.length !== dynamicPartLength * BYTE_HEX_LENGTH) {
+    throw new Error('Invalid contract signature')
+  }
+
+  return `0x${contractSignatureData}`
+}
+
+export const buildSignatureBytes = (signatures: SafeSignature[]): string => {
   signatures.sort((left, right) =>
     left.signer.toLowerCase().localeCompare(right.signer.toLowerCase())
   )

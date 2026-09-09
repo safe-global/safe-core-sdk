@@ -35,6 +35,7 @@ If you want to develop using Safe Smart Accounts in a Javascript/Typescript app,
 | Title | Description |
 | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Integrating the Safe{Core} SDK](https://github.com/safe-global/safe-core-sdk/blob/main/guides/integrating-the-safe-core-sdk.md) | This guide shows how to use the [Protocol Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/protocol-kit) and [API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit). |
+| [Batch transactions with MultiSend](https://github.com/safe-global/safe-core-sdk/blob/main/guides/multisend-transactions.md) | How the Protocol Kit and SDK Starter Kit build MultiSend batches when you pass multiple transactions to `createTransaction` / `send`. |
 
 ## Need Help or Have Questions?
 

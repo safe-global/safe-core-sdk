@@ -11,6 +11,7 @@ Software development kit that facilitates the interaction with [Safe Smart Accou
 - [Documentation](#documentation)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [MultiSend / batch transactions](#multisend--batch-transactions)
 - [Need Help or Have Questions?](#need-help-or-have-questions)
 - [Contributing](#contributing)
 - [License](#license)
@@ -61,6 +62,38 @@ const protocolKit = await Safe.init({
   predictedSafe
 })
 ```
+
+## MultiSend / batch transactions
+
+Safe can run several calls in one Safe transaction using MultiSend. Pass more than one item in the `transactions` array to `createTransaction` and the Protocol Kit builds the MultiSend (or MultiSendCallOnly) transaction for you:
+
+```js
+import { MetaTransactionData, OperationType } from '@safe-global/types-kit'
+
+const transactions: MetaTransactionData[] = [
+  {
+    to: '0x...',
+    value: '0',
+    data: '0x...',
+    operation: OperationType.Call // optional
+  },
+  {
+    to: '0x...',
+    value: '0',
+    data: '0x...',
+    operation: OperationType.Call
+  }
+]
+
+const safeTransaction = await protocolKit.createTransaction({
+  transactions
+  // onlyCalls: true by default (MultiSendCallOnly). Set false to allow DelegateCall.
+})
+```
+
+A single-element array is executed as a normal Safe transaction (no MultiSend wrapper). You usually do not need `encodeMultiSendData` directly; it is used internally by `createTransaction`.
+
+For a full walkthrough, see the [MultiSend guide](https://github.com/safe-global/safe-core-sdk/blob/main/guides/multisend-transactions.md) and the [`createTransaction` reference](https://docs.safe.global/reference-sdk-protocol-kit/transactions/createtransaction).
 
 ## Need Help or Have Questions?
 

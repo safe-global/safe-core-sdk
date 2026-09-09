@@ -170,11 +170,11 @@ console.log('Safe Threshold:', await protocolKit.getThreshold())
 
 ## <a name="create-transaction">4. Create a transaction</a>
 
-The Protocol Kit supports the execution of single Safe transactions but also MultiSend transactions. We can create a transaction object by calling the method `createTransaction` in our `Safe` instance.
+The Protocol Kit supports single Safe transactions and MultiSend batches. Create a transaction object by calling `createTransaction` on the `Safe` instance.
 
-This method takes an array of `MetaTransactionData` objects that represent the individual transactions we want to include in our MultiSend transaction. If we want to specify some of the optional properties in our MultiSend transaction, we can pass a second argument to the method `createTransaction` with the `SafeTransactionOptionalProps` object.
+Pass an array of `MetaTransactionData` objects. If the array has more than one item, the kit encodes a MultiSend (or MultiSendCallOnly) transaction automatically. Optional Safe transaction fields go in `options` on the same object. When the array contains only one transaction, it is not wrapped in MultiSend.
 
-When the array contains only one transaction, it is not wrapped in the MultiSend.
+For a dedicated walkthrough (including `onlyCalls` and the Starter Kit), see [Batch transactions with MultiSend](./multisend-transactions.md).
 
 ```js
 import { SafeTransactionOptionalProps } from '@safe-global/protocol-kit'

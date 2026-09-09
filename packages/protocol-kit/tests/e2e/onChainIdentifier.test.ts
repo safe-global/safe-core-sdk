@@ -30,14 +30,26 @@ describe('On-chain analytics', () => {
       const onChainIdentifier = generateOnChainIdentifier({ project, platform, tool, toolVersion })
 
       const identifierPrefix = '5afe'
-      const identifierVersion = '00'
+      const identifierVersion = '01'
+
+      // Hard-coded expected hashes (byte-accurate truncation, identifier version 01)
+      const expectedProjectHash = 'b239ef6cc45f806ddf9a8ae456f26a86add0878d'
+      const expectedPlatformHash = '193dea'
+      const expectedToolHash = 'bfe928'
+      const expectedToolVersionHash = 'b2972c'
 
       chai.expect(onChainIdentifier.startsWith(identifierPrefix)).to.be.true
       chai.expect(onChainIdentifier.substring(4, 6)).to.equals(identifierVersion)
-      chai.expect(onChainIdentifier.substring(6, 46)).to.equals(generateHash(project, 20))
-      chai.expect(onChainIdentifier.substring(46, 52)).to.equals(generateHash(platform, 3))
-      chai.expect(onChainIdentifier.substring(52, 58)).to.equals(generateHash(tool, 3))
-      chai.expect(onChainIdentifier.substring(58, 64)).to.equals(generateHash(toolVersion, 3))
+      chai.expect(onChainIdentifier.substring(6, 46)).to.equals(expectedProjectHash)
+      chai.expect(onChainIdentifier.substring(46, 52)).to.equals(expectedPlatformHash)
+      chai.expect(onChainIdentifier.substring(52, 58)).to.equals(expectedToolHash)
+      chai.expect(onChainIdentifier.substring(58, 64)).to.equals(expectedToolVersionHash)
+
+      // Also confirm generateHash itself matches the byte-accurate vectors
+      chai.expect(generateHash(project, 20)).to.equals(expectedProjectHash)
+      chai.expect(generateHash(platform, 3)).to.equals(expectedPlatformHash)
+      chai.expect(generateHash(tool, 3)).to.equals(expectedToolHash)
+      chai.expect(generateHash(toolVersion, 3)).to.equals(expectedToolVersionHash)
     })
   })
 
@@ -60,7 +72,7 @@ describe('On-chain analytics', () => {
         onchainAnalytics
       })
 
-      const onChainIdentifier = '5afe003861653435366632366138366164643038373864646561393238653366'
+      const onChainIdentifier = '5afe01b239ef6cc45f806ddf9a8ae456f26a86add0878d193deabfe928a73e3f'
 
       chai.expect(onChainIdentifier).to.equals(protocolKit.getOnchainIdentifier())
       stub.restore()
@@ -113,7 +125,7 @@ describe('On-chain analytics', () => {
       const toolHash = generateHash(toolVersion, 3)
 
       const onChainIdentifier =
-        '5afe003861653435366632366138366164643038373864646561393238' + toolHash
+        '5afe01b239ef6cc45f806ddf9a8ae456f26a86add0878d193deabfe928' + toolHash
 
       chai.expect(onChainIdentifier).to.equals(protocolKit.getOnchainIdentifier())
       chai.expect(deploymentTransaction.data.endsWith(onChainIdentifier)).to.be.true
@@ -163,7 +175,7 @@ describe('On-chain analytics', () => {
       const toolHash = generateHash(toolVersion, 3)
 
       const onChainIdentifier =
-        '5afe003861653435366632366138366164643038373864646561393238' + toolHash
+        '5afe01b239ef6cc45f806ddf9a8ae456f26a86add0878d193deabfe928' + toolHash
 
       chai.expect(onChainIdentifier).to.equals(protocolKit.getOnchainIdentifier())
       chai.expect(transaction.input.endsWith(onChainIdentifier)).to.be.true

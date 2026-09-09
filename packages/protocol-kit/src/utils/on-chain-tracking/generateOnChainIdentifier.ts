@@ -9,7 +9,8 @@ import { keccak256, toHex } from 'viem'
  */
 export function generateHash(input: string, size: number): string {
   const fullHash = keccak256(toHex(input))
-  return toHex(fullHash.slice(-size)).replace('0x', '') // Take the last X bytes
+  // Take the last `size` bytes (2 hex characters per byte). fullHash is 0x-prefixed.
+  return fullHash.slice(-size * 2)
 }
 
 export type OnChainIdentifierParamsType = {
@@ -45,7 +46,8 @@ function generateOnChainIdentifier({
   toolVersion
 }: OnChainIdentifierParamsType): string {
   const identifierPrefix = '5afe'
-  const identifierVersion = '00' // first version
+  // Version 01: byte-accurate hash truncation (see #1424). Version 00 used nibble/hex-char truncation.
+  const identifierVersion = '01'
   const projectHash = generateHash(project, 20) // Take the last 20 bytes
   const platformHash = generateHash(platform, 3) // Take the last 3 bytes
   const toolHash = generateHash(tool, 3) // Take the last 3 bytes

@@ -44,3 +44,5 @@ We'll assume that you are familiar with TypeScript (JavaScript), Ethereum and ha
 If you need help, please follow our support guidelines: https://github.com/safe-global/safe-core-sdk/tree/main/SUPPORT.md.
 
 Let's jump into the guide: [Integrating the Safe Core SDK](/guides/integrating-the-safe-core-sdk.md)
+
+For batching multiple calls in one Safe transaction, see [Batch transactions with MultiSend](/guides/multisend-transactions.md).

@@ -26,7 +26,7 @@ export const createSafe4337Pack = async (
 
   const safe4337Pack = await Safe4337Pack.init({
     provider: fixtures.RPC_URL,
-    signer: process.env.PRIVATE_KEY,
+    signer: fixtures.PRIVATE_KEY,
     safeModulesVersion: initOptions.safeModulesVersion,
     options: {
       safeAddress: ''

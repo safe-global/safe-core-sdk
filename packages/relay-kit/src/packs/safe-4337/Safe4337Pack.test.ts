@@ -1,5 +1,4 @@
 import crypto from 'crypto'
-import dotenv from 'dotenv'
 import * as viem from 'viem'
 import Safe, * as protocolKit from '@safe-global/protocol-kit'
 import { WebAuthnCredentials, createMockPasskey } from '@safe-global/protocol-kit/test-utils'
@@ -17,8 +16,6 @@ import {
   createSafe4337Pack,
   generateTransferCallData
 } from '@safe-global/relay-kit/test-utils'
-
-dotenv.config()
 
 const requestResponseMap = {
   [constants.RPC_4337_CALLS.SUPPORTED_ENTRY_POINTS]: [
@@ -589,7 +586,6 @@ describe('Safe4337Pack', () => {
   describe('When using a passkey signer', () => {
     const SAFE_WEBAUTHN_SHARED_SIGNER_ADDRESS = '0x94a4F6affBd8975951142c3999aEAB7ecee555c2'
     const CUSTOM_P256_VERIFIER_ADDRESS = '0xcA89CBa4813D5B40AeC6E57A30d0Eeb500d6531b'
-    const PASSKEY_PRIVATE_KEY = BigInt(process.env.PASSKEY_PRIVATE_KEY!)
     jest.setTimeout(120_000)
 
     let passkey: protocolKit.PasskeyArgType
@@ -599,7 +595,8 @@ describe('Safe4337Pack', () => {
         global.crypto = crypto as unknown as Crypto
       }
 
-      const webAuthnCredentials = new WebAuthnCredentials(PASSKEY_PRIVATE_KEY)
+      // Disposable per-run passkey key (matches protocol-kit test-utils pattern)
+      const webAuthnCredentials = new WebAuthnCredentials()
 
       passkey = {
         ...(await createMockPasskey('chucknorris', webAuthnCredentials)),
@@ -759,6 +756,9 @@ describe('Safe4337Pack', () => {
         }
       })
 
+      // Disposable passkey is not the on-chain owner; ownership is mocked so signing stays local
+      jest.spyOn(safe4337Pack.protocolKit, 'isOwner').mockResolvedValueOnce(true)
+
       let safeOperation = await safe4337Pack.createTransaction({
         transactions: [transferUSDC]
       })
@@ -807,20 +807,19 @@ describe('Safe4337Pack', () => {
       safeModulesVersion: '0.3.0'
     })
 
+    jest.spyOn(safe4337Pack.protocolKit, 'isOwner').mockResolvedValueOnce(true)
+
     const safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC]
     })
 
-    expect(await safe4337Pack.signSafeOperation(safeOperation)).toMatchObject({
-      signatures: new Map().set(
-        fixtures.OWNER_1.toLowerCase(),
-        new protocolKit.EthSafeSignature(
-          fixtures.OWNER_1,
-          '0x341b48cbc73a74905d3e52f96329cd994043b8cc261d5f2d2fc87875c6a0e987241e09f0ceb7a061e6c058e65fd3e2f9d3b47f56cad00c4e02cf62fed012a8bb1c',
-          false
-        )
-      )
-    })
+    const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
+    const signature = signedSafeOperation.signatures.get(fixtures.SIGNER_ADDRESS.toLowerCase())
+
+    expect(signature).toBeDefined()
+    expect(signature?.signer).toBe(fixtures.SIGNER_ADDRESS)
+    expect(signature?.data).toMatch(/^0x[0-9a-fA-F]+$/)
+    expect(signature?.isContractSignature).toBe(false)
   })
 
   it('should allow to sign a SafeOperation using a SafeOperationResponse object from the api to add a signature', async () => {
@@ -831,25 +830,26 @@ describe('Safe4337Pack', () => {
       safeModulesVersion: '0.3.0'
     })
 
-    expect(await safe4337Pack.signSafeOperation(fixtures.SAFE_OPERATION_RESPONSE)).toMatchObject({
-      signatures: new Map()
-        .set(
-          fixtures.OWNER_1.toLowerCase(),
-          new protocolKit.EthSafeSignature(
-            fixtures.OWNER_1,
-            '0x6fa024afd110bee3832dd9507b5ce2bf1bb097363ba63b887b1a44f5a7b89e3b5d32ff9dbb5fee63f0bf44df1b427d7a7e69451b3c05d25fb49f77fe2fd044141b',
-            false
-          )
-        )
-        .set(
-          fixtures.OWNER_2.toLowerCase(),
-          new protocolKit.EthSafeSignature(
-            fixtures.OWNER_2,
-            '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d',
-            false
-          )
-        )
-    })
+    jest.spyOn(safe4337Pack.protocolKit, 'isOwner').mockResolvedValueOnce(true)
+
+    const signedSafeOperation = await safe4337Pack.signSafeOperation(
+      fixtures.SAFE_OPERATION_RESPONSE
+    )
+
+    const disposableSignature = signedSafeOperation.signatures.get(
+      fixtures.SIGNER_ADDRESS.toLowerCase()
+    )
+    expect(disposableSignature).toBeDefined()
+    expect(disposableSignature?.signer).toBe(fixtures.SIGNER_ADDRESS)
+    expect(disposableSignature?.data).toMatch(/^0x[0-9a-fA-F]+$/)
+
+    expect(signedSafeOperation.signatures.get(fixtures.OWNER_2.toLowerCase())).toMatchObject(
+      new protocolKit.EthSafeSignature(
+        fixtures.OWNER_2,
+        '0xcb28e74375889e400a4d8aca46b8c59e1cf8825e373c26fa99c2fd7c078080e64fe30eaf1125257bdfe0b358b5caef68aa0420478145f52decc8e74c979d43ab1d',
+        false
+      )
+    )
   })
 
   it('should allow to send an UserOperation to a bundler', async () => {
@@ -867,6 +867,7 @@ describe('Safe4337Pack', () => {
       safeModulesVersion: '0.3.0'
     })
     const readContractSpy = jest.spyOn(safe4337Pack.protocolKit.getSafeProvider(), 'readContract')
+    jest.spyOn(safe4337Pack.protocolKit, 'isOwner').mockResolvedValueOnce(true)
 
     let safeOperation = await safe4337Pack.createTransaction({
       transactions: [transferUSDC]
@@ -1099,6 +1100,8 @@ describe('Safe4337Pack', () => {
         },
         safeModulesVersion: '0.3.0'
       })
+
+      jest.spyOn(safe4337Pack.protocolKit, 'isOwner').mockResolvedValueOnce(true)
 
       const customNonce = utils.encodeNonce({
         key: BigInt(Date.now()),

@@ -1,5 +1,13 @@
 # @safe-global/relay-kit
 
+## 6.1.2
+
+### Patch Changes
+
+- d0b426a: Bump @safe-global/safe-deployments and @safe-global/safe-modules-deployments to the latest versions
+- Updated dependencies [d0b426a]
+  - @safe-global/protocol-kit@8.0.8
+
 ## 6.1.1
 
 ### Patch Changes

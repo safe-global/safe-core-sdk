@@ -156,26 +156,6 @@ This script shows how to create a Safe Operation and store it using the Safe Tra
 pnpm play userop-api-kit-interoperability
 ```
 
-#### Relay a transaction using Gelato
-
-> **Deprecated:** `GelatoRelayPack` will be removed in the next major version of the relay-kit. Use the `Safe4337Pack` scripts above instead.
-
-In case you want to execute the transaction via a transaction relay, this script allows to do that, where the fees are extracted from the Safe balance:
-
-```bash
-pnpm play gelato-paid-transaction
-```
-
-#### Relay an sponsored transaction using Gelato
-
-> **Deprecated:** `GelatoRelayPack` will be removed in the next major version of the relay-kit. Use the `Safe4337Pack` scripts above instead.
-
-In case you want to execute the transaction via a transaction relay, this script allows to to that, where the fees are extracted from a third party account balance that sponsors the transaction:
-
-```bash
-pnpm play gelato-sponsored-transaction
-```
-
 ### `sdk-starter-kit`
 
 #### Create and execute a transaction

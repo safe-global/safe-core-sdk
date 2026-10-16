@@ -1,5 +1,11 @@
 # @safe-global/protocol-kit
 
+## 8.0.8
+
+### Patch Changes
+
+- d0b426a: Bump @safe-global/safe-deployments and @safe-global/safe-modules-deployments to the latest versions
+
 ## 8.0.7
 
 ### Patch Changes

@@ -41,6 +41,14 @@ export interface SafeApiKitConfig {
 
 type QueryParams = Record<string, string | number | boolean | bigint | undefined>
 
+const trimTrailingSlashes = (url: string): string => {
+  let end = url.length
+  while (end > 0 && url[end - 1] === '/') {
+    end--
+  }
+  return url.slice(0, end)
+}
+
 class SafeApiKit {
   #chainId: bigint
   #apiKey?: string
@@ -59,7 +67,7 @@ class SafeApiKit {
           'apiKey is mandatory when using api.safe.global or api.5afe.dev domains. Please obtain your API key at https://developer.safe.global.'
         )
       }
-      this.#queueServiceBaseUrl = queueServiceUrl.replace(/\/+$/, '')
+      this.#queueServiceBaseUrl = trimTrailingSlashes(queueServiceUrl)
     } else {
       // If queueServiceUrl is not defined, apiKey is mandatory
       if (!apiKey) {

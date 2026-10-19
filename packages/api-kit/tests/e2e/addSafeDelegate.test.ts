@@ -15,7 +15,7 @@ let signer: AddSafeDelegateProps['signer']
 let delegatorAddress: Address
 
 const { address: safeAddress, version } = getSafe()
-const PRIVATE_KEY = '0xb0057716d5917badaf911b193b12b910811c1497b5bada8d7711f758981c3773'
+const delegateAddress = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
 describe(`[${version}] addSafeDelegate`, () => {
   before(() => {
     safeApiKit = getApiKit()
@@ -28,21 +28,18 @@ describe(`[${version}] addSafeDelegate`, () => {
   })
 
   // Always runs (even on failure), so a failed assertion can't orphan the delegate.
-  // The Safe self-recovers after one run.
+  // The delegate is removed from both the Safe scope and the "all Safes" scope.
   afterEach(async () => {
-    try {
-      await safeApiKit.removeSafeDelegate({
-        delegateAddress: '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B',
-        delegatorAddress,
-        signer
-      })
-    } catch {
-      // nothing to remove (e.g. a validation test that added no delegate)
+    for (const scope of [{ safeAddress }, {}]) {
+      try {
+        await safeApiKit.removeSafeDelegate({ ...scope, delegateAddress, delegatorAddress, signer })
+      } catch {
+        // nothing to remove (e.g. a validation test that added no delegate)
+      }
     }
   })
 
   it('should fail if Label is empty', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -55,9 +52,8 @@ describe(`[${version}] addSafeDelegate`, () => {
   })
 
   it('should fail if Safe delegate address is empty', async () => {
-    const delegateAddress = ''
     const delegateConfig: AddSafeDelegateProps = {
-      delegateAddress,
+      delegateAddress: '',
       delegatorAddress,
       signer,
       label: 'Label'
@@ -68,11 +64,9 @@ describe(`[${version}] addSafeDelegate`, () => {
   })
 
   it('should fail if Safe delegator address is empty', async () => {
-    const delegateAddress = '0xe4bb611E4e4164D54Ad7361B9d58b0A1eBD462B8'
-    const delegatorAddress = ''
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
-      delegatorAddress,
+      delegatorAddress: '',
       signer,
       label: 'Label'
     }
@@ -81,89 +75,31 @@ describe(`[${version}] addSafeDelegate`, () => {
       .to.be.rejectedWith('Invalid Safe delegator address')
   })
 
-  it('should fail if Safe address is not checksummed', async () => {
-    const lowercaseSafeAddress = safeAddress.toLowerCase()
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
+  it('should fail if the delegate is the same as the delegator', async () => {
     const delegateConfig: AddSafeDelegateProps = {
-      safeAddress: lowercaseSafeAddress,
-      delegateAddress,
+      safeAddress,
+      delegateAddress: delegatorAddress,
       delegatorAddress,
       signer,
       label: 'Label'
     }
     await chai
       .expect(safeApiKit.addSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Address ${lowercaseSafeAddress} is not checksumed`)
+      .to.be.rejectedWith('Delegate cannot be the same as delegator')
   })
 
-  it('should fail if Safe delegate address is not checksummed', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
+  it('should fail if the signature does not belong to the delegator', async () => {
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
-      delegatorAddress,
+      delegatorAddress: '0xe4bb611E4e4164D54Ad7361B9d58b0A1eBD462B8',
       signer,
       label: 'Label'
     }
-    await chai
-      .expect(safeApiKit.addSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Address ${delegateAddress} is not checksumed`)
-  })
-
-  it('should fail if Safe delegator address is not checksummed', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddressLowerCase = delegatorAddress.toLowerCase()
-    const delegateConfig: AddSafeDelegateProps = {
-      safeAddress,
-      delegateAddress,
-      delegatorAddress: delegatorAddressLowerCase,
-      signer,
-      label: 'Label'
-    }
-    await chai
-      .expect(safeApiKit.addSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Address ${delegatorAddressLowerCase} is not checksumed`)
-  })
-
-  it('should fail if Safe does not exist', async () => {
-    const safeAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegateConfig: AddSafeDelegateProps = {
-      safeAddress,
-      delegateAddress,
-      delegatorAddress,
-      signer,
-      label: 'Label'
-    }
-    await chai
-      .expect(safeApiKit.addSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Safe=${safeAddress} does not exist or it's still not indexed`)
-  })
-
-  it('should fail if the signer is not an owner of the Safe', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const nonOwnerSigner = createWalletClient({
-      chain: sepolia,
-      transport: http(),
-      account: privateKeyToAccount(PRIVATE_KEY)
-    })
-    const delegatorAddress = nonOwnerSigner.account.address
-    const delegateConfig: AddSafeDelegateProps = {
-      safeAddress,
-      delegateAddress,
-      delegatorAddress,
-      signer: nonOwnerSigner,
-      label: 'Label'
-    }
-    await chai
-      .expect(safeApiKit.addSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(
-        `Provided delegator=${delegatorAddress} is not an owner of Safe=${safeAddress}`
-      )
+    await chai.expect(safeApiKit.addSafeDelegate(delegateConfig)).to.be.rejected
   })
 
   it('should add a new delegate', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegateConfig: AddSafeDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -175,10 +111,12 @@ describe(`[${version}] addSafeDelegate`, () => {
 
     chai.expect(initialDelegates.length).to.be.eq(0)
     const delegateResponse = await safeApiKit.addSafeDelegate(delegateConfig)
-    chai.expect(delegateResponse.safe).to.be.equal(delegateConfig.safeAddress)
-    chai.expect(delegateResponse.delegate).to.be.equal(delegateConfig.delegateAddress)
-    chai.expect(delegateResponse.delegator).to.be.equal(delegateConfig.delegatorAddress)
-    chai.expect(delegateResponse.signature).to.be.a('string')
+    chai.expect(delegateResponse.safe?.toLowerCase()).to.be.equal(safeAddress.toLowerCase())
+    chai.expect(delegateResponse.delegate.toLowerCase()).to.be.equal(delegateAddress.toLowerCase())
+    chai
+      .expect(delegateResponse.delegator.toLowerCase())
+      .to.be.equal(delegatorAddress.toLowerCase())
+    chai.expect(delegateResponse.chainId).to.be.equal(config.CHAIN_ID.toString())
     chai.expect(delegateResponse.label).to.be.equal(delegateConfig.label)
     const { results: finalDelegates } = await safeApiKit.getSafeDelegates({ safeAddress })
     chai.expect(finalDelegates.length).to.be.eq(1)
@@ -186,7 +124,6 @@ describe(`[${version}] addSafeDelegate`, () => {
   })
 
   it('should add a new delegate without specifying a Safe', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegateConfig: AddSafeDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -199,9 +136,11 @@ describe(`[${version}] addSafeDelegate`, () => {
     })
     chai.expect(initialDelegates.length).to.be.eq(0)
     const delegateResponse = await safeApiKit.addSafeDelegate(delegateConfig)
-    chai.expect(delegateResponse.delegate).to.be.equal(delegateConfig.delegateAddress)
-    chai.expect(delegateResponse.delegator).to.be.equal(delegateConfig.delegatorAddress)
-    chai.expect(delegateResponse.signature).to.be.a('string')
+    chai.expect(delegateResponse.safe).to.be.null
+    chai.expect(delegateResponse.delegate.toLowerCase()).to.be.equal(delegateAddress.toLowerCase())
+    chai
+      .expect(delegateResponse.delegator.toLowerCase())
+      .to.be.equal(delegatorAddress.toLowerCase())
     chai.expect(delegateResponse.label).to.be.equal(delegateConfig.label)
     const { results: finalDelegates } = await safeApiKit.getSafeDelegates({
       delegateAddress,
@@ -213,7 +152,6 @@ describe(`[${version}] addSafeDelegate`, () => {
 
   it('should add a new delegate EIP-3770', async () => {
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
     const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
     const delegateConfig: AddSafeDelegateProps = {
@@ -229,10 +167,11 @@ describe(`[${version}] addSafeDelegate`, () => {
 
     chai.expect(initialDelegates.length).to.be.eq(0)
     const delegateResponse = await safeApiKit.addSafeDelegate(delegateConfig)
-    chai.expect(delegateResponse.safe).to.be.equal(safeAddress)
-    chai.expect(delegateResponse.delegate).to.be.equal(delegateAddress)
-    chai.expect(delegateResponse.delegator).to.be.equal(delegatorAddress)
-    chai.expect(delegateResponse.signature).to.be.a('string')
+    chai.expect(delegateResponse.safe?.toLowerCase()).to.be.equal(safeAddress.toLowerCase())
+    chai.expect(delegateResponse.delegate.toLowerCase()).to.be.equal(delegateAddress.toLowerCase())
+    chai
+      .expect(delegateResponse.delegator.toLowerCase())
+      .to.be.equal(delegatorAddress.toLowerCase())
     chai.expect(delegateResponse.label).to.be.equal(delegateConfig.label)
     const { results: finalDelegates } = await safeApiKit.getSafeDelegates({
       safeAddress: eip3770SafeAddress

@@ -97,16 +97,18 @@ export class SafeClient extends BaseClient {
     const safeAddress = await this.protocolKit.getAddress()
     let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
 
-    if (transactionResponse.isExecuted) {
+    if (transactionResponse.txHash) {
       return createSafeClientResult({
         status: SafeClientTxStatus.EXECUTED,
         safeAddress,
-        txHash: transactionResponse.transactionHash || '',
+        txHash: transactionResponse.txHash,
         safeTxHash
       })
     }
 
-    if (this.#needsConfirmation(transactionResponse)) {
+    const threshold = await this.protocolKit.getThreshold()
+
+    if (this.#needsConfirmation(transactionResponse, threshold)) {
       const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
       const signature = signedTransaction.encodedSignatures()
 
@@ -115,7 +117,7 @@ export class SafeClient extends BaseClient {
       transactionResponse = await this.apiKit.getTransaction(safeTxHash)
     }
 
-    if (!this.#needsConfirmation(transactionResponse)) {
+    if (!this.#needsConfirmation(transactionResponse, threshold)) {
       const executedTransactionResponse: TransactionResult =
         await this.protocolKit.executeTransaction(transactionResponse)
 
@@ -278,10 +280,11 @@ export class SafeClient extends BaseClient {
     })
   }
 
-  #needsConfirmation(transactionResponse: SafeMultisigTransactionResponse): boolean {
-    return (
-      (transactionResponse.confirmations?.length || 0) < transactionResponse.confirmationsRequired
-    )
+  #needsConfirmation(
+    transactionResponse: SafeMultisigTransactionResponse,
+    threshold: number
+  ): boolean {
+    return (transactionResponse.confirmations?.length || 0) < threshold
   }
 
   async #reconnectSafe(): Promise<void> {

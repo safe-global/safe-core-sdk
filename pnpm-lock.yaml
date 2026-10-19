@@ -288,9 +288,6 @@ importers:
       '@safe-global/protocol-kit':
         specifier: workspace:^
         version: link:../protocol-kit
-      '@safe-global/relay-kit':
-        specifier: workspace:^
-        version: link:../relay-kit
       '@safe-global/types-kit':
         specifier: workspace:^
         version: link:../types-kit

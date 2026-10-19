@@ -28,7 +28,7 @@ export class SafeMessageClient {
   }
 
   /**
-   * Send off-chain messages using the Transaction service
+   * Send off-chain messages using the Safe Queue Service
    *
    * @param {SendOffChainMessageProps} props The message properties
    * @param {string | EIP712TypedData} props.message The message to be sent. Can be a raw string or an EIP712TypedData object
@@ -46,7 +46,7 @@ export class SafeMessageClient {
   }
 
   /**
-   * Confirms an off-chain message using the Transaction service
+   * Confirms an off-chain message using the Safe Queue Service
    *
    * @param {ConfirmOffChainMessageProps} props The confirmation properties
    * @param {string} props.messageHash The messageHash. Returned from the sendMessage() method inside the SafeClientResult messages property
@@ -86,7 +86,7 @@ export class SafeMessageClient {
   }
 
   /**
-   * Deploys a new Safe account based on the provided config and adds a message using the Transaction service
+   * Deploys a new Safe account based on the provided config and adds a message using the Safe Queue Service
    * - If the Safe threshold > 1, we need to deploy the Safe account first and afterwards add the message
    *   The message should be confirmed with other owners using the confirmMessage() method until the threshold is reached in order to be valid
    * - If the threshold = 1, we can deploy the Safe account and add the message in one step. The message will be valid immediately
@@ -132,7 +132,7 @@ export class SafeMessageClient {
   }
 
   /**
-   * Add a new off-chain message using the Transaction service
+   * Add a new off-chain message using the Safe Queue Service
    * - If the threshold > 1, remember to confirmMessage() after sendMessage()
    * - If the threshold = 1, then the message is confirmed and valid immediately
    *

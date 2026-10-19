@@ -1,6 +1,7 @@
 export enum HttpMethod {
   Get = 'get',
   Post = 'post',
+  Patch = 'patch',
   Delete = 'delete'
 }
 
@@ -20,6 +21,33 @@ export class HttpError extends Error {
     this.statusCode = statusCode
     this.data = data
   }
+}
+
+type FieldError = { loc?: Array<string | number>; msg: string }
+
+/**
+ * Builds the error message of a failed request.
+ * The Safe Queue Service returns `{ detail: string }` for rejected data and `{ detail: FieldError[] }` for malformed requests.
+ */
+function getErrorMessage(jsonResponse: any): string | undefined {
+  const { detail, message } = jsonResponse ?? {}
+
+  if (typeof detail === 'string') {
+    return detail
+  }
+  if (Array.isArray(detail)) {
+    return detail
+      .map((error: FieldError) => {
+        const location = error.loc?.filter((part) => part !== 'body').join('.')
+        return location ? `${location}: ${error.msg}` : error.msg
+      })
+      .join('; ')
+  }
+  if (typeof message === 'string') {
+    return message
+  }
+
+  return undefined
 }
 
 export async function sendRequest<T>(
@@ -54,28 +82,12 @@ export async function sendRequest<T>(
     } catch {
       throw new HttpError(response.status, response.statusText, undefined)
     }
-    if (jsonResponse.data) {
-      throw new HttpError(response.status, jsonResponse.data, jsonResponse)
-    }
-    if (jsonResponse.detail) {
-      throw new HttpError(response.status, jsonResponse.detail, jsonResponse)
-    }
-    if (jsonResponse.message) {
-      throw new HttpError(response.status, jsonResponse.message, jsonResponse)
-    }
-    if (jsonResponse.nonFieldErrors) {
-      throw new HttpError(response.status, jsonResponse.nonFieldErrors, jsonResponse)
-    }
-    if (jsonResponse.delegate) {
-      throw new HttpError(response.status, jsonResponse.delegate, jsonResponse)
-    }
-    if (jsonResponse.safe) {
-      throw new HttpError(response.status, jsonResponse.safe, jsonResponse)
-    }
-    if (jsonResponse.delegator) {
-      throw new HttpError(response.status, jsonResponse.delegator, jsonResponse)
-    }
-    throw new HttpError(response.status, response.statusText, jsonResponse)
+
+    throw new HttpError(
+      response.status,
+      getErrorMessage(jsonResponse) ?? response.statusText,
+      jsonResponse
+    )
   }
 
   if (!text) {

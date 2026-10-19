@@ -68,7 +68,7 @@ pnpm play validate-signatures
 
 #### Propose a transaction
 
-This script allows a signer of a Safe to share a transaction with the other signers by submitting it to the Safe Transaction Service first:
+This script allows a signer of a Safe to share a transaction with the other signers by submitting it to the Safe Queue Service first:
 
 ```bash
 pnpm play propose-transaction
@@ -76,7 +76,7 @@ pnpm play propose-transaction
 
 #### Confirm a transaction
 
-This script allows a signer of a Safe to get a proposed transaction from the Safe Transaction Service and confirm it by signing it and submitting its signature:
+This script allows a signer of a Safe to get a proposed transaction from the Safe Queue Service and confirm it by signing it and submitting its signature:
 
 ```bash
 pnpm play confirm-transaction
@@ -84,7 +84,7 @@ pnpm play confirm-transaction
 
 #### Execute a transaction
 
-Once there are enough signatures collected for a given transaction in the Safe Transaction Service, this script allows any account to get the transaction and execute it:
+Once there are enough signatures collected for a given transaction in the Safe Queue Service, this script allows any account to get the transaction and execute it:
 
 ```bash
 pnpm play execute-transaction
@@ -148,14 +148,6 @@ This script showcases how to execute multiple User Operations in parallel by usi
 pnpm play userop-parallel-execution
 ```
 
-#### Api kit interoperability
-
-This script shows how to create a Safe Operation and store it using the Safe Transaction Service. This process orchestrates signatures from additional owners before bundle the User Operation and send it to provider bundler services:
-
-```bash
-pnpm play userop-api-kit-interoperability
-```
-
 #### Relay a transaction using Gelato
 
 > **Deprecated:** `GelatoRelayPack` will be removed in the next major version of the relay-kit. Use the `Safe4337Pack` scripts above instead.
@@ -180,23 +172,15 @@ pnpm play gelato-sponsored-transaction
 
 #### Create and execute a transaction
 
-This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute a transaction and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the transactions in case more than one owner signature is required:
+This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute a transaction and deploy the Safe account if it does not exist. Internally it uses the Safe Queue Service to propose and confirm the transactions in case more than one owner signature is required:
 
 ```bash
 pnpm play send-transactions
 ```
 
-#### Create and execute Safe Operations
-
-This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute a Safe Operation and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the Safe Operations in case more than one owner signature is required:
-
-```bash
-pnpm play send-safe-operation
-```
-
 #### Create and execute on-chain messages
 
-This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute on-chain messages and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the on-chain messages (that are basically regular transactions) in case more than one owner signature is required:
+This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute on-chain messages and deploy the Safe account if it does not exist. Internally it uses the Safe Queue Service to propose and confirm the on-chain messages (that are basically regular transactions) in case more than one owner signature is required:
 
 ```bash
 pnpm play send-on-chain-message
@@ -204,7 +188,7 @@ pnpm play send-on-chain-message
 
 #### Create and execute off-chain messages
 
-This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute off-chain messages and deploy the Safe account if it does not exist. Internally it use the Safe Transaction Service to propose and confirm the off-chain messages in case more than one owner signature is required:
+This script demonstrates how to use the `sdk-starter-kit` to create, sign, and execute off-chain messages and deploy the Safe account if it does not exist. Internally it uses the Safe Queue Service to propose and confirm the off-chain messages in case more than one owner signature is required:
 
 ```bash
 pnpm play send-off-chain-message

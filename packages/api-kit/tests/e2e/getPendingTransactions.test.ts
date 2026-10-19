@@ -20,15 +20,8 @@ describe('getPendingTransactions', () => {
       .to.be.rejectedWith('Invalid Safe address')
   })
 
-  it('should fail if safeAddress is not checksummed', async () => {
-    const safeAddress = '0xF8ef84392f7542576F6b9d1b140334144930Ac78'.toLowerCase()
-    await chai
-      .expect(safeApiKit.getPendingTransactions(safeAddress))
-      .to.be.rejectedWith('Checksum address validation failed')
-  })
-
   it('should return an empty list if there are no pending transactions', async () => {
-    const safeAddress = '0xDa8dd250065F19f7A29564396D7F13230b9fC5A3' // Safe without pending transaction
+    const safeAddress = '0x513697456eDb113aDCAA1bbDA5bE59D9D7A2efd1' // Safe without pending transactions
     const transactionList = await safeApiKit.getPendingTransactions(safeAddress)
     chai.expect(transactionList.count).to.be.equal(0)
     chai.expect(transactionList.results.length).to.be.equal(0)
@@ -39,6 +32,10 @@ describe('getPendingTransactions', () => {
     const transactionList = await safeApiKit.getPendingTransactions(safeAddress)
     chai.expect(transactionList.count).to.be.equal(10)
     chai.expect(transactionList.results.length).to.be.equal(10)
+    transactionList.results.forEach((transaction) => {
+      chai.expect(transaction.txHash).to.be.null
+      chai.expect(transaction.safe.toLowerCase()).to.be.equal(safeAddress.toLowerCase())
+    })
   })
 
   it('should return the the transaction list EIP-3770', async () => {
@@ -69,5 +66,15 @@ describe('getPendingTransactions', () => {
     chai.expect(transactionList).to.have.property('count').greaterThan(1)
     chai.expect(transactionList).to.have.property('results').to.be.an('array')
     chai.expect(transactionList.results.length).to.be.lessThanOrEqual(transactionList.count - 1)
+  })
+
+  it('should order the transactions by descending nonce with nonceOrder = desc', async () => {
+    const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
+    const { results } = await safeApiKit.getPendingTransactions(safeAddress, {
+      nonceOrder: 'desc'
+    })
+
+    const nonces = results.map((transaction) => BigInt(transaction.nonce))
+    chai.expect([...nonces].sort((a, b) => (a > b ? -1 : 1))).to.deep.equal(nonces)
   })
 })

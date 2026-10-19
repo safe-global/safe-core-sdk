@@ -14,8 +14,13 @@ describe('getMessage', () => {
     safeApiKit = getApiKit()
   })
 
-  it('should fail if safeAddress is empty', async () => {
+  it('should fail if messageHash is empty', async () => {
     await chai.expect(safeApiKit.getMessage('')).to.be.rejectedWith('Invalid messageHash')
+  })
+
+  it('should fail if the message does not exist', async () => {
+    const messageHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480b'
+    await chai.expect(safeApiKit.getMessage(messageHash)).to.be.rejected
   })
 
   it('should get the message given a message hash', async () => {

@@ -34,12 +34,12 @@ async function main() {
   const signature = await protocolKit.signHash(safeTxHash)
 
   // Confirm the Safe transaction
-  const signatureResponse = await apiKit.confirmTransaction(safeTxHash, signature.data)
+  const [confirmation] = await apiKit.confirmTransaction(safeTxHash, signature.data)
 
   const signerAddress = await protocolKit.getSafeProvider().getSignerAddress()
-  console.log('Added a new signature to transaction with safeTxGas:', SAFE_TX_HASH)
+  console.log('Added a new signature to transaction with safeTxHash:', SAFE_TX_HASH)
   console.log('- Signer:', signerAddress)
-  console.log('- Signer signature:', signatureResponse.signature)
+  console.log('- Signer signature:', confirmation.signature)
 }
 
 main()

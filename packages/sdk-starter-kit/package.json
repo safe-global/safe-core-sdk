@@ -47,7 +47,6 @@
   "dependencies": {
     "@safe-global/api-kit": "workspace:^",
     "@safe-global/protocol-kit": "workspace:^",
-    "@safe-global/relay-kit": "workspace:^",
     "@safe-global/types-kit": "workspace:^",
     "viem": "^2.52.2"
   }

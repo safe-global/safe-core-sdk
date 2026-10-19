@@ -207,13 +207,14 @@ export const SignatureTypes = {
 
 export type SignatureType = (typeof SignatureTypes)[keyof typeof SignatureTypes]
 
+export type ProposalRoute = 'UNKNOWN' | 'OWNER' | 'DELEGATE' | 'NESTED_OWNER'
+
 export type SafeMultisigConfirmationResponse = {
   readonly owner: string
-  readonly submissionDate: string
-  readonly transactionHash?: string
-  readonly confirmationType?: string
   readonly signature: string
   readonly signatureType: SignatureType
+  readonly created: string
+  readonly modified: string
 }
 
 export type ListResponse<T> = {
@@ -222,7 +223,6 @@ export type ListResponse<T> = {
   readonly previous?: string
   readonly results: T[]
 }
-export type SafeMultisigConfirmationListResponse = ListResponse<SafeMultisigConfirmationResponse>
 
 export type DataDecoded = {
   readonly method: string
@@ -242,39 +242,34 @@ export type ValueDecoded = MetaTransactionData & {
 }
 
 export type SafeMultisigTransactionResponse = {
+  readonly safeTxHash: string
+  readonly chainId: string
   readonly safe: string
-  readonly to: string
+  readonly nonce: string
+  /** Address credited with the proposal: the signer for `OWNER`, the delegating owner for `DELEGATE`, the owner Safe for `NESTED_OWNER` */
+  readonly proposer: string | null
+  /** How the proposal was authenticated */
+  readonly proposedVia: ProposalRoute
+  /** Address that actually signed the proposal, set only when it differs from `proposer` (`DELEGATE` and `NESTED_OWNER`) */
+  readonly proposedBy: string | null
+  readonly to: string | null
   readonly value: string
-  readonly data?: string
+  readonly data: string | null
   readonly operation: number
-  readonly gasToken: string
   readonly safeTxGas: string
   readonly baseGas: string
   readonly gasPrice: string
-  readonly refundReceiver?: string
-  readonly nonce: string
-  readonly executionDate: string | null
-  readonly submissionDate: string
+  readonly gasToken: string | null
+  readonly refundReceiver: string | null
+  readonly failed: boolean | null
+  readonly notes: string | null
+  readonly originName: string | null
+  readonly originUrl: string | null
+  /** Hash of the Ethereum transaction that executed the Safe transaction. `null` while it is not executed */
+  readonly txHash: string | null
+  readonly created: string
   readonly modified: string
-  readonly blockNumber: number | null
-  readonly transactionHash: string | null
-  readonly safeTxHash: string
-  readonly executor: string | null
-  readonly proposer: string | null
-  readonly proposedByDelegate: string | null
-  readonly isExecuted: boolean
-  readonly isSuccessful: boolean | null
-  readonly ethGasPrice: string | null
-  readonly maxFeePerGas: string | null
-  readonly maxPriorityFeePerGas: string | null
-  readonly gasUsed: number | null
-  readonly fee: string | null
-  readonly origin: string
-  readonly dataDecoded?: DataDecoded
-  readonly confirmationsRequired: number
-  readonly confirmations?: SafeMultisigConfirmationResponse[]
-  readonly trusted: boolean
-  readonly signatures: string | null
+  readonly confirmations: SafeMultisigConfirmationResponse[]
 }
 
 export interface RelayTransaction {

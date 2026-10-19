@@ -6,14 +6,15 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import config from '../utils/config'
 import { getApiKit } from '../utils/setupKits'
+import { getSafe, PRIVATE_KEY_1 as PRIVATE_KEY } from 'tests/helpers/safe'
 
 chai.use(chaiAsPromised)
-
-const PRIVATE_KEY = '0x83a415ca62e11f5fa5567e98450d0f82ae19ff36ef876c10a8d448c788a53676'
 
 let safeApiKit: SafeApiKit
 let signer: DeleteSafeDelegateProps['signer']
 let delegatorAddress: Address
+
+const { address: safeAddress } = getSafe()
 
 describe('removeSafeDelegate', () => {
   before(() => {
@@ -51,31 +52,6 @@ describe('removeSafeDelegate', () => {
       .to.be.rejectedWith('Invalid Safe delegator address')
   })
 
-  it('should fail if Safe delegate address is not checksummed', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'.toLowerCase()
-    const delegateConfig: DeleteSafeDelegateProps = {
-      delegateAddress,
-      delegatorAddress,
-      signer
-    }
-    await chai
-      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Checksum address validation failed`)
-  })
-
-  it('should fail if Safe delegator address is not checksummed', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
-    const delegatorAddressLowerCase = delegatorAddress.toLowerCase()
-    const delegateConfig: DeleteSafeDelegateProps = {
-      delegateAddress,
-      delegatorAddress: delegatorAddressLowerCase,
-      signer
-    }
-    await chai
-      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
-      .to.be.rejectedWith(`Address ${delegatorAddressLowerCase} is not checksumed`)
-  })
-
   it('should fail if the delegate to remove is not a delegate', async () => {
     const delegateAddress = '0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e'
     const delegateConfig: DeleteSafeDelegateProps = {
@@ -83,7 +59,9 @@ describe('removeSafeDelegate', () => {
       delegatorAddress,
       signer
     }
-    await chai.expect(safeApiKit.removeSafeDelegate(delegateConfig)).to.be.rejectedWith('Not Found')
+    await chai
+      .expect(safeApiKit.removeSafeDelegate(delegateConfig))
+      .to.be.rejectedWith('No matching delegates found')
   })
 
   it('should remove a delegate', async () => {
@@ -103,6 +81,28 @@ describe('removeSafeDelegate', () => {
     const { results: finalDelegates } = await safeApiKit.getSafeDelegates({
       delegateAddress,
       delegatorAddress
+    })
+    chai.expect(finalDelegates.length).to.be.eq(0)
+  })
+
+  it('should remove a delegate scoped to a Safe', async () => {
+    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
+    const delegateConfig: DeleteSafeDelegateProps = {
+      safeAddress,
+      delegateAddress,
+      delegatorAddress,
+      signer
+    }
+    await safeApiKit.addSafeDelegate({ ...delegateConfig, label: 'Label' })
+    const { results: initialDelegates } = await safeApiKit.getSafeDelegates({
+      safeAddress,
+      delegateAddress
+    })
+    chai.expect(initialDelegates.length).to.be.eq(1)
+    await safeApiKit.removeSafeDelegate(delegateConfig)
+    const { results: finalDelegates } = await safeApiKit.getSafeDelegates({
+      safeAddress,
+      delegateAddress
     })
     chai.expect(finalDelegates.length).to.be.eq(0)
   })

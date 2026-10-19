@@ -187,10 +187,33 @@ describe('SafeClient', () => {
   })
 
   describe('confirm', () => {
+    beforeEach(() => {
+      protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
+    })
+
+    it('should return the executed transaction if it was already executed', async () => {
+      const TRANSACTION_RESPONSE = { txHash: ETHEREUM_TX_HASH, confirmations: [] }
+
+      apiKit.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
+
+      const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
+
+      expect(apiKit.confirmTransaction).not.toHaveBeenCalled()
+      expect(protocolKit.executeTransaction).not.toHaveBeenCalled()
+      expect(result).toMatchObject({
+        description: MESSAGES[SafeClientTxStatus.EXECUTED],
+        safeAddress: SAFE_ADDRESS,
+        status: SafeClientTxStatus.EXECUTED,
+        transactions: {
+          ethereumTxHash: ETHEREUM_TX_HASH,
+          safeTxHash: SAFE_TX_HASH
+        }
+      })
+    })
+
     it('should execute the transaction after reaching the threshold with the confirmation', async () => {
       const TRANSACTION_RESPONSE = {
-        confirmations: [{ signature: '0x1' }],
-        confirmationsRequired: 2
+        confirmations: [{ signature: '0x1' }]
       }
 
       const CONFIRMED_TRANSACTION_RESPONSE = {
@@ -222,8 +245,7 @@ describe('SafeClient', () => {
 
     it('should execute the transaction without confirmation if it already has enough signatures', async () => {
       const TRANSACTION_RESPONSE = {
-        confirmations: [{ signature: '0x1' }, { signature: '0x2' }],
-        confirmationsRequired: 2
+        confirmations: [{ signature: '0x1' }, { signature: '0x2' }]
       }
 
       apiKit.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
@@ -246,8 +268,7 @@ describe('SafeClient', () => {
 
     it('should return more signatures are required when threshold is not reached after confirmation', async () => {
       const TRANSACTION_RESPONSE = {
-        confirmations: [{ signature: '0x1' }],
-        confirmationsRequired: 2
+        confirmations: [{ signature: '0x1' }]
       }
 
       apiKit.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)

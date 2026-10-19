@@ -52,12 +52,14 @@ describe('proposeTransaction', () => {
     const txOptions = {
       safeAddress,
       safeTransactionData: tx.data,
-      safeTxHash: txHash,
-      senderAddress: signerAddress,
       senderSignature: buildSignatureBytes([ethSig])
     }
 
-    await chai.expect(safeApiKit.proposeTransaction(txOptions)).to.be.fulfilled
+    const proposedTransaction = await safeApiKit.proposeTransaction(txOptions)
+    chai.expect(proposedTransaction.safeTxHash).to.eq(txHash)
+    chai.expect(proposedTransaction.proposedVia).to.eq('OWNER')
+    chai.expect(proposedTransaction.proposer?.toLowerCase()).to.eq(signerAddress.toLowerCase())
+    chai.expect(proposedTransaction.confirmations.length).to.eq(1)
 
     // Signer Safe signature
     protocolKit = await protocolKit.connect({
@@ -96,36 +98,30 @@ describe('proposeTransaction', () => {
 
     const contractSig = buildSignatureBytes([signerSafeSig])
 
-    await chai.expect(safeApiKit.confirmTransaction(txHash, contractSig)).to.be.fulfilled
+    const addedConfirmations = await safeApiKit.confirmTransaction(txHash, contractSig)
+    chai.expect(addedConfirmations.length).to.eq(1)
+    chai.expect(addedConfirmations[0].safeTxHash).to.eq(txHash)
+    chai.expect(addedConfirmations[0].owner.toLowerCase()).to.eq(signerSafeAddress.toLowerCase())
 
-    const confirmedMessage = await safeApiKit.getTransaction(txHash)
+    const confirmedTransaction = await safeApiKit.getTransaction(txHash)
 
-    chai.expect(confirmedMessage.confirmations?.length).to.eq(2)
+    chai.expect(confirmedTransaction.confirmations.length).to.eq(2)
 
-    const [confirmation1, confirmation2] = confirmedMessage!.confirmations as [
-      a: SafeMultisigConfirmationResponse,
-      b: SafeMultisigConfirmationResponse
-    ]
+    // The order of the confirmations is not guaranteed
+    const findConfirmation = (owner: string) =>
+      confirmedTransaction.confirmations.find(
+        (confirmation) => confirmation.owner.toLowerCase() === owner.toLowerCase()
+      ) as SafeMultisigConfirmationResponse
+    const eoaConfirmation = findConfirmation(signerAddress)
+    const contractConfirmation = findConfirmation(signerSafeAddress)
 
-    // Check that the submission date is within the last minute
-    chai.expect(Date.now() - new Date(confirmation1.submissionDate).valueOf()).lte(60000)
-    chai.expect(Date.now() - new Date(confirmation2.submissionDate).valueOf()).lte(60000)
+    // Check that the creation date is within the last minute
+    chai.expect(Date.now() - new Date(eoaConfirmation.created).valueOf()).lte(60000)
+    chai.expect(Date.now() - new Date(contractConfirmation.created).valueOf()).lte(60000)
 
-    chai.expect(confirmedMessage.confirmations).to.deep.eq([
-      {
-        owner: signerAddress,
-        submissionDate: confirmation1.submissionDate,
-        transactionHash: null,
-        signature: ethSig.data,
-        signatureType: 'EOA'
-      },
-      {
-        owner: signerSafeAddress,
-        submissionDate: confirmation2.submissionDate,
-        transactionHash: null,
-        signature: contractSig.toLowerCase(),
-        signatureType: 'CONTRACT_SIGNATURE'
-      }
-    ])
+    chai.expect(eoaConfirmation.signature.toLowerCase()).to.eq(ethSig.data.toLowerCase())
+    chai.expect(eoaConfirmation.signatureType).to.eq('EOA')
+    chai.expect(contractConfirmation.signature.toLowerCase()).to.eq(contractSig.toLowerCase())
+    chai.expect(contractConfirmation.signatureType).to.eq('CONTRACT_SIGNATURE')
   })
 })

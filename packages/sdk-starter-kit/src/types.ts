@@ -3,10 +3,8 @@ import {
   TransactionBase,
   TransactionOptions,
   EIP712TypedData,
-  MetaTransactionData,
   SafeVersion
 } from '@safe-global/types-kit'
-import { IFeeEstimator } from '@safe-global/relay-kit'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
 
 export type SendTransactionProps = {
@@ -27,18 +25,6 @@ export type SendOffChainMessageProps = {
 
 export type ConfirmOffChainMessageProps = {
   messageHash: string
-}
-
-export type SendSafeOperationProps = {
-  transactions: MetaTransactionData[]
-  amountToApprove?: bigint
-  validUntil?: number
-  validAfter?: number
-  feeEstimator?: IFeeEstimator
-}
-
-export type ConfirmSafeOperationProps = {
-  safeOperationHash: string
 }
 
 export type SafeConfig = {
@@ -63,7 +49,7 @@ export type SdkStarterKitRootConfig = {
   provider: SafeProvider['provider']
   signer?: SafeProvider['signer']
   apiKey?: string
-  txServiceUrl?: string
+  queueServiceUrl?: string
 }
 
 export type SdkStarterKitConfig = SdkStarterKitRootConfig &
@@ -79,10 +65,6 @@ export type SafeClientResult = {
   }
   messages?: {
     messageHash?: string
-  }
-  safeOperations?: {
-    userOperationHash?: string
-    safeOperationHash?: string
   }
   safeAccountDeployment?: {
     ethereumTxHash?: string

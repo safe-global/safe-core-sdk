@@ -27,7 +27,7 @@ describe('getMessages', () => {
     chai.expect(messages.results[0]).to.have.property('message')
     chai.expect(messages.results[0]).to.have.property('messageHash')
     chai.expect(messages.results[0]).to.have.property('confirmations')
-    chai.expect(messages.results[0]).to.have.property('safe').to.eq(safeAddress)
+    chai.expect(messages.results[0].safe.toLowerCase()).to.eq(safeAddress.toLowerCase())
   })
 
   it('should return a maximum of 5 messages with limit = 5', async () => {

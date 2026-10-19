@@ -55,12 +55,15 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(`[${version}] addMes
     const safeMessage = protocolKit.createMessage(rawMessage)
     const signedMessage = await protocolKit.signMessage(safeMessage, 'eth_sign')
 
-    await chai.expect(
-      safeApiKit.addMessage(safeAddress, {
-        message: rawMessage,
-        signature: signedMessage.encodedSignatures()
-      })
-    ).to.be.fulfilled
+    const messageResponse = await safeApiKit.addMessage(safeAddress, {
+      message: rawMessage,
+      signature: signedMessage.encodedSignatures()
+    })
+
+    chai.expect(messageResponse.message).to.eq(rawMessage)
+    chai.expect(messageResponse.safe.toLowerCase()).to.eq(safeAddress.toLowerCase())
+    chai.expect(messageResponse.messageHash).to.be.a('string')
+    chai.expect(messageResponse.confirmations.length).to.eq(1)
   })
 
   it('should allow to create a new off-chain message signed with EIP-712', async () => {
@@ -68,12 +71,15 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(`[${version}] addMes
     const safeMessage = protocolKit.createMessage(rawMessage)
     const signedMessage = await protocolKit.signMessage(safeMessage, 'eth_signTypedData_v4')
 
-    await chai.expect(
-      safeApiKit.addMessage(safeAddress, {
-        message: rawMessage,
-        safeAppId: 123,
-        signature: signedMessage.encodedSignatures()
-      })
-    ).to.be.fulfilled
+    const messageResponse = await safeApiKit.addMessage(safeAddress, {
+      message: rawMessage,
+      originName: 'Safe Core SDK',
+      originUrl: 'https://safe.global',
+      signature: signedMessage.encodedSignatures()
+    })
+
+    chai.expect(messageResponse.originName).to.eq('Safe Core SDK')
+    chai.expect(messageResponse.originUrl).to.eq('https://safe.global')
+    chai.expect(messageResponse.confirmations.length).to.eq(1)
   })
 })

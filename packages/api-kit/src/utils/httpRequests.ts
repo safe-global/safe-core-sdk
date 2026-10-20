@@ -27,14 +27,11 @@ type FieldError = { loc?: Array<string | number>; msg: string }
 
 /**
  * Builds the error message of a failed request.
- * The Safe Queue Service returns `{ detail: string }` for rejected data and `{ detail: FieldError[] }` for malformed requests.
+ * The Safe Queue and Decoder services return `{ detail: string }` for rejected data and `{ detail: FieldError[] }` for malformed requests.
  */
 function getErrorMessage(jsonResponse: any): string | undefined {
-  const { detail, message } = jsonResponse ?? {}
+  const { detail } = jsonResponse ?? {}
 
-  if (typeof detail === 'string') {
-    return detail
-  }
   if (Array.isArray(detail)) {
     return detail
       .map((error: FieldError) => {
@@ -43,8 +40,21 @@ function getErrorMessage(jsonResponse: any): string | undefined {
       })
       .join('; ')
   }
-  if (typeof message === 'string') {
-    return message
+
+  // Error payloads of the Safe Transaction Service (data, message, nonFieldErrors and field errors)
+  // and of the Safe Queue and Decoder services (detail)
+  for (const key of [
+    'data',
+    'detail',
+    'message',
+    'nonFieldErrors',
+    'delegate',
+    'safe',
+    'delegator'
+  ]) {
+    if (jsonResponse?.[key]) {
+      return jsonResponse[key]
+    }
   }
 
   return undefined

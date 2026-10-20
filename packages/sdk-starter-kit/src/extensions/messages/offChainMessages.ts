@@ -27,7 +27,7 @@ export function offChainMessages() {
 
     return {
       /**
-       * Creates an off-chain message using the Safe Queue Service
+       * Creates an off-chain message using the Transaction service
        *
        * @param {SendOffChainMessageProps} props The message properties
        * @returns {Promise<SafeClientResult>} A SafeClientResult. You can get the messageHash to confirmMessage() afterwards from the messages property       */
@@ -35,7 +35,7 @@ export function offChainMessages() {
         return safeMessageClient.sendMessage(props)
       },
       /**
-       * Confirms an off-chain message using the Safe Queue Service
+       * Confirms an off-chain message using the Transaction service
        *
        * @param {ConfirmOffChainMessageProps} props The confirmation properties
        * @returns {Promise<SafeClientResult>} A SafeClientResult with the result of the confirmation

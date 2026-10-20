@@ -103,7 +103,9 @@ async function getApiKitInstance(
   return new SafeApiKit({
     chainId,
     apiKey: config.apiKey,
-    queueServiceUrl: config.queueServiceUrl
+    txServiceUrl: config.txServiceUrl,
+    queueServiceUrl: config.queueServiceUrl,
+    decoderServiceUrl: config.decoderServiceUrl
   })
 }
 

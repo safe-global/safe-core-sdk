@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-Software development kit that facilitates the interaction with the Safe Queue Service API, allowing to propose and share transactions and off-chain messages with the other signers of a Safe, sending the signatures to the service to collect them, reading the pending transactions of a Safe and managing delegates, among other features.
+Software development kit that facilitates the interaction with the Safe services API: the Safe Queue Service (transaction proposals, confirmations, off-chain messages and delegates), the [Safe Transaction Service](https://github.com/safe-global/safe-transaction-service) (Safe info, transaction history, tokens, SafeOperations) and the Safe Decoder Service. It allows to propose and share transactions with the other signers of a Safe, sending the signatures to the service to collect them, getting information about a Safe (like reading the transaction history, pending transactions, enabled Modules and Guards, etc.), among other features.
 
 ## Table of contents
 
@@ -35,10 +35,12 @@ import SafeApiKit from '@safe-global/api-kit'
 
 const apiKit = new SafeApiKit({
   chainId: 1n,
-  // Required when using the Safe hosted service. Get your API key at https://developer.safe.global
+  // Required when using the Safe hosted services. Get your API key at https://developer.safe.global
   apiKey: 'YOUR_API_KEY',
-  // Optional. queueServiceUrl must be used to set a custom Safe Queue Service.
-  queueServiceUrl: 'https://api.safe.global/queue'
+  // Optional. Custom service URLs. For example on chains where Safe doesn't run services.
+  txServiceUrl: 'https://safe-transaction-mainnet.safe.global',
+  queueServiceUrl: 'https://api.safe.global/queue',
+  decoderServiceUrl: 'https://api.safe.global/decoder'
 })
 ```
 

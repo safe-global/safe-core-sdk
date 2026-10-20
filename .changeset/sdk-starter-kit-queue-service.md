@@ -4,6 +4,6 @@
 
 Use the Safe Queue Service through the API Kit.
 
-- `txServiceUrl` is renamed to `queueServiceUrl` in the `createSafeClient` config.
-- The `safeOperations` extension is removed, since the Safe Queue Service does not store ERC-4337 SafeOperations. Use the `Safe4337Pack` of the Relay Kit directly to send user operations.
-- `confirm` checks the threshold of the Safe on-chain to decide whether the transaction can be executed.
+- New optional `queueServiceUrl` and `decoderServiceUrl` options in the `createSafeClient` config, next to `txServiceUrl`.
+- `confirm` checks the threshold of the Safe on-chain to decide whether the transaction can be executed, and reports the transaction as executed when the queue service returns its `txHash`.
+- The transactions returned by `getPendingTransactions` follow the Safe Queue Service schema.

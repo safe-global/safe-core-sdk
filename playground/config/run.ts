@@ -20,6 +20,7 @@ const playgroundApiKitPaths = {
 const playgroundRelayKitPaths = {
   'gelato-paid-transaction': 'relay-kit/gelato-paid-transaction',
   'gelato-sponsored-transaction': 'relay-kit/gelato-sponsored-transaction',
+  'userop-api-kit-interoperability': 'relay-kit/userop-api-kit-interoperability',
   userop: 'relay-kit/userop',
   'userop-counterfactual': 'relay-kit/userop-counterfactual',
   'userop-erc20-paymaster': 'relay-kit/userop-erc20-paymaster',
@@ -34,6 +35,7 @@ const playgroundStarterKitPaths = {
   'send-transactions': 'sdk-starter-kit/send-transactions',
   'send-on-chain-message': 'sdk-starter-kit/send-on-chain-message',
   'send-off-chain-message': 'sdk-starter-kit/send-off-chain-message',
+  'send-safe-operation': 'sdk-starter-kit/send-safe-operation',
   'owner-management': 'sdk-starter-kit/owner-management'
 }
 

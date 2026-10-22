@@ -43,11 +43,11 @@ async function main() {
   const safeTxHash = await protocolKit.getTransactionHash(safeTransaction)
   const signature = await protocolKit.signHash(safeTxHash)
 
-  // Propose transaction to the service. The proposer is derived from the signature
-  const proposedTransaction = await apiKit.proposeTransaction({
+  // Propose the transaction to the Safe Queue Service. The proposer is derived from the signature
+  const proposedTransaction = await apiKit.queue.proposeTransaction({
     safeAddress: SAFE_ADDRESS,
     safeTransactionData: safeTransaction.data,
-    senderSignature: signature.data
+    signatures: signature.data
   })
 
   console.log('Proposed a transaction with Safe:', SAFE_ADDRESS)

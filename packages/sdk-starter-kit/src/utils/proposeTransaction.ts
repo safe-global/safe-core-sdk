@@ -24,10 +24,10 @@ export const proposeTransaction = async ({
   const signerAddress = (await protocolKit.getSafeProvider().getSignerAddress()) || '0x'
   const ethSig = safeTransaction.getSignature(signerAddress) as EthSafeSignature
 
-  const { safeTxHash } = await apiKit.proposeTransaction({
+  const { safeTxHash } = await apiKit.queue.proposeTransaction({
     safeAddress: await protocolKit.getAddress(),
     safeTransactionData: safeTransaction.data,
-    senderSignature: buildSignatureBytes([ethSig])
+    signatures: buildSignatureBytes([ethSig])
   })
 
   return safeTxHash

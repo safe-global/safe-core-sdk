@@ -1,5 +1,5 @@
 import Safe, { hashSafeMessage } from '@safe-global/protocol-kit'
-import SafeApiKit, { ListOptions, SafeMessageListResponse } from '@safe-global/api-kit'
+import SafeApiKit, { ListOptions, MessageListResponse } from '@safe-global/api-kit'
 import { SafeMessage } from '@safe-global/types-kit'
 import { createSafeClientResult, sendTransaction } from '@safe-global/sdk-starter-kit/utils'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
@@ -53,15 +53,15 @@ export class SafeMessageClient {
    * @returns {Promise<SafeClientResult>} A SafeClientResult with the result of the confirmation
    */
   async confirmMessage({ messageHash }: ConfirmOffChainMessageProps): Promise<SafeClientResult> {
-    let messageResponse = await this.apiKit.getMessage(messageHash)
+    let messageResponse = await this.apiKit.queue.getMessage(messageHash)
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()
     let safeMessage = this.protocolKit.createMessage(messageResponse.message as any)
     safeMessage = await this.protocolKit.signMessage(safeMessage)
 
-    await this.apiKit.addMessageSignature(messageHash, safeMessage.encodedSignatures())
+    await this.apiKit.queue.confirmMessage(messageHash, safeMessage.encodedSignatures())
 
-    messageResponse = await this.apiKit.getMessage(messageHash)
+    messageResponse = await this.apiKit.queue.getMessage(messageHash)
 
     return createSafeClientResult({
       status:
@@ -77,12 +77,12 @@ export class SafeMessageClient {
    * Get the list of pending off-chain messages. This messages can be confirmed using the confirmMessage() method
    *
    * @param {ListOptions} options The pagination options
-   * @returns {Promise<SafeMessageListResponse>} A list of pending messages
+   * @returns {Promise<MessageListResponse>} A list of pending messages
    */
-  async getPendingMessages(options?: ListOptions): Promise<SafeMessageListResponse> {
+  async getPendingMessages(options?: ListOptions): Promise<MessageListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
-    return this.apiKit.getMessages(safeAddress, options)
+    return this.apiKit.queue.getMessages(safeAddress, options)
   }
 
   /**
@@ -115,7 +115,7 @@ export class SafeMessageClient {
 
     try {
       const { messages } = await this.#addMessage({ safeMessage })
-      const messageResponse = await this.apiKit.getMessage(messages?.messageHash || '0x')
+      const messageResponse = await this.apiKit.queue.getMessage(messages?.messageHash || '0x')
 
       return createSafeClientResult({
         safeAddress: await this.protocolKit.getAddress(),
@@ -146,15 +146,15 @@ export class SafeMessageClient {
     const messageHash = await this.protocolKit.getSafeMessageHash(hashSafeMessage(safeMessage.data))
 
     try {
-      await this.apiKit.addMessage(safeAddress, {
+      await this.apiKit.queue.addMessage(safeAddress, {
         message: safeMessage.data,
-        signature: signedMessage.encodedSignatures()
+        signatures: signedMessage.encodedSignatures()
       })
     } catch (error) {
       throw new Error('Could not add a new off-chain message to the Safe account')
     }
 
-    const message = await this.apiKit.getMessage(messageHash)
+    const message = await this.apiKit.queue.getMessage(messageHash)
 
     return createSafeClientResult({
       safeAddress: await this.protocolKit.getAddress(),

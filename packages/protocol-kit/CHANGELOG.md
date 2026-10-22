@@ -1,5 +1,11 @@
 # @safe-global/protocol-kit
 
+## 8.0.9
+
+### Patch Changes
+
+- 3c25d33: chore: add GenLayer (genlayer) chain support and bump safe-deployments and safe-modules-deployments
+
 ## 8.0.8
 
 ### Patch Changes

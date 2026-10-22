@@ -529,6 +529,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 13863860n, shortName: 'sis' },
   { chainId: 20250407n, shortName: 'platondev3' },
   { chainId: 21000000n, shortName: 'corn' },
+  { chainId: 42424242n, shortName: 'genlayer' },
   { chainId: 52164803n, shortName: 'fluence-testnet' },
   { chainId: 65100004n, shortName: 'piccadilly-04' },
   { chainId: 94204209n, shortName: 'polygon-blackberry' },

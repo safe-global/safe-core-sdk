@@ -14,8 +14,10 @@ let safeApiKit: SafeApiKit
 let signer: AddDelegateProps['signer']
 let delegatorAddress: Address
 
-const { address: safeAddress, version } = getSafe()
-const delegateAddress = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
+const { address: safeAddress, version, owners } = getSafe()
+// One delegate per Safe version: the CI matrix runs the three versions in parallel against the
+// same hosted queue, and the delegation without a Safe is shared by all of them otherwise
+const delegateAddress = owners[2]
 describe(`[${version}] addSafeDelegate`, () => {
   before(() => {
     safeApiKit = getApiKit()
@@ -27,9 +29,9 @@ describe(`[${version}] addSafeDelegate`, () => {
     delegatorAddress = signer.account.address
   })
 
-  // Always runs (even on failure), so a failed assertion can't orphan the delegate.
+  // Runs before and after each test (even on failure), so a failed run can't orphan the delegate.
   // The delegate is removed from both the Safe scope and the "all Safes" scope.
-  afterEach(async () => {
+  const cleanup = async () => {
     for (const scope of [{ safeAddress }, {}]) {
       try {
         await safeApiKit.queue.removeDelegate({
@@ -42,7 +44,9 @@ describe(`[${version}] addSafeDelegate`, () => {
         // nothing to remove (e.g. a validation test that added no delegate)
       }
     }
-  })
+  }
+  beforeEach(cleanup)
+  afterEach(cleanup)
 
   it('should fail if Label is empty', async () => {
     const delegateConfig: AddDelegateProps = {

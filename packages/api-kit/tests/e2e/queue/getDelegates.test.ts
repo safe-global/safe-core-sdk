@@ -64,6 +64,14 @@ describe('getSafeDelegates', () => {
         signer
       }
 
+      // Remove what a previous failed run may have left behind before adding
+      for (const delegateConfig of [delegateConfig1, delegateConfig2]) {
+        try {
+          await safeApiKit.queue.removeDelegate(delegateConfig)
+        } catch {
+          // nothing to remove
+        }
+      }
       await safeApiKit.queue.addDelegate({ label: 'Label1', ...delegateConfig1 })
       await safeApiKit.queue.addDelegate({ label: 'Label2', ...delegateConfig2 })
     })

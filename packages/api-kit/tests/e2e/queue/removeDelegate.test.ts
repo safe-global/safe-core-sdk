@@ -14,7 +14,18 @@ let safeApiKit: SafeApiKit
 let signer: RemoveDelegateProps['signer']
 let delegatorAddress: Address
 
-const { address: safeAddress } = getSafe()
+const { address: safeAddress, owners } = getSafe()
+// One delegate per Safe version: the CI matrix runs the three versions in parallel against the
+// same hosted queue, and the delegation without a Safe is shared by all of them otherwise
+const delegateAddress = owners[2]
+
+const ignoreErrors = async (promise: Promise<unknown>) => {
+  try {
+    await promise
+  } catch {
+    // nothing to remove
+  }
+}
 
 describe('removeSafeDelegate', () => {
   before(() => {
@@ -26,6 +37,17 @@ describe('removeSafeDelegate', () => {
     })
     delegatorAddress = signer.account.address
   })
+
+  // Runs before and after each test so a failed run cannot leave the delegate behind
+  const cleanup = async () => {
+    for (const scope of [{ safeAddress }, {}]) {
+      await ignoreErrors(
+        safeApiKit.queue.removeDelegate({ ...scope, delegateAddress, delegatorAddress, signer })
+      )
+    }
+  }
+  beforeEach(cleanup)
+  afterEach(cleanup)
 
   it('should fail if Safe delegate address is empty', async () => {
     const delegateAddress = ''
@@ -40,7 +62,6 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should fail if Safe delegator address is empty', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegatorAddress = ''
     const delegateConfig: RemoveDelegateProps = {
       delegateAddress,
@@ -65,7 +86,6 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should remove a delegate', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegateConfig: RemoveDelegateProps = {
       delegateAddress,
       delegatorAddress,
@@ -86,7 +106,6 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should remove a delegate scoped to a Safe', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const delegateConfig: RemoveDelegateProps = {
       safeAddress,
       delegateAddress,
@@ -108,7 +127,6 @@ describe('removeSafeDelegate', () => {
   })
 
   it('should remove a delegate EIP-3770', async () => {
-    const delegateAddress = '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B'
     const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
     const eip3770DelegatorAddress = `${config.EIP_3770_PREFIX}:${delegatorAddress}`
     const delegateConfig: RemoveDelegateProps = {

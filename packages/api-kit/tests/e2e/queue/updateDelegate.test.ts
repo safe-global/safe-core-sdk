@@ -27,7 +27,8 @@ describe(`[${version}] updateSafeDelegate`, () => {
     delegatorAddress = signer.account.address
   })
 
-  afterEach(async () => {
+  // Runs before and after each test, so a failed run cannot leave the delegate behind
+  const cleanup = async () => {
     try {
       await safeApiKit.queue.removeDelegate({
         safeAddress,
@@ -38,7 +39,9 @@ describe(`[${version}] updateSafeDelegate`, () => {
     } catch {
       // nothing to remove
     }
-  })
+  }
+  beforeEach(cleanup)
+  afterEach(cleanup)
 
   it('should fail if Label is empty', async () => {
     await chai

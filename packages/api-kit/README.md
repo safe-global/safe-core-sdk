@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/release/safe-global/safe-core-sdk.svg?style=flat)](https://github.com/safe-global/safe-core-sdk/releases)
 [![GitHub](https://img.shields.io/github/license/safe-global/safe-core-sdk)](https://github.com/safe-global/safe-core-sdk/blob/main/LICENSE.md)
 
-Software development kit that facilitates the interaction with the [Safe Transaction Service API](https://github.com/safe-global/safe-transaction-service), allowing to propose and share transactions with the other signers of a Safe, sending the signatures to the service to collect them, getting information about a Safe (like reading the transaction history, pending transactions, enabled Modules and Guards, etc.), among other features.
+Software development kit that facilitates the interaction with the Safe services: the Safe Queue Service (transaction proposals, confirmations, off-chain messages and delegates), the [Safe Transaction Service](https://github.com/safe-global/safe-transaction-service) (Safe info, transaction history, tokens, SafeOperations) and the Safe Decoder Service (data decoding). It allows to propose and share transactions with the other signers of a Safe, sending the signatures to the service to collect them, getting information about a Safe (like reading the transaction history, pending transactions, enabled Modules and Guards, etc.), among other features.
 
 ## Table of contents
 
@@ -35,9 +35,33 @@ import SafeApiKit from '@safe-global/api-kit'
 
 const apiKit = new SafeApiKit({
   chainId: 1n,
-  // Optional. txServiceUrl must be used to set a custom service. For example on chains where Safe doesn't run services.
-  txServiceUrl: 'https://safe-transaction-mainnet.safe.global'
+  // Required when using the Safe hosted services. Get your API key at https://developer.safe.global
+  apiKey: 'YOUR_API_KEY',
+  // Optional. Custom service URLs, for example for self-hosted services or chains where Safe doesn't run them.
+  txServiceUrl: 'https://safe-transaction-mainnet.safe.global',
+  queueServiceUrl: 'https://api.safe.global/queue',
+  decoderServiceUrl: 'https://api.safe.global/decoder'
 })
+```
+
+The kit exposes one client per Safe service, with one method per endpoint:
+
+- `apiKit.queue`: the Safe Queue Service, the off-chain queue of multisig transactions, messages and delegates.
+- `apiKit.indexer`: the Safe Transaction Service, the data indexed from the chain (Safe accounts, history, transfers, tokens) and the ERC-4337 SafeOperations.
+- `apiKit.decoder`: the Safe Decoder Service, transaction data decoding and known contracts.
+
+```js
+// Propose a transaction and confirm it from another owner
+const { safeTxHash } = await apiKit.queue.proposeTransaction({
+  safeAddress,
+  safeTransactionData: safeTransaction.data,
+  signatures: ownerSignature
+})
+await apiKit.queue.confirmTransaction(safeTxHash, otherOwnerSignature)
+
+// Read the indexed Safe info and decode some data
+const safeInfo = await apiKit.indexer.getSafeInfo(safeAddress)
+const decoded = await apiKit.decoder.decodeData(data, to)
 ```
 
 ## Need Help or Have Questions?

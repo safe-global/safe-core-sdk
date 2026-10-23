@@ -1,3 +1,4 @@
+import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import {
   OperationType,
   SafeMultisigTransactionResponse,
@@ -1579,19 +1580,17 @@ class Safe {
     serviceTransactionResponse: SafeMultisigTransactionResponse
   ): Promise<SafeTransaction> {
     const safeTransactionData = {
-      to: serviceTransactionResponse.to,
+      to: serviceTransactionResponse.to || ZERO_ADDRESS,
       value: serviceTransactionResponse.value,
       data: serviceTransactionResponse.data || '0x',
       operation: serviceTransactionResponse.operation
     }
     const options = {
-      // TODO remove toString() in next major v7.0
-      safeTxGas: serviceTransactionResponse.safeTxGas.toString(),
-      // TODO remove toString() in next major v7.0
-      baseGas: serviceTransactionResponse.baseGas.toString(),
+      safeTxGas: serviceTransactionResponse.safeTxGas,
+      baseGas: serviceTransactionResponse.baseGas,
       gasPrice: serviceTransactionResponse.gasPrice,
-      gasToken: serviceTransactionResponse.gasToken,
-      refundReceiver: serviceTransactionResponse.refundReceiver,
+      gasToken: serviceTransactionResponse.gasToken || ZERO_ADDRESS,
+      refundReceiver: serviceTransactionResponse.refundReceiver || ZERO_ADDRESS,
       nonce: parseInt(serviceTransactionResponse.nonce, 10)
     }
     const safeTransaction = await this.createTransaction({

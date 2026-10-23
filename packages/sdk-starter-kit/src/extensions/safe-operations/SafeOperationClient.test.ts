@@ -7,7 +7,6 @@ import { MESSAGES, SafeClientTxStatus } from '../../constants'
 
 jest.mock('@safe-global/protocol-kit')
 jest.mock('@safe-global/relay-kit')
-jest.mock('@safe-global/api-kit')
 jest.mock('../../utils', () => {
   return {
     ...jest.requireActual('../../utils'),
@@ -64,10 +63,24 @@ describe('SafeOperationClient', () => {
     const bundlerClientMock = { send: jest.fn().mockResolvedValue('1') } as any
 
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({
-      chainId: 1n,
-      apiKey: 'apiKey'
-    }) as jest.Mocked<SafeApiKit>
+    apiKit = {
+      queue: {
+        getTransaction: jest.fn(),
+        confirmTransaction: jest.fn(),
+        getPendingTransactions: jest.fn(),
+        getMessage: jest.fn(),
+        getMessages: jest.fn(),
+        addMessage: jest.fn(),
+        confirmMessage: jest.fn()
+      },
+      indexer: {
+        addSafeOperation: jest.fn(),
+        getSafeOperation: jest.fn(),
+        confirmSafeOperation: jest.fn(),
+        getPendingSafeOperations: jest.fn()
+      },
+      decoder: {}
+    } as unknown as jest.Mocked<SafeApiKit>
     safe4337Pack = new Safe4337Pack({
       protocolKit,
       bundlerClient: bundlerClientMock,
@@ -82,8 +95,8 @@ describe('SafeOperationClient', () => {
 
     safeOperationClient = new SafeOperationClient(safe4337Pack, apiKit)
 
-    apiKit.confirmSafeOperation = jest.fn().mockResolvedValue(true)
-    apiKit.getSafeOperation = jest.fn().mockResolvedValue(SAFE_OPERATION_RESPONSE)
+    apiKit.indexer.confirmSafeOperation = jest.fn().mockResolvedValue(true)
+    apiKit.indexer.getSafeOperation = jest.fn().mockResolvedValue(SAFE_OPERATION_RESPONSE)
 
     protocolKit.getAddress = jest.fn().mockResolvedValue(SAFE_ADDRESS)
     protocolKit.signHash = jest
@@ -122,7 +135,7 @@ describe('SafeOperationClient', () => {
         options: {}
       })
       expect(safe4337Pack.signSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION)
-      expect(apiKit.addSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION)
+      expect(apiKit.indexer.addSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION)
 
       expect(safeOperationResult).toEqual({
         safeAddress: SAFE_ADDRESS,
@@ -162,7 +175,7 @@ describe('SafeOperationClient', () => {
         safeOperationHash: SAFE_OPERATION_HASH
       })
 
-      expect(apiKit.confirmSafeOperation).not.toHaveBeenCalledWith()
+      expect(apiKit.indexer.confirmSafeOperation).not.toHaveBeenCalledWith()
 
       expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({
         executable: SAFE_OPERATION_RESPONSE
@@ -186,7 +199,10 @@ describe('SafeOperationClient', () => {
         safeOperationHash: SAFE_OPERATION_HASH
       })
 
-      expect(apiKit.confirmSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION_HASH, undefined)
+      expect(apiKit.indexer.confirmSafeOperation).toHaveBeenCalledWith(
+        SAFE_OPERATION_HASH,
+        undefined
+      )
 
       expect(safeOperationResult).toEqual({
         safeAddress: SAFE_ADDRESS,
@@ -209,7 +225,7 @@ describe('SafeOperationClient', () => {
         ]
       }
       protocolKit.getThreshold = jest.fn().mockResolvedValue(3)
-      apiKit.getSafeOperation = jest
+      apiKit.indexer.getSafeOperation = jest
         .fn()
         .mockResolvedValueOnce(SAFE_OPERATION_RESPONSE)
         .mockResolvedValueOnce(CONFIRMED_SAFE_OPERATION_RESPONSE)
@@ -218,7 +234,10 @@ describe('SafeOperationClient', () => {
         safeOperationHash: SAFE_OPERATION_HASH
       })
 
-      expect(apiKit.confirmSafeOperation).toHaveBeenCalledWith(SAFE_OPERATION_HASH, undefined)
+      expect(apiKit.indexer.confirmSafeOperation).toHaveBeenCalledWith(
+        SAFE_OPERATION_HASH,
+        undefined
+      )
       expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({
         executable: CONFIRMED_SAFE_OPERATION_RESPONSE
       })
@@ -237,12 +256,12 @@ describe('SafeOperationClient', () => {
 
   describe('getPendingSafeOperations', () => {
     it('should return the pending Safe operations for the Safe address', async () => {
-      apiKit.getPendingSafeOperations = jest.fn().mockResolvedValue(PENDING_SAFE_OPERATIONS)
+      apiKit.indexer.getPendingSafeOperations = jest.fn().mockResolvedValue(PENDING_SAFE_OPERATIONS)
 
       const result = await safeOperationClient.getPendingSafeOperations()
 
       expect(protocolKit.getAddress).toHaveBeenCalled()
-      expect(apiKit.getPendingSafeOperations).toHaveBeenCalledWith(SAFE_ADDRESS, undefined)
+      expect(apiKit.indexer.getPendingSafeOperations).toHaveBeenCalledWith(SAFE_ADDRESS, undefined)
       expect(result).toBe(PENDING_SAFE_OPERATIONS)
     })
   })

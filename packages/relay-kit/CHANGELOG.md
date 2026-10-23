@@ -1,5 +1,13 @@
 # @safe-global/relay-kit
 
+## 6.1.4
+
+### Patch Changes
+
+- Republish: 8.0.9 / 6.1.3 shipped unresolved `workspace:^` dependency ranges
+- Updated dependencies
+  - @safe-global/protocol-kit@8.0.10
+
 ## 6.1.3
 
 ### Patch Changes

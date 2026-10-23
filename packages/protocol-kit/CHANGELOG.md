@@ -1,5 +1,11 @@
 # @safe-global/protocol-kit
 
+## 8.0.10
+
+### Patch Changes
+
+- Republish: 8.0.9 / 6.1.3 shipped unresolved `workspace:^` dependency ranges
+
 ## 8.0.9
 
 ### Patch Changes

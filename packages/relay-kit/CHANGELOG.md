@@ -1,5 +1,13 @@
 # @safe-global/relay-kit
 
+## 6.1.5
+
+### Patch Changes
+
+- 0306511: chore: add Whitechain (wbt) chain support and bump safe-deployments and safe-modules-deployments
+- Updated dependencies [0306511]
+  - @safe-global/protocol-kit@8.0.11
+
 ## 6.1.4
 
 ### Patch Changes

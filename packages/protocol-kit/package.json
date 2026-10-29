@@ -91,7 +91,7 @@
     "viem": "^2.52.2"
   },
   "optionalDependencies": {
-    "@noble/curves": "^1.6.0",
+    "@noble/curves": "^2.4.0",
     "@peculiar/asn1-schema": "^2.3.13"
   }
 }

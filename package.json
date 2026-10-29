@@ -16,7 +16,7 @@
     "generate-publish-info": "ts-node ./scripts/generate-publish-info.ts"
   },
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=22.0.0",
     "pnpm": ">=10.16.0"
   },
   "author": "Safe (https://safe.global)",
@@ -29,7 +29,7 @@
     "@safe-global/sdk-starter-kit": "workspace:^",
     "@safe-global/types-kit": "workspace:^",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.15.30",
+    "@types/node": "^22.20.5",
     "dotenv": "^16.4.7",
     "esbuild": "^0.28.1",
     "eslint": "^10.13.0",

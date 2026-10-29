@@ -17,7 +17,7 @@ async function checkShortNameIntegrity() {
         // It just prints the chain that is not aligned so we can check if manual action is necessary.
         console.log(`Update ${network.chainId} from '${network.shortName}' to '${shortName}'`)
       }
-    } catch (error) {
+    } catch {
       console.log(`EIP-3770 Failed to retrieve chain name for ${network.chainId}`)
     }
   }

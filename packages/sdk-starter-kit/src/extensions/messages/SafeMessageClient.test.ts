@@ -6,7 +6,6 @@ import { SafeMessageClient } from './SafeMessageClient'
 import { MESSAGES, SafeClientTxStatus } from '../../constants'
 
 jest.mock('@safe-global/protocol-kit')
-jest.mock('@safe-global/api-kit')
 jest.mock('../../utils', () => {
   return {
     ...jest.requireActual('../../utils'),
@@ -33,13 +32,27 @@ describe('SafeClient', () => {
 
   beforeEach(() => {
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({
-      chainId: 1n,
-      apiKey: 'apiKey'
-    }) as jest.Mocked<SafeApiKit>
+    apiKit = {
+      queue: {
+        getTransaction: jest.fn(),
+        confirmTransaction: jest.fn(),
+        getPendingTransactions: jest.fn(),
+        getMessage: jest.fn(),
+        getMessages: jest.fn(),
+        addMessage: jest.fn(),
+        confirmMessage: jest.fn()
+      },
+      indexer: {
+        addSafeOperation: jest.fn(),
+        getSafeOperation: jest.fn(),
+        confirmSafeOperation: jest.fn(),
+        getPendingSafeOperations: jest.fn()
+      },
+      decoder: {}
+    } as unknown as jest.Mocked<SafeApiKit>
     safeMessageClient = new SafeMessageClient(protocolKit, apiKit)
 
-    apiKit.getMessage = jest.fn().mockResolvedValue(MESSAGE_RESPONSE)
+    apiKit.queue.getMessage = jest.fn().mockResolvedValue(MESSAGE_RESPONSE)
 
     protocolKit.createMessage = jest.fn().mockReturnValue(SAFE_MESSAGE)
     protocolKit.signMessage = jest.fn().mockResolvedValue(SAFE_MESSAGE)
@@ -77,9 +90,9 @@ describe('SafeClient', () => {
 
       expect(protocolKit.createMessage).toHaveBeenCalledWith(MESSAGE)
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
-      expect(apiKit.addMessage).toHaveBeenCalledWith(SAFE_ADDRESS, {
+      expect(apiKit.queue.addMessage).toHaveBeenCalledWith(SAFE_ADDRESS, {
         message: SAFE_MESSAGE.data,
-        signature: SAFE_MESSAGE.encodedSignatures()
+        signatures: SAFE_MESSAGE.encodedSignatures()
       })
 
       expect(result).toMatchObject({
@@ -100,9 +113,9 @@ describe('SafeClient', () => {
 
       expect(protocolKit.createMessage).toHaveBeenCalledWith(MESSAGE)
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
-      expect(apiKit.addMessage).toHaveBeenCalledWith(SAFE_ADDRESS, {
+      expect(apiKit.queue.addMessage).toHaveBeenCalledWith(SAFE_ADDRESS, {
         message: SAFE_MESSAGE.data,
-        signature: SAFE_MESSAGE.encodedSignatures()
+        signatures: SAFE_MESSAGE.encodedSignatures()
       })
 
       expect(result).toMatchObject({
@@ -130,9 +143,9 @@ describe('SafeClient', () => {
 
       expect(protocolKit.createMessage).toHaveBeenCalledWith(MESSAGE)
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
-      expect(apiKit.addMessage).toHaveBeenCalledWith(SAFE_ADDRESS, {
+      expect(apiKit.queue.addMessage).toHaveBeenCalledWith(SAFE_ADDRESS, {
         message: SAFE_MESSAGE.data,
-        signature: SAFE_MESSAGE.encodedSignatures()
+        signatures: SAFE_MESSAGE.encodedSignatures()
       })
 
       expect(result).toMatchObject({
@@ -158,7 +171,7 @@ describe('SafeClient', () => {
 
       expect(protocolKit.createMessage).toHaveBeenCalledWith(MESSAGE_RESPONSE.message)
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
-      expect(apiKit.addMessageSignature).toHaveBeenCalledWith('0xSafeMessageHash', undefined)
+      expect(apiKit.queue.confirmMessage).toHaveBeenCalledWith('0xSafeMessageHash', undefined)
       expect(result).toMatchObject({
         description: MESSAGES[SafeClientTxStatus.MESSAGE_CONFIRMED],
         safeAddress: SAFE_ADDRESS,
@@ -174,11 +187,11 @@ describe('SafeClient', () => {
     it('should return the pending messages for the Safe address', async () => {
       const PENDING_MESSAGES = [{ messageHash: 'messageHash' }]
 
-      apiKit.getMessages = jest.fn().mockResolvedValue(PENDING_MESSAGES)
+      apiKit.queue.getMessages = jest.fn().mockResolvedValue(PENDING_MESSAGES)
 
       const result = await safeMessageClient.getPendingMessages()
 
-      expect(apiKit.getMessages).toHaveBeenCalledWith(SAFE_ADDRESS, undefined)
+      expect(apiKit.queue.getMessages).toHaveBeenCalledWith(SAFE_ADDRESS, undefined)
       expect(result).toBe(PENDING_MESSAGES)
     })
   })

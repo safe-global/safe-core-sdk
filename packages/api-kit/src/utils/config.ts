@@ -1,5 +1,9 @@
 const TRANSACTION_SERVICE_URL = 'https://api.safe.global/tx-service'
 
+export const DEFAULT_QUEUE_SERVICE_URL = 'https://api.safe.global/queue'
+
+export const DEFAULT_DECODER_SERVICE_URL = 'https://api.safe.global/decoder'
+
 type NetworkShortName = {
   shortName: string
   chainId: bigint

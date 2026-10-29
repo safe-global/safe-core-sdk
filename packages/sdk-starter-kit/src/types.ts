@@ -63,7 +63,12 @@ export type SdkStarterKitRootConfig = {
   provider: SafeProvider['provider']
   signer?: SafeProvider['signer']
   apiKey?: string
+  /** Custom Safe Transaction Service URL */
   txServiceUrl?: string
+  /** Custom Safe Queue Service URL */
+  queueServiceUrl?: string
+  /** Custom Safe Decoder Service URL */
+  decoderServiceUrl?: string
 }
 
 export type SdkStarterKitConfig = SdkStarterKitRootConfig &

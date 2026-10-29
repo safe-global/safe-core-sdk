@@ -1,0 +1,11 @@
+---
+'@safe-global/api-kit': major
+---
+
+Split the API Kit into one client per Safe service, with one method per endpoint:
+
+- `apiKit.queue`: Safe Queue Service (`https://api.safe.global/queue`, `queueServiceUrl`), the off-chain queue. `proposeTransaction`, `getTransaction`, `getTransactions` (several Safes), `getPendingTransactions`, `getTransactionsBatch`, `getSafeTransactions`, `confirmTransaction`, `deleteTransaction`, `addMessage`, `getMessages`, `getMessage`, `confirmMessage`, `getDelegates`, `addDelegate`, `updateDelegate`, `removeDelegate`, `getServiceInfo`. The service is multi-chain: the `chainId` of the kit is sent with each request, and the `allChains` options widen the queries. Delegate and deletion requests sign the EIP-712 typed data of the service. Responses follow the queue schema and return addresses lowercased.
+- `apiKit.indexer`: Safe Transaction Service (`txServiceUrl`, resolved per chain as before), the data indexed from the chain and the ERC-4337 SafeOperations: `getServiceInfo`, `getServiceSingletonsInfo`, `getSafeInfo`, `getSafeCreationInfo`, `getSafesByOwner`, `getSafesByModule`, `estimateSafeTransaction`, `getAllTransactions`, `getIncomingTransactions`, `getModuleTransactions`, `getTokenList`, `getToken` and the six SafeOperation methods. Unchanged behaviour.
+- `apiKit.decoder`: Safe Decoder Service (`https://api.safe.global/decoder`, `decoderServiceUrl`): `decodeData` (now with the `accuracy` of the decoding), `getContracts`, `getContract`, `getServiceInfo`.
+
+Breaking changes: every method moves under its client. `proposeTransaction` takes `signatures` instead of `safeTxHash`, `senderAddress`, `senderSignature` and `origin` (`originName`, `originUrl`, `notes` and `nestedTransaction` are added) and returns the stored transaction. `getNextNonce` and `getTransactionConfirmations`, which combined or derived from other calls, are removed. `SafeMultisigTransactionResponse` and `SafeMultisigConfirmationResponse` (types-kit) follow the queue schema; the shape indexed by the Transaction Service is now `IndexerMultisigTransactionResponse`. Like `txServiceUrl`, the new `queueServiceUrl` and `decoderServiceUrl` default to the Safe hosted services, which require the `apiKey`.

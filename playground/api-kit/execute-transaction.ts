@@ -31,7 +31,7 @@ async function main() {
   })
 
   // Get the transaction
-  const safeTransaction = await apiKit.getTransaction(SAFE_TX_HASH)
+  const safeTransaction = await apiKit.queue.getTransaction(SAFE_TX_HASH)
   const isTxExecutable = await protocolKit.isValidTransaction(safeTransaction)
 
   if (isTxExecutable) {

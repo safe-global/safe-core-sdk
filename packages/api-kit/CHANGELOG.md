@@ -1,5 +1,13 @@
 # @safe-global/api-kit
 
+## 5.0.4
+
+### Patch Changes
+
+- fe3d012: Update the list of supported chains: add Morph (`morph`, 2818), ADI (`adi`, 36900) and Zenith Testnet (`zenith-testnet`, 936485), and remove Lens (`lens`, 232).
+- Updated dependencies [d0b426a]
+  - @safe-global/protocol-kit@8.0.8
+
 ## 5.0.3
 
 ### Patch Changes

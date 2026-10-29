@@ -1,5 +1,35 @@
 # @safe-global/protocol-kit
 
+## 8.0.11
+
+### Patch Changes
+
+- 0306511: chore: add Whitechain (wbt) chain support and bump safe-deployments and safe-modules-deployments
+
+## 8.0.10
+
+### Patch Changes
+
+- Republish: 8.0.9 / 6.1.3 shipped unresolved `workspace:^` dependency ranges
+
+## 8.0.9
+
+### Patch Changes
+
+- 3c25d33: chore: add GenLayer (genlayer) chain support and bump safe-deployments and safe-modules-deployments
+
+## 8.0.8
+
+### Patch Changes
+
+- d0b426a: Bump @safe-global/safe-deployments and @safe-global/safe-modules-deployments to the latest versions
+
+## 8.0.7
+
+### Patch Changes
+
+- c754070: Add Mizuhiki (mizuhiki), ADI Testnet (adi-testnet) and Zenith EVM Testnet (zenith-evm-testnet) chain support and bump safe-deployments and safe-modules-deployments
+
 ## 8.0.6
 
 ### Patch Changes

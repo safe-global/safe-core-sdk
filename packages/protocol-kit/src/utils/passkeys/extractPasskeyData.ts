@@ -78,7 +78,7 @@ export async function decodePublicKeyForReactNative(
   const isUncompressedKey = publicKeyBytes.length === 64
 
   if (isAsn1Encoded) {
-    const asn1ParsedKey = AsnParser.parse(publicKeyBytes.buffer, ECPublicKey)
+    const asn1ParsedKey = AsnParser.parse(new Uint8Array(publicKeyBytes), ECPublicKey)
 
     publicKeyBytes = new Uint8Array(asn1ParsedKey.publicKey)
   } else if (isUncompressedKey) {

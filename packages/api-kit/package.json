@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/api-kit",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "description": "SDK that facilitates the interaction with the Safe Transaction Service API",
   "types": "dist/src/index.d.ts",
   "main": "dist/cjs/index.cjs",
@@ -42,6 +42,9 @@
   },
   "author": "Safe (https://safe.global)",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "bugs": {
     "url": "https://github.com/safe-global/safe-core-sdk/issues"
   },

@@ -70,7 +70,7 @@
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.10",
     "@types/semver": "^7.7.1",
-    "@types/sinon": "^17.0.4",
+    "@types/sinon": "^22.0.1",
     "axios": "^1.16.1",
     "cbor": "^9.0.2",
     "chai": "^4.5.0",
@@ -79,7 +79,7 @@
     "ethers": "^6.13.5",
     "mocha": "^11.1.0",
     "nyc": "^18.0.0",
-    "sinon": "^19.0.2",
+    "sinon": "^22.1.0",
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {

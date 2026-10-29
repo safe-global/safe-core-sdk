@@ -203,8 +203,8 @@ importers:
         specifier: ^17.0.4
         version: 17.0.4
       axios:
-        specifier: ^1.16.1
-        version: 1.16.1
+        specifier: ^1.20.0
+        version: 1.20.0
       cbor:
         specifier: ^9.0.2
         version: 9.0.2
@@ -312,7 +312,7 @@ importers:
         version: '@gnosis.pm/safe-contracts@1.3.0(ethers@5.4.0)'
       '@nomicfoundation/hardhat-viem':
         specifier: ^2.0.6
-        version: 2.0.6(hardhat@2.22.19(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.9.3))(typescript@5.9.3))(typescript@5.9.3)(viem@2.52.2(typescript@5.9.3))
+        version: 2.0.6(hardhat@2.22.19(ts-node@10.9.2(@types/node@22.20.5)(typescript@5.9.3))(typescript@5.9.3))(typescript@5.9.3)(viem@2.52.2(typescript@5.9.3))
       '@openzeppelin/contracts':
         specifier: ^5.6.1
         version: 5.6.1
@@ -336,7 +336,7 @@ importers:
         version: 16.4.7
       hardhat:
         specifier: ^2.22.19
-        version: 2.22.19(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.9.3))(typescript@5.9.3)
+        version: 2.22.19(ts-node@10.9.2(@types/node@22.20.5)(typescript@5.9.3))(typescript@5.9.3)
       hardhat-deploy:
         specifier: ^0.12.4
         version: 0.12.4
@@ -1463,6 +1463,9 @@ packages:
   '@types/node@22.15.35':
     resolution: {integrity: sha512-stV91mHxlWpDksiUiivmFfQzjy2JLlb2NUTxKipiANEbxBZsdbDU9fSrT7SHY4uoCXAxYfJZVasn3x2/hqpd3g==}
 
+  '@types/node@22.20.5':
+    resolution: {integrity: sha512-U2+DNr+wSjpsTS/wZGYHq7GcwfuSmKiKvoPvK22zwTlRhU91yOniN4qRR5KhIjvif7ysw/dz/hKmfDH0Ris4aA==}
+
   '@types/node@22.7.5':
     resolution: {integrity: sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==}
 
@@ -1710,8 +1713,8 @@ packages:
   axios@0.29.0:
     resolution: {integrity: sha512-Kjsq1xisgO5DjjNQwZFsy0gpcU1P2j36dZeQDXVhpIU26GVgkDUnROaHLSuluhMqtDE7aKA2hbKXG5yu5DN8Tg==}
 
-  axios@1.16.1:
-    resolution: {integrity: sha512-caYkukvroVPO8KrzuJEb50Hm07KwfBZPEC3VeFHTsqWHvKTsy54hjJz9BS/cdaypROE2rH6xvm9mHX4fgWkr3A==}
+  axios@1.20.0:
+    resolution: {integrity: sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==}
 
   babel-jest@29.7.0:
     resolution: {integrity: sha512-BrvGY3xZSwEcCzKvKsCi2GgHqDqsYkOP4/by5xCgIwGXQxIEh+8ew3gmrE1y7XRR6LHZIj6yLYnUi/mm2KXKBg==}
@@ -2411,8 +2414,8 @@ packages:
   fmix@0.1.0:
     resolution: {integrity: sha512-Y6hyofImk9JdzU8k5INtTXX1cu8LDlePWDFU5sftm9H+zKCr5SGrVjdhkvsim646cw5zD0nADj8oHyXMZmCZ9w==}
 
-  follow-redirects@1.16.0:
-    resolution: {integrity: sha512-y5rN/uOsadFT/JfYwhxRS5R7Qce+g3zG97+JrtFZlC9klX/W5hD7iiLzScI4nZqUS7DNUdhPgw4xI8W2LuXlUw==}
+  follow-redirects@1.16.2:
+    resolution: {integrity: sha512-/kVP2U8z596Ia0gwFrwyIeo74ta5aVmSeU1FfAUMAmcEP5EP7zydmag3SLiN64NaRKef3lxsq7i/g7ltJQDGow==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -2436,8 +2439,8 @@ packages:
     resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
     engines: {node: '>= 6'}
 
-  form-data@4.0.5:
-    resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
+  form-data@4.0.6:
+    resolution: {integrity: sha512-vKatAh4SlVfgbv+YtmhiRjhEMJsYpsG1Y2rMQtR+SVSbytsSD1YGzDIcrAJmdFec88u/+VoGmxnl+80gL1tRCQ==}
     engines: {node: '>= 6'}
 
   fp-ts@1.19.3:
@@ -5611,10 +5614,10 @@ snapshots:
       '@nomicfoundation/ethereumjs-rlp': 5.0.4
       ethereum-cryptography: 0.1.3
 
-  '@nomicfoundation/hardhat-viem@2.0.6(hardhat@2.22.19(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.9.3))(typescript@5.9.3))(typescript@5.9.3)(viem@2.52.2(typescript@5.9.3))':
+  '@nomicfoundation/hardhat-viem@2.0.6(hardhat@2.22.19(ts-node@10.9.2(@types/node@22.20.5)(typescript@5.9.3))(typescript@5.9.3))(typescript@5.9.3)(viem@2.52.2(typescript@5.9.3))':
     dependencies:
       abitype: 0.9.10(typescript@5.9.3)
-      hardhat: 2.22.19(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.9.3))(typescript@5.9.3)
+      hardhat: 2.22.19(ts-node@10.9.2(@types/node@22.20.5)(typescript@5.9.3))(typescript@5.9.3)
       lodash.memoize: 4.1.2
       viem: 2.52.2(typescript@5.9.3)
     transitivePeerDependencies:
@@ -5877,6 +5880,11 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/node@22.20.5':
+    dependencies:
+      undici-types: 6.21.0
+    optional: true
+
   '@types/node@22.7.5':
     dependencies:
       undici-types: 6.19.8
@@ -6112,22 +6120,22 @@ snapshots:
 
   axios@0.21.4(debug@4.4.0):
     dependencies:
-      follow-redirects: 1.16.0(debug@4.4.0)
+      follow-redirects: 1.16.2(debug@4.4.0)
     transitivePeerDependencies:
       - debug
 
   axios@0.29.0:
     dependencies:
-      follow-redirects: 1.16.0(debug@4.4.0)
-      form-data: 4.0.5
+      follow-redirects: 1.16.2(debug@4.4.0)
+      form-data: 4.0.6
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
 
-  axios@1.16.1:
+  axios@1.20.0:
     dependencies:
-      follow-redirects: 1.16.0(debug@4.4.0)
-      form-data: 4.0.5
+      follow-redirects: 1.16.2(debug@4.4.0)
+      form-data: 4.0.6
       https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
@@ -7030,7 +7038,7 @@ snapshots:
     dependencies:
       imul: 1.0.1
 
-  follow-redirects@1.16.0(debug@4.4.0):
+  follow-redirects@1.16.2(debug@4.4.0):
     optionalDependencies:
       debug: 4.4.0(supports-color@8.1.1)
 
@@ -7056,7 +7064,7 @@ snapshots:
       hasown: 2.0.3
       mime-types: 2.1.35
 
-  form-data@4.0.5:
+  form-data@4.0.6:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
@@ -7243,7 +7251,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  hardhat@2.22.19(ts-node@10.9.2(@types/node@22.15.35)(typescript@5.9.3))(typescript@5.9.3):
+  hardhat@2.22.19(ts-node@10.9.2(@types/node@22.20.5)(typescript@5.9.3))(typescript@5.9.3):
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@metamask/eth-sig-util': 4.0.1
@@ -7290,7 +7298,7 @@ snapshots:
       uuid: 8.3.2
       ws: 7.5.9
     optionalDependencies:
-      ts-node: 10.9.2(@types/node@22.15.35)(typescript@5.9.3)
+      ts-node: 10.9.2(@types/node@22.20.5)(typescript@5.9.3)
       typescript: 5.9.3
     transitivePeerDependencies:
       - bufferutil
@@ -8650,7 +8658,7 @@ snapshots:
     dependencies:
       command-exists: 1.2.9
       commander: 8.3.0
-      follow-redirects: 1.16.0(debug@4.4.0)
+      follow-redirects: 1.16.2(debug@4.4.0)
       js-sha3: 0.8.0
       memorystream: 0.3.1
       semver: 5.7.2
@@ -8849,6 +8857,25 @@ snapshots:
       typescript: 5.9.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+
+  ts-node@10.9.2(@types/node@22.20.5)(typescript@5.9.3):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.12
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 22.20.5
+      acorn: 8.16.0
+      acorn-walk: 8.3.5
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.4
+      make-error: 1.3.6
+      typescript: 5.9.3
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+    optional: true
 
   tsc-alias@1.8.17:
     dependencies:

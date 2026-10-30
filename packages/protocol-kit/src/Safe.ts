@@ -228,7 +228,8 @@ class Safe {
     } = config
     const configProps: SafeConfigProps = {
       provider: provider || this.#safeProvider.provider,
-      signer,
+      // Keep the current signer unless one is passed, including an explicit `undefined`
+      signer: 'signer' in config ? signer : this.#safeProvider.signer,
       isL1SafeSingleton: isL1SafeSingleton || this.#contractManager.isL1SafeSingleton,
       contractNetworks: contractNetworks || this.#contractManager.contractNetworks,
       onchainAnalytics

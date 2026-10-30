@@ -13,8 +13,15 @@ updates:
       interval: 'weekly'
       day: 'monday'
     open-pull-requests-limit: 10
+    # default-days aligns with pnpm-workspace.yaml minimumReleaseAge (10080 minutes = 7 days);
+    # majors wait 30 days and are always opened as individual PRs.
     cooldown:
       default-days: 7 # aligns with minimumReleaseAge in pnpm-workspace.yaml
+      semver-major-days: 30
+    ignore:
+      # @types/node tracks the Node runtime in .nvmrc; bump its major together with Node.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     groups:
       typescript-toolchain:
         patterns: ['typescript', 'ts-jest', 'ts-node', '@types/']

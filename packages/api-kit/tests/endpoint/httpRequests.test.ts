@@ -30,18 +30,18 @@ function mockResponse(status: number, body: string | object): Response {
 
 describe('sendRequest', () => {
   let fetchStub: sinon.SinonStub
-  let originalWindow: unknown
+  let originalFetch: typeof fetch
 
   const request = { url: 'https://example.com/api', method: HttpMethod.Get }
 
   beforeEach(() => {
-    originalWindow = (globalThis as any).window
+    originalFetch = globalThis.fetch
     fetchStub = sinon.stub()
-    ;(globalThis as any).window = { fetch: fetchStub }
+    globalThis.fetch = fetchStub as unknown as typeof fetch
   })
 
   afterEach(() => {
-    ;(globalThis as any).window = originalWindow
+    globalThis.fetch = originalFetch
   })
 
   describe('successful responses', () => {
@@ -131,6 +131,14 @@ describe('sendRequest', () => {
       fetchStub.resolves(mockResponse(429, { detail: 'Rate limited' }))
       const err = await sendRequest(request).catch((e) => e)
       expect(err).to.be.instanceOf(Error)
+    })
+
+    it('propagates errors thrown by fetch unchanged', async () => {
+      fetchStub.rejects(new TypeError('fetch failed'))
+      const err = await sendRequest(request).catch((e) => e)
+      expect(err).to.be.instanceOf(TypeError)
+      expect(err).not.to.be.instanceOf(HttpError)
+      expect(err.message).to.equal('fetch failed')
     })
   })
 })

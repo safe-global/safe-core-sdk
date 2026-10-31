@@ -165,6 +165,104 @@ describe('The EIP1271 implementation', () => {
       }
     )
 
+    // Regression test: signTransaction(tx, SigningMethod.SAFE_SIGNATURE, preimageSafeAddress) used to
+    // read `.data` off the *raw* input parameter instead of the converted `transaction` local when the
+    // input was a SafeMultisigTransactionResponse (i.e. `.data` is a calldata hex string, not a
+    // SafeTransactionData object) - this only affects Safe versions in [1.3.0, 1.5.0) since >=1.5.0 uses
+    // a different (correct) code path.
+    itif(safeVersionDeployed >= '1.3.0' && safeVersionDeployed < '1.5.0')(
+      'should allow contract signatures for a SafeMultisigTransactionResponse-shaped input',
+      async () => {
+        const { safeAddress, accounts, signerSafeAddress1_1, contractNetworks, provider } =
+          await setupTests()
+        const [, , account3] = accounts
+
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: safeAddress,
+          value: '0',
+          data: '0x'
+        }
+
+        // Reference: build + sign the SAME transaction as a proper SafeTransaction (the already-working
+        // code path), to compare the resulting signature against.
+        const referenceProtocolKit = await Safe.init({
+          provider,
+          safeAddress: signerSafeAddress1_1,
+          signer: account3.address,
+          contractNetworks
+        })
+        let referenceTx = await referenceProtocolKit.createTransaction({
+          transactions: [safeTransactionData]
+        })
+        referenceTx = await referenceProtocolKit.signTransaction(
+          referenceTx,
+          SigningMethod.SAFE_SIGNATURE,
+          safeAddress
+        )
+        const referenceSignature = Array.from(referenceTx.signatures.values())[0].data
+
+        // Now build the SAME logical transaction, but shaped as a SafeMultisigTransactionResponse -
+        // the shape returned by the Safe transaction service - which is what isSafeMultisigTransactionResponse
+        // detects via `.isExecuted !== undefined`, and drives the buggy `>=1.3.0 && <1.5.0` branch.
+        const responseShapedProtocolKit = await Safe.init({
+          provider,
+          safeAddress: signerSafeAddress1_1,
+          signer: account3.address,
+          contractNetworks
+        })
+        const nonce = await responseShapedProtocolKit.getNonce()
+        const responseShapedTx = {
+          safe: signerSafeAddress1_1,
+          to: safeAddress,
+          value: '0',
+          data: '0x',
+          operation: 0,
+          gasToken: '0x0000000000000000000000000000000000000000',
+          safeTxGas: '0',
+          baseGas: '0',
+          gasPrice: '0',
+          refundReceiver: '0x0000000000000000000000000000000000000000',
+          nonce: nonce.toString(),
+          executionDate: null,
+          submissionDate: new Date().toISOString(),
+          modified: new Date().toISOString(),
+          blockNumber: null,
+          transactionHash: null,
+          safeTxHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+          executor: null,
+          proposer: null,
+          proposedByDelegate: null,
+          isExecuted: false,
+          isSuccessful: null,
+          ethGasPrice: null,
+          maxFeePerGas: null,
+          maxPriorityFeePerGas: null,
+          gasUsed: null,
+          fee: null,
+          origin: '',
+          confirmationsRequired: 1,
+          confirmations: [],
+          trusted: true,
+          signatures: null
+        }
+
+        // Before the fix, this rejects with a TypeError deep inside the EIP-712 encoder (undefined.length
+        // / undefined.to) - the response's raw `.data` string gets treated as the whole SafeTransactionData
+        // object. After the fix it resolves, and produces the IDENTICAL signature as the reference
+        // SafeTransaction path above, proving the fix doesn't just avoid the crash but computes the
+        // correct preimage hash.
+        const signedResponseShapedTx = await responseShapedProtocolKit.signTransaction(
+          responseShapedTx,
+          SigningMethod.SAFE_SIGNATURE,
+          safeAddress
+        )
+        const responseShapedSignature = Array.from(signedResponseShapedTx.signatures.values())[0]
+          .data
+
+        chai.expect(responseShapedSignature).to.equal(referenceSignature)
+      }
+    )
+
     itif(safeVersionDeployed >= '1.3.0')(
       'should allow to sign and validate typed messages',
       async () => {

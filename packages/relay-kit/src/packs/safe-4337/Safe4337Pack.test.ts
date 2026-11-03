@@ -1038,15 +1038,15 @@ describe('Safe4337Pack', () => {
       const identifierWithoutToolVersion = onchainIdentifier.slice(0, -6)
 
       expect(identifierWithoutToolVersion).toBe(
-        '5afe006137303238633936636562316132623939353333646561393063'
+        '5afe0159322b2c2d0c6e0d3f6ba7028c96ceb1a2b99533193deae7e90c'
       )
 
       const relayKitCurrentVersion = utils.getRelayKitVersion()
 
       // check the tool version hash
-      const toolversionHash = viem
-        .toHex(viem.keccak256(viem.toHex(relayKitCurrentVersion)).slice(-3))
-        .replace('0x', '')
+      // Last 3 bytes of the digest (6 hex characters), not the ASCII re-encoding
+      // of the last 3 hex characters
+      const toolversionHash = viem.keccak256(viem.toHex(relayKitCurrentVersion)).slice(-6)
       expect(onchainIdentifier.endsWith(toolversionHash)).toBeTruthy()
     })
 
@@ -1081,7 +1081,7 @@ describe('Safe4337Pack', () => {
       const identifierWithoutToolVersion = onchainIdentifier.slice(0, -6)
 
       expect(identifierWithoutToolVersion).toBe(
-        '5afe006137303238633936636562316132623939353333646561393063'
+        '5afe0159322b2c2d0c6e0d3f6ba7028c96ceb1a2b99533193deae7e90c'
       )
     })
 

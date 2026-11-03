@@ -15,17 +15,28 @@ type PackagePublishInfo = {
   entryCount: number
 }
 
-type NpmPublishOutput = Record<
-  string,
-  PackagePublishInfo & {
-    files?: string[]
-    bundled?: unknown[]
-  }
->
+// `pnpm publish --json` includes these extra fields we don't want to persist.
+type PublishDryRunOutput = PackagePublishInfo & {
+  files?: string[]
+  bundled?: unknown[]
+}
 
-const executeCommand = (command: string, args: string[]): Promise<string> => {
+type NpmPublishOutput = Record<string, PublishDryRunOutput>
+
+type WorkspacePackage = {
+  name: string
+  version: string
+  path: string
+  private?: boolean
+}
+
+const executeCommand = (
+  command: string,
+  args: string[],
+  cwd?: string
+): Promise<string> => {
   return new Promise((resolve, reject) => {
-    execFile(command, args, (error, stdout, stderr) => {
+    execFile(command, args, { cwd, maxBuffer: 64 * 1024 * 1024 }, (error, stdout, stderr) => {
       if (error) {
         return reject(`Error executing command: ${error.message}`)
       }
@@ -37,6 +48,28 @@ const executeCommand = (command: string, args: string[]): Promise<string> => {
       resolve(stdout)
     })
   })
+}
+
+// List the publishable (non-private) workspace packages.
+const listWorkspacePackages = async (): Promise<WorkspacePackage[]> => {
+  const stdout = await executeCommand('pnpm', ['-r', 'ls', '--depth', '-1', '--json'])
+  const packages = JSON.parse(stdout) as WorkspacePackage[]
+
+  return packages.filter((pkg) => !pkg.private)
+}
+
+// Run `pnpm publish --dry-run` for a single package. Unlike `npm publish`, pnpm
+// rewrites the `workspace:` protocol to the pinned version, so the resulting
+// tarball (and therefore its shasum/integrity) matches what `pnpm publish` will
+// actually upload to the registry.
+const getPackagePublishInfo = async (pkg: WorkspacePackage): Promise<PublishDryRunOutput> => {
+  const stdout = await executeCommand(
+    'pnpm',
+    ['publish', '--dry-run', '--json', '--no-git-checks', '--ignore-scripts'],
+    pkg.path
+  )
+
+  return JSON.parse(stdout) as PublishDryRunOutput
 }
 
 const writeToFile = (filePath: string, data: string): Promise<void> => {
@@ -85,22 +118,20 @@ const main = async () => {
     const projectRoot = path.join(__dirname, '../')
     process.chdir(projectRoot)
 
-    const stdout = await executeCommand('npm', [
-      'publish',
-      '--access',
-      'public',
-      '--dry-run',
-      '--workspaces',
-      '--json',
-      '--ignore-scripts'
-    ])
+    const packages = await listWorkspacePackages()
 
-    let jsonOutput: NpmPublishOutput
-    try {
-      jsonOutput = JSON.parse(stdout) as NpmPublishOutput
-    } catch (parseError) {
-      throw new Error(`Error parsing JSON output: ${(parseError as Error).message}`)
-    }
+    // Resolve each package independently so `workspace:` specifiers are pinned,
+    // then key the results by package name (sorted for a deterministic output).
+    const entries = await Promise.all(
+      packages
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(async (pkg): Promise<[string, PublishDryRunOutput]> => {
+          const info = await getPackagePublishInfo(pkg)
+          return [pkg.name, info]
+        })
+    )
+
+    const jsonOutput: NpmPublishOutput = Object.fromEntries(entries)
 
     const cleanedOutput = sanitizePublishOutput(jsonOutput)
     const yamlOutput = yaml.stringify(cleanedOutput)

@@ -37,12 +37,15 @@ const apiKit = new SafeApiKit({
   chainId: 1n,
   // Required when using the Safe hosted services. Get your API key at https://developer.safe.global
   apiKey: 'YOUR_API_KEY',
-  // Optional. Custom service URLs, for example for self-hosted services or chains where Safe doesn't run them.
-  txServiceUrl: 'https://safe-transaction-mainnet.safe.global',
-  queueServiceUrl: 'https://api.safe.global/queue',
-  decoderServiceUrl: 'https://api.safe.global/decoder'
+  // Optional. Custom service URLs, including the `/api` path, for example for self-hosted services
+  // or chains where Safe doesn't run them.
+  indexerServiceUrl: 'https://my-transaction-service.example.com/api',
+  queueServiceUrl: 'https://my-queue-service.example.com/api',
+  decoderServiceUrl: 'https://my-decoder-service.example.com/api'
 })
 ```
+
+Each client is created the first time it is used, and only its own service has to be configured. For example, a self-hosted Transaction Service without an API key can be used through `apiKit.indexer`; `apiKit.queue` and `apiKit.decoder` throw when accessed until their service is configured. `txServiceUrl` is still accepted as the former name of `indexerServiceUrl`.
 
 The kit exposes one client per Safe service, with one method per endpoint:
 

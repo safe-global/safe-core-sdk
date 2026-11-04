@@ -18,7 +18,7 @@ type GetKits = {
 
 type GetKitsOptions = {
   signer?: SafeProviderConfig['signer']
-  txServiceUrl?: string
+  indexerServiceUrl?: string
   chainId?: bigint
   safeAddress: string
 }
@@ -59,13 +59,13 @@ export async function getProtocolKit({
 }
 
 export function getApiKit(
-  txServiceUrl?: GetKitsOptions['txServiceUrl'],
+  indexerServiceUrl?: GetKitsOptions['indexerServiceUrl'],
   chainId?: GetKitsOptions['chainId']
 ): SafeApiKit {
   const safeApiKit = new SafeApiKit({
     chainId: chainId || config.CHAIN_ID,
     apiKey: process.env.API_KEY || 'jwt-token',
-    txServiceUrl
+    indexerServiceUrl
   })
 
   return safeApiKit
@@ -74,10 +74,10 @@ export function getApiKit(
 export async function getKits({
   signer,
   safeAddress,
-  txServiceUrl
+  indexerServiceUrl
 }: GetKitsOptions): Promise<GetKits> {
   const protocolKit = await getProtocolKit({ signer, safeAddress })
-  const safeApiKit = getApiKit(txServiceUrl)
+  const safeApiKit = getApiKit(indexerServiceUrl)
 
   return { protocolKit, safeApiKit }
 }

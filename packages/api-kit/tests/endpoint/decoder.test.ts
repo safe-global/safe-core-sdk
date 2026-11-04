@@ -15,7 +15,7 @@ const chainId = 11155111n
 const contractAddress = '0x4103eEB76EBBcB652F8B15d3817EBFC07b664b0c'
 const eip3770ContractAddress = `${config.EIP_3770_PREFIX}:${contractAddress}`
 const data = '0x610b592500000000000000000000000090F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
-const baseUrl = `${DEFAULT_DECODER_SERVICE_URL}/api/v1`
+const baseUrl = `${DEFAULT_DECODER_SERVICE_URL}/v1`
 const OK = { data: { success: true } }
 
 let safeApiKit: SafeApiKit
@@ -104,9 +104,7 @@ describe('Decoder service endpoints', () => {
   it('uses the custom decoderServiceUrl', async () => {
     const apiKit = new SafeApiKit({
       chainId,
-      txServiceUrl: 'http://my-custom-tx-service.com/api',
-      queueServiceUrl: 'http://my-custom-queue-service.com',
-      decoderServiceUrl: 'http://my-custom-decoder-service.com/'
+      decoderServiceUrl: 'http://my-custom-decoder-service.com/api/'
     })
     await chai.expect(apiKit.decoder.decodeData(data)).to.be.fulfilled
     chai.expect(fetchData).to.have.been.calledWith({

@@ -27,7 +27,7 @@ const delegateAddress = '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b'
 const eip3770DelegateAddress = `${config.EIP_3770_PREFIX}:${delegateAddress}`
 const safeTxHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480a'
 const otherSafeTxHash = '0x0000000000000000000000000000000000000000000000000000000000000001'
-const baseUrl = `${DEFAULT_QUEUE_SERVICE_URL}/api/v1`
+const baseUrl = `${DEFAULT_QUEUE_SERVICE_URL}/v1`
 const OK = { data: { success: true } }
 
 const signer = createWalletClient({
@@ -582,6 +582,28 @@ describe('Queue service endpoints', () => {
       })
     })
 
+    it('addMessage EIP-3770', async () => {
+      await chai
+        .expect(
+          safeApiKit.queue.addMessage(eip3770SafeAddress, {
+            message: 'message',
+            signatures: '0x1234'
+          })
+        )
+        .to.be.eventually.deep.equals(OK)
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${baseUrl}/safes/${safeAddress}/messages`,
+        method: 'post',
+        body: {
+          chainId: Number(chainId),
+          message: 'message',
+          signatures: ['0x1234'],
+          originName: undefined,
+          originUrl: undefined
+        }
+      })
+    })
+
     it('addMessage validations', async () => {
       await chai
         .expect(safeApiKit.queue.addMessage('0x123', { message: 'message', signatures: '0x1234' }))
@@ -593,6 +615,16 @@ describe('Queue service endpoints', () => {
 
     it('getMessages', async () => {
       await chai.expect(safeApiKit.queue.getMessages(safeAddress)).to.be.eventually.deep.equals(OK)
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${baseUrl}/safes/${safeAddress}/messages?chainId=${chainId}`,
+        method: 'get'
+      })
+    })
+
+    it('getMessages EIP-3770', async () => {
+      await chai
+        .expect(safeApiKit.queue.getMessages(eip3770SafeAddress))
+        .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages?chainId=${chainId}`,
         method: 'get'
@@ -637,9 +669,7 @@ describe('Queue service endpoints', () => {
     it('uses the custom queueServiceUrl', async () => {
       const apiKit = new SafeApiKit({
         chainId,
-        txServiceUrl: 'http://my-custom-tx-service.com/api',
-        queueServiceUrl: 'http://my-custom-queue-service.com/',
-        decoderServiceUrl: 'http://my-custom-decoder-service.com'
+        queueServiceUrl: 'http://my-custom-queue-service.com/api/'
       })
       await chai.expect(apiKit.queue.getTransaction(safeTxHash)).to.be.fulfilled
       chai.expect(fetchData).to.have.been.calledWith({

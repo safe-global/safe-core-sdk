@@ -1,4 +1,4 @@
-import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
+import { validateEip3770Address } from '@safe-global/protocol-kit'
 import { Eip3770Address } from '@safe-global/types-kit'
 import { HttpRequest, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
 
@@ -14,7 +14,7 @@ export type ServiceClientConfig = {
 export type QueryParams = Record<string, string | number | boolean | bigint | undefined>
 
 /**
- * Shared plumbing of the service clients: HTTP requests with the API key, address validation and query parameters.
+ * Shared plumbing of the service clients: HTTP requests with the API key, EIP-3770 address validation and query parameters.
  */
 export abstract class BaseClient {
   protected readonly baseUrl: string
@@ -29,15 +29,6 @@ export abstract class BaseClient {
 
   protected async api<T>(request: HttpRequest): Promise<T> {
     return sendRequest(request, this.#apiKey)
-  }
-
-  protected isValidAddress(address: string): boolean {
-    try {
-      validateEthereumAddress(address)
-      return true
-    } catch {
-      return false
-    }
   }
 
   /**

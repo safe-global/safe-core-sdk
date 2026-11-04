@@ -63,11 +63,16 @@ export type SdkStarterKitRootConfig = {
   provider: SafeProvider['provider']
   signer?: SafeProvider['signer']
   apiKey?: string
-  /** Custom Safe Transaction Service URL */
+  /** Custom Safe Transaction Service URL, including the `/api` path */
+  indexerServiceUrl?: string
+  /**
+   * Former name of `indexerServiceUrl`, still accepted. `indexerServiceUrl` takes precedence.
+   * @deprecated Use `indexerServiceUrl` instead.
+   */
   txServiceUrl?: string
-  /** Custom Safe Queue Service URL */
+  /** Custom Safe Queue Service URL, including the `/api` path */
   queueServiceUrl?: string
-  /** Custom Safe Decoder Service URL */
+  /** Custom Safe Decoder Service URL, including the `/api` path */
   decoderServiceUrl?: string
 }
 

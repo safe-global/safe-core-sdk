@@ -19,7 +19,7 @@ export class DecoderClient extends BaseClient {
    */
   async getServiceInfo(): Promise<DecoderServiceInfoResponse> {
     return this.api({
-      url: `${this.baseUrl}/about`,
+      url: `${this.baseUrl}/v1/about`,
       method: HttpMethod.Get
     })
   }
@@ -47,7 +47,7 @@ export class DecoderClient extends BaseClient {
     }
 
     return this.api({
-      url: `${this.baseUrl}/data-decoder`,
+      url: `${this.baseUrl}/v1/data-decoder`,
       method: HttpMethod.Post,
       body
     })
@@ -60,7 +60,7 @@ export class DecoderClient extends BaseClient {
    * @returns The list of contracts
    */
   async getContracts(options: GetContractsOptions = {}): Promise<ContractListResponse> {
-    const url = new URL(`${this.baseUrl}/contracts`)
+    const url = new URL(`${this.baseUrl}/v1/contracts`)
     const { chainIds, trustedForDelegateCall, limit, offset } = options
 
     chainIds?.forEach((chainId) => url.searchParams.append('chain_ids', chainId.toString()))
@@ -92,7 +92,7 @@ export class DecoderClient extends BaseClient {
       throw new Error('Invalid contract address')
     }
     const address = this.getAddress(contractAddress)
-    const url = new URL(`${this.baseUrl}/contracts/${address}`)
+    const url = new URL(`${this.baseUrl}/v1/contracts/${address}`)
     const { chainIds, limit, offset } = options
 
     chainIds?.forEach((chainId) => url.searchParams.append('chain_ids', chainId.toString()))

@@ -49,16 +49,18 @@ The kit exposes one client per service, with one method per endpoint:
 - `apiKit.indexer`: the Safe Transaction Service, the data indexed from the chain (Safe accounts, history, transfers, tokens) and the ERC-4337 SafeOperations.
 - `apiKit.decoder`: the Safe Decoder Service, transaction data decoding.
 
-Using the `chainId` is enough for chains where Safe runs its services. For those chains where Safe doesn't run a Transaction Service, or to use self-hosted services, use the `txServiceUrl`, `queueServiceUrl` and `decoderServiceUrl` parameters to set the custom service endpoints. The Safe Queue Service and the Safe Decoder Service are multi-chain, so the same URL works for every chain.
+Using the `chainId` is enough for chains where Safe runs its services. For those chains where Safe doesn't run a Transaction Service, or to use self-hosted services, use the `indexerServiceUrl`, `queueServiceUrl` and `decoderServiceUrl` parameters to set the custom service endpoints, including their `/api` path. The Safe Queue Service and the Safe Decoder Service are multi-chain, so the same URL works for every chain.
 
 ```js
 const apiKit = new SafeApiKit({
   chainId,
-  txServiceUrl: 'https://txServiceUrl.com',
-  queueServiceUrl: 'https://queueServiceUrl.com',
-  decoderServiceUrl: 'https://decoderServiceUrl.com'
+  indexerServiceUrl: 'https://indexerServiceUrl.com/api',
+  queueServiceUrl: 'https://queueServiceUrl.com/api',
+  decoderServiceUrl: 'https://decoderServiceUrl.com/api'
 })
 ```
+
+Each client is created the first time it is used, so only the services you use need to be configured. `txServiceUrl` is still accepted as the former name of `indexerServiceUrl`.
 
 ### Initialize the Protocol Kit
 
@@ -73,7 +75,6 @@ There are two versions of the Safe contracts: [Safe.sol](https://github.com/safe
 By default `Safe.sol` will be only used on Ethereum Mainnet. For the rest of the networks where the Safe contracts are already deployed, the `SafeL2.sol` contract will be used unless you add the property `isL1SafeSingleton` to force the use of the `Safe.sol` contract.
 
 ```js
-
 const protocolKit = await Safe.init({ provider, signer, safeAddress, isL1SafeSingleton: true })
 ```
 

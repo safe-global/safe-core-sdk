@@ -11,28 +11,38 @@ export interface SafeApiKitConfig {
   /** chainId - The chainId */
   chainId: bigint
   /**
-   * txServiceUrl - Safe Transaction Service URL, used by `indexer`.
-   * Defaults to the Safe hosted service of the chain.
+   * indexerServiceUrl - Safe Transaction Service URL, used by `indexer`, including the `/api` path
+   * (e.g. `https://api.safe.global/tx-service/eth/api`). Defaults to the Safe hosted service of the chain.
+   */
+  indexerServiceUrl?: string
+  /**
+   * txServiceUrl - Former name of `indexerServiceUrl`, still accepted. `indexerServiceUrl` takes precedence.
+   * @deprecated Use `indexerServiceUrl` instead.
    */
   txServiceUrl?: string
   /**
-   * queueServiceUrl - Safe Queue Service URL, used by `queue`. The service is multi-chain, so the same
-   * URL works for every chain. Defaults to the Safe hosted service.
+   * queueServiceUrl - Safe Queue Service URL, used by `queue`, including the `/api` path
+   * (e.g. `https://api.safe.global/queue/api`). The service is multi-chain, so the same URL works for every chain.
+   * Defaults to the Safe hosted service.
    */
   queueServiceUrl?: string
   /**
-   * decoderServiceUrl - Safe Decoder Service URL, used by `decoder`. The service is multi-chain.
-   * Defaults to the Safe hosted service.
+   * decoderServiceUrl - Safe Decoder Service URL, used by `decoder`, including the `/api` path
+   * (e.g. `https://api.safe.global/decoder/api`). The service is multi-chain. Defaults to the Safe hosted service.
    */
   decoderServiceUrl?: string
   /**
    * apiKey - The API key to access the Safe services.
-   * - Required if any of the service URLs is undefined
-   * - Required if any of the service URLs contains "safe.global" or "5afe.dev"
+   * - Required to use a service whose URL is undefined
+   * - Required to use a service whose URL contains "safe.global" or "5afe.dev"
    * - Optional otherwise
+   *
+   * Each service is checked when its client is first used, so a missing configuration only affects that client.
    */
   apiKey?: string
 }
+
+type ServiceUrlOption = 'indexerServiceUrl' | 'queueServiceUrl' | 'decoderServiceUrl'
 
 const API_KEY_HELP = 'Please obtain your API key at https://developer.safe.global.'
 
@@ -49,11 +59,12 @@ const trimTrailingSlashes = (url: string): string => {
 
 /**
  * Resolves the base URL of a service and checks the API key requirements.
+ * The default URL is only computed when no custom URL is given.
  */
 function resolveServiceUrl(
-  name: keyof SafeApiKitConfig,
+  name: ServiceUrlOption,
   url: string | undefined,
-  defaultUrl: string,
+  getDefaultUrl: () => string,
   apiKey?: string
 ): string {
   if (url) {
@@ -67,7 +78,7 @@ function resolveServiceUrl(
   if (!apiKey) {
     throw new Error(`apiKey is mandatory when ${name} is not defined. ${API_KEY_HELP}`)
   }
-  return defaultUrl
+  return getDefaultUrl()
 }
 
 /**
@@ -75,51 +86,72 @@ function resolveServiceUrl(
  * - `queue`: Safe Queue Service, the off-chain queue of multisig transactions, messages and delegates
  * - `indexer`: Safe Transaction Service, the data indexed from the chain and the ERC-4337 SafeOperations
  * - `decoder`: Safe Decoder Service, transaction data decoding
+ *
+ * The clients are created independently the first time they are used, so a service that is not configured
+ * (e.g. a self-hosted Transaction Service without an API key for the hosted Queue Service) does not prevent
+ * using the others. A misconfigured service throws when its client is accessed.
  */
 class SafeApiKit {
-  readonly queue: QueueClient
-  readonly indexer: IndexerClient
-  readonly decoder: DecoderClient
+  readonly #config: SafeApiKitConfig
+  #queue?: QueueClient
+  #indexer?: IndexerClient
+  #decoder?: DecoderClient
 
-  constructor({
-    chainId,
-    txServiceUrl,
-    queueServiceUrl,
-    decoderServiceUrl,
-    apiKey
-  }: SafeApiKitConfig) {
-    let txServiceBaseUrl: string
-    if (txServiceUrl) {
-      txServiceBaseUrl = resolveServiceUrl('txServiceUrl', txServiceUrl, '', apiKey)
-    } else {
-      if (!apiKey) {
-        throw new Error(`apiKey is mandatory when txServiceUrl is not defined. ${API_KEY_HELP}`)
-      }
-      const url = getTransactionServiceUrl(chainId)
-      if (!url) {
-        throw new TypeError(
-          `There is no transaction service available for chainId ${chainId}. Please set the txServiceUrl property to use a custom transaction service.`
-        )
-      }
-      txServiceBaseUrl = url
+  constructor(config: SafeApiKitConfig) {
+    this.#config = config
+  }
+
+  /** Safe Queue Service client */
+  get queue(): QueueClient {
+    if (!this.#queue) {
+      const { chainId, queueServiceUrl, apiKey } = this.#config
+      const baseUrl = resolveServiceUrl(
+        'queueServiceUrl',
+        queueServiceUrl,
+        () => DEFAULT_QUEUE_SERVICE_URL,
+        apiKey
+      )
+      this.#queue = new QueueClient({ baseUrl, chainId, apiKey })
     }
+    return this.#queue
+  }
 
-    const queueBaseUrl = resolveServiceUrl(
-      'queueServiceUrl',
-      queueServiceUrl,
-      DEFAULT_QUEUE_SERVICE_URL,
-      apiKey
-    )
-    const decoderBaseUrl = resolveServiceUrl(
-      'decoderServiceUrl',
-      decoderServiceUrl,
-      DEFAULT_DECODER_SERVICE_URL,
-      apiKey
-    )
+  /** Safe Transaction Service client */
+  get indexer(): IndexerClient {
+    if (!this.#indexer) {
+      const { chainId, indexerServiceUrl, txServiceUrl, apiKey } = this.#config
+      const baseUrl = resolveServiceUrl(
+        'indexerServiceUrl',
+        indexerServiceUrl || txServiceUrl,
+        () => {
+          try {
+            return getTransactionServiceUrl(chainId)
+          } catch {
+            throw new TypeError(
+              `There is no transaction service available for chainId ${chainId}. Please set the indexerServiceUrl property to use a custom transaction service.`
+            )
+          }
+        },
+        apiKey
+      )
+      this.#indexer = new IndexerClient({ baseUrl, chainId, apiKey })
+    }
+    return this.#indexer
+  }
 
-    this.indexer = new IndexerClient({ baseUrl: txServiceBaseUrl, chainId, apiKey })
-    this.queue = new QueueClient({ baseUrl: `${queueBaseUrl}/api/v1`, chainId, apiKey })
-    this.decoder = new DecoderClient({ baseUrl: `${decoderBaseUrl}/api/v1`, chainId, apiKey })
+  /** Safe Decoder Service client */
+  get decoder(): DecoderClient {
+    if (!this.#decoder) {
+      const { chainId, decoderServiceUrl, apiKey } = this.#config
+      const baseUrl = resolveServiceUrl(
+        'decoderServiceUrl',
+        decoderServiceUrl,
+        () => DEFAULT_DECODER_SERVICE_URL,
+        apiKey
+      )
+      this.#decoder = new DecoderClient({ baseUrl, chainId, apiKey })
+    }
+    return this.#decoder
   }
 }
 

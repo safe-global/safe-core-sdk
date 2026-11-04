@@ -37,13 +37,24 @@ const toArray = (signatures: Signatures): string[] =>
  */
 export class QueueClient extends BaseClient {
   /**
+   * Validates a Safe address, plain or with an EIP-3770 prefix, and returns it without the prefix.
+   */
+  #getSafeAddress(safeAddress: string): string {
+    try {
+      return this.getAddress(safeAddress)
+    } catch {
+      throw new Error('Invalid Safe address')
+    }
+  }
+
+  /**
    * Returns the version of the service.
    *
    * @returns The version and build of the service
    */
   async getServiceInfo(): Promise<QueueServiceInfoResponse> {
     return this.api({
-      url: `${this.baseUrl}/about`,
+      url: `${this.baseUrl}/v1/about`,
       method: HttpMethod.Get
     })
   }
@@ -73,7 +84,7 @@ export class QueueClient extends BaseClient {
       )
     }
 
-    const url = new URL(`${this.baseUrl}/delegates`)
+    const url = new URL(`${this.baseUrl}/v1/delegates`)
 
     this.addQueryParams(url, {
       chainId,
@@ -131,7 +142,7 @@ export class QueueClient extends BaseClient {
     }
 
     return this.api({
-      url: `${this.baseUrl}/delegates`,
+      url: `${this.baseUrl}/v1/delegates`,
       method,
       body
     })
@@ -202,7 +213,7 @@ export class QueueClient extends BaseClient {
     }
 
     return this.api({
-      url: `${this.baseUrl}/multisig-transactions`,
+      url: `${this.baseUrl}/v1/multisig-transactions`,
       method: HttpMethod.Post,
       body: {
         ...safeTransactionData,
@@ -242,7 +253,7 @@ export class QueueClient extends BaseClient {
     if (!safes?.length) {
       throw new Error('At least one Safe is required')
     }
-    const url = new URL(`${this.baseUrl}/multisig-transactions`)
+    const url = new URL(`${this.baseUrl}/v1/multisig-transactions`)
     this.#toSafesParam(safes).forEach((safe) => url.searchParams.append('safes', safe))
     this.addQueryParams(url, { executed, nonceOrder, limit, offset })
 
@@ -269,7 +280,7 @@ export class QueueClient extends BaseClient {
     if (addresses.length === 0 || addresses.some((address) => address === '')) {
       throw new Error('Invalid Safe address')
     }
-    const url = new URL(`${this.baseUrl}/multisig-transactions/queue`)
+    const url = new URL(`${this.baseUrl}/v1/multisig-transactions/queue`)
     addresses.forEach((address) =>
       url.searchParams.append('safes', `${this.getAddress(address)}:${this.chainId}`)
     )
@@ -293,7 +304,7 @@ export class QueueClient extends BaseClient {
     if (!safeTxHashes?.length) {
       throw new Error('At least one safeTxHash is required')
     }
-    const url = new URL(`${this.baseUrl}/multisig-transactions/batch`)
+    const url = new URL(`${this.baseUrl}/v1/multisig-transactions/batch`)
     safeTxHashes.forEach((safeTxHash) => url.searchParams.append('safeTxHash', safeTxHash))
 
     return this.api({
@@ -314,7 +325,7 @@ export class QueueClient extends BaseClient {
       throw new Error('Invalid safeTxHash')
     }
     return this.api({
-      url: `${this.baseUrl}/multisig-transactions/${safeTxHash}`,
+      url: `${this.baseUrl}/v1/multisig-transactions/${safeTxHash}`,
       method: HttpMethod.Get
     })
   }
@@ -341,7 +352,7 @@ export class QueueClient extends BaseClient {
     const signature = await signDeleteTransaction(signer, safeTxHash, safe, this.chainId)
 
     return this.api({
-      url: `${this.baseUrl}/multisig-transactions/${safeTxHash}`,
+      url: `${this.baseUrl}/v1/multisig-transactions/${safeTxHash}`,
       method: HttpMethod.Delete,
       body: { signature }
     })
@@ -363,7 +374,7 @@ export class QueueClient extends BaseClient {
       throw new Error('Invalid Safe address')
     }
     const url = new URL(
-      `${this.baseUrl}/safes/${this.getAddress(safeAddress)}/multisig-transactions`
+      `${this.baseUrl}/v1/safes/${this.getAddress(safeAddress)}/multisig-transactions`
     )
     this.addQueryParams(url, {
       chainId: allChains ? undefined : this.chainId,
@@ -400,7 +411,7 @@ export class QueueClient extends BaseClient {
       throw new Error('Invalid signatures')
     }
     return this.api({
-      url: `${this.baseUrl}/multisig-transactions/${safeTxHash}/signatures`,
+      url: `${this.baseUrl}/v1/multisig-transactions/${safeTxHash}/signatures`,
       method: HttpMethod.Post,
       body: { signatures: signatureList }
     })
@@ -421,16 +432,14 @@ export class QueueClient extends BaseClient {
     safeAddress: string,
     { message, signatures, originName, originUrl }: AddMessageProps
   ): Promise<MessageResponse> {
-    if (!this.isValidAddress(safeAddress)) {
-      throw new Error('Invalid Safe address')
-    }
+    const safe = this.#getSafeAddress(safeAddress)
     const signatureList = toArray(signatures).filter(Boolean)
     if (signatureList.length === 0) {
       throw new Error('Invalid signatures')
     }
 
     return this.api({
-      url: `${this.baseUrl}/safes/${safeAddress}/messages`,
+      url: `${this.baseUrl}/v1/safes/${safe}/messages`,
       method: HttpMethod.Post,
       body: {
         chainId: Number(this.chainId),
@@ -454,10 +463,8 @@ export class QueueClient extends BaseClient {
     safeAddress: string,
     { allChains, limit, offset }: GetMessagesOptions = {}
   ): Promise<MessageListResponse> {
-    if (!this.isValidAddress(safeAddress)) {
-      throw new Error('Invalid Safe address')
-    }
-    const url = new URL(`${this.baseUrl}/safes/${safeAddress}/messages`)
+    const safe = this.#getSafeAddress(safeAddress)
+    const url = new URL(`${this.baseUrl}/v1/safes/${safe}/messages`)
     this.addQueryParams(url, { chainId: allChains ? undefined : this.chainId, limit, offset })
 
     return this.api({
@@ -478,7 +485,7 @@ export class QueueClient extends BaseClient {
       throw new Error('Invalid messageHash')
     }
     return this.api({
-      url: `${this.baseUrl}/messages/${messageHash}`,
+      url: `${this.baseUrl}/v1/messages/${messageHash}`,
       method: HttpMethod.Get
     })
   }
@@ -504,7 +511,7 @@ export class QueueClient extends BaseClient {
       throw new Error('Invalid signatures')
     }
     return this.api({
-      url: `${this.baseUrl}/messages/${messageHash}/signatures`,
+      url: `${this.baseUrl}/v1/messages/${messageHash}/signatures`,
       method: HttpMethod.Post,
       body: { signatures: signatureList }
     })

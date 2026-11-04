@@ -308,17 +308,15 @@ describe('Indexer (Transaction Service) endpoints', () => {
     })
   })
 
-  it('uses the custom txServiceUrl', async () => {
-    const txServiceUrl = 'http://my-custom-tx-service.com/api'
+  it('uses the custom indexerServiceUrl', async () => {
+    const indexerServiceUrl = 'http://my-custom-tx-service.com/api'
     const apiKit = new SafeApiKit({
       chainId,
-      txServiceUrl,
-      queueServiceUrl: 'http://my-custom-queue-service.com',
-      decoderServiceUrl: 'http://my-custom-decoder-service.com'
+      indexerServiceUrl
     })
     await chai.expect(apiKit.indexer.getServiceInfo()).to.be.fulfilled
     chai
       .expect(fetchData)
-      .to.have.been.calledWith({ url: `${txServiceUrl}/v1/about`, method: 'get' })
+      .to.have.been.calledWith({ url: `${indexerServiceUrl}/v1/about`, method: 'get' })
   })
 })

@@ -5,7 +5,6 @@ import { onChainMessages } from './onChainMessages'
 import { SafeClient } from '../../SafeClient'
 
 jest.mock('@safe-global/protocol-kit')
-jest.mock('@safe-global/api-kit')
 jest.mock('../../utils', () => {
   return {
     ...jest.requireActual('../../utils'),
@@ -22,10 +21,24 @@ describe('onChainMessages', () => {
 
   beforeEach(() => {
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({
-      chainId: 1n,
-      apiKey: 'apiKey'
-    }) as jest.Mocked<SafeApiKit>
+    apiKit = {
+      queue: {
+        getTransaction: jest.fn(),
+        confirmTransaction: jest.fn(),
+        getPendingTransactions: jest.fn(),
+        getMessage: jest.fn(),
+        getMessages: jest.fn(),
+        addMessage: jest.fn(),
+        confirmMessage: jest.fn()
+      },
+      indexer: {
+        addSafeOperation: jest.fn(),
+        getSafeOperation: jest.fn(),
+        confirmSafeOperation: jest.fn(),
+        getPendingSafeOperations: jest.fn()
+      },
+      decoder: {}
+    } as unknown as jest.Mocked<SafeApiKit>
     safeClient = new SafeClient(protocolKit, apiKit)
   })
 

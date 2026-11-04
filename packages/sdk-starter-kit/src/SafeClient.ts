@@ -1,5 +1,5 @@
 import Safe from '@safe-global/protocol-kit'
-import SafeApiKit, { SafeMultisigTransactionListResponse } from '@safe-global/api-kit'
+import SafeApiKit, { TransactionListResponse } from '@safe-global/api-kit'
 import {
   SafeMultisigTransactionResponse,
   SafeTransaction,
@@ -95,27 +95,29 @@ export class SafeClient extends BaseClient {
    */
   async confirm({ safeTxHash }: ConfirmTransactionProps): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
-    let transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+    let transactionResponse = await this.apiKit.queue.getTransaction(safeTxHash)
 
-    if (transactionResponse.isExecuted) {
+    if (transactionResponse.txHash) {
       return createSafeClientResult({
         status: SafeClientTxStatus.EXECUTED,
         safeAddress,
-        txHash: transactionResponse.transactionHash || '',
+        txHash: transactionResponse.txHash,
         safeTxHash
       })
     }
 
-    if (this.#needsConfirmation(transactionResponse)) {
+    const threshold = await this.protocolKit.getThreshold()
+
+    if (this.#needsConfirmation(transactionResponse, threshold)) {
       const signedTransaction = await this.protocolKit.signTransaction(transactionResponse)
       const signature = signedTransaction.encodedSignatures()
 
-      await this.apiKit.confirmTransaction(safeTxHash, signature)
+      await this.apiKit.queue.confirmTransaction(safeTxHash, signature)
 
-      transactionResponse = await this.apiKit.getTransaction(safeTxHash)
+      transactionResponse = await this.apiKit.queue.getTransaction(safeTxHash)
     }
 
-    if (!this.#needsConfirmation(transactionResponse)) {
+    if (!this.#needsConfirmation(transactionResponse, threshold)) {
       const executedTransactionResponse: TransactionResult =
         await this.protocolKit.executeTransaction(transactionResponse)
 
@@ -140,13 +142,13 @@ export class SafeClient extends BaseClient {
    * Retrieves the pending transactions for the current safe address.
    *
    * @async
-   * @returns {Promise<SafeMultisigTransactionListResponse>} A promise that resolves to an array of pending transactions.
+   * @returns {Promise<TransactionListResponse>} A promise that resolves to an array of pending transactions.
    * @throws {Error} If there is an issue retrieving the safe address or pending transactions.
    */
-  async getPendingTransactions(): Promise<SafeMultisigTransactionListResponse> {
+  async getPendingTransactions(): Promise<TransactionListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
-    return this.apiKit.getPendingTransactions(safeAddress)
+    return this.apiKit.queue.getPendingTransactions(safeAddress)
   }
 
   /**
@@ -278,10 +280,11 @@ export class SafeClient extends BaseClient {
     })
   }
 
-  #needsConfirmation(transactionResponse: SafeMultisigTransactionResponse): boolean {
-    return (
-      (transactionResponse.confirmations?.length || 0) < transactionResponse.confirmationsRequired
-    )
+  #needsConfirmation(
+    transactionResponse: SafeMultisigTransactionResponse,
+    threshold: number
+  ): boolean {
+    return (transactionResponse.confirmations?.length || 0) < threshold
   }
 
   async #reconnectSafe(): Promise<void> {

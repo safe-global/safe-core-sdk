@@ -61,7 +61,7 @@ describe('Queue service endpoints', () => {
 
   it('getServiceInfo', async () => {
     await chai.expect(safeApiKit.queue.getServiceInfo()).to.be.eventually.deep.equals(OK)
-    chai.expect(fetchData).to.have.been.calledWith({ url: `${baseUrl}/about`, method: 'get' })
+    chai.expect(fetchData).to.have.been.calledWith({ url: `${baseUrl}/about`, method: 'GET' })
   })
 
   describe('delegates', () => {
@@ -71,7 +71,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates?safe=${safeAddress}`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -81,7 +81,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates?safe=${safeAddress}`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -101,7 +101,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates?chainId=${chainId}&safe=${safeAddress}&delegate=${delegateAddress}&delegator=${delegatorAddress}&label=label&limit=10&offset=5`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -121,7 +121,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(safeApiKit.queue.addDelegate(props)).to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates`,
-        method: 'post',
+        method: 'POST',
         body: {
           chainId: Number(chainId),
           safe: null,
@@ -146,7 +146,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(safeApiKit.queue.addDelegate(props)).to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates`,
-        method: 'post',
+        method: 'POST',
         body: {
           chainId: Number(chainId),
           safe: safeAddress,
@@ -171,7 +171,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(safeApiKit.queue.addDelegate(props)).to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates`,
-        method: 'post',
+        method: 'POST',
         body: {
           chainId: null,
           safe: null,
@@ -210,7 +210,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(safeApiKit.queue.updateDelegate(props)).to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates`,
-        method: 'patch',
+        method: 'PATCH',
         body: {
           chainId: Number(chainId),
           safe: safeAddress,
@@ -229,7 +229,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(safeApiKit.queue.removeDelegate(props)).to.be.fulfilled
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates`,
-        method: 'delete',
+        method: 'DELETE',
         body: {
           chainId: Number(chainId),
           safe: null,
@@ -252,7 +252,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(safeApiKit.queue.removeDelegate(props)).to.be.fulfilled
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates`,
-        method: 'delete',
+        method: 'DELETE',
         body: {
           chainId: Number(chainId),
           safe: safeAddress,
@@ -270,7 +270,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(safeApiKit.queue.removeDelegate(props)).to.be.fulfilled
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/delegates`,
-        method: 'delete',
+        method: 'DELETE',
         body: {
           chainId: Number(chainId),
           safe: null,
@@ -316,7 +316,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions`,
-        method: 'post',
+        method: 'POST',
         body: {
           ...safeTransactionData,
           ...options,
@@ -343,7 +343,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions`,
-        method: 'post',
+        method: 'POST',
         body: {
           ...safeTransactionData,
           ...options,
@@ -391,7 +391,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions?safes=${safeAddress}&safes=${otherSafeAddress}%3A1%3A137&executed=false&nonceOrder=asc&limit=10&offset=2`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -407,7 +407,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions/queue?safes=${safeAddress}%3A${chainId}`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -423,7 +423,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions/queue?safes=${safeAddress}%3A${chainId}&safes=${otherSafeAddress}%3A${chainId}&nonceOrder=desc&limit=1&offset=1`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -442,7 +442,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions/batch?safeTxHash=${safeTxHash}&safeTxHash=${otherSafeTxHash}`,
-        method: 'get'
+        method: 'GET'
       })
       await chai
         .expect(safeApiKit.queue.getTransactionsBatch([]))
@@ -455,7 +455,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions/${safeTxHash}`,
-        method: 'get'
+        method: 'GET'
       })
       await chai
         .expect(safeApiKit.queue.getTransaction(''))
@@ -474,7 +474,7 @@ describe('Queue service endpoints', () => {
       ).to.be.fulfilled
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions/${safeTxHash}`,
-        method: 'delete',
+        method: 'DELETE',
         body: { signature }
       })
       await chai
@@ -491,7 +491,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/multisig-transactions?chainId=${chainId}`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -509,7 +509,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/multisig-transactions?executed=true&nonceOrder=asc&limit=10&offset=2`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -519,7 +519,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions/${safeTxHash}/signatures`,
-        method: 'post',
+        method: 'POST',
         body: { signatures: ['0x1234'] }
       })
       await chai
@@ -527,7 +527,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions/${safeTxHash}/signatures`,
-        method: 'post',
+        method: 'POST',
         body: { signatures: ['0x1234', '0x5678'] }
       })
       await chai
@@ -547,7 +547,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages`,
-        method: 'post',
+        method: 'POST',
         body: {
           chainId: Number(chainId),
           message: 'message',
@@ -571,7 +571,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages`,
-        method: 'post',
+        method: 'POST',
         body: {
           chainId: Number(chainId),
           message: 'message',
@@ -593,7 +593,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages`,
-        method: 'post',
+        method: 'POST',
         body: {
           chainId: Number(chainId),
           message: 'message',
@@ -617,7 +617,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(safeApiKit.queue.getMessages(safeAddress)).to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages?chainId=${chainId}`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -627,7 +627,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages?chainId=${chainId}`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -637,7 +637,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages?limit=5&offset=1`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -645,7 +645,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(safeApiKit.queue.getMessage(messageHash)).to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/messages/${messageHash}`,
-        method: 'get'
+        method: 'GET'
       })
       await chai.expect(safeApiKit.queue.getMessage('')).to.be.rejectedWith('Invalid messageHash')
     })
@@ -656,7 +656,7 @@ describe('Queue service endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/messages/${messageHash}/signatures`,
-        method: 'post',
+        method: 'POST',
         body: { signatures: ['0x1234'] }
       })
       await chai
@@ -674,7 +674,7 @@ describe('Queue service endpoints', () => {
       await chai.expect(apiKit.queue.getTransaction(safeTxHash)).to.be.fulfilled
       chai.expect(fetchData).to.have.been.calledWith({
         url: `http://my-custom-queue-service.com/api/v1/multisig-transactions/${safeTxHash}`,
-        method: 'get'
+        method: 'GET'
       })
     })
   })

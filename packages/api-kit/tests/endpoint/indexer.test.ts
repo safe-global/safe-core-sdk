@@ -50,7 +50,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
   it('getServiceInfo', async () => {
     await chai.expect(safeApiKit.indexer.getServiceInfo()).to.be.eventually.deep.equals(OK)
-    chai.expect(fetchData).to.have.been.calledWith({ url: `${baseUrl}/v1/about`, method: 'get' })
+    chai.expect(fetchData).to.have.been.calledWith({ url: `${baseUrl}/v1/about`, method: 'GET' })
   })
 
   it('getServiceSingletonsInfo', async () => {
@@ -59,7 +59,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/about/singletons`,
-      method: 'get'
+      method: 'GET'
     })
   })
 
@@ -69,7 +69,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/owners/${randomAddress}/safes/`,
-      method: 'get'
+      method: 'GET'
     })
     await chai
       .expect(safeApiKit.indexer.getSafesByOwner(''))
@@ -82,7 +82,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/modules/${randomAddress}/safes/`,
-      method: 'get'
+      method: 'GET'
     })
     await chai
       .expect(safeApiKit.indexer.getSafesByModule(''))
@@ -95,7 +95,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK_WITH_SINGLETON)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/`,
-      method: 'get'
+      method: 'GET'
     })
     await chai.expect(safeApiKit.indexer.getSafeInfo('')).to.be.rejectedWith('Invalid Safe address')
   })
@@ -106,7 +106,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK_WITH_SINGLETON)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/creation/`,
-      method: 'get'
+      method: 'GET'
     })
   })
 
@@ -122,7 +122,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/multisig-transactions/estimations/`,
-      method: 'post',
+      method: 'POST',
       body: safeTransaction
     })
   })
@@ -133,7 +133,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/incoming-transfers/`,
-      method: 'get'
+      method: 'GET'
     })
   })
 
@@ -143,7 +143,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/incoming-transfers/?_from=${safeAddress}`,
-      method: 'get'
+      method: 'GET'
     })
   })
 
@@ -155,7 +155,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/module-transactions/?module=${randomAddress}`,
-      method: 'get'
+      method: 'GET'
     })
   })
 
@@ -165,7 +165,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v2/safes/${safeAddress}/all-transactions/?limit=5`,
-      method: 'get'
+      method: 'GET'
     })
   })
 
@@ -175,7 +175,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/tokens/?search=USD`,
-      method: 'get'
+      method: 'GET'
     })
   })
 
@@ -185,7 +185,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/tokens/${tokenAddress}/`,
-      method: 'get'
+      method: 'GET'
     })
     await chai.expect(safeApiKit.indexer.getToken('')).to.be.rejectedWith('Invalid token address')
   })
@@ -197,7 +197,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safes/${safeAddress}/safe-operations/`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -207,7 +207,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safes/${safeAddress}/safe-operations/?executed=false`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -217,7 +217,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safe-operations/${safeOpHash}/`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -262,7 +262,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safes/${safeAddress}/safe-operations/`,
-        method: 'post',
+        method: 'POST',
         body: {
           nonce: userOperation.nonce,
           initCode: userOperation.initCode,
@@ -288,7 +288,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safe-operations/${safeOpHash}/confirmations/?limit=2`,
-        method: 'get'
+        method: 'GET'
       })
     })
 
@@ -299,7 +299,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safe-operations/${safeOpHash}/confirmations/`,
-        method: 'post',
+        method: 'POST',
         body: {
           signature:
             '0x23e70757bcfe1ccba40588ee3ec8fbca7ff4b51ad48703a598fbe98b935b927d064a98cdcfaf2eff00ae05628ed38f15799a732e143f9fce7215a62fe8e14ff020'
@@ -317,6 +317,6 @@ describe('Indexer (Transaction Service) endpoints', () => {
     await chai.expect(apiKit.indexer.getServiceInfo()).to.be.fulfilled
     chai
       .expect(fetchData)
-      .to.have.been.calledWith({ url: `${indexerServiceUrl}/v1/about`, method: 'get' })
+      .to.have.been.calledWith({ url: `${indexerServiceUrl}/v1/about`, method: 'GET' })
   })
 })

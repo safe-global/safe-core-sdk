@@ -38,14 +38,14 @@ describe('Decoder service endpoints', () => {
 
   it('getServiceInfo', async () => {
     await chai.expect(safeApiKit.decoder.getServiceInfo()).to.be.eventually.deep.equals(OK)
-    chai.expect(fetchData).to.have.been.calledWith({ url: `${baseUrl}/about`, method: 'get' })
+    chai.expect(fetchData).to.have.been.calledWith({ url: `${baseUrl}/about`, method: 'GET' })
   })
 
   it('decodeData', async () => {
     await chai.expect(safeApiKit.decoder.decodeData(data)).to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/data-decoder`,
-      method: 'post',
+      method: 'POST',
       body: { data }
     })
   })
@@ -56,7 +56,7 @@ describe('Decoder service endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/data-decoder`,
-      method: 'post',
+      method: 'POST',
       body: { data, to: contractAddress, chainId: Number(chainId) }
     })
   })
@@ -68,7 +68,7 @@ describe('Decoder service endpoints', () => {
 
   it('getContracts', async () => {
     await chai.expect(safeApiKit.decoder.getContracts()).to.be.eventually.deep.equals(OK)
-    chai.expect(fetchData).to.have.been.calledWith({ url: `${baseUrl}/contracts`, method: 'get' })
+    chai.expect(fetchData).to.have.been.calledWith({ url: `${baseUrl}/contracts`, method: 'GET' })
   })
 
   it('getContracts with filters', async () => {
@@ -84,7 +84,7 @@ describe('Decoder service endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/contracts?chain_ids=1&chain_ids=137&trusted_for_delegate_call=true&limit=10&offset=5`,
-      method: 'get'
+      method: 'GET'
     })
   })
 
@@ -94,7 +94,7 @@ describe('Decoder service endpoints', () => {
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/contracts/${contractAddress}?chain_ids=${chainId}`,
-      method: 'get'
+      method: 'GET'
     })
     await chai
       .expect(safeApiKit.decoder.getContract(''))
@@ -109,7 +109,7 @@ describe('Decoder service endpoints', () => {
     await chai.expect(apiKit.decoder.decodeData(data)).to.be.fulfilled
     chai.expect(fetchData).to.have.been.calledWith({
       url: 'http://my-custom-decoder-service.com/api/v1/data-decoder',
-      method: 'post',
+      method: 'POST',
       body: { data }
     })
   })

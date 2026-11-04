@@ -1,8 +1,8 @@
 export enum HttpMethod {
-  Get = 'get',
-  Post = 'post',
-  Patch = 'patch',
-  Delete = 'delete'
+  Get = 'GET',
+  Post = 'POST',
+  Patch = 'PATCH',
+  Delete = 'DELETE'
 }
 
 export interface HttpRequest {

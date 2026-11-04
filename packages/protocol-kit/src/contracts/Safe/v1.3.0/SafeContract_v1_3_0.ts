@@ -239,7 +239,7 @@ class SafeContract_v1_3_0
       })
 
       return txResult.result
-    } catch (error) {
+    } catch {
       return false
     }
   }

@@ -1,5 +1,29 @@
 # @safe-global/relay-kit
 
+## 6.1.5
+
+### Patch Changes
+
+- 0306511: chore: add Whitechain (wbt) chain support and bump safe-deployments and safe-modules-deployments
+- Updated dependencies [0306511]
+  - @safe-global/protocol-kit@8.0.11
+
+## 6.1.4
+
+### Patch Changes
+
+- Republish: 8.0.9 / 6.1.3 shipped unresolved `workspace:^` dependency ranges
+- Updated dependencies
+  - @safe-global/protocol-kit@8.0.10
+
+## 6.1.3
+
+### Patch Changes
+
+- 3c25d33: chore: add GenLayer (genlayer) chain support and bump safe-deployments and safe-modules-deployments
+- Updated dependencies [3c25d33]
+  - @safe-global/protocol-kit@8.0.9
+
 ## 6.1.2
 
 ### Patch Changes

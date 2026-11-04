@@ -16,8 +16,8 @@
     "generate-publish-info": "ts-node ./scripts/generate-publish-info.ts"
   },
   "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=10.16.0"
+    "node": ">=22.0.0",
+    "pnpm": ">=10.34.9"
   },
   "author": "Safe (https://safe.global)",
   "license": "MIT",
@@ -29,14 +29,12 @@
     "@safe-global/sdk-starter-kit": "workspace:^",
     "@safe-global/types-kit": "workspace:^",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.15.30",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
+    "@types/node": "^22.20.5",
     "dotenv": "^16.4.7",
     "esbuild": "^0.28.1",
-    "eslint": "^8.56.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.5.6",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.7",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
     "lint-staged": "^15.4.3",
@@ -46,7 +44,8 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.8",
-    "typescript": "^5.6.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.0",
     "viem": "^2.52.2",
     "yaml": "^2.9.0"
   },
@@ -59,5 +58,5 @@
       "prettier --write"
     ]
   },
-  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
+  "packageManager": "pnpm@10.34.9+sha512.f49b5a8ea0fdedb44bb3c0c1d6575092a53c2950d95b7ad15df11f17974877a2de3a01c07e934e9b28ce716e51c09a94962c7306d09be2e1e4b18a8c8762fd32"
 }

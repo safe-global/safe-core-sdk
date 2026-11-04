@@ -404,7 +404,7 @@ export class IndexerClient extends BaseClient {
     }
     try {
       safeAddress = this.getAddress(safeAddressProp)
-    } catch (err) {
+    } catch {
       throw new Error(`Invalid Safe address ${safeAddressProp}`)
     }
 
@@ -414,7 +414,7 @@ export class IndexerClient extends BaseClient {
 
     try {
       moduleAddress = this.getAddress(moduleAddressProp)
-    } catch (err) {
+    } catch {
       throw new Error(`Invalid module address ${moduleAddressProp}`)
     }
 

@@ -71,7 +71,7 @@ async function checkAndUpdate() {
         const shortName = await getChainShortName(chainId)
         console.log(`Adding ${chainId} with shortName ${shortName}`)
         updateNetworks.push({ chainId: BigInt(chainId), shortName: shortName })
-      } catch (error) {
+      } catch {
         throw new Error(`EIP-3770 Failed to retrieve chain name for ${chainId}`)
       }
     }

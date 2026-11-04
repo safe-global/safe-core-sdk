@@ -14,7 +14,7 @@ export const DUMMY_CLIENT_DATA_FIELDS = [
  * Dummy authenticator data. This can be used for gas estimations, as it ensures that the correct
  * authenticator flags are set.
  */
-export const DUMMY_AUTHENTICATOR_DATA = new Uint8Array(37)
+export const DUMMY_AUTHENTICATOR_DATA: Uint8Array = new Uint8Array(37)
 // Authenticator data is the concatenation of:
 // - 32 byte SHA-256 hash of the relying party ID
 // - 1 byte for the user verification flag

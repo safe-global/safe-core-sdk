@@ -5,11 +5,11 @@ import {
   SignatureType,
   UserOperationResponse
 } from '@safe-global/types-kit'
-import { ListOptions, ListResponse } from './common'
+import { ChainOptions, ListOptions, ListResponse } from './common'
 
 export type QueryParamsOptions = {
   // Accept query params that are part of the swagger documentation. Check at https://safe-transaction-mainnet.safe.global/
-  [key: string]: string | number | boolean | undefined
+  [key: string]: string | number | boolean | bigint | undefined
 }
 
 export type IndexerServiceInfoResponse = {
@@ -81,6 +81,7 @@ export type SafeMultisigTransactionEstimateResponse = {
 export type GetIncomingTransactionsOptions = {
   from?: string
 } & ListOptions &
+  ChainOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_incoming_transfers_list
   QueryParamsOptions
 
@@ -104,6 +105,7 @@ export type SafeModuleTransactionListResponse = ListResponse<SafeModuleTransacti
 export type GetModuleTransactionsOptions = {
   module?: string
 } & ListOptions &
+  ChainOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/transactions/safes_module_transactions_list
   QueryParamsOptions
 
@@ -142,6 +144,7 @@ export type TokenInfoListOptions = {
   /** Which field to use when ordering the results. It can be: `name`, `symbol`, `address` (default: `-name`) */
   ordering?: string
 } & ListOptions &
+  ChainOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/tokens/tokens_list
   QueryParamsOptions
 
@@ -216,7 +219,7 @@ export type EthereumTxWithTransfersResponse = EthereumTxResponse & {
   readonly transfers: TransferResponse[]
 }
 
-export type AllTransactionsOptions = ListOptions
+export type AllTransactionsOptions = ListOptions & ChainOptions
 
 export type AllTransactionsListResponse = ListResponse<
   | SafeModuleTransactionWithTransfersResponse
@@ -234,6 +237,7 @@ export type GetSafeOperationListOptions = {
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string
 } & ListOptions &
+  ChainOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/4337/safes_safe_operations_list
   QueryParamsOptions
 
@@ -242,6 +246,7 @@ export type GetPendingSafeOperationListOptions = {
   /** Which field to use when ordering the results. It can be: `user_operation__nonce`, `created` (default: `-user_operation__nonce`) */
   ordering?: string
 } & ListOptions &
+  ChainOptions &
   // Other query parameters may be accepted. Check at https://safe-transaction-mainnet.safe.global/#/4337/safes_safe_operations_list
   QueryParamsOptions
 
@@ -263,4 +268,4 @@ export type AddSafeOperationProps = {
     /** The UserOperation will be valid after this block's timestamp */
     validAfter?: number
   }
-}
+} & ChainOptions

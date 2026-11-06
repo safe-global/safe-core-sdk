@@ -57,11 +57,12 @@ describe('SafeApiKit', () => {
       expect(() => apiKit.queue).to.throw('apiKey is mandatory when queueServiceUrl is not defined')
     })
 
-    it('should allow using the queue and the decoder on a chain without hosted Transaction Service', () => {
+    it('should allow using the queue and the decoder on a chain without hosted Transaction Service', async () => {
       const apiKit = new SafeApiKit({ chainId: 123456789n, apiKey: 'valid-api-key' })
       expect(() => apiKit.queue).not.to.throw()
       expect(() => apiKit.decoder).not.to.throw()
-      expect(() => apiKit.indexer).to.throw(
+      expect(() => apiKit.indexer).not.to.throw()
+      await expect(apiKit.indexer.getServiceInfo()).to.be.rejectedWith(
         'There is no transaction service available for chainId 123456789'
       )
     })

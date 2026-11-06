@@ -1,18 +1,15 @@
 import { DecoderClient } from './clients/DecoderClient'
 import { IndexerClient } from './clients/IndexerClient'
 import { QueueClient } from './clients/QueueClient'
-import {
-  DEFAULT_DECODER_SERVICE_URL,
-  DEFAULT_QUEUE_SERVICE_URL,
-  getTransactionServiceUrl
-} from './utils/config'
+import { DEFAULT_DECODER_SERVICE_URL, DEFAULT_QUEUE_SERVICE_URL } from './utils/config'
 
 export interface SafeApiKitConfig {
-  /** chainId - The chainId */
-  chainId: bigint
+  /** chainId - Default chain of the requests. Each method can set its own `chainId` */
+  chainId?: bigint
   /**
    * indexerServiceUrl - Safe Transaction Service URL, used by `indexer`, including the `/api` path
-   * (e.g. `https://api.safe.global/tx-service/eth/api`). Defaults to the Safe hosted service of the chain.
+   * (e.g. `https://api.safe.global/tx-service/eth/api`). It only serves the `chainId` of the kit.
+   * Defaults to the Safe hosted service of the chain of each request.
    */
   indexerServiceUrl?: string
   /**
@@ -58,15 +55,13 @@ const trimTrailingSlashes = (url: string): string => {
 }
 
 /**
- * Resolves the base URL of a service and checks the API key requirements.
- * The default URL is only computed when no custom URL is given.
+ * Checks the API key requirements and returns the custom URL, or `undefined` for the Safe hosted service.
  */
 function resolveServiceUrl(
   name: ServiceUrlOption,
   url: string | undefined,
-  getDefaultUrl: () => string,
   apiKey?: string
-): string {
+): string | undefined {
   if (url) {
     if (isSafeHostedUrl(url) && !apiKey) {
       throw new Error(
@@ -78,7 +73,7 @@ function resolveServiceUrl(
   if (!apiKey) {
     throw new Error(`apiKey is mandatory when ${name} is not defined. ${API_KEY_HELP}`)
   }
-  return getDefaultUrl()
+  return undefined
 }
 
 /**
@@ -97,20 +92,21 @@ class SafeApiKit {
   #indexer?: IndexerClient
   #decoder?: DecoderClient
 
-  constructor(config: SafeApiKitConfig) {
+  constructor(config: SafeApiKitConfig = {}) {
     this.#config = config
+  }
+
+  /** Returns a kit with the same configuration and another default chain */
+  forChain(chainId: bigint): SafeApiKit {
+    return new SafeApiKit({ ...this.#config, chainId })
   }
 
   /** Safe Queue Service client */
   get queue(): QueueClient {
     if (!this.#queue) {
       const { chainId, queueServiceUrl, apiKey } = this.#config
-      const baseUrl = resolveServiceUrl(
-        'queueServiceUrl',
-        queueServiceUrl,
-        () => DEFAULT_QUEUE_SERVICE_URL,
-        apiKey
-      )
+      const baseUrl =
+        resolveServiceUrl('queueServiceUrl', queueServiceUrl, apiKey) ?? DEFAULT_QUEUE_SERVICE_URL
       this.#queue = new QueueClient({ baseUrl, chainId, apiKey })
     }
     return this.#queue
@@ -123,15 +119,6 @@ class SafeApiKit {
       const baseUrl = resolveServiceUrl(
         'indexerServiceUrl',
         indexerServiceUrl || txServiceUrl,
-        () => {
-          try {
-            return getTransactionServiceUrl(chainId)
-          } catch {
-            throw new TypeError(
-              `There is no transaction service available for chainId ${chainId}. Please set the indexerServiceUrl property to use a custom transaction service.`
-            )
-          }
-        },
         apiKey
       )
       this.#indexer = new IndexerClient({ baseUrl, chainId, apiKey })
@@ -143,12 +130,9 @@ class SafeApiKit {
   get decoder(): DecoderClient {
     if (!this.#decoder) {
       const { chainId, decoderServiceUrl, apiKey } = this.#config
-      const baseUrl = resolveServiceUrl(
-        'decoderServiceUrl',
-        decoderServiceUrl,
-        () => DEFAULT_DECODER_SERVICE_URL,
-        apiKey
-      )
+      const baseUrl =
+        resolveServiceUrl('decoderServiceUrl', decoderServiceUrl, apiKey) ??
+        DEFAULT_DECODER_SERVICE_URL
       this.#decoder = new DecoderClient({ baseUrl, chainId, apiKey })
     }
     return this.#decoder

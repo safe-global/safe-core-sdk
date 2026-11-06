@@ -39,9 +39,9 @@ export class QueueClient extends BaseClient {
   /**
    * Validates a Safe address, plain or with an EIP-3770 prefix, and returns it without the prefix.
    */
-  #getSafeAddress(safeAddress: string): string {
+  #getSafeAddress(safeAddress: string, chainId?: bigint): string {
     try {
-      return this.getAddress(safeAddress)
+      return this.getAddress(safeAddress, chainId)
     } catch {
       throw new Error('Invalid Safe address')
     }
@@ -111,7 +111,8 @@ export class QueueClient extends BaseClient {
       delegatorAddress,
       signer,
       label,
-      allChains
+      allChains,
+      chainId: requestChainId
     }: RemoveDelegateProps & { label?: string }
   ): Promise<T> {
     if (delegateAddress === '') {
@@ -123,11 +124,14 @@ export class QueueClient extends BaseClient {
     if (label === '') {
       throw new Error('Invalid label')
     }
-    const safe = safeAddress ? this.getAddress(safeAddress) : null
+    const chainId = allChains ? null : this.requireChainId(requestChainId, safeAddress)
+    const addressChainId = chainId ?? undefined
+    const safe = safeAddress ? this.getAddress(safeAddress, addressChainId) : null
     const delegate =
-      delegateAddress === zeroAddress ? zeroAddress : this.getAddress(delegateAddress)
-    const delegator = this.getAddress(delegatorAddress)
-    const chainId = allChains ? null : this.chainId
+      delegateAddress === zeroAddress
+        ? zeroAddress
+        : this.getAddress(delegateAddress, addressChainId)
+    const delegator = this.getAddress(delegatorAddress, addressChainId)
     const signature = await signDelegate(signer, delegate, chainId ?? 0n, action, safe ?? undefined)
 
     const body: Record<string, unknown> = {
@@ -150,7 +154,7 @@ export class QueueClient extends BaseClient {
 
   /**
    * Authorizes a delegate to propose transactions on behalf of the delegator (a Safe owner).
-   * The delegation is scoped to the chain of the kit (or all chains with `allChains`) and to the optional Safe.
+   * The delegation is scoped to the chain of the request (or all chains with `allChains`) and to the optional Safe.
    *
    * @param props - The configuration of the new delegate
    * @returns The created delegate
@@ -202,7 +206,8 @@ export class QueueClient extends BaseClient {
     originName,
     originUrl,
     notes,
-    nestedTransaction
+    nestedTransaction,
+    chainId
   }: ProposeTransactionProps): Promise<SafeMultisigTransactionResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
@@ -211,14 +216,15 @@ export class QueueClient extends BaseClient {
     if (signatureList.length === 0) {
       throw new Error('Invalid signatures')
     }
+    const requestChainId = this.requireChainId(chainId, safeAddress)
 
     return this.api({
       url: `${this.baseUrl}/v1/multisig-transactions`,
       method: HttpMethod.Post,
       body: {
         ...safeTransactionData,
-        chainId: Number(this.chainId),
-        safe: this.getAddress(safeAddress),
+        chainId: Number(requestChainId),
+        safe: this.getAddress(safeAddress, requestChainId),
         signatures: signatureList,
         originName,
         originUrl,
@@ -264,26 +270,28 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the pending multisig transactions of one or several Safes on the chain of the kit:
+   * Lists the pending multisig transactions of one or several Safes:
    * the ones not executed whose nonce is equal or higher than the current nonce of the Safe.
+   * Safes of different chains can be mixed using EIP-3770 prefixes.
    *
    * @param safeAddresses - One or several Safe addresses
-   * @param options - Sort and pagination
+   * @param options - Chain, sort and pagination
    * @returns The list of pending transactions
    * @throws "Invalid Safe address"
    */
   async getPendingTransactions(
     safeAddresses: string | string[],
-    { nonceOrder, limit, offset }: GetPendingTransactionsOptions = {}
+    { chainId, nonceOrder, limit, offset }: GetPendingTransactionsOptions = {}
   ): Promise<TransactionListResponse> {
     const addresses = Array.isArray(safeAddresses) ? safeAddresses : [safeAddresses]
     if (addresses.length === 0 || addresses.some((address) => address === '')) {
       throw new Error('Invalid Safe address')
     }
     const url = new URL(`${this.baseUrl}/v1/multisig-transactions/queue`)
-    addresses.forEach((address) =>
-      url.searchParams.append('safes', `${this.getAddress(address)}:${this.chainId}`)
-    )
+    addresses.forEach((address) => {
+      const safeChainId = this.requireChainId(chainId, address)
+      url.searchParams.append('safes', `${this.getAddress(address, safeChainId)}:${safeChainId}`)
+    })
     this.addQueryParams(url, { nonceOrder, limit, offset })
 
     return this.api({
@@ -340,7 +348,8 @@ export class QueueClient extends BaseClient {
   async deleteTransaction({
     safeTxHash,
     safeAddress,
-    signer
+    signer,
+    chainId
   }: DeleteTransactionProps): Promise<void> {
     if (safeTxHash === '') {
       throw new Error('Invalid safeTxHash')
@@ -348,8 +357,9 @@ export class QueueClient extends BaseClient {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const safe = this.getAddress(safeAddress)
-    const signature = await signDeleteTransaction(signer, safeTxHash, safe, this.chainId)
+    const requestChainId = this.requireChainId(chainId, safeAddress)
+    const safe = this.getAddress(safeAddress, requestChainId)
+    const signature = await signDeleteTransaction(signer, safeTxHash, safe, requestChainId)
 
     return this.api({
       url: `${this.baseUrl}/v1/multisig-transactions/${safeTxHash}`,
@@ -359,7 +369,8 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the multisig transactions of a Safe on the chain of the kit (or on every chain with `allChains`).
+   * Lists the multisig transactions of a Safe on the chain of the request, or on every chain
+   * without one or with `allChains`.
    *
    * @param safeAddress - The Safe address
    * @param options - Filters and pagination
@@ -368,16 +379,17 @@ export class QueueClient extends BaseClient {
    */
   async getSafeTransactions(
     safeAddress: string,
-    { executed, nonceOrder, allChains, limit, offset }: GetSafeTransactionsOptions = {}
+    { executed, nonceOrder, allChains, chainId, limit, offset }: GetSafeTransactionsOptions = {}
   ): Promise<TransactionListResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
+    const requestChainId = this.getChainId(chainId, safeAddress)
     const url = new URL(
-      `${this.baseUrl}/v1/safes/${this.getAddress(safeAddress)}/multisig-transactions`
+      `${this.baseUrl}/v1/safes/${this.getAddress(safeAddress, requestChainId)}/multisig-transactions`
     )
     this.addQueryParams(url, {
-      chainId: allChains ? undefined : this.chainId,
+      chainId: allChains ? undefined : requestChainId,
       executed,
       nonceOrder,
       limit,
@@ -420,7 +432,7 @@ export class QueueClient extends BaseClient {
   // Messages
 
   /**
-   * Proposes an off-chain message for a Safe on the chain of the kit.
+   * Proposes an off-chain message for a Safe on the chain of the request.
    *
    * @param safeAddress - The Safe address
    * @param props - The message, its signatures and the optional origin
@@ -430,19 +442,20 @@ export class QueueClient extends BaseClient {
    */
   async addMessage(
     safeAddress: string,
-    { message, signatures, originName, originUrl }: AddMessageProps
+    { message, signatures, originName, originUrl, chainId }: AddMessageProps
   ): Promise<MessageResponse> {
-    const safe = this.#getSafeAddress(safeAddress)
+    const safe = this.#getSafeAddress(safeAddress, chainId)
     const signatureList = toArray(signatures).filter(Boolean)
     if (signatureList.length === 0) {
       throw new Error('Invalid signatures')
     }
+    const requestChainId = this.requireChainId(chainId, safeAddress)
 
     return this.api({
       url: `${this.baseUrl}/v1/safes/${safe}/messages`,
       method: HttpMethod.Post,
       body: {
-        chainId: Number(this.chainId),
+        chainId: Number(requestChainId),
         message,
         signatures: signatureList,
         originName,
@@ -452,7 +465,8 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the messages of a Safe, newest first, on the chain of the kit (or on every chain with `allChains`).
+   * Lists the messages of a Safe, newest first, on the chain of the request, or on every chain
+   * without one or with `allChains`.
    *
    * @param safeAddress - The Safe address
    * @param options - Pagination
@@ -461,11 +475,16 @@ export class QueueClient extends BaseClient {
    */
   async getMessages(
     safeAddress: string,
-    { allChains, limit, offset }: GetMessagesOptions = {}
+    { allChains, chainId, limit, offset }: GetMessagesOptions = {}
   ): Promise<MessageListResponse> {
-    const safe = this.#getSafeAddress(safeAddress)
+    const safe = this.#getSafeAddress(safeAddress, chainId)
+    const requestChainId = this.getChainId(chainId, safeAddress)
     const url = new URL(`${this.baseUrl}/v1/safes/${safe}/messages`)
-    this.addQueryParams(url, { chainId: allChains ? undefined : this.chainId, limit, offset })
+    this.addQueryParams(url, {
+      chainId: allChains ? undefined : requestChainId,
+      limit,
+      offset
+    })
 
     return this.api({
       url: url.toString(),

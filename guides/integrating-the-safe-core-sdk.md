@@ -35,7 +35,7 @@ In the examples below, you can see `provider` and `signer` properties, which rep
 
 ### Initialize the Safe API Kit
 
-As stated in the introduction, the [Safe API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the Safe services. To start using this library, create a new instance of the `SafeApiKit` class, imported from `@safe-global/api-kit`, and pass the `chainId` of the network and your API key.
+As stated in the introduction, the [Safe API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the Safe services. To start using this library, create a new instance of the `SafeApiKit` class, imported from `@safe-global/api-kit`, and pass your API key and, optionally, the `chainId` used by default in the requests.
 
 ```js
 import SafeApiKit from '@safe-global/api-kit'
@@ -61,6 +61,15 @@ const apiKit = new SafeApiKit({
 ```
 
 Each client is created the first time it is used, so only the services you use need to be configured. `txServiceUrl` is still accepted as the former name of `indexerServiceUrl`.
+
+The services are multi-chain. Each method that depends on the chain accepts its own `chainId`, which takes precedence over the EIP-3770 prefix of the address and over the `chainId` of the kit. A custom `indexerServiceUrl` serves only the `chainId` of the kit.
+
+```js
+const apiKit = new SafeApiKit({ apiKey })
+
+const safeInfo = await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 1n })
+const { results } = await apiKit.queue.getPendingTransactions(['eth:0x…', 'base:0x…'])
+```
 
 ### Initialize the Protocol Kit
 

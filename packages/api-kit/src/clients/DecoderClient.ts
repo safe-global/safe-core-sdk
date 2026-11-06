@@ -1,4 +1,5 @@
 import { HttpMethod } from '@safe-global/api-kit/utils/httpRequests'
+import { ChainOptions } from '@safe-global/api-kit/types/common'
 import {
   ContractListResponse,
   DecodeDataResponse,
@@ -28,12 +29,17 @@ export class DecoderClient extends BaseClient {
    * Decodes the specified transaction data using the known ABIs.
    *
    * @param data - The transaction data. '0x' prefixed hexadecimal string
-   * @param to - The address of the receiving contract. When provided, the ABI of the contract on the chain of the kit is used, which makes the decoding more accurate
+   * @param to - The address of the receiving contract, which makes the decoding more accurate
+   * @param options - Chain of the receiving contract
    * @returns The decoded data and the accuracy of the decoding
    * @throws "Invalid data"
    * @throws "Cannot find function selector to decode data"
    */
-  async decodeData(data: string, to?: string): Promise<DecodeDataResponse> {
+  async decodeData(
+    data: string,
+    to?: string,
+    { chainId }: ChainOptions = {}
+  ): Promise<DecodeDataResponse> {
     if (data === '') {
       throw new Error('Invalid data')
     }
@@ -41,9 +47,12 @@ export class DecoderClient extends BaseClient {
     const body: { data: string; to?: string; chainId?: number } = { data }
 
     if (to) {
-      body.to = this.getAddress(to)
-      // The chainId is only accepted by the service when the receiving contract is known
-      body.chainId = Number(this.chainId)
+      // The service only accepts the chainId together with `to`
+      const requestChainId = this.getChainId(chainId, to)
+      body.to = this.getAddress(to, requestChainId)
+      if (requestChainId !== undefined) {
+        body.chainId = Number(requestChainId)
+      }
     }
 
     return this.api({

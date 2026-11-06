@@ -34,6 +34,7 @@ npm install @safe-global/api-kit
 import SafeApiKit from '@safe-global/api-kit'
 
 const apiKit = new SafeApiKit({
+  // Optional. Default chain of the requests, see Multi-chain below
   chainId: 1n,
   // Required when using the Safe hosted services. Get your API key at https://developer.safe.global
   apiKey: 'YOUR_API_KEY',
@@ -66,6 +67,28 @@ await apiKit.queue.confirmTransaction(safeTxHash, otherOwnerSignature)
 const safeInfo = await apiKit.indexer.getSafeInfo(safeAddress)
 const decoded = await apiKit.decoder.decodeData(data, to)
 ```
+
+### Multi-chain
+
+The Safe services are multi-chain, so one kit can work with every chain. The `chainId` of the config is only the default chain of the requests, and each method that depends on the chain accepts its own `chainId`. The chain of a request is, in order of precedence:
+
+1. The `chainId` passed to the method.
+2. The EIP-3770 prefix of the address (`eth:0x…`).
+3. The `chainId` of the kit.
+
+```js
+const apiKit = new SafeApiKit({ apiKey })
+
+await apiKit.queue.proposeTransaction({ safeAddress, safeTransactionData, signatures, chainId: 1n })
+await apiKit.queue.getPendingTransactions(['eth:0x…', 'base:0x…'])
+await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 8453n })
+await apiKit.decoder.decodeData(data, to, { chainId: 1n })
+
+// Same configuration with another default chain
+const mainnetApiKit = apiKit.forChain(1n)
+```
+
+Without a chain, the requests that store or sign something for a chain (`proposeTransaction`, `addMessage`, the delegates, `deleteTransaction`) and the hosted Transaction Service requests throw, while `getSafeTransactions` and `getMessages` return every chain. A Transaction Service indexes a single chain, so a custom `indexerServiceUrl` is only used for the `chainId` of the kit: requests for another chain throw.
 
 ## Need Help or Have Questions?
 

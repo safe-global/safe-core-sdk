@@ -953,7 +953,7 @@ class SafeApiKit {
     }
     try {
       safeAddress = this.#getEip3770Address(safeAddressProp).address
-    } catch (err) {
+    } catch {
       throw new Error(`Invalid Safe address ${safeAddressProp}`)
     }
 
@@ -963,7 +963,7 @@ class SafeApiKit {
 
     try {
       moduleAddress = this.#getEip3770Address(moduleAddressProp).address
-    } catch (err) {
+    } catch {
       throw new Error(`Invalid module address ${moduleAddressProp}`)
     }
 

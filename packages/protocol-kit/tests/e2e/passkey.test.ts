@@ -843,7 +843,7 @@ describe('Passkey', () => {
       })
       const tx = await safeSdk2.createTransaction({ transactions: [safeTransactionData] })
       const signedTx = await safeSdk2.signTransaction(tx)
-      chai.expect(safeSdk.executeTransaction(signedTx)).to.not.be.rejected
+      await chai.expect(safeSdk.executeTransaction(signedTx)).to.not.be.rejected
     })
   })
 

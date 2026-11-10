@@ -8,7 +8,7 @@ export async function signDelegate(
   const domain = {
     name: 'Safe Transaction Service',
     version: '1.0',
-    chainId: Number(chainId)
+    chainId
   }
 
   const types = {

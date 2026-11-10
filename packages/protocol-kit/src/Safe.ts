@@ -2080,7 +2080,7 @@ class Safe {
       const magicValues = [this.#MAGIC_VALUE, this.#MAGIC_VALUE_BYTES]
 
       return responses.some((response, i) => response.slice(0, 10).toLowerCase() === magicValues[i])
-    } catch (error) {
+    } catch {
       return false
     }
   }

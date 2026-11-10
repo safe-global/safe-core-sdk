@@ -24,37 +24,55 @@ describe('estimateTxBaseGas', () => {
     sinon.restore()
   })
 
+  const SAFE_ADDRESS = '0x5000000000000000000000000000000000000005'
+
   function buildSafe({
     contractCode = '0x',
     nonce = 0,
     balance = 0n,
     tokenBalance = 0n,
-    tokenBalanceReverts = false
+    tokenBalanceReverts = false,
+    threshold = 1,
+    isL1SafeSingleton = false,
+    transferProbeGas,
+    transferProbeReverts = true
   }: {
     contractCode?: string
     nonce?: number
     balance?: bigint
     tokenBalance?: bigint
     tokenBalanceReverts?: boolean
+    threshold?: number
+    isL1SafeSingleton?: boolean
+    // Raw eth_estimateGas value the transfer probe resolves to (the helper then strips intrinsic
+    // + calldata). Defaults to reverting, so tests fall back to the flat ERC20 constants.
+    transferProbeGas?: number
+    transferProbeReverts?: boolean
   } = {}) {
     const balanceOfResponse = '0x' + tokenBalance.toString(16).padStart(64, '0')
     const callStub = tokenBalanceReverts
       ? sinon.stub().rejects(new Error('reverted'))
       : sinon.stub().resolves(balanceOfResponse)
+    const estimateGasStub =
+      transferProbeReverts || transferProbeGas === undefined
+        ? sinon.stub().rejects(new Error('reverted'))
+        : sinon.stub().resolves(transferProbeGas.toString())
     const safeProvider = {
       getContractCode: sinon.stub().resolves(contractCode),
       getNonce: sinon.stub().resolves(nonce),
       getBalance: sinon.stub().resolves(balance),
-      call: callStub
+      call: callStub,
+      estimateGas: estimateGasStub
     }
 
     return {
-      getThreshold: sinon.stub().resolves(1),
+      getThreshold: sinon.stub().resolves(threshold),
       getNonce: sinon.stub().resolves(1),
+      getAddress: sinon.stub().resolves(SAFE_ADDRESS),
       getContractVersion: sinon.stub().returns('1.3.0'),
       getSafeProvider: sinon.stub().returns(safeProvider),
       getContractManager: sinon.stub().returns({
-        isL1SafeSingleton: false,
+        isL1SafeSingleton,
         contractNetworks: {}
       }),
       getChainId: sinon.stub().resolves(1n)
@@ -195,6 +213,69 @@ describe('estimateTxBaseGas', () => {
     chai.expect(Number(newReceiverBaseGas) - Number(contractReceiverBaseGas)).to.eq(25_000)
   })
 
+  // Marginal cost per signature: 65 non-zero calldata bytes * 16 + 3_100 ecrecover
+  // (3_000 precompile + 100 warm STATICCALL) + 2_100 cold owners[signer] SLOAD (EIP-2929)
+  const GAS_COST_PER_SIGNATURE = 6_240
+
+  it('scales signature cost with threshold', async () => {
+    // L1 singleton: no SafeMultiSigTransaction event, so the delta is the signature cost alone
+    const singleOwnerSafe = buildSafe({ threshold: 1, isL1SafeSingleton: true })
+    const twoOwnerSafe = buildSafe({ threshold: 2, isL1SafeSingleton: true })
+
+    const singleOwnerBaseGas = await estimateTxBaseGas(singleOwnerSafe, buildTransaction())
+    const twoOwnerBaseGas = await estimateTxBaseGas(twoOwnerSafe, buildTransaction())
+
+    chai.expect(Number(twoOwnerBaseGas) - Number(singleOwnerBaseGas)).to.eq(GAS_COST_PER_SIGNATURE)
+  })
+
+  it('uses the ERC20 transfer probe when it exceeds the flat floor', async () => {
+    const TRANSFER_PROBE_CALLDATA_GAS = 356
+    const INTRINSIC_TX_GAS_COST = 21_000
+    const ERC20_TRANSFER_GAS_COST = 21_000
+    const flooredSafe = buildSafe({ tokenBalance: 1n })
+    const probedSafe = buildSafe({
+      tokenBalance: 1n,
+      transferProbeGas: 90_000,
+      transferProbeReverts: false
+    })
+
+    const flooredBaseGas = await estimateTxBaseGas(
+      flooredSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+    const probedBaseGas = await estimateTxBaseGas(
+      probedSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+
+    const executionGas = 90_000 - INTRINSIC_TX_GAS_COST - TRANSFER_PROBE_CALLDATA_GAS
+    chai
+      .expect(Number(probedBaseGas) - Number(flooredBaseGas))
+      .to.eq(executionGas - ERC20_TRANSFER_GAS_COST)
+  })
+
+  it('ignores the ERC20 transfer probe when it is below the flat floor', async () => {
+    // Raw probe 30_000 -> execution-only 30_000 - 21_000 - 356 = 8_644 < 21_000 floor, so the
+    // flat constant wins and baseGas matches the reverting-probe (floor) case.
+    const flooredSafe = buildSafe({ tokenBalance: 1n })
+    const lowProbeSafe = buildSafe({
+      tokenBalance: 1n,
+      transferProbeGas: 30_000,
+      transferProbeReverts: false
+    })
+
+    const flooredBaseGas = await estimateTxBaseGas(
+      flooredSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+    const lowProbeBaseGas = await estimateTxBaseGas(
+      lowProbeSafe,
+      buildTransaction({ gasToken: ERC20_TOKEN, refundReceiver: NEW_REFUND_RECEIVER })
+    )
+
+    chai.expect(Number(lowProbeBaseGas) - Number(flooredBaseGas)).to.eq(0)
+  })
+
   // Polygon PoS (137) raises COLD_SLOAD_COST 2_100 -> 5_460 and COLD_SSTORE_COST 2_100 -> 2_940
   // (PIP-88 / Chicago hard fork). baseGas must scale the cold SLOADs/SSTOREs it counts.
   function buildSafeOnChain(chainId: bigint, overrides = {}) {
@@ -205,20 +286,21 @@ describe('estimateTxBaseGas', () => {
 
   it('scales the cold SLOADs counted in baseGas for Polygon (PIP-88) vs an EIP-2929 chain', async () => {
     // Initialized Safe (nonce != 0): the only per-chain difference is the cold SLOAD price,
-    // applied to the 3 cold SLOADs counted in EXTRA_BASE (threshold + getGuard + owners lookup).
+    // applied to 4 cold SLOADs: threshold + getGuard (EXTRA_BASE), owners[signer] (1 signature)
+    // and the proxy's singleton slot (proxy fallback).
     const ethereumSafe = buildSafeOnChain(1n)
     const polygonSafe = buildSafeOnChain(137n)
 
     const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
     const polygonBaseGas = await estimateTxBaseGas(polygonSafe, buildTransaction())
 
-    // 3 cold SLOADs * (5_460 - 2_100) = 3 * 3_360 = 10_080
-    chai.expect(Number(polygonBaseGas) - Number(ethereumBaseGas)).to.eq(10_080)
+    // 4 cold SLOADs * (5_460 - 2_100) = 4 * 3_360 = 13_440
+    chai.expect(Number(polygonBaseGas) - Number(ethereumBaseGas)).to.eq(13_440)
   })
 
   it('scales the cold SSTORE nonce initialization for Polygon when the Safe is uninitialized', async () => {
     // Uninitialized Safe (nonce == 0): adds the cold SSTORE set surcharge difference on top of
-    // the 3 cold SLOAD difference.
+    // the 4 cold SLOAD difference.
     const ethereumSafe = buildSafeOnChain(1n)
     const polygonSafe = buildSafeOnChain(137n)
     ethereumSafe.getNonce = sinon.stub().resolves(0)
@@ -227,8 +309,8 @@ describe('estimateTxBaseGas', () => {
     const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
     const polygonBaseGas = await estimateTxBaseGas(polygonSafe, buildTransaction())
 
-    // cold SLOAD delta (10_080) + cold SSTORE set delta (2_940 - 2_100 = 840) = 10_920
-    chai.expect(Number(polygonBaseGas) - Number(ethereumBaseGas)).to.eq(10_920)
+    // cold SLOAD delta (13_440) + cold SSTORE set delta (2_940 - 2_100 = 840) = 14_280
+    chai.expect(Number(polygonBaseGas) - Number(ethereumBaseGas)).to.eq(14_280)
   })
 
   it('uses the EIP-2929 default for chains without a repricing entry', async () => {

@@ -87,7 +87,7 @@ describe('EIP-712 sign typed data', () => {
         data: safeTransactionData
       })
       chai.expect(domain.verifyingContract).to.be.eq(safeAddress)
-      chai.expect(domain.chainId).to.be.eq(Number(chainId))
+      chai.expect(domain.chainId).to.be.eq(chainId)
     })
 
     it('should generate the correct types for a EIP-191 message for >= 1.3.0 Safes', () => {
@@ -115,7 +115,7 @@ describe('EIP-712 sign typed data', () => {
           SafeMessage: [{ name: 'message', type: 'bytes' }]
         },
         domain: {
-          chainId: 1,
+          chainId: 1n,
           verifyingContract: safeAddress
         },
         primaryType: 'SafeMessage',
@@ -225,7 +225,7 @@ describe('EIP-712 sign typed data', () => {
           SafeMessage: [{ name: 'message', type: 'bytes' }]
         },
         domain: {
-          chainId: 1,
+          chainId: 1n,
           verifyingContract: safeAddress
         },
         primaryType: 'SafeMessage',

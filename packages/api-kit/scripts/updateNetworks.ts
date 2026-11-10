@@ -1,5 +1,4 @@
 import fs from 'fs'
-import fetch from 'node-fetch'
 import { networks } from '../src/utils/config'
 
 const SAFE_CONFIG_ORIGIN = 'https://safe-config.safe.global'

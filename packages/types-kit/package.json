@@ -1,6 +1,6 @@
 {
   "name": "@safe-global/types-kit",
-  "version": "3.1.0",
+  "version": "4.0.1",
   "description": "Types for use with the Safe Core SDK packages",
   "types": "dist/src/index.d.ts",
   "main": "dist/cjs/index.cjs",
@@ -32,6 +32,9 @@
   },
   "author": "Safe (https://safe.global)",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "bugs": {
     "url": "https://github.com/safe-global/safe-core-sdk/issues"
   },
@@ -40,6 +43,6 @@
   ],
   "homepage": "https://github.com/safe-global/safe-core-sdk#readme",
   "dependencies": {
-    "abitype": "^1.0.2"
+    "abitype": "^1.2.3"
   }
 }

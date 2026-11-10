@@ -614,7 +614,7 @@ export class Safe4337Pack extends RelayKitBasePack<{
         const safeOperation = safeOp.getSafeOperation()
         const signature = await signer.signTypedData({
           domain: {
-            chainId: Number(this.#chainId),
+            chainId: this.#chainId,
             verifyingContract: this.#SAFE_4337_MODULE_ADDRESS
           },
           types: safeOp.getEIP712Type(),

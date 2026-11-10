@@ -18,28 +18,34 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 1
+      fail-fast: false
       matrix:
-        node-version: [20.x]
-        provider: [ethers, viem]
+        node-version: [24.x]
         safe-version: [v1.3.0, v1.4.1, v1.5.0]
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v5.0.0
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413  # v6.1.0
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
       - run: |
           pnpm install --frozen-lockfile
           pnpm build
-      - name: Test ${{ matrix.provider }} - Safe ${{ matrix.safe-version }}
+      - name: Test ethers - Safe ${{ matrix.safe-version }}
         env:
           API_KEY: ${{ secrets.API_KEY }}
         run: |
           cd packages/api-kit
-          pnpm test:ci:${{ matrix.provider }}:${{ matrix.safe-version }}
+          pnpm test:ci:ethers:${{ matrix.safe-version }}
+      - name: Test viem - Safe ${{ matrix.safe-version }}
+        if: ${{ !cancelled() }}
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+        run: |
+          cd packages/api-kit
+          pnpm test:ci:viem:${{ matrix.safe-version }}

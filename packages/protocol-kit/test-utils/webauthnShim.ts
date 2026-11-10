@@ -22,7 +22,9 @@ import CBOR from 'cbor'
  */
 export function base64UrlEncode(data: string | Uint8Array | ArrayBuffer): string {
   const buffer =
-    typeof data === 'string' ? Buffer.from(data.replace(/^0x/, ''), 'hex') : Buffer.from(data)
+    typeof data === 'string'
+      ? Buffer.from(data.replace(/^0x/, ''), 'hex')
+      : Buffer.from(new Uint8Array(data))
   return buffer.toString('base64url')
 }
 
@@ -48,7 +50,7 @@ export function userVerificationFlag(
 }
 
 function b2ab(buf: Uint8Array): ArrayBuffer {
-  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength)
+  return new Uint8Array(buf).buffer
 }
 
 /**
@@ -71,7 +73,7 @@ function isEqualArray(a: Uint8Array, b: Uint8Array) {
 export function encodeWebAuthnSigningMessage(
   clientData: { type: 'webauthn.get'; challenge: string; [key: string]: unknown },
   authenticatorData: BytesLike
-) {
+): Uint8Array {
   return ethers.getBytes(
     ethers.concat([
       authenticatorData,
@@ -252,7 +254,7 @@ export class WebAuthnCredentials {
 
     return {
       id: base64UrlEncode(credential.rawId),
-      rawId: credential.rawId.slice(),
+      rawId: b2ab(credential.rawId),
       response: {
         clientDataJSON: b2ab(ethers.toUtf8Bytes(JSON.stringify(clientData))),
         attestationObject: b2ab(CBOR.encode(attestationObject)),
@@ -308,12 +310,12 @@ export class WebAuthnCredentials {
 
     return {
       id: base64UrlEncode(credential.rawId),
-      rawId: credential.rawId.slice(),
+      rawId: b2ab(credential.rawId),
       response: {
         clientDataJSON: b2ab(ethers.toUtf8Bytes(JSON.stringify(clientData))),
         authenticatorData: b2ab(ethers.getBytes(authenticatorData)),
         signature: b2ab(signature.toDERRawBytes(false)),
-        userHandle: credential.user
+        userHandle: b2ab(credential.user)
       },
       type: 'public-key'
     }

@@ -134,7 +134,7 @@ export type EIP712Types = EIP712TxTypes | EIP712MessageTypes
 export interface EIP712TypedDataTx {
   types: EIP712TxTypes
   domain: {
-    chainId?: string
+    chainId?: bigint
     verifyingContract: string
   }
   primaryType: 'SafeTx'
@@ -155,7 +155,7 @@ export interface EIP712TypedDataTx {
 export interface EIP712TypedDataMessage {
   types: EIP712MessageTypes
   domain: {
-    chainId?: number
+    chainId?: bigint
     verifyingContract: string
   }
   primaryType: 'SafeMessage'
@@ -177,7 +177,7 @@ export type SigningMethodType = SigningMethod | string
 export interface TypedDataDomain {
   name?: string
   version?: string
-  chainId?: number
+  chainId?: number | bigint
   verifyingContract?: string
   salt?: ArrayLike<number> | string
 }

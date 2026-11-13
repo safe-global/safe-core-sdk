@@ -22,7 +22,7 @@
   "author": "Safe (https://safe.global)",
   "license": "MIT",
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
+    "@changesets/cli": "^2.31.1",
     "@safe-global/api-kit": "workspace:^",
     "@safe-global/protocol-kit": "workspace:^",
     "@safe-global/relay-kit": "workspace:^",

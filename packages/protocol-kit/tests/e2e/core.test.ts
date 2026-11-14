@@ -103,6 +103,36 @@ describe('Safe Info', () => {
         )
       ).to.be.true
     })
+
+    it('should keep the signer when connecting to another Safe without a signer', async () => {
+      const { safe, accounts, contractNetworks } = await setupTests()
+      const [account1, account2] = accounts
+      const safeSdk = await Safe.init({
+        provider,
+        signer: account2.address,
+        safeAddress: safe.address,
+        contractNetworks
+      })
+      const safe2 = await getSafeWithOwners([account2.address])
+
+      const safeSdk2 = await safeSdk.connect({ safeAddress: safe2.address })
+      chai.expect(await safeSdk2.getAddress()).to.be.eq(safe2.address)
+      chai.expect(
+        sameString(
+          await safeSdk2.getSafeProvider().getSignerAddress(),
+          account2.signer.account?.address
+        )
+      ).to.be.true
+
+      // An explicit `signer: undefined` still connects without the previous signer
+      const safeSdk3 = await safeSdk.connect({ safeAddress: safe2.address, signer: undefined })
+      chai.expect(
+        sameString(
+          await safeSdk3.getSafeProvider().getSignerAddress(),
+          account1.signer.account?.address
+        )
+      ).to.be.true
+    })
   })
 
   describe('getContractVersion', async () => {

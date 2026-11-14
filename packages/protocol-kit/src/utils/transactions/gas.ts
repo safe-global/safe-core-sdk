@@ -30,13 +30,53 @@ const CALL_DATA_ZERO_BYTE_GAS_COST = 4
 // Every byte != 00 -> 16 Gas cost (68 before Istanbul)
 const CALL_DATA_BYTE_GAS_COST = 16
 
-// Cold SLOAD surcharge (EIP-2929) — first access to a storage slot in a transaction
-const COLD_SLOAD_GAS_COST = 2_100
+// --- Per-chain cold-storage gas costs (EIP-2929) ----------------------------------------------
+//
+// EIP-2929 (Berlin) prices the first ("cold") access to a storage slot in a transaction. The same
+// 2_100 constant is reused for SLOAD and for the cold surcharge of SSTORE. Some chains reprice
+// these away from the Ethereum-mainnet defaults, so the values used by baseGas estimation are
+// resolved per chain via a lookup. Warm access (100) is unchanged on every chain we have traced.
+//
+// Default = EIP-2929 / Berlin standard.
+const DEFAULT_COLD_SLOAD_GAS_COST = 2_100
+const DEFAULT_COLD_SSTORE_GAS_COST = 2_100
 
-// gas cost initialization of a Safe (SSTORE 0→non-zero on a cold slot = 20 000 + 2 100 cold-load surcharge per EIP-2929)
-const INITIALIZATION_GAS_COST = 20_000 + COLD_SLOAD_GAS_COST
+// Chains that deviate from the EIP-2929 default. Keyed by chainId (decimal string).
+//
+// Polygon PoS (137) — PIP-88 "Cold-Storage and Precompile Gas Repricing", activated by the
+// "Chicago" hard fork (mainnet block 87_218_600, 2026-05-21). It splits EIP-2929's single
+// COLD_SLOAD_COST into two independent constants and raises both:
+//   COLD_SLOAD_COST : 2_100 -> 5_460 (2.6x)
+//   COLD_SSTORE_COST: 2_100 -> 2_940 (1.4x)  => warm SSTORE reset = 5_000 - 2_940 = 2_060
+// The `cold + (RESET - cold) == 5_000` invariant is preserved, so the cold SSTORE reset stays
+// 5_000. Confirmed empirically via debug_traceTransaction on Polygon mainnet (see PLA-1651).
+const COLD_SLOAD_GAS_COST_BY_CHAIN: Record<string, number> = {
+  '137': 5_460
+}
+const COLD_SSTORE_GAS_COST_BY_CHAIN: Record<string, number> = {
+  '137': 2_940
+}
 
-// increment nonce gas cost
+function getColdSloadGasCost(chainId: bigint): number {
+  return COLD_SLOAD_GAS_COST_BY_CHAIN[chainId.toString()] ?? DEFAULT_COLD_SLOAD_GAS_COST
+}
+
+function getColdSstoreGasCost(chainId: bigint): number {
+  return COLD_SSTORE_GAS_COST_BY_CHAIN[chainId.toString()] ?? DEFAULT_COLD_SSTORE_GAS_COST
+}
+// ----------------------------------------------------------------------------------------------
+
+// SSTORE 0 -> non-zero (EIP-2200 SSTORE_SET_GAS); the cold surcharge is added per chain.
+const SSTORE_SET_GAS_COST = 20_000
+
+// gas cost initialization of a Safe nonce slot: SSTORE 0->non-zero on a cold slot
+// = SSTORE_SET_GAS_COST + cold SSTORE surcharge (chain-aware).
+function getInitializationGasCost(coldSstoreGasCost: number): number {
+  return SSTORE_SET_GAS_COST + coldSstoreGasCost
+}
+
+// increment nonce gas cost (cold SSTORE reset, non-zero -> non-zero). The `cold + (RESET - cold)`
+// invariant keeps this at 5_000 on every chain we have traced, including post-Chicago Polygon.
 const INCREMENT_NONCE_GAS_COST = 5_000
 
 // Keccak gas cost for the hash of the Safe transaction
@@ -49,16 +89,21 @@ const ECRECOVER_GAS_COST = 3_100
 // Intrinsic transaction fee charged by the EVM (always paid by the relayer)
 const INTRINSIC_TX_GAS_COST = 21_000
 
-// Cold SLOADs always paid in execTransaction: `threshold` (in checkSignatures) + `getGuard()` slot
-const PRE_EXEC_STORAGE_GAS_COST = 2 * COLD_SLOAD_GAS_COST
+// Cold SLOADs always paid in execTransaction outside safeTxGas: `threshold` (in checkSignatures) +
+// `getGuard()` slot. Counted explicitly so they scale with the chain's cold SLOAD price. (The cold
+// `owners[signer]` lookups are counted per signature, see getGasCostPerSignature.)
+const PRE_EXEC_COLD_SLOAD_COUNT = 2
 
-// Headroom for SafeMath wrappers, memory expansion, and control-flow checks.
-// Rounded up to leave slack for dynamic signature types and misc.
+// Headroom for SafeMath wrappers, memory expansion and control-flow checks. Slack to leave room
+// for dynamic signature types and misc. (The cold SLOADs above are accounted for separately.)
 const MISC_OVERHEAD_GAS_COST = 900
 
 // Base operations always paid on top of the contract-counted gas (not in safeTxGas / refundGas / events)
-const EXTRA_BASE_GAS_COST =
-  INTRINSIC_TX_GAS_COST + PRE_EXEC_STORAGE_GAS_COST + MISC_OVERHEAD_GAS_COST
+function getExtraBaseGasCost(coldSloadGasCost: number): number {
+  return (
+    INTRINSIC_TX_GAS_COST + PRE_EXEC_COLD_SLOAD_COUNT * coldSloadGasCost + MISC_OVERHEAD_GAS_COST
+  )
+}
 
 // New account creation cost (EIP-161)
 const NEW_ACCOUNT_GAS_COST = 25_000
@@ -66,10 +111,12 @@ const NEW_ACCOUNT_GAS_COST = 25_000
 // Cold address access (EIP-2929) — first touch of the refund receiver in this tx
 const COLD_ACCOUNT_ACCESS_GAS_COST = 2_600
 
-// SafeProxy to Safe Singleton delegatecall cost: cold SLOAD of the singleton slot
-// (2_100) + cold DELEGATECALL to the singleton address (full EIP-2929 cold access 2_600, since
+// SafeProxy to Safe Singleton delegatecall cost: cold SLOAD of the singleton slot (chain-aware)
+// + cold DELEGATECALL to the singleton address (full EIP-2929 cold access 2_600, since
 // the singleton is first touched here) + calldatacopy/returndatacopy/control-flow (~400).
-const PROXY_FALLBACK_GAS_COST = COLD_SLOAD_GAS_COST + COLD_ACCOUNT_ACCESS_GAS_COST + 400
+function getProxyFallbackGasCost(coldSloadGasCost: number): number {
+  return coldSloadGasCost + COLD_ACCOUNT_ACCESS_GAS_COST + 400
+}
 
 // Extra gas charged when CALL forwards a non-zero value
 const CALL_VALUE_GAS_COST = 9_000
@@ -97,12 +144,15 @@ const L2_EVENT_ENCODING_GAS_COST = 354
 
 // Calculate gas for signatures
 // (array count (3 -> r, s, v) + ecrecover costs + cold owners[signer] SLOAD) * signature count
-// Each signer reads a distinct `owners` mapping slot in checkNSignatures (EIP-2929 cold)
-const GAS_COST_PER_SIGNATURE =
-  1 * CALL_DATA_BYTE_GAS_COST +
-  2 * 32 * CALL_DATA_BYTE_GAS_COST +
-  ECRECOVER_GAS_COST +
-  COLD_SLOAD_GAS_COST
+// Each signer reads a distinct `owners` mapping slot in checkNSignatures (EIP-2929 cold, chain-aware)
+function getGasCostPerSignature(coldSloadGasCost: number): number {
+  return (
+    1 * CALL_DATA_BYTE_GAS_COST +
+    2 * 32 * CALL_DATA_BYTE_GAS_COST +
+    ECRECOVER_GAS_COST +
+    coldSloadGasCost
+  )
+}
 
 function estimateDataGasCosts(data: string): number {
   const bytes = data.match(/.{2}/g) as string[]
@@ -379,8 +429,6 @@ export async function estimateTxBaseGas(
     calculateRefundGas(safeProvider, gasPrice, encodeGasToken, encodeRefundReceiver, safeAddress)
   ])
 
-  const signaturesGasCost = safeThreshold * GAS_COST_PER_SIGNATURE
-
   // TODO: Account for transaction guard hooks (checkTransaction, checkAfterExecution)
   // when a guard is set on the Safe — cost depends on the guard implementation.
 
@@ -408,11 +456,17 @@ export async function estimateTxBaseGas(
     signatures
   ])
 
+  // Resolve the chain's cold-storage gas costs (EIP-2929 default unless the chain reprices them).
+  const coldSloadGasCost = getColdSloadGasCost(chainId)
+  const coldSstoreGasCost = getColdSstoreGasCost(chainId)
+
+  const signaturesGasCost = safeThreshold * getGasCostPerSignature(coldSloadGasCost)
+
   // If nonce == 0, nonce storage has to be initialized
   const isSafeInitialized = safeNonce !== 0
   const incrementNonceGasCost = isSafeInitialized
     ? INCREMENT_NONCE_GAS_COST
-    : INITIALIZATION_GAS_COST
+    : getInitializationGasCost(coldSstoreGasCost)
 
   let baseGas =
     signaturesGasCost +
@@ -426,11 +480,11 @@ export async function estimateTxBaseGas(
   // Add events gas
   baseGas += calculateExecTransactionEventsGas(isL1SafeSingleton ?? false, data, safeThreshold)
 
-  // Extra costs
-  baseGas += EXTRA_BASE_GAS_COST
+  // Extra costs (chain-aware: cold SLOADs scale with the chain's COLD_SLOAD_COST)
+  baseGas += getExtraBaseGasCost(coldSloadGasCost)
 
   // SafeProxy fallback hop (not counted by the singleton's gasUsed)
-  baseGas += PROXY_FALLBACK_GAS_COST
+  baseGas += getProxyFallbackGasCost(coldSloadGasCost)
 
   // Base gas encoding gas costs. Base gas was already encoded as `0` with `32 bytes (uint256)`, so we only need to add the data needed
   const baseGasUsedBytes = Math.ceil(baseGas.toString(16).length / 2)

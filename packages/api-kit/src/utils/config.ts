@@ -39,6 +39,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 10143n, shortName: 'monad-testnet' },
   { chainId: 10200n, shortName: 'chi' },
   { chainId: 16661n, shortName: '0g' },
+  { chainId: 20994n, shortName: 'fluent-testnet' },
   { chainId: 25363n, shortName: 'fluent' },
   { chainId: 36900n, shortName: 'adi' },
   { chainId: 42161n, shortName: 'arb1' },
@@ -59,6 +60,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 5042002n, shortName: 'arc-testnet' },
   { chainId: 11142220n, shortName: 'celo-sep' },
   { chainId: 11155111n, shortName: 'sep' },
+  { chainId: 42424242n, shortName: 'getherium-testnet' },
   { chainId: 1313161554n, shortName: 'aurora' }
 ]
 

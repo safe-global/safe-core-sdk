@@ -1,5 +1,5 @@
 import { SafeOperation } from '@safe-global/types-kit'
-import { AddSafeOperationProps } from '../types/safeTransactionServiceTypes'
+import { AddSafeOperationProps } from '../types/indexerServiceTypes'
 
 export const getAddSafeOperationProps = async (safeOperation: SafeOperation) => {
   const userOperation = safeOperation.getUserOperation()

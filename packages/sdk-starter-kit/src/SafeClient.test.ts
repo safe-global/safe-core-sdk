@@ -5,7 +5,6 @@ import { SafeClient } from './SafeClient'
 import { MESSAGES, SafeClientTxStatus } from './constants'
 
 jest.mock('@safe-global/protocol-kit')
-jest.mock('@safe-global/api-kit')
 jest.mock('./utils', () => {
   return {
     ...jest.requireActual('./utils'),
@@ -45,10 +44,24 @@ describe('SafeClient', () => {
 
   beforeEach(() => {
     protocolKit = new Safe()
-    apiKit = new SafeApiKit({
-      chainId: 1n,
-      apiKey: 'apiKey'
-    }) as jest.Mocked<SafeApiKit>
+    apiKit = {
+      queue: {
+        getTransaction: jest.fn(),
+        confirmTransaction: jest.fn(),
+        getPendingTransactions: jest.fn(),
+        getMessage: jest.fn(),
+        getMessages: jest.fn(),
+        addMessage: jest.fn(),
+        confirmMessage: jest.fn()
+      },
+      indexer: {
+        addSafeOperation: jest.fn(),
+        getSafeOperation: jest.fn(),
+        confirmSafeOperation: jest.fn(),
+        getPendingSafeOperations: jest.fn()
+      },
+      decoder: {}
+    } as unknown as jest.Mocked<SafeApiKit>
 
     safeClient = new SafeClient(protocolKit, apiKit)
 
@@ -187,10 +200,33 @@ describe('SafeClient', () => {
   })
 
   describe('confirm', () => {
+    beforeEach(() => {
+      protocolKit.getThreshold = jest.fn().mockResolvedValue(2)
+    })
+
+    it('should return the executed transaction if it was already executed', async () => {
+      const TRANSACTION_RESPONSE = { txHash: ETHEREUM_TX_HASH, confirmations: [] }
+
+      apiKit.queue.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
+
+      const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
+
+      expect(apiKit.queue.confirmTransaction).not.toHaveBeenCalled()
+      expect(protocolKit.executeTransaction).not.toHaveBeenCalled()
+      expect(result).toMatchObject({
+        description: MESSAGES[SafeClientTxStatus.EXECUTED],
+        safeAddress: SAFE_ADDRESS,
+        status: SafeClientTxStatus.EXECUTED,
+        transactions: {
+          ethereumTxHash: ETHEREUM_TX_HASH,
+          safeTxHash: SAFE_TX_HASH
+        }
+      })
+    })
+
     it('should execute the transaction after reaching the threshold with the confirmation', async () => {
       const TRANSACTION_RESPONSE = {
-        confirmations: [{ signature: '0x1' }],
-        confirmationsRequired: 2
+        confirmations: [{ signature: '0x1' }]
       }
 
       const CONFIRMED_TRANSACTION_RESPONSE = {
@@ -198,16 +234,16 @@ describe('SafeClient', () => {
         confirmations: [{ signature: '0x1' }, { signature: '0x2' }]
       }
 
-      apiKit.getTransaction = jest
+      apiKit.queue.getTransaction = jest
         .fn()
         .mockResolvedValueOnce(TRANSACTION_RESPONSE)
         .mockResolvedValueOnce(CONFIRMED_TRANSACTION_RESPONSE)
 
       const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
 
-      expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
+      expect(apiKit.queue.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
       expect(protocolKit.signTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
-      expect(apiKit.confirmTransaction).toHaveBeenCalledWith(SAFE_TX_HASH, undefined)
+      expect(apiKit.queue.confirmTransaction).toHaveBeenCalledWith(SAFE_TX_HASH, undefined)
       expect(protocolKit.executeTransaction).toHaveBeenCalledWith(CONFIRMED_TRANSACTION_RESPONSE)
       expect(result).toMatchObject({
         description: MESSAGES[SafeClientTxStatus.EXECUTED],
@@ -222,16 +258,15 @@ describe('SafeClient', () => {
 
     it('should execute the transaction without confirmation if it already has enough signatures', async () => {
       const TRANSACTION_RESPONSE = {
-        confirmations: [{ signature: '0x1' }, { signature: '0x2' }],
-        confirmationsRequired: 2
+        confirmations: [{ signature: '0x1' }, { signature: '0x2' }]
       }
 
-      apiKit.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
+      apiKit.queue.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
 
       const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
 
-      expect(apiKit.confirmTransaction).not.toHaveBeenCalled()
-      expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
+      expect(apiKit.queue.confirmTransaction).not.toHaveBeenCalled()
+      expect(apiKit.queue.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
       expect(protocolKit.executeTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
       expect(result).toMatchObject({
         description: MESSAGES[SafeClientTxStatus.EXECUTED],
@@ -246,17 +281,16 @@ describe('SafeClient', () => {
 
     it('should return more signatures are required when threshold is not reached after confirmation', async () => {
       const TRANSACTION_RESPONSE = {
-        confirmations: [{ signature: '0x1' }],
-        confirmationsRequired: 2
+        confirmations: [{ signature: '0x1' }]
       }
 
-      apiKit.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
+      apiKit.queue.getTransaction = jest.fn().mockResolvedValue(TRANSACTION_RESPONSE)
 
       const result = await safeClient.confirm({ safeTxHash: SAFE_TX_HASH })
 
-      expect(apiKit.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
+      expect(apiKit.queue.getTransaction).toHaveBeenCalledWith(SAFE_TX_HASH)
       expect(protocolKit.signTransaction).toHaveBeenCalledWith(TRANSACTION_RESPONSE)
-      expect(apiKit.confirmTransaction).toHaveBeenCalledWith(SAFE_TX_HASH, undefined)
+      expect(apiKit.queue.confirmTransaction).toHaveBeenCalledWith(SAFE_TX_HASH, undefined)
 
       expect(result).toMatchObject({
         description: MESSAGES[SafeClientTxStatus.PENDING_SIGNATURES],
@@ -272,12 +306,12 @@ describe('SafeClient', () => {
 
   describe('getPendingTransactions', () => {
     it('should return the pending transactions for the Safe address', async () => {
-      apiKit.getPendingTransactions = jest.fn().mockResolvedValue(PENDING_TRANSACTIONS)
+      apiKit.queue.getPendingTransactions = jest.fn().mockResolvedValue(PENDING_TRANSACTIONS)
 
       const result = await safeClient.getPendingTransactions()
 
       expect(protocolKit.getAddress).toHaveBeenCalled()
-      expect(apiKit.getPendingTransactions).toHaveBeenCalledWith(SAFE_ADDRESS)
+      expect(apiKit.queue.getPendingTransactions).toHaveBeenCalledWith(SAFE_ADDRESS)
       expect(result).toBe(PENDING_TRANSACTIONS)
     })
   })

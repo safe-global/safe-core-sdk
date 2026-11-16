@@ -166,11 +166,11 @@ importers:
   packages/protocol-kit:
     dependencies:
       '@safe-global/safe-deployments':
-        specifier: ^1.37.66
-        version: 1.37.66
+        specifier: ^1.37.67
+        version: 1.37.67
       '@safe-global/safe-modules-deployments':
-        specifier: ^3.0.13
-        version: 3.0.13
+        specifier: ^3.0.14
+        version: 3.0.14
       '@safe-global/types-kit':
         specifier: workspace:^
         version: link:../types-kit
@@ -249,8 +249,8 @@ importers:
         specifier: workspace:^
         version: link:../protocol-kit
       '@safe-global/safe-modules-deployments':
-        specifier: ^3.0.13
-        version: 3.0.13
+        specifier: ^3.0.14
+        version: 3.0.14
       '@safe-global/types-kit':
         specifier: workspace:^
         version: link:../types-kit
@@ -1314,12 +1314,12 @@ packages:
     peerDependencies:
       ethers: 5.4.0
 
-  '@safe-global/safe-deployments@1.37.66':
-    resolution: {integrity: sha512-LxnZcBmAHplv3KuEQlcFEd4V31Jdti7rAztRMe5e+KmL8Off0YFnQfPv4qI5fOvKFTq2Atl9fJ+qNRDeJzAP/A==}
+  '@safe-global/safe-deployments@1.37.67':
+    resolution: {integrity: sha512-WRQ47OjHJ8Mn6vW72Eby6r4AqL1vA16iSV9U5+cOCj41HuiIMU1c2qm59D5SgkQHfE/bJ/h2dYnK0ki2e1WJWg==}
     engines: {node: '>=22.0.0', pnpm: '>=10.16.0'}
 
-  '@safe-global/safe-modules-deployments@3.0.13':
-    resolution: {integrity: sha512-zxdVg8Zx0u2jHMTTQ47fp85RiWpsrrjkr0igOhT/TYE4UWNxXIAUrHMZjTMg2JzeiBIzyrz/p1ZazNxMbmiHsw==}
+  '@safe-global/safe-modules-deployments@3.0.14':
+    resolution: {integrity: sha512-Br8QWV4rav2duXNSVe4iahTBrZ6XAEOw11s3SE9/DUhE1FKkWfy7zx18wI2kJg/VIblXWRUidZ4eJLz6bwoClw==}
 
   '@safe-global/safe-passkey@0.2.0':
     resolution: {integrity: sha512-B9IpVvwXLvK3m+BRhn9z8kCbEizFmua4YmaUBZ9yr0xM9YsX2PRTnxbFvC7pLph1OQ2u+9O2V3FEmPiS10YEIw==}
@@ -5684,11 +5684,11 @@ snapshots:
     dependencies:
       ethers: 5.4.0
 
-  '@safe-global/safe-deployments@1.37.66':
+  '@safe-global/safe-deployments@1.37.67':
     dependencies:
       semver: 7.8.0
 
-  '@safe-global/safe-modules-deployments@3.0.13': {}
+  '@safe-global/safe-modules-deployments@3.0.14': {}
 
   '@safe-global/safe-passkey@0.2.0(ethers@5.4.0)':
     dependencies:

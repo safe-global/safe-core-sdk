@@ -224,6 +224,7 @@ export const networks: NetworkShortName[] = [
   { chainId: 4162n, shortName: 'SXR' },
   { chainId: 4202n, shortName: 'lisksep' },
   { chainId: 4217n, shortName: 'tempo' },
+  { chainId: 4221n, shortName: 'genlayer-testnets' },
   { chainId: 4326n, shortName: 'megaeth' },
   { chainId: 4337n, shortName: 'beam' },
   { chainId: 4441n, shortName: 'liteforge' },

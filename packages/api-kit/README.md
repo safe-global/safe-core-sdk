@@ -34,19 +34,18 @@ npm install @safe-global/api-kit
 import SafeApiKit from '@safe-global/api-kit'
 
 const apiKit = new SafeApiKit({
-  // Optional. Default chain of the requests, see Multi-chain below
-  chainId: 1n,
   // Required when using the Safe hosted services. Get your API key at https://developer.safe.global
   apiKey: 'YOUR_API_KEY',
-  // Optional. Custom service URLs, including the `/api` path, for example for self-hosted services
-  // or chains where Safe doesn't run them.
-  indexerServiceUrl: 'https://my-transaction-service.example.com/api',
+  // Optional. Transaction Service URL of some chains, including the `/api` path, for example for
+  // self-hosted services or chains where Safe doesn't run them. The other chains use the Safe hosted service.
+  indexerUrls: [{ chainId: 11155111n, url: 'https://my-transaction-service.example.com/api' }],
+  // Optional. Custom multi-chain service URLs, including the `/api` path
   queueServiceUrl: 'https://my-queue-service.example.com/api',
   decoderServiceUrl: 'https://my-decoder-service.example.com/api'
 })
 ```
 
-Each client is created the first time it is used, and only its own service has to be configured. For example, a self-hosted Transaction Service without an API key can be used through `apiKit.indexer`; `apiKit.queue` and `apiKit.decoder` throw when accessed until their service is configured. `txServiceUrl` is still accepted as the former name of `indexerServiceUrl`.
+The kit has no chain: each request carries its own, see [Multi-chain](#multi-chain). Each client is created the first time it is used, and only its own service has to be configured. For example, a self-hosted Transaction Service without an API key can be used through `apiKit.indexer`; `apiKit.queue` and `apiKit.decoder` throw when accessed until their service is configured.
 
 The kit exposes one client per Safe service, with one method per endpoint:
 
@@ -59,36 +58,73 @@ The kit exposes one client per Safe service, with one method per endpoint:
 const { safeTxHash } = await apiKit.queue.proposeTransaction({
   safeAddress,
   safeTransactionData: safeTransaction.data,
-  signatures: ownerSignature
+  signatures: ownerSignature,
+  chainId: 11155111n
 })
 await apiKit.queue.confirmTransaction(safeTxHash, otherOwnerSignature)
 
 // Read the indexed Safe info and decode some data
-const safeInfo = await apiKit.indexer.getSafeInfo(safeAddress)
-const decoded = await apiKit.decoder.decodeData(data, to)
+const safeInfo = await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 11155111n })
+const decoded = await apiKit.decoder.decodeData(data, to, { chainId: 11155111n })
 ```
 
 ### Multi-chain
 
-The Safe services are multi-chain, so one kit can work with every chain. The `chainId` of the config is only the default chain of the requests, and each method that depends on the chain accepts its own `chainId`. The chain of a request is, in order of precedence:
+The Safe services are multi-chain, so one kit works with every chain. The kit has no chain; the chain of a request is, in order of precedence:
 
 1. The `chainId` passed to the method.
 2. The EIP-3770 prefix of the address (`eth:0x…`).
-3. The `chainId` of the kit.
+
+When both are set they must match.
 
 ```js
 const apiKit = new SafeApiKit({ apiKey })
 
+// Writes: `chainId` is required
 await apiKit.queue.proposeTransaction({ safeAddress, safeTransactionData, signatures, chainId: 1n })
-await apiKit.queue.getPendingTransactions(['eth:0x…', 'base:0x…'])
-await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 8453n })
-await apiKit.decoder.decodeData(data, to, { chainId: 1n })
+await apiKit.queue.addMessage(safeAddress, { message, signatures, chainId: 1n })
+await apiKit.queue.addDelegate({ delegateAddress, delegatorAddress, signer, label, chainId: 1n })
+await apiKit.queue.addDelegate({
+  delegateAddress,
+  delegatorAddress,
+  signer,
+  label,
+  allChains: true
+})
 
-// Same configuration with another default chain
-const mainnetApiKit = apiKit.forChain(1n)
+// Queue reads: without a chain they return every chain
+await apiKit.queue.getSafeTransactions(safeAddress)
+await apiKit.queue.getSafeTransactions(safeAddress, { chainId: 1n })
+await apiKit.queue.getPendingTransactions(['eth:0x…', 'base:0x…'])
+
+// Indexer: `chainId` is required in every method. An EIP-3770 prefix must match it
+await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 8453n })
+await apiKit.indexer.getSafeInfo('base:0x…', { chainId: 8453n })
+await apiKit.indexer.getServiceInfo({ chainId: 8453n })
+
+// Decoder: the chain is optional
+await apiKit.decoder.decodeData(data, to, { chainId: 1n })
 ```
 
-Without a chain, the requests that store or sign something for a chain (`proposeTransaction`, `addMessage`, the delegates, `deleteTransaction`) and the hosted Transaction Service requests throw, while `getSafeTransactions` and `getMessages` return every chain. A Transaction Service indexes a single chain, so a custom `indexerServiceUrl` is only used for the `chainId` of the kit: requests for another chain throw.
+The confirmations (`confirmTransaction`, `confirmMessage`) and the other requests by hash in the Queue Service don't need a chain.
+
+A Transaction Service indexes a single chain, so `apiKit.indexer` sends each request to the service of its chain: the `indexerUrls` entry of the chain, or the Safe hosted service. A chain without an `indexerUrls` entry needs the `apiKey`, and throws when Safe doesn't run a Transaction Service for it. `apiKit.getIndexerUrls()` returns the URL of every chain the indexer can be used with: the `indexerUrls` entries and, with an `apiKey`, the Safe hosted service of the other chains.
+
+```js
+const apiKit = new SafeApiKit({
+  apiKey,
+  indexerUrls: [
+    { chainId: 11155111n, url: 'https://my-sepolia-indexer.example.com/api' },
+    { chainId: 123456789n, url: 'https://my-chain-indexer.example.com/api' }
+  ]
+})
+
+await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 11155111n }) // my-sepolia-indexer
+await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 1n }) // Safe hosted service
+
+// The indexers available to the kit, `[{ chainId, url }]`
+const indexerUrls = apiKit.getIndexerUrls()
+```
 
 ## Need Help or Have Questions?
 

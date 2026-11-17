@@ -16,21 +16,25 @@ describe('getMultisigTransactions', () => {
   it('should fail if Safe address is empty', async () => {
     const safeAddress = ''
     await chai
-      .expect(safeApiKit.queue.getSafeTransactions(safeAddress))
+      .expect(safeApiKit.queue.getSafeTransactions(safeAddress, { chainId: config.CHAIN_ID }))
       .to.be.rejectedWith('Invalid Safe address')
   })
 
   it('should return an empty list if there are no multisig transactions', async () => {
     const safeAddress = '0x513697456eDb113aDCAA1bbDA5bE59D9D7A2efd1' // Safe without multisig transactions
-    const safeMultisigTransactionListResponse =
-      await safeApiKit.queue.getSafeTransactions(safeAddress)
+    const safeMultisigTransactionListResponse = await safeApiKit.queue.getSafeTransactions(
+      safeAddress,
+      { chainId: config.CHAIN_ID }
+    )
     chai.expect(safeMultisigTransactionListResponse.count).to.be.equal(0)
     chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(0)
   })
 
   it('should return the list of multisig transactions', async () => {
     const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with multisig transactions
-    const { count, results } = await safeApiKit.queue.getSafeTransactions(safeAddress)
+    const { count, results } = await safeApiKit.queue.getSafeTransactions(safeAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(count).to.be.greaterThanOrEqual(10)
     chai.expect(results.length).to.be.equal(Math.min(count, 50))
     results.map((transaction) => {
@@ -53,6 +57,7 @@ describe('getMultisigTransactions', () => {
   it('should filter the executed transactions and order them by nonce', async () => {
     const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with multisig transactions
     const { results } = await safeApiKit.queue.getSafeTransactions(safeAddress, {
+      chainId: config.CHAIN_ID,
       executed: true,
       nonceOrder: 'asc',
       limit: 3

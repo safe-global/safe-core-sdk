@@ -4,6 +4,7 @@ import { Safe4337InitOptions, Safe4337Pack, SafeOperation } from '@safe-global/r
 import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
+import config from '../../utils/config'
 import { getApiKit, getEip1193Provider } from '../../utils/setupKits'
 import {
   getSafeWith4337Module,
@@ -55,7 +56,10 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('confirmSafeOperatio
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
     const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
-    await safeApiKit.indexer.addSafeOperation(addSafeOperationProps)
+    await safeApiKit.indexer.addSafeOperation({
+      ...addSafeOperationProps,
+      chainId: config.CHAIN_ID
+    })
 
     return signedSafeOperation
   }
@@ -80,19 +84,27 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('confirmSafeOperatio
     it('if SafeOperation hash is empty', async () => {
       const signature = await createSignature(safeOperation, PRIVATE_KEY_2)
       await chai
-        .expect(safeApiKit.indexer.confirmSafeOperation('', signature!.data))
+        .expect(
+          safeApiKit.indexer.confirmSafeOperation('', signature!.data, { chainId: config.CHAIN_ID })
+        )
         .to.be.rejectedWith('Invalid SafeOperation hash')
     })
 
     it('if signature is empty', async () => {
       await chai
-        .expect(safeApiKit.indexer.confirmSafeOperation(safeOpHash, ''))
+        .expect(
+          safeApiKit.indexer.confirmSafeOperation(safeOpHash, '', { chainId: config.CHAIN_ID })
+        )
         .to.be.rejectedWith('Invalid signature')
     })
 
     it('if signature is invalid', async () => {
       await chai
-        .expect(safeApiKit.indexer.confirmSafeOperation(safeOpHash, '0xInvalidSignature'))
+        .expect(
+          safeApiKit.indexer.confirmSafeOperation(safeOpHash, '0xInvalidSignature', {
+            chainId: config.CHAIN_ID
+          })
+        )
         .to.be.rejectedWith('Bad Request')
     })
   })
@@ -104,11 +116,16 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('confirmSafeOperatio
     const signatureSigner2 = await createSignature(safeOperation, PRIVATE_KEY_2)
 
     // Add the second signature to the Safe operation
-    await chai.expect(safeApiKit.indexer.confirmSafeOperation(safeOpHash, signatureSigner2!.data))
-      .to.be.fulfilled
+    await chai.expect(
+      safeApiKit.indexer.confirmSafeOperation(safeOpHash, signatureSigner2!.data, {
+        chainId: config.CHAIN_ID
+      })
+    ).to.be.fulfilled
 
     // Check that the Safe operation is now confirmed by both owners
-    const safeOperationResponse = await safeApiKit.indexer.getSafeOperation(safeOpHash)
+    const safeOperationResponse = await safeApiKit.indexer.getSafeOperation(safeOpHash, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(safeOperationResponse.confirmations).to.have.lengthOf(2)
 
     chai

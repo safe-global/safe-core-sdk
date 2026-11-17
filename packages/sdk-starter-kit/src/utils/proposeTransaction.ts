@@ -27,7 +27,8 @@ export const proposeTransaction = async ({
   const { safeTxHash } = await apiKit.queue.proposeTransaction({
     safeAddress: await protocolKit.getAddress(),
     safeTransactionData: safeTransaction.data,
-    signatures: buildSignatureBytes([ethSig])
+    signatures: buildSignatureBytes([ethSig]),
+    chainId: await protocolKit.getChainId()
   })
 
   return safeTxHash

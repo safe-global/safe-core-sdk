@@ -16,20 +16,24 @@ describe('getPendingTransactions', () => {
   it('should fail if safeAddress is empty', async () => {
     const safeAddress = ''
     await chai
-      .expect(safeApiKit.queue.getPendingTransactions(safeAddress))
+      .expect(safeApiKit.queue.getPendingTransactions(safeAddress, { chainId: config.CHAIN_ID }))
       .to.be.rejectedWith('Invalid Safe address')
   })
 
   it('should return an empty list if there are no pending transactions', async () => {
     const safeAddress = '0x513697456eDb113aDCAA1bbDA5bE59D9D7A2efd1' // Safe without pending transactions
-    const transactionList = await safeApiKit.queue.getPendingTransactions(safeAddress)
+    const transactionList = await safeApiKit.queue.getPendingTransactions(safeAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(transactionList.count).to.be.equal(0)
     chai.expect(transactionList.results.length).to.be.equal(0)
   })
 
   it('should return the the transaction list', async () => {
     const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
-    const transactionList = await safeApiKit.queue.getPendingTransactions(safeAddress)
+    const transactionList = await safeApiKit.queue.getPendingTransactions(safeAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(transactionList.count).to.be.equal(10)
     chai.expect(transactionList.results.length).to.be.equal(10)
     transactionList.results.forEach((transaction) => {
@@ -41,7 +45,9 @@ describe('getPendingTransactions', () => {
   it('should return the the transaction list EIP-3770', async () => {
     const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const transactionList = await safeApiKit.queue.getPendingTransactions(eip3770SafeAddress)
+    const transactionList = await safeApiKit.queue.getPendingTransactions(eip3770SafeAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(transactionList.count).to.be.equal(10)
     chai.expect(transactionList.results.length).to.be.equal(10)
   })
@@ -49,6 +55,7 @@ describe('getPendingTransactions', () => {
   it('should return a maximum of 2 transactions with limit = 2', async () => {
     const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
     const transactionList = await safeApiKit.queue.getPendingTransactions(safeAddress, {
+      chainId: config.CHAIN_ID,
       limit: 2
     })
 
@@ -60,6 +67,7 @@ describe('getPendingTransactions', () => {
   it('should return all pending transactions excluding the first one with offset = 1', async () => {
     const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
     const transactionList = await safeApiKit.queue.getPendingTransactions(safeAddress, {
+      chainId: config.CHAIN_ID,
       offset: 1
     })
 
@@ -71,6 +79,7 @@ describe('getPendingTransactions', () => {
   it('should order the transactions by descending nonce with nonceOrder = desc', async () => {
     const safeAddress = '0x95eF108E0dcC050c129fbBEB0456D1121c98A59c' // Safe with pending transaction
     const { results } = await safeApiKit.queue.getPendingTransactions(safeAddress, {
+      chainId: config.CHAIN_ID,
       nonceOrder: 'desc'
     })
 

@@ -4,6 +4,7 @@ import { sepolia } from 'viem/chains'
 import SafeApiKit, { UpdateDelegateProps } from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import config from '../../utils/config'
 import { getApiKit } from '../../utils/setupKits'
 import { getSafe, PRIVATE_KEY_2 } from '../../helpers/safe'
 
@@ -34,7 +35,8 @@ describe(`[${version}] updateSafeDelegate`, () => {
         safeAddress,
         delegateAddress,
         delegatorAddress,
-        signer
+        signer,
+        chainId: config.CHAIN_ID
       })
     } catch {
       // nothing to remove
@@ -51,7 +53,8 @@ describe(`[${version}] updateSafeDelegate`, () => {
           delegateAddress,
           delegatorAddress,
           signer,
-          label: ''
+          label: '',
+          chainId: config.CHAIN_ID
         })
       )
       .to.be.rejectedWith('Invalid label')
@@ -64,13 +67,20 @@ describe(`[${version}] updateSafeDelegate`, () => {
         delegateAddress,
         delegatorAddress,
         signer,
-        label: 'Label'
+        label: 'Label',
+        chainId: config.CHAIN_ID
       })
     ).to.be.rejected
   })
 
   it('should update the label of a delegate', async () => {
-    const delegateConfig = { safeAddress, delegateAddress, delegatorAddress, signer }
+    const delegateConfig = {
+      safeAddress,
+      delegateAddress,
+      delegatorAddress,
+      signer,
+      chainId: config.CHAIN_ID
+    }
 
     await safeApiKit.queue.addDelegate({ ...delegateConfig, label: 'Label' })
 

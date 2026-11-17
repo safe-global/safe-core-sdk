@@ -49,13 +49,15 @@ describe('Indexer (Transaction Service) endpoints', () => {
   })
 
   it('getServiceInfo', async () => {
-    await chai.expect(safeApiKit.indexer.getServiceInfo()).to.be.eventually.deep.equals(OK)
+    await chai
+      .expect(safeApiKit.indexer.getServiceInfo({ chainId }))
+      .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({ url: `${baseUrl}/v1/about`, method: 'GET' })
   })
 
   it('getServiceSingletonsInfo', async () => {
     await chai
-      .expect(safeApiKit.indexer.getServiceSingletonsInfo())
+      .expect(safeApiKit.indexer.getServiceSingletonsInfo({ chainId }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/about/singletons`,
@@ -65,44 +67,46 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
   it('getSafesByOwner', async () => {
     await chai
-      .expect(safeApiKit.indexer.getSafesByOwner(eip3770RandomAddress))
+      .expect(safeApiKit.indexer.getSafesByOwner(eip3770RandomAddress, { chainId }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/owners/${randomAddress}/safes/`,
       method: 'GET'
     })
     await chai
-      .expect(safeApiKit.indexer.getSafesByOwner(''))
+      .expect(safeApiKit.indexer.getSafesByOwner('', { chainId }))
       .to.be.rejectedWith('Invalid owner address')
   })
 
   it('getSafesByModule', async () => {
     await chai
-      .expect(safeApiKit.indexer.getSafesByModule(eip3770RandomAddress))
+      .expect(safeApiKit.indexer.getSafesByModule(eip3770RandomAddress, { chainId }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/modules/${randomAddress}/safes/`,
       method: 'GET'
     })
     await chai
-      .expect(safeApiKit.indexer.getSafesByModule(''))
+      .expect(safeApiKit.indexer.getSafesByModule('', { chainId }))
       .to.be.rejectedWith('Invalid module address')
   })
 
   it('getSafeInfo', async () => {
     await chai
-      .expect(safeApiKit.indexer.getSafeInfo(eip3770SafeAddress))
+      .expect(safeApiKit.indexer.getSafeInfo(eip3770SafeAddress, { chainId }))
       .to.be.eventually.deep.equals(OK_WITH_SINGLETON)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/`,
       method: 'GET'
     })
-    await chai.expect(safeApiKit.indexer.getSafeInfo('')).to.be.rejectedWith('Invalid Safe address')
+    await chai
+      .expect(safeApiKit.indexer.getSafeInfo('', { chainId }))
+      .to.be.rejectedWith('Invalid Safe address')
   })
 
   it('getSafeCreationInfo', async () => {
     await chai
-      .expect(safeApiKit.indexer.getSafeCreationInfo(eip3770SafeAddress))
+      .expect(safeApiKit.indexer.getSafeCreationInfo(eip3770SafeAddress, { chainId }))
       .to.be.eventually.deep.equals(OK_WITH_SINGLETON)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/creation/`,
@@ -118,7 +122,9 @@ describe('Indexer (Transaction Service) endpoints', () => {
       operation: 0
     }
     await chai
-      .expect(safeApiKit.indexer.estimateSafeTransaction(eip3770SafeAddress, safeTransaction))
+      .expect(
+        safeApiKit.indexer.estimateSafeTransaction(eip3770SafeAddress, safeTransaction, { chainId })
+      )
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/multisig-transactions/estimations/`,
@@ -129,7 +135,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
   it('getIncomingTransactions', async () => {
     await chai
-      .expect(safeApiKit.indexer.getIncomingTransactions(eip3770SafeAddress))
+      .expect(safeApiKit.indexer.getIncomingTransactions(eip3770SafeAddress, { chainId }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/incoming-transfers/`,
@@ -139,7 +145,9 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
   it('getIncomingTransactions with query params', async () => {
     await chai
-      .expect(safeApiKit.indexer.getIncomingTransactions(safeAddress, { from: safeAddress }))
+      .expect(
+        safeApiKit.indexer.getIncomingTransactions(safeAddress, { from: safeAddress, chainId })
+      )
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/safes/${safeAddress}/incoming-transfers/?_from=${safeAddress}`,
@@ -150,7 +158,10 @@ describe('Indexer (Transaction Service) endpoints', () => {
   it('getModuleTransactions', async () => {
     await chai
       .expect(
-        safeApiKit.indexer.getModuleTransactions(eip3770SafeAddress, { module: randomAddress })
+        safeApiKit.indexer.getModuleTransactions(eip3770SafeAddress, {
+          module: randomAddress,
+          chainId
+        })
       )
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
@@ -161,7 +172,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
   it('getAllTransactions', async () => {
     await chai
-      .expect(safeApiKit.indexer.getAllTransactions(eip3770SafeAddress, { limit: 5 }))
+      .expect(safeApiKit.indexer.getAllTransactions(eip3770SafeAddress, { limit: 5, chainId }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v2/safes/${safeAddress}/all-transactions/?limit=5`,
@@ -171,7 +182,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
   it('getTokenList', async () => {
     await chai
-      .expect(safeApiKit.indexer.getTokenList({ search: 'USD' }))
+      .expect(safeApiKit.indexer.getTokenList({ search: 'USD', chainId }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/tokens/?search=USD`,
@@ -181,19 +192,21 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
   it('getToken', async () => {
     await chai
-      .expect(safeApiKit.indexer.getToken(eip3770TokenAddress))
+      .expect(safeApiKit.indexer.getToken(eip3770TokenAddress, { chainId }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/v1/tokens/${tokenAddress}/`,
       method: 'GET'
     })
-    await chai.expect(safeApiKit.indexer.getToken('')).to.be.rejectedWith('Invalid token address')
+    await chai
+      .expect(safeApiKit.indexer.getToken('', { chainId }))
+      .to.be.rejectedWith('Invalid token address')
   })
 
   describe('SafeOperations', () => {
     it('getSafeOperationsByAddress', async () => {
       await chai
-        .expect(safeApiKit.indexer.getSafeOperationsByAddress(safeAddress))
+        .expect(safeApiKit.indexer.getSafeOperationsByAddress(safeAddress, { chainId }))
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safes/${safeAddress}/safe-operations/`,
@@ -203,7 +216,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
     it('getPendingSafeOperations', async () => {
       await chai
-        .expect(safeApiKit.indexer.getPendingSafeOperations(safeAddress))
+        .expect(safeApiKit.indexer.getPendingSafeOperations(safeAddress, { chainId }))
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safes/${safeAddress}/safe-operations/?executed=false`,
@@ -213,7 +226,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
     it('getSafeOperation', async () => {
       await chai
-        .expect(safeApiKit.indexer.getSafeOperation(safeOpHash))
+        .expect(safeApiKit.indexer.getSafeOperation(safeOpHash, { chainId }))
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safe-operations/${safeOpHash}/`,
@@ -255,7 +268,8 @@ describe('Indexer (Transaction Service) endpoints', () => {
             moduleAddress,
             options,
             safeAddress,
-            userOperation
+            userOperation,
+            chainId
           })
         )
         .to.be.eventually.deep.equals(OK)
@@ -284,7 +298,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
 
     it('getSafeOperationConfirmations', async () => {
       await chai
-        .expect(safeApiKit.indexer.getSafeOperationConfirmations(safeOpHash, { limit: 2 }))
+        .expect(safeApiKit.indexer.getSafeOperationConfirmations(safeOpHash, { limit: 2, chainId }))
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safe-operations/${safeOpHash}/confirmations/?limit=2`,
@@ -295,7 +309,9 @@ describe('Indexer (Transaction Service) endpoints', () => {
     it('confirmSafeOperation', async () => {
       const senderSignature = await protocolKit.signHash(safeOpHash)
       await chai
-        .expect(safeApiKit.indexer.confirmSafeOperation(safeOpHash, senderSignature.data))
+        .expect(
+          safeApiKit.indexer.confirmSafeOperation(safeOpHash, senderSignature.data, { chainId })
+        )
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/v1/safe-operations/${safeOpHash}/confirmations/`,
@@ -308,13 +324,10 @@ describe('Indexer (Transaction Service) endpoints', () => {
     })
   })
 
-  it('uses the custom indexerServiceUrl', async () => {
+  it('uses the indexerUrls entry of the chain', async () => {
     const indexerServiceUrl = 'http://my-custom-tx-service.com/api'
-    const apiKit = new SafeApiKit({
-      chainId,
-      indexerServiceUrl
-    })
-    await chai.expect(apiKit.indexer.getServiceInfo()).to.be.fulfilled
+    const apiKit = new SafeApiKit({ indexerUrls: [{ chainId, url: indexerServiceUrl }] })
+    await chai.expect(apiKit.indexer.getServiceInfo({ chainId })).to.be.fulfilled
     chai
       .expect(fetchData)
       .to.have.been.calledWith({ url: `${indexerServiceUrl}/v1/about`, method: 'GET' })

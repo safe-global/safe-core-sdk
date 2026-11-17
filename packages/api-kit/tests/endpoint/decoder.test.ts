@@ -103,7 +103,6 @@ describe('Decoder service endpoints', () => {
 
   it('uses the custom decoderServiceUrl', async () => {
     const apiKit = new SafeApiKit({
-      chainId,
       decoderServiceUrl: 'http://my-custom-decoder-service.com/api/'
     })
     await chai.expect(apiKit.decoder.decodeData(data)).to.be.fulfilled

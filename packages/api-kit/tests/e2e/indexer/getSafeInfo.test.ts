@@ -19,20 +19,22 @@ describe('getSafeInfo', () => {
   it('should fail if Safe address is empty', async () => {
     const safeAddress = ''
     await chai
-      .expect(safeApiKit.indexer.getSafeInfo(safeAddress))
+      .expect(safeApiKit.indexer.getSafeInfo(safeAddress, { chainId: config.CHAIN_ID }))
       .to.be.rejectedWith('Invalid Safe address')
   })
 
   it('should fail if Safe address is not checksummed', async () => {
     const safeAddress = API_TESTING_SAFE.address.toLowerCase()
     await chai
-      .expect(safeApiKit.indexer.getSafeInfo(safeAddress))
+      .expect(safeApiKit.indexer.getSafeInfo(safeAddress, { chainId: config.CHAIN_ID }))
       .to.be.rejectedWith('Checksum address validation failed')
   })
 
   it('should return the Safe info if the address is correct', async () => {
     const safeAddress = API_TESTING_SAFE.address
-    const safeInfoResponse = await safeApiKit.indexer.getSafeInfo(safeAddress)
+    const safeInfoResponse = await safeApiKit.indexer.getSafeInfo(safeAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(safeInfoResponse.address).to.be.equal(safeAddress)
     chai.expect(safeInfoResponse.nonce).to.be.a('string')
     chai.expect(safeInfoResponse.threshold).to.be.equal(API_TESTING_SAFE.threshold)
@@ -51,7 +53,9 @@ describe('getSafeInfo', () => {
   it('should return the Safe info if EIP-3770 address is correct', async () => {
     const safeAddress = API_TESTING_SAFE.address
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const safeInfoResponse = await safeApiKit.indexer.getSafeInfo(eip3770SafeAddress)
+    const safeInfoResponse = await safeApiKit.indexer.getSafeInfo(eip3770SafeAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(safeInfoResponse.address).to.be.equal(safeAddress)
     chai.expect(safeInfoResponse.nonce).to.be.a('string')
     chai.expect(safeInfoResponse.threshold).to.be.equal(API_TESTING_SAFE.threshold)

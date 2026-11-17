@@ -12,6 +12,7 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { toBytes, toHex } from 'viem'
+import config from '../../utils/config'
 import { getKits } from '../../utils/setupKits'
 import { getSafe, PRIVATE_KEY_1, PRIVATE_KEY_2 } from 'tests/helpers/safe'
 
@@ -52,7 +53,8 @@ describe('proposeTransaction', () => {
     const txOptions = {
       safeAddress,
       safeTransactionData: tx.data,
-      signatures: buildSignatureBytes([ethSig])
+      signatures: buildSignatureBytes([ethSig]),
+      chainId: config.CHAIN_ID
     }
 
     const proposedTransaction = await safeApiKit.queue.proposeTransaction(txOptions)

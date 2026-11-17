@@ -20,27 +20,31 @@ describe('getIncomingTransactions', () => {
   it('should fail if Safe address is empty', async () => {
     const safeAddress = ''
     await chai
-      .expect(safeApiKit.indexer.getIncomingTransactions(safeAddress))
+      .expect(safeApiKit.indexer.getIncomingTransactions(safeAddress, { chainId: config.CHAIN_ID }))
       .to.be.rejectedWith('Invalid Safe address')
   })
 
   it('should fail if Safe address is not checksummed', async () => {
     const safeAddress = API_TESTING_SAFE.address.toLowerCase()
     await chai
-      .expect(safeApiKit.indexer.getIncomingTransactions(safeAddress))
+      .expect(safeApiKit.indexer.getIncomingTransactions(safeAddress, { chainId: config.CHAIN_ID }))
       .to.be.rejectedWith('Checksum address validation failed')
   })
 
   it('should return an empty list if there are no incoming transactions', async () => {
     const safeAddress = '0x3e04a375aC5847C690A7f2fF54b45c59f7eeD6f0' // Safe without incoming transactions
-    const transferListResponse = await safeApiKit.indexer.getIncomingTransactions(safeAddress)
+    const transferListResponse = await safeApiKit.indexer.getIncomingTransactions(safeAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(transferListResponse.count).to.be.equal(0)
     chai.expect(transferListResponse.results.length).to.be.equal(0)
   })
 
   it('should return the list of incoming transactions', async () => {
     const safeAddress = API_TESTING_SAFE.address // Safe with incoming transactions
-    const transferListResponse = await safeApiKit.indexer.getIncomingTransactions(safeAddress)
+    const transferListResponse = await safeApiKit.indexer.getIncomingTransactions(safeAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(transferListResponse.count).to.be.equal(6)
     chai.expect(transferListResponse.results.length).to.be.equal(6)
     transferListResponse.results.map((transaction) => {
@@ -66,8 +70,10 @@ describe('getIncomingTransactions', () => {
   it('should return the list of incoming transactions EIP-3770', async () => {
     const safeAddress = API_TESTING_SAFE.address // Safe with incoming transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const transferListResponse =
-      await safeApiKit.indexer.getIncomingTransactions(eip3770SafeAddress)
+    const transferListResponse = await safeApiKit.indexer.getIncomingTransactions(
+      eip3770SafeAddress,
+      { chainId: config.CHAIN_ID }
+    )
     chai.expect(transferListResponse.count).to.be.equal(6)
     chai.expect(transferListResponse.results.length).to.be.equal(6)
     transferListResponse.results.map((transaction) => {

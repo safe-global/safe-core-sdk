@@ -2,6 +2,7 @@ import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import semverSatisfies from 'semver/functions/satisfies.js'
 import SafeApiKit from '@safe-global/api-kit/index'
+import config from '../../utils/config'
 import { getApiKit } from '../../utils/setupKits'
 import { zeroHash } from 'viem'
 import { safeVersionDeployed } from 'tests/helpers/safe'
@@ -38,21 +39,25 @@ describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationConf
 
   it('should fail if safeOperationHash is empty', async () => {
     await chai
-      .expect(safeApiKit.indexer.getSafeOperationConfirmations(''))
+      .expect(safeApiKit.indexer.getSafeOperationConfirmations('', { chainId: config.CHAIN_ID }))
       .to.be.rejectedWith('Invalid SafeOperation hash')
   })
 
   it('should return an empty array if the safeOperationHash is not found', async () => {
     const safeOperationHash = zeroHash
-    const safeOpConfirmations =
-      await safeApiKit.indexer.getSafeOperationConfirmations(safeOperationHash)
+    const safeOpConfirmations = await safeApiKit.indexer.getSafeOperationConfirmations(
+      safeOperationHash,
+      { chainId: config.CHAIN_ID }
+    )
     chai.expect(safeOpConfirmations.count).to.be.equal(0)
     chai.expect(safeOpConfirmations.results.length).to.be.equal(0)
   })
 
   it('should return the confirmations for the given safeOperationHash', async () => {
-    const safeOpConfirmations =
-      await safeApiKit.indexer.getSafeOperationConfirmations(SAFE_OPERATION_HASH)
+    const safeOpConfirmations = await safeApiKit.indexer.getSafeOperationConfirmations(
+      SAFE_OPERATION_HASH,
+      { chainId: config.CHAIN_ID }
+    )
     chai.expect(safeOpConfirmations.count).to.be.equal(2)
     chai.expect(safeOpConfirmations.results.length).to.be.equal(2)
     chai.expect(safeOpConfirmations.results).to.deep.equal(EXPECTED_SAFE_OPERATION_CONFIRMATIONS)
@@ -61,7 +66,7 @@ describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationConf
   it('should return only the first confirmation if limit = 1', async () => {
     const safeOpConfirmations = await safeApiKit.indexer.getSafeOperationConfirmations(
       SAFE_OPERATION_HASH,
-      { limit: 1 }
+      { chainId: config.CHAIN_ID, limit: 1 }
     )
     chai.expect(safeOpConfirmations.count).to.be.equal(2)
     chai
@@ -72,7 +77,7 @@ describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationConf
   it('should return only the second confirmation if offset = 1', async () => {
     const safeOpConfirmations = await safeApiKit.indexer.getSafeOperationConfirmations(
       SAFE_OPERATION_HASH,
-      { offset: 1 }
+      { chainId: config.CHAIN_ID, offset: 1 }
     )
     chai.expect(safeOpConfirmations.count).to.be.equal(2)
     chai

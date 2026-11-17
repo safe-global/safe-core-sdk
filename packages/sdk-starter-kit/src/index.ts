@@ -98,12 +98,11 @@ async function getApiKitInstance(
   protocolKit: Safe,
   config: SdkStarterKitConfig
 ): Promise<SafeApiKit> {
-  const chainId = await protocolKit.getChainId()
+  const indexerUrl = config.indexerServiceUrl || config.txServiceUrl
 
   return new SafeApiKit({
-    chainId,
     apiKey: config.apiKey,
-    indexerServiceUrl: config.indexerServiceUrl || config.txServiceUrl,
+    indexerUrls: indexerUrl ? [{ chainId: await protocolKit.getChainId(), url: indexerUrl }] : [],
     queueServiceUrl: config.queueServiceUrl,
     decoderServiceUrl: config.decoderServiceUrl
   })

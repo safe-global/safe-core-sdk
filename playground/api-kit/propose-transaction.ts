@@ -24,7 +24,6 @@ async function main() {
 
   // Create Safe API Kit instance
   const apiKit = new SafeApiKit({
-    chainId: BigInt(CHAIN_ID),
     apiKey: API_KEY || ''
   })
 
@@ -47,7 +46,8 @@ async function main() {
   const proposedTransaction = await apiKit.queue.proposeTransaction({
     safeAddress: SAFE_ADDRESS,
     safeTransactionData: safeTransaction.data,
-    signatures: signature.data
+    signatures: signature.data,
+    chainId: BigInt(CHAIN_ID)
   })
 
   console.log('Proposed a transaction with Safe:', SAFE_ADDRESS)

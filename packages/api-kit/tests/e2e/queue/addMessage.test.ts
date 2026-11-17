@@ -2,6 +2,7 @@ import Safe from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import config from '../../utils/config'
 import { getKits } from '../../utils/setupKits'
 import { getSafe, PRIVATE_KEY_1 as PRIVATE_KEY, safeVersionDeployed } from 'tests/helpers/safe'
 import { describeif } from 'tests/utils/helpers'
@@ -36,7 +37,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(`[${version}] addMes
       .expect(
         safeApiKit.queue.addMessage('', {
           message: generateMessage(),
-          signatures: '0x1234'
+          signatures: '0x1234',
+          chainId: config.CHAIN_ID
         })
       )
       .to.be.rejectedWith('Invalid Safe address')
@@ -44,7 +46,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(`[${version}] addMes
       .expect(
         safeApiKit.queue.addMessage('0x123', {
           message: generateMessage(),
-          signatures: '0x1234'
+          signatures: '0x1234',
+          chainId: config.CHAIN_ID
         })
       )
       .to.be.rejectedWith('Invalid Safe address')
@@ -57,7 +60,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(`[${version}] addMes
 
     const messageResponse = await safeApiKit.queue.addMessage(safeAddress, {
       message: rawMessage,
-      signatures: signedMessage.encodedSignatures()
+      signatures: signedMessage.encodedSignatures(),
+      chainId: config.CHAIN_ID
     })
 
     chai.expect(messageResponse.message).to.eq(rawMessage)
@@ -75,7 +79,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(`[${version}] addMes
       message: rawMessage,
       originName: 'Safe Core SDK',
       originUrl: 'https://safe.global',
-      signatures: signedMessage.encodedSignatures()
+      signatures: signedMessage.encodedSignatures(),
+      chainId: config.CHAIN_ID
     })
 
     chai.expect(messageResponse.originName).to.eq('Safe Core SDK')

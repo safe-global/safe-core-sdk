@@ -10,6 +10,11 @@ export type ListOptions = {
 }
 
 export type ChainOptions = {
-  /** Chain of the request. Defaults to the EIP-3770 prefix of the address, then to the `chainId` of the kit */
+  /** Chain of the request. Defaults to the EIP-3770 prefix of the address */
   chainId?: bigint
+}
+
+export type RequiredChainOptions = {
+  /** Chain of the request */
+  chainId: bigint
 }

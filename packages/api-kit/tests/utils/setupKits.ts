@@ -63,9 +63,10 @@ export function getApiKit(
   chainId?: GetKitsOptions['chainId']
 ): SafeApiKit {
   const safeApiKit = new SafeApiKit({
-    chainId: chainId || config.CHAIN_ID,
     apiKey: process.env.API_KEY || 'jwt-token',
-    indexerServiceUrl
+    indexerUrls: indexerServiceUrl
+      ? [{ chainId: chainId || config.CHAIN_ID, url: indexerServiceUrl }]
+      : undefined
   })
 
   return safeApiKit

@@ -55,13 +55,15 @@ describe('getSafeDelegates', () => {
         safeAddress,
         delegateAddress: '0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B',
         delegatorAddress,
-        signer
+        signer,
+        chainId: config.CHAIN_ID
       }
       delegateConfig2 = {
         safeAddress,
         delegateAddress: '0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b',
         delegatorAddress,
-        signer
+        signer,
+        chainId: config.CHAIN_ID
       }
 
       // Remove what a previous failed run may have left behind before adding
@@ -132,13 +134,15 @@ describe('getSafeDelegates', () => {
       safeAddress: eip3770SafeAddress,
       delegateAddress: `${config.EIP_3770_PREFIX}:0x9cCBDE03eDd71074ea9c49e413FA9CDfF16D263B`,
       delegatorAddress,
-      signer
+      signer,
+      chainId: config.CHAIN_ID
     }
     const delegateConfig2: RemoveDelegateProps = {
       safeAddress: eip3770SafeAddress,
       delegateAddress: `${config.EIP_3770_PREFIX}:0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b`,
       delegatorAddress,
-      signer
+      signer,
+      chainId: config.CHAIN_ID
     }
     await safeApiKit.queue.addDelegate({ label: 'Label1', ...delegateConfig1 })
     await safeApiKit.queue.addDelegate({ label: 'Label2', ...delegateConfig2 })

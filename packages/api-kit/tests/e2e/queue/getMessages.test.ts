@@ -1,6 +1,7 @@
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import config from '../../utils/config'
 import { getApiKit } from '../../utils/setupKits'
 import { getSafe } from 'tests/helpers/safe'
 
@@ -22,7 +23,7 @@ describe('getMessages', () => {
   })
 
   it('should get the messages list', async () => {
-    const messages = await safeApiKit.queue.getMessages(safeAddress)
+    const messages = await safeApiKit.queue.getMessages(safeAddress, { chainId: config.CHAIN_ID })
 
     chai.expect(messages).to.have.property('count').greaterThan(1)
     chai.expect(messages).to.have.property('results').to.be.an('array')
@@ -33,7 +34,10 @@ describe('getMessages', () => {
   })
 
   it('should return a maximum of 5 messages with limit = 5', async () => {
-    const messages = await safeApiKit.queue.getMessages(safeAddress, { limit: 5 })
+    const messages = await safeApiKit.queue.getMessages(safeAddress, {
+      chainId: config.CHAIN_ID,
+      limit: 5
+    })
 
     chai.expect(messages).to.have.property('count').greaterThan(1)
     chai.expect(messages).to.have.property('results').to.be.an('array')
@@ -41,7 +45,10 @@ describe('getMessages', () => {
   })
 
   it('should return all messages excluding the first one with offset = 1', async () => {
-    const messages = await safeApiKit.queue.getMessages(safeAddress, { offset: 1 })
+    const messages = await safeApiKit.queue.getMessages(safeAddress, {
+      chainId: config.CHAIN_ID,
+      offset: 1
+    })
 
     chai.expect(messages).to.have.property('count').greaterThan(1)
     chai.expect(messages).to.have.property('results').to.be.an('array')

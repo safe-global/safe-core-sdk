@@ -5,6 +5,7 @@ import SafeApiKit from '@safe-global/api-kit/index'
 import { getAddSafeOperationProps } from '@safe-global/api-kit/utils/safeOperation'
 import { Safe4337Pack, encodeNonce } from '@safe-global/relay-kit'
 import { generateTransferCallData } from '@safe-global/relay-kit/test-utils'
+import config from '../../utils/config'
 import { getKits } from '../../utils/setupKits'
 import { getSafeWith4337Module, PRIVATE_KEY_1, safeVersionDeployed } from 'tests/helpers/safe'
 import { describeif } from 'tests/utils/helpers'
@@ -56,7 +57,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', 
         .expect(
           safeApiKit.indexer.addSafeOperation({
             ...addSafeOperationProps,
-            safeAddress: ''
+            safeAddress: '',
+            chainId: config.CHAIN_ID
           })
         )
         .to.be.rejectedWith('Safe address must not be empty')
@@ -71,7 +73,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', 
         .expect(
           safeApiKit.indexer.addSafeOperation({
             ...addSafeOperationProps,
-            safeAddress: '0x123'
+            safeAddress: '0x123',
+            chainId: config.CHAIN_ID
           })
         )
         .to.be.rejectedWith('Invalid Safe address 0x123')
@@ -86,7 +89,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', 
         .expect(
           safeApiKit.indexer.addSafeOperation({
             ...addSafeOperationProps,
-            moduleAddress: ''
+            moduleAddress: '',
+            chainId: config.CHAIN_ID
           })
         )
         .to.be.rejectedWith('Module address must not be empty')
@@ -101,7 +105,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', 
         .expect(
           safeApiKit.indexer.addSafeOperation({
             ...addSafeOperationProps,
-            moduleAddress: '0x234'
+            moduleAddress: '0x234',
+            chainId: config.CHAIN_ID
           })
         )
         .to.be.rejectedWith('Invalid module address 0x234')
@@ -112,7 +117,12 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', 
       const addSafeOperationProps = await getAddSafeOperationProps(safeOperation)
 
       await chai
-        .expect(safeApiKit.indexer.addSafeOperation(addSafeOperationProps))
+        .expect(
+          safeApiKit.indexer.addSafeOperation({
+            ...addSafeOperationProps,
+            chainId: config.CHAIN_ID
+          })
+        )
         .to.be.rejectedWith('Signature must not be empty')
     })
   })
@@ -127,12 +137,18 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', 
     const addSafeOperationProps = await getAddSafeOperationProps(signedSafeOperation)
 
     // Get the number of SafeOperations before adding a new one
-    const safeOperationsBefore = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsBefore = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS, {
+      chainId: config.CHAIN_ID
+    })
     const initialNumSafeOperations = safeOperationsBefore.count
 
-    await chai.expect(safeApiKit.indexer.addSafeOperation(addSafeOperationProps)).to.be.fulfilled
+    await chai.expect(
+      safeApiKit.indexer.addSafeOperation({ ...addSafeOperationProps, chainId: config.CHAIN_ID })
+    ).to.be.fulfilled
 
-    const safeOperationsAfter = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsAfter = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(safeOperationsAfter.count).to.equal(initialNumSafeOperations + 1)
   })
 
@@ -144,12 +160,16 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('addSafeOperation', 
     })
     const signedSafeOperation = await safe4337Pack.signSafeOperation(safeOperation)
     // Get the number of SafeOperations before adding a new one
-    const safeOperationsBefore = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsBefore = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS, {
+      chainId: config.CHAIN_ID
+    })
     const initialNumSafeOperations = safeOperationsBefore.count
 
     await chai.expect(safeApiKit.indexer.addSafeOperation(signedSafeOperation)).to.be.fulfilled
 
-    const safeOperationsAfter = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const safeOperationsAfter = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(safeOperationsAfter.count).to.equal(initialNumSafeOperations + 1)
   })
 })

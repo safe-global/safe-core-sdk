@@ -9,8 +9,6 @@ import { HttpRequest, sendRequest } from '@safe-global/api-kit/utils/httpRequest
 export type ServiceClientConfig = {
   /** Base URL of the service, without trailing slash */
   baseUrl: string
-  /** Default chain of the requests */
-  chainId?: bigint
   /** API key sent as a Bearer token */
   apiKey?: string
 }
@@ -27,22 +25,18 @@ const getEip3770Prefix = (fullAddress: string): string => {
  */
 export abstract class BaseClient {
   protected readonly baseUrl: string
-  protected readonly chainId?: bigint
-  readonly #apiKey?: string
+  protected readonly apiKey?: string
 
-  constructor({ baseUrl, chainId, apiKey }: ServiceClientConfig) {
+  constructor({ baseUrl, apiKey }: ServiceClientConfig) {
     this.baseUrl = baseUrl
-    this.chainId = chainId
-    this.#apiKey = apiKey
+    this.apiKey = apiKey
   }
 
   protected async api<T>(request: HttpRequest): Promise<T> {
-    return sendRequest(request, this.#apiKey)
+    return sendRequest(request, this.apiKey)
   }
 
-  /**
-   * Chain of a request: the `chainId` of the method, then the EIP-3770 prefix of the address, then the default chain.
-   */
+  /** Chain of a request: the `chainId` of the method, then the EIP-3770 prefix of the address */
   protected getChainId(chainId?: bigint, fullAddress?: string): bigint | undefined {
     if (chainId !== undefined) {
       return chainId
@@ -55,14 +49,14 @@ export abstract class BaseClient {
         // unknown prefix, rejected by the address validation
       }
     }
-    return this.chainId
+    return undefined
   }
 
   protected requireChainId(chainId?: bigint, fullAddress?: string): bigint {
     const resolvedChainId = this.getChainId(chainId, fullAddress)
     if (resolvedChainId === undefined) {
       throw new Error(
-        'chainId is required. Pass it to the method or set a default chainId in the kit'
+        'chainId is required. Pass it to the method or use an EIP-3770 address (e.g. sep:0x...)'
       )
     }
     return resolvedChainId

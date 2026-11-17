@@ -66,6 +66,7 @@ describe('SafeClient', () => {
     safeClient = new SafeClient(protocolKit, apiKit)
 
     protocolKit.getAddress = jest.fn().mockResolvedValue(SAFE_ADDRESS)
+    protocolKit.getChainId = jest.fn().mockResolvedValue(1n)
     protocolKit.createTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
     protocolKit.signTransaction = jest.fn().mockResolvedValue(SAFE_TRANSACTION)
     protocolKit.executeTransaction = jest.fn().mockResolvedValue({ hash: ETHEREUM_TX_HASH })
@@ -311,7 +312,9 @@ describe('SafeClient', () => {
       const result = await safeClient.getPendingTransactions()
 
       expect(protocolKit.getAddress).toHaveBeenCalled()
-      expect(apiKit.queue.getPendingTransactions).toHaveBeenCalledWith(SAFE_ADDRESS)
+      expect(apiKit.queue.getPendingTransactions).toHaveBeenCalledWith(SAFE_ADDRESS, {
+        chainId: 1n
+      })
       expect(result).toBe(PENDING_TRANSACTIONS)
     })
   })

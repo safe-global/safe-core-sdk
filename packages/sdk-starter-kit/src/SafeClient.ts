@@ -148,7 +148,9 @@ export class SafeClient extends BaseClient {
   async getPendingTransactions(): Promise<TransactionListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
-    return this.apiKit.queue.getPendingTransactions(safeAddress)
+    return this.apiKit.queue.getPendingTransactions(safeAddress, {
+      chainId: await this.protocolKit.getChainId()
+    })
   }
 
   /**

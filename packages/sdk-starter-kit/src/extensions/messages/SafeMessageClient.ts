@@ -82,7 +82,10 @@ export class SafeMessageClient {
   async getPendingMessages(options?: ListOptions): Promise<MessageListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
-    return this.apiKit.queue.getMessages(safeAddress, options)
+    return this.apiKit.queue.getMessages(safeAddress, {
+      ...options,
+      chainId: await this.protocolKit.getChainId()
+    })
   }
 
   /**
@@ -148,7 +151,8 @@ export class SafeMessageClient {
     try {
       await this.apiKit.queue.addMessage(safeAddress, {
         message: safeMessage.data,
-        signatures: signedMessage.encodedSignatures()
+        signatures: signedMessage.encodedSignatures(),
+        chainId: await this.protocolKit.getChainId()
       })
     } catch {
       throw new Error('Could not add a new off-chain message to the Safe account')

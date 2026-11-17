@@ -3,6 +3,7 @@ import { SafeOperationResponse } from '@safe-global/types-kit'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import semverSatisfies from 'semver/functions/satisfies.js'
+import config from '../../utils/config'
 import { getApiKit } from '../../utils/setupKits'
 import { getSafeWith4337Module, safeVersionDeployed } from 'tests/helpers/safe'
 import { describeif } from 'tests/utils/helpers'
@@ -25,19 +26,23 @@ describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationsByA
   describe('should fail', () => {
     it('should fail if safeAddress is empty', async () => {
       await chai
-        .expect(safeApiKit.indexer.getSafeOperationsByAddress(''))
+        .expect(safeApiKit.indexer.getSafeOperationsByAddress('', { chainId: config.CHAIN_ID }))
         .to.be.rejectedWith('Safe address must not be empty')
     })
 
     it('should fail if safeAddress is invalid', async () => {
       await chai
-        .expect(safeApiKit.indexer.getSafeOperationsByAddress('0x123'))
+        .expect(
+          safeApiKit.indexer.getSafeOperationsByAddress('0x123', { chainId: config.CHAIN_ID })
+        )
         .to.be.rejectedWith('Invalid Ethereum address 0x123')
     })
   })
 
   it('should get the SafeOperation list', async () => {
-    const response = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress)
+    const response = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress, {
+      chainId: config.CHAIN_ID
+    })
 
     safeOperations = response.results
 
@@ -83,7 +88,10 @@ describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationsByA
   })
 
   it('should get a maximum of 3 SafeOperations with limit = 3', async () => {
-    const response = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress, { limit: 3 })
+    const response = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress, {
+      chainId: config.CHAIN_ID,
+      limit: 3
+    })
 
     chai.expect(response).to.have.property('count').greaterThan(1)
     chai.expect(response).to.have.property('results').to.be.an('array')
@@ -92,7 +100,10 @@ describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationsByA
   })
 
   it('should get all SafeOperations excluding the first one with offset = 1', async () => {
-    const response = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress, { offset: 1 })
+    const response = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress, {
+      chainId: config.CHAIN_ID,
+      offset: 1
+    })
 
     chai.expect(response).to.have.property('count').greaterThan(1)
     chai.expect(response).to.have.property('results').to.be.an('array')
@@ -100,17 +111,21 @@ describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationsByA
   })
 
   it('should get pending safe operations', async () => {
-    const allSafeOperations = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress)
+    const allSafeOperations = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress, {
+      chainId: config.CHAIN_ID
+    })
 
     // Prepared 2 executed SafeOperations in the E2E Safe account
     const pendingSafeOperations = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress, {
-      executed: false
+      executed: false,
+      chainId: config.CHAIN_ID
     })
 
     const executedSafeOperations = await safeApiKit.indexer.getSafeOperationsByAddress(
       safeAddress,
       {
-        executed: true
+        executed: true,
+        chainId: config.CHAIN_ID
       }
     )
 
@@ -121,7 +136,8 @@ describeif(semverSatisfies(safeVersionDeployed, '=1.4.1'))('getSafeOperationsByA
   it('should get all safe operations without confirmations', async () => {
     const response = await safeApiKit.indexer.getSafeOperationsByAddress(safeAddress, {
       offset: 1,
-      hasConfirmations: false
+      hasConfirmations: false,
+      chainId: config.CHAIN_ID
     })
 
     chai.expect(response).to.have.property('count').equals(0)

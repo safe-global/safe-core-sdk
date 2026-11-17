@@ -2,10 +2,9 @@
 '@safe-global/api-kit': minor
 ---
 
-Multi-chain requests. The `chainId` of the config is now optional and only sets the default chain of the requests. Every method that depends on the chain accepts its own `chainId`, which takes precedence over the EIP-3770 prefix of the address and over the `chainId` of the kit. `forChain(chainId)` returns a kit with the same configuration and another default chain.
+Multi-chain requests. The kit has no chain anymore: the `chainId` of the config is removed and each request carries its own chain, through the `chainId` of the method or the EIP-3770 prefix of the address. When both are set they must match.
 
-- `apiKit.queue`: `chainId` in `proposeTransaction`, `deleteTransaction`, `addMessage`, `addDelegate`, `updateDelegate`, `removeDelegate`, `getPendingTransactions`, `getSafeTransactions` and `getMessages`. Without a chain, `getSafeTransactions` and `getMessages` return every chain and the other methods throw. `getPendingTransactions` accepts Safes of several chains through their EIP-3770 prefixes.
-- `apiKit.indexer`: every method accepts `{ chainId }` as its last argument. Without `indexerServiceUrl`, each request uses the Safe hosted Transaction Service of its chain. A custom `indexerServiceUrl` serves only the `chainId` of the kit and rejects requests for another chain. `addSafeOperation` takes the chain of the `SafeOperation`. Accessing `apiKit.indexer` on a chain without hosted Transaction Service no longer throws; its requests do.
+- `indexerUrls: [{ chainId, url }]` replaces `indexerServiceUrl` and `txServiceUrl`. It sets the Transaction Service URL of some chains, for example self-hosted services; the other chains use the Safe hosted service, which requires the `apiKey`.
+- `apiKit.queue`: `chainId` is required in `proposeTransaction`, `deleteTransaction` and `addMessage`. The delegates (`addDelegate`, `updateDelegate`, `removeDelegate`) take `chainId` or `allChains: true`. `getSafeTransactions`, `getMessages` and `getPendingTransactions` accept `chainId`; without a chain, `getSafeTransactions` and `getMessages` return every chain, and `getPendingTransactions` accepts Safes of several chains through their EIP-3770 prefixes.
+- `apiKit.indexer`: `chainId` is required in every method, as the last argument or in the options, to select the service of the chain. An EIP-3770 prefix in the addresses must match it. `addSafeOperation` takes it in the props, or from the `SafeOperation`. `apiKit.getIndexerUrls()` returns the Transaction Service URL of every chain the indexer can be used with. Accessing `apiKit.indexer` no longer throws for a missing configuration; its requests do.
 - `apiKit.decoder`: `decodeData(data, to, { chainId })`. Without a chain, the contract is looked up on every chain.
-
-An EIP-3770 prefix now selects the chain of the request instead of having to match the `chainId` of the kit.

@@ -42,7 +42,13 @@ describe('removeSafeDelegate', () => {
   const cleanup = async () => {
     for (const scope of [{ safeAddress }, {}]) {
       await ignoreErrors(
-        safeApiKit.queue.removeDelegate({ ...scope, delegateAddress, delegatorAddress, signer })
+        safeApiKit.queue.removeDelegate({
+          ...scope,
+          delegateAddress,
+          delegatorAddress,
+          signer,
+          chainId: config.CHAIN_ID
+        })
       )
     }
   }
@@ -54,7 +60,8 @@ describe('removeSafeDelegate', () => {
     const delegateConfig: RemoveDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer
+      signer,
+      chainId: config.CHAIN_ID
     }
     await chai
       .expect(safeApiKit.queue.removeDelegate(delegateConfig))
@@ -66,7 +73,8 @@ describe('removeSafeDelegate', () => {
     const delegateConfig: RemoveDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer
+      signer,
+      chainId: config.CHAIN_ID
     }
     await chai
       .expect(safeApiKit.queue.removeDelegate(delegateConfig))
@@ -78,7 +86,8 @@ describe('removeSafeDelegate', () => {
     const delegateConfig: RemoveDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer
+      signer,
+      chainId: config.CHAIN_ID
     }
     await chai
       .expect(safeApiKit.queue.removeDelegate(delegateConfig))
@@ -89,7 +98,8 @@ describe('removeSafeDelegate', () => {
     const delegateConfig: RemoveDelegateProps = {
       delegateAddress,
       delegatorAddress,
-      signer
+      signer,
+      chainId: config.CHAIN_ID
     }
     await safeApiKit.queue.addDelegate({ ...delegateConfig, label: 'Label' })
     const { results: initialDelegates } = await safeApiKit.queue.getDelegates({
@@ -110,7 +120,8 @@ describe('removeSafeDelegate', () => {
       safeAddress,
       delegateAddress,
       delegatorAddress,
-      signer
+      signer,
+      chainId: config.CHAIN_ID
     }
     await safeApiKit.queue.addDelegate({ ...delegateConfig, label: 'Label' })
     const { results: initialDelegates } = await safeApiKit.queue.getDelegates({
@@ -132,7 +143,8 @@ describe('removeSafeDelegate', () => {
     const delegateConfig: RemoveDelegateProps = {
       delegateAddress: eip3770DelegateAddress,
       delegatorAddress: eip3770DelegatorAddress,
-      signer
+      signer,
+      chainId: config.CHAIN_ID
     }
     await safeApiKit.queue.addDelegate({ ...delegateConfig, label: 'Label' })
     const { results: initialDelegates } = await safeApiKit.queue.getDelegates({

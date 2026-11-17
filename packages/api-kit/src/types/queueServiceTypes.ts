@@ -7,7 +7,7 @@ import {
   SafeTransactionData,
   SignatureType
 } from '@safe-global/types-kit'
-import { ChainOptions, ListOptions, ListResponse } from './common'
+import { ChainOptions, ListOptions, ListResponse, RequiredChainOptions } from './common'
 
 export type QueueServiceInfoResponse = {
   readonly version: string
@@ -34,6 +34,11 @@ export type GetDelegatesOptions = {
   label?: string
 } & ListOptions
 
+/** Chain of a delegation: one chain, or all of them with `allChains` */
+export type DelegateChainScope =
+  | (RequiredChainOptions & { allChains?: false })
+  | { allChains: true; chainId?: undefined }
+
 export type AddDelegateProps = {
   /** Safe the delegation is scoped to. When omitted the delegate is valid for all the Safes of the delegator */
   safeAddress?: string
@@ -42,9 +47,7 @@ export type AddDelegateProps = {
   /** The delegator wallet, used to sign the request */
   signer: Signer
   label: string
-  /** When true the delegation is valid on all chains instead of only on the chain of the request */
-  allChains?: boolean
-} & ChainOptions
+} & DelegateChainScope
 
 export type UpdateDelegateProps = AddDelegateProps
 
@@ -55,9 +58,7 @@ export type RemoveDelegateProps = {
   delegateAddress: string
   delegatorAddress: string
   signer: Signer
-  /** Must match the scope used when the delegate was added */
-  allChains?: boolean
-} & ChainOptions
+} & DelegateChainScope
 
 export type DelegateResponse = {
   readonly created: string
@@ -93,7 +94,7 @@ export type ProposeTransactionProps = {
    * approves (`approveHash`) or executes (`execTransaction`) a transaction of a Safe it owns.
    */
   nestedTransaction?: SafeTransactionData
-} & ChainOptions
+} & RequiredChainOptions
 
 export type DeleteTransactionProps = {
   safeTxHash: string
@@ -101,7 +102,7 @@ export type DeleteTransactionProps = {
   safeAddress: string
   /** The EOA that proposed the transaction (proposer, delegate or nested Safe owner) */
   signer: Signer
-} & ChainOptions
+} & RequiredChainOptions
 
 /** A Safe address, optionally restricted to some chains. Without chains, every chain of the Safe is returned */
 export type SafeFilter = string | { address: string; chainIds: bigint[] }
@@ -177,7 +178,7 @@ export type AddMessageProps = {
   originName?: string
   /** URL of the dapp or client submitting the message (max 200 characters) */
   originUrl?: string
-} & ChainOptions
+} & RequiredChainOptions
 
 export type GetMessagesOptions = {
   /** Return the messages of every chain instead of only the chain of the request */

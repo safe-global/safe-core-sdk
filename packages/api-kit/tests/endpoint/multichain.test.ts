@@ -53,7 +53,7 @@ describe('Multi-chain requests', () => {
     sinon.resetHistory()
   })
 
-  describe('kit without default chain', () => {
+  describe('chain of each request', () => {
     const apiKit = new SafeApiKit({ apiKey })
 
     it('should use the chainId of each request in the queue', async () => {
@@ -71,26 +71,26 @@ describe('Multi-chain requests', () => {
       )
     })
 
-    it('should take the chain from the EIP-3770 prefix of the address', async () => {
-      await apiKit.queue.addMessage(`eth:${safeAddress}`, { message: 'hi', signatures: '0x01' })
-      expect(fetchData).to.have.been.calledWith(
-        sinon.match({
-          url: `${queueUrl}/safes/${safeAddress}/messages`,
-          body: sinon.match({ chainId: 1 })
-        })
-      )
-    })
-
-    it('should reject the requests that need a chain when there is none', async () => {
+    it('should reject an EIP-3770 prefix that does not match the chainId of the request', async () => {
       await expect(
-        apiKit.queue.addMessage(safeAddress, { message: 'hi', signatures: '0x01' })
-      ).to.be.rejectedWith('chainId is required')
-      await expect(apiKit.indexer.getSafeInfo(safeAddress)).to.be.rejectedWith(
-        'chainId is required'
-      )
+        apiKit.queue.proposeTransaction({
+          safeAddress: `eth:${safeAddress}`,
+          safeTransactionData,
+          signatures: '0x01',
+          chainId: sepolia
+        })
+      ).to.be.rejectedWith('The network prefix must match the current network')
     })
 
-    it('should list every chain when there is no chain', async () => {
+    it('should take the chain of a read from the EIP-3770 prefix of the address', async () => {
+      await apiKit.queue.getSafeTransactions(`eth:${safeAddress}`)
+      expect(fetchData).to.have.been.calledWith({
+        url: `${queueUrl}/safes/${safeAddress}/multisig-transactions?chainId=1`,
+        method: 'GET'
+      })
+    })
+
+    it('should list every chain when a queue read has no chain', async () => {
       await apiKit.queue.getSafeTransactions(safeAddress)
       expect(fetchData).to.have.been.calledWith({
         url: `${queueUrl}/safes/${safeAddress}/multisig-transactions`,
@@ -106,6 +106,12 @@ describe('Multi-chain requests', () => {
       })
     })
 
+    it('should reject an EIP-3770 prefix that does not match the chainId of an indexer request', async () => {
+      await expect(
+        apiKit.indexer.getSafeInfo(`eth:${safeAddress}`, { chainId: sepolia })
+      ).to.be.rejectedWith('The network prefix must match the current network')
+    })
+
     it('should use the hosted indexer of the chain of each request', async () => {
       await apiKit.indexer.getSafeInfo(safeAddress, { chainId: mainnet })
       expect(fetchData).to.have.been.calledWith({
@@ -113,7 +119,7 @@ describe('Multi-chain requests', () => {
         method: 'GET'
       })
 
-      await apiKit.indexer.getSafeInfo(`sep:${safeAddress}`)
+      await apiKit.indexer.getSafeInfo(`sep:${safeAddress}`, { chainId: sepolia })
       expect(fetchData).to.have.been.calledWith({
         url: `${getTransactionServiceUrl(sepolia)}/v1/safes/${safeAddress}/`,
         method: 'GET'
@@ -137,77 +143,53 @@ describe('Multi-chain requests', () => {
     })
   })
 
-  describe('kit with default chain', () => {
-    const apiKit = new SafeApiKit({ chainId: sepolia, apiKey })
+  describe('indexerUrls', () => {
+    const sepoliaIndexer = 'https://my-indexer.example.com/api'
+    const customChain = 123456789n
+    const customChainIndexer = 'https://my-chain-indexer.example.com/api/'
 
-    it('should use the default chain when the request does not set one', async () => {
-      await apiKit.queue.getSafeTransactions(safeAddress)
+    const apiKit = new SafeApiKit({
+      apiKey,
+      indexerUrls: [
+        { chainId: sepolia, url: sepoliaIndexer },
+        { chainId: customChain, url: customChainIndexer }
+      ]
+    })
+
+    it('should use the URL of the chain of the request', async () => {
+      await apiKit.indexer.getSafeInfo(safeAddress, { chainId: sepolia })
       expect(fetchData).to.have.been.calledWith({
-        url: `${queueUrl}/safes/${safeAddress}/multisig-transactions?chainId=11155111`,
+        url: `${sepoliaIndexer}/v1/safes/${safeAddress}/`,
+        method: 'GET'
+      })
+
+      await apiKit.indexer.getServiceInfo({ chainId: customChain })
+      expect(fetchData).to.have.been.calledWith({
+        url: 'https://my-chain-indexer.example.com/api/v1/about',
         method: 'GET'
       })
     })
 
-    it('should give precedence to the chainId of the request', async () => {
-      await apiKit.queue.getSafeTransactions(safeAddress, { chainId: mainnet })
-      expect(fetchData).to.have.been.calledWith({
-        url: `${queueUrl}/safes/${safeAddress}/multisig-transactions?chainId=1`,
-        method: 'GET'
-      })
-
-      await apiKit.indexer.getSafeInfo(`eth:${safeAddress}`)
+    it('should use the hosted indexer for the chains without URL', async () => {
+      await apiKit.indexer.getSafeInfo(`eth:${safeAddress}`, { chainId: mainnet })
       expect(fetchData).to.have.been.calledWith({
         url: `${getTransactionServiceUrl(mainnet)}/v1/safes/${safeAddress}/`,
         method: 'GET'
       })
     })
 
-    it('should reject an EIP-3770 prefix that does not match the chainId of the request', async () => {
-      await expect(
-        apiKit.queue.getSafeTransactions(`eth:${safeAddress}`, { chainId: sepolia })
-      ).to.be.rejectedWith('The network prefix must match the current network')
-    })
-
-    it('should create a kit for another chain with forChain', async () => {
-      await apiKit.forChain(mainnet).queue.getSafeTransactions(safeAddress)
+    it('should not need an apiKey for the chains with URL', async () => {
+      const selfHostedKit = new SafeApiKit({
+        indexerUrls: [{ chainId: sepolia, url: sepoliaIndexer }]
+      })
+      await selfHostedKit.indexer.getServiceInfo({ chainId: sepolia })
       expect(fetchData).to.have.been.calledWith({
-        url: `${queueUrl}/safes/${safeAddress}/multisig-transactions?chainId=1`,
+        url: `${sepoliaIndexer}/v1/about`,
         method: 'GET'
       })
-    })
-  })
-
-  describe('custom indexer URL', () => {
-    const indexerServiceUrl = 'https://my-custom-service.example.com/api'
-
-    it('should use the custom URL for its chain', async () => {
-      const apiKit = new SafeApiKit({ chainId: sepolia, indexerServiceUrl })
-      await apiKit.indexer.getSafeInfo(safeAddress)
-      expect(fetchData).to.have.been.calledWith({
-        url: `${indexerServiceUrl}/v1/safes/${safeAddress}/`,
-        method: 'GET'
-      })
-    })
-
-    it('should reject requests for another chain', async () => {
-      const apiKit = new SafeApiKit({ chainId: sepolia, indexerServiceUrl })
-      await expect(
-        apiKit.indexer.getSafeInfo(safeAddress, { chainId: mainnet })
-      ).to.be.rejectedWith(
-        `The indexer service at ${indexerServiceUrl} only serves chainId 11155111`
+      await expect(selfHostedKit.indexer.getServiceInfo({ chainId: mainnet })).to.be.rejectedWith(
+        'apiKey is mandatory to use the Safe hosted indexer of chainId 1'
       )
-      await expect(apiKit.indexer.getSafeInfo(`eth:${safeAddress}`)).to.be.rejectedWith(
-        'only serves chainId 11155111'
-      )
-    })
-
-    it('should not need a chain when the kit has no default chain', async () => {
-      const apiKit = new SafeApiKit({ indexerServiceUrl })
-      await apiKit.indexer.getServiceInfo()
-      expect(fetchData).to.have.been.calledWith({
-        url: `${indexerServiceUrl}/v1/about`,
-        method: 'GET'
-      })
     })
   })
 })

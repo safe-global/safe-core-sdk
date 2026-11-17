@@ -95,7 +95,10 @@ export class SafeOperationClient {
   }: ConfirmSafeOperationProps): Promise<SafeClientResult> {
     const safeAddress = await this.protocolKit.getAddress()
     const threshold = await this.protocolKit.getThreshold()
-    let safeOperationResponse = await this.apiKit.indexer.getSafeOperation(safeOperationHash)
+    const chainId = await this.protocolKit.getChainId()
+    let safeOperationResponse = await this.apiKit.indexer.getSafeOperation(safeOperationHash, {
+      chainId
+    })
 
     if (safeOperationResponse.userOperation?.ethereumTxHash) {
       return createSafeClientResult({
@@ -109,9 +112,11 @@ export class SafeOperationClient {
     if (this.#needsConfirmation(safeOperationResponse, threshold)) {
       const signature = buildSignatureBytes([await this.protocolKit.signHash(safeOperationHash)])
 
-      await this.apiKit.indexer.confirmSafeOperation(safeOperationHash, signature)
+      await this.apiKit.indexer.confirmSafeOperation(safeOperationHash, signature, { chainId })
 
-      safeOperationResponse = await this.apiKit.indexer.getSafeOperation(safeOperationHash)
+      safeOperationResponse = await this.apiKit.indexer.getSafeOperation(safeOperationHash, {
+        chainId
+      })
     }
 
     if (!this.#needsConfirmation(safeOperationResponse, threshold)) {
@@ -147,7 +152,10 @@ export class SafeOperationClient {
   async getPendingSafeOperations(options?: ListOptions): Promise<GetSafeOperationListResponse> {
     const safeAddress = await this.protocolKit.getAddress()
 
-    return this.apiKit.indexer.getPendingSafeOperations(safeAddress, options)
+    return this.apiKit.indexer.getPendingSafeOperations(safeAddress, {
+      ...options,
+      chainId: await this.protocolKit.getChainId()
+    })
   }
 
   #needsConfirmation(safeOperationResponse: SafeOperationResponse, threshold: number): boolean {

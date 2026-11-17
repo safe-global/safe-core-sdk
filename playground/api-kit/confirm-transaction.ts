@@ -6,7 +6,6 @@ dotenv.config({ path: './playground/api-kit/.env' })
 // Load environment variables from ./.env file
 // Follow .env-sample as an example to create your own file
 const {
-  CHAIN_ID = 11155111,
   RPC_URL = '',
   API_KEY = '',
   SIGNER_ADDRESS_PRIVATE_KEY = '',
@@ -24,7 +23,6 @@ async function main() {
 
   // Create Safe API Kit instance
   const apiKit = new SafeApiKit({
-    chainId: BigInt(CHAIN_ID),
     apiKey: API_KEY
   })
 

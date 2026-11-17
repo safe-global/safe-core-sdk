@@ -16,27 +16,31 @@ describe('getToken', () => {
   it('should fail if token address is empty', async () => {
     const tokenAddress = ''
     await chai
-      .expect(safeApiKit.indexer.getToken(tokenAddress))
+      .expect(safeApiKit.indexer.getToken(tokenAddress, { chainId: config.CHAIN_ID }))
       .to.be.rejectedWith('Invalid token address')
   })
 
   it('should fail if token address is not checksummed', async () => {
     const tokenAddress = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'.toLowerCase()
     await chai
-      .expect(safeApiKit.indexer.getToken(tokenAddress))
+      .expect(safeApiKit.indexer.getToken(tokenAddress, { chainId: config.CHAIN_ID }))
       .to.be.rejectedWith('Invalid ethereum address')
   })
 
   it('should return the token info', async () => {
     const tokenAddress = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
-    const tokenInfoResponse = await safeApiKit.indexer.getToken(tokenAddress)
+    const tokenInfoResponse = await safeApiKit.indexer.getToken(tokenAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(tokenInfoResponse.address).to.be.equal('0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14')
   })
 
   it('should return the token info EIP-3770', async () => {
     const tokenAddress = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
     const eip3770TokenAddress = `${config.EIP_3770_PREFIX}:${tokenAddress}`
-    const tokenInfoResponse = await safeApiKit.indexer.getToken(eip3770TokenAddress)
+    const tokenInfoResponse = await safeApiKit.indexer.getToken(eip3770TokenAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(tokenInfoResponse.address).to.be.equal('0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14')
   })
 })

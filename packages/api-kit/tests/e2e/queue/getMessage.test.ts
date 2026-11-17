@@ -1,6 +1,7 @@
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import config from '../../utils/config'
 import { getApiKit } from '../../utils/setupKits'
 import { getSafe } from 'tests/helpers/safe'
 
@@ -24,7 +25,7 @@ describe('getMessage', () => {
   })
 
   it('should get the message given a message hash', async () => {
-    const messages = await safeApiKit.queue.getMessages(safeAddress)
+    const messages = await safeApiKit.queue.getMessages(safeAddress, { chainId: config.CHAIN_ID })
     const messageHash = messages.results[0].messageHash
     const message = await safeApiKit.queue.getMessage(messageHash)
 

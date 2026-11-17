@@ -36,6 +36,7 @@ describe(`[${version}] addSafeDelegate`, () => {
       try {
         await safeApiKit.queue.removeDelegate({
           ...scope,
+          chainId: config.CHAIN_ID,
           delegateAddress,
           delegatorAddress,
           signer
@@ -53,7 +54,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       delegateAddress,
       delegatorAddress,
       signer,
-      label: ''
+      label: '',
+      chainId: config.CHAIN_ID
     }
     await chai
       .expect(safeApiKit.queue.addDelegate(delegateConfig))
@@ -65,7 +67,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       delegateAddress: '',
       delegatorAddress,
       signer,
-      label: 'Label'
+      label: 'Label',
+      chainId: config.CHAIN_ID
     }
     await chai
       .expect(safeApiKit.queue.addDelegate(delegateConfig))
@@ -77,7 +80,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       delegateAddress,
       delegatorAddress: '',
       signer,
-      label: 'Label'
+      label: 'Label',
+      chainId: config.CHAIN_ID
     }
     await chai
       .expect(safeApiKit.queue.addDelegate(delegateConfig))
@@ -90,7 +94,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       delegateAddress: delegatorAddress,
       delegatorAddress,
       signer,
-      label: 'Label'
+      label: 'Label',
+      chainId: config.CHAIN_ID
     }
     await chai
       .expect(safeApiKit.queue.addDelegate(delegateConfig))
@@ -103,7 +108,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       delegateAddress,
       delegatorAddress: '0xe4bb611E4e4164D54Ad7361B9d58b0A1eBD462B8',
       signer,
-      label: 'Label'
+      label: 'Label',
+      chainId: config.CHAIN_ID
     }
     await chai.expect(safeApiKit.queue.addDelegate(delegateConfig)).to.be.rejected
   })
@@ -114,7 +120,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       delegateAddress,
       delegatorAddress,
       signer,
-      label: 'Label'
+      label: 'Label',
+      chainId: config.CHAIN_ID
     }
     const { results: initialDelegates } = await safeApiKit.queue.getDelegates({ safeAddress })
 
@@ -137,7 +144,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       delegateAddress,
       delegatorAddress,
       signer,
-      label: 'Label'
+      label: 'Label',
+      chainId: config.CHAIN_ID
     }
     const { results: initialDelegates } = await safeApiKit.queue.getDelegates({
       delegateAddress,
@@ -168,7 +176,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       delegateAddress: eip3770DelegateAddress,
       delegatorAddress: eip3770DelegatorAddress,
       signer,
-      label: 'Label'
+      label: 'Label',
+      chainId: config.CHAIN_ID
     }
     const { results: initialDelegates } = await safeApiKit.queue.getDelegates({
       safeAddress: eip3770SafeAddress

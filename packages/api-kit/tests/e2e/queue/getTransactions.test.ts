@@ -23,8 +23,12 @@ describe('queue.getTransactions', () => {
   })
 
   it('should merge the transactions of several Safes', async () => {
-    const { count: count1 } = await safeApiKit.queue.getSafeTransactions(safeAddress1)
-    const { count: count2 } = await safeApiKit.queue.getSafeTransactions(safeAddress2)
+    const { count: count1 } = await safeApiKit.queue.getSafeTransactions(safeAddress1, {
+      chainId: config.CHAIN_ID
+    })
+    const { count: count2 } = await safeApiKit.queue.getSafeTransactions(safeAddress2, {
+      chainId: config.CHAIN_ID
+    })
     const { count, results } = await safeApiKit.queue.getTransactions({
       safes: [
         { address: safeAddress1, chainIds: [config.CHAIN_ID] },
@@ -64,7 +68,10 @@ describe('queue.getTransactionsBatch', () => {
   })
 
   it('should return the transactions of the given hashes, skipping the unknown ones', async () => {
-    const { results } = await safeApiKit.queue.getSafeTransactions(safeAddress2, { limit: 2 })
+    const { results } = await safeApiKit.queue.getSafeTransactions(safeAddress2, {
+      chainId: config.CHAIN_ID,
+      limit: 2
+    })
     const hashes = results.map((transaction) => transaction.safeTxHash)
     const unknownHash = '0x317834aea988fd3cfa54fd8b2be2c96b4fd70a14d8c9470a7110576b01e6480b'
 

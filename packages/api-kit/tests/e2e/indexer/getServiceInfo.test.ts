@@ -1,11 +1,12 @@
 import { expect } from 'chai'
 import { getTransactionServiceUrl, networks } from '@safe-global/api-kit/utils/config'
+import config from '../../utils/config'
 import { getApiKit } from '../../utils/setupKits'
 
 describe('getServiceInfo', () => {
   it('should return the Safe service info', async () => {
     const safeApiKit = getApiKit()
-    const serviceInfo = await safeApiKit.indexer.getServiceInfo()
+    const serviceInfo = await safeApiKit.indexer.getServiceInfo({ chainId: config.CHAIN_ID })
     expect(serviceInfo.api_version).to.be.equal('v1')
   })
 
@@ -17,8 +18,8 @@ describe('getServiceInfo', () => {
     networks.forEach((network) => {
       it(`should return correct network info for chainId ${network.chainId} (${getTransactionServiceUrl(network.chainId)})`, async function () {
         this.timeout(10000)
-        const safeApiKit = getApiKit(undefined, network.chainId)
-        const serviceInfo = await safeApiKit.indexer.getServiceInfo()
+        const safeApiKit = getApiKit()
+        const serviceInfo = await safeApiKit.indexer.getServiceInfo({ chainId: network.chainId })
 
         expect(serviceInfo).to.have.property('version').to.be.a('string').not.empty
         expect(serviceInfo).to.have.property('name').to.be.a('string').not.empty

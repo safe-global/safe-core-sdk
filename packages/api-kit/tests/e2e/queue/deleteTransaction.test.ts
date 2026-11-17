@@ -6,6 +6,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { createWalletClient, http, toBytes, toHex } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
+import config from '../../utils/config'
 import { getKits } from '../../utils/setupKits'
 import { getSafe, PRIVATE_KEY_1, PRIVATE_KEY_2 } from 'tests/helpers/safe'
 
@@ -37,7 +38,8 @@ describe('deleteTransaction', () => {
         safeApiKit.queue.deleteTransaction({
           safeTxHash: '',
           safeAddress,
-          signer: getSigner(PRIVATE_KEY_1)
+          signer: getSigner(PRIVATE_KEY_1),
+          chainId: config.CHAIN_ID
         })
       )
       .to.be.rejectedWith('Invalid safeTxHash')
@@ -49,7 +51,8 @@ describe('deleteTransaction', () => {
       safeApiKit.queue.deleteTransaction({
         safeTxHash,
         safeAddress,
-        signer: getSigner(PRIVATE_KEY_1)
+        signer: getSigner(PRIVATE_KEY_1),
+        chainId: config.CHAIN_ID
       })
     ).to.be.rejected
   })
@@ -74,7 +77,8 @@ describe('deleteTransaction', () => {
       ;({ safeTxHash } = await safeApiKit.queue.proposeTransaction({
         safeAddress,
         safeTransactionData: tx.data,
-        signatures: buildSignatureBytes([ethSig])
+        signatures: buildSignatureBytes([ethSig]),
+        chainId: config.CHAIN_ID
       }))
     })
 
@@ -83,7 +87,8 @@ describe('deleteTransaction', () => {
         await safeApiKit.queue.deleteTransaction({
           safeTxHash,
           safeAddress,
-          signer: getSigner(PRIVATE_KEY_1)
+          signer: getSigner(PRIVATE_KEY_1),
+          chainId: config.CHAIN_ID
         })
       } catch {
         // already deleted
@@ -95,7 +100,8 @@ describe('deleteTransaction', () => {
         safeApiKit.queue.deleteTransaction({
           safeTxHash,
           safeAddress,
-          signer: getSigner(PRIVATE_KEY_2)
+          signer: getSigner(PRIVATE_KEY_2),
+          chainId: config.CHAIN_ID
         })
       ).to.be.rejected
 
@@ -107,7 +113,8 @@ describe('deleteTransaction', () => {
         safeApiKit.queue.deleteTransaction({
           safeTxHash,
           safeAddress,
-          signer: getSigner(PRIVATE_KEY_1)
+          signer: getSigner(PRIVATE_KEY_1),
+          chainId: config.CHAIN_ID
         })
       ).to.be.fulfilled
 

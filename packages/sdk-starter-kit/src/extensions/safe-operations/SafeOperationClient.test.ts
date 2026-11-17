@@ -99,6 +99,7 @@ describe('SafeOperationClient', () => {
     apiKit.indexer.getSafeOperation = jest.fn().mockResolvedValue(SAFE_OPERATION_RESPONSE)
 
     protocolKit.getAddress = jest.fn().mockResolvedValue(SAFE_ADDRESS)
+    protocolKit.getChainId = jest.fn().mockResolvedValue(1n)
     protocolKit.signHash = jest
       .fn()
       .mockResolvedValue(new protocolKitModule.EthSafeSignature('0xSigner', '0xSignature'))
@@ -201,7 +202,8 @@ describe('SafeOperationClient', () => {
 
       expect(apiKit.indexer.confirmSafeOperation).toHaveBeenCalledWith(
         SAFE_OPERATION_HASH,
-        undefined
+        undefined,
+        { chainId: 1n }
       )
 
       expect(safeOperationResult).toEqual({
@@ -236,7 +238,8 @@ describe('SafeOperationClient', () => {
 
       expect(apiKit.indexer.confirmSafeOperation).toHaveBeenCalledWith(
         SAFE_OPERATION_HASH,
-        undefined
+        undefined,
+        { chainId: 1n }
       )
       expect(safe4337Pack.executeTransaction).toHaveBeenCalledWith({
         executable: CONFIRMED_SAFE_OPERATION_RESPONSE
@@ -261,7 +264,9 @@ describe('SafeOperationClient', () => {
       const result = await safeOperationClient.getPendingSafeOperations()
 
       expect(protocolKit.getAddress).toHaveBeenCalled()
-      expect(apiKit.indexer.getPendingSafeOperations).toHaveBeenCalledWith(SAFE_ADDRESS, undefined)
+      expect(apiKit.indexer.getPendingSafeOperations).toHaveBeenCalledWith(SAFE_ADDRESS, {
+        chainId: 1n
+      })
       expect(result).toBe(PENDING_SAFE_OPERATIONS)
     })
   })

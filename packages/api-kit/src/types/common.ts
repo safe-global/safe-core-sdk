@@ -8,3 +8,13 @@ export type ListOptions = {
   /** Initial index from which to return the results */
   offset?: number
 }
+
+export type ChainOptions = {
+  /** Chain of the request. Defaults to the EIP-3770 prefix of the address */
+  chainId?: bigint
+}
+
+export type RequiredChainOptions = {
+  /** Chain of the request */
+  chainId: bigint
+}

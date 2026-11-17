@@ -115,7 +115,13 @@ describe('Queue service endpoints', () => {
     })
 
     it('addDelegate', async () => {
-      const props: AddDelegateProps = { delegateAddress, delegatorAddress, signer, label: 'label' }
+      const props: AddDelegateProps = {
+        delegateAddress,
+        delegatorAddress,
+        signer,
+        label: 'label',
+        chainId
+      }
       const signature = await signDelegate(signer, delegateAddress, chainId, 'add')
 
       await chai.expect(safeApiKit.queue.addDelegate(props)).to.be.eventually.deep.equals(OK)
@@ -139,7 +145,8 @@ describe('Queue service endpoints', () => {
         delegateAddress: eip3770DelegateAddress,
         delegatorAddress: eip3770DelegatorAddress,
         signer,
-        label: 'label'
+        label: 'label',
+        chainId
       }
       const signature = await signDelegate(signer, delegateAddress, chainId, 'add', safeAddress)
 
@@ -184,7 +191,7 @@ describe('Queue service endpoints', () => {
     })
 
     it('addDelegate validations', async () => {
-      const base = { delegateAddress, delegatorAddress, signer, label: 'label' }
+      const base = { delegateAddress, delegatorAddress, signer, label: 'label', chainId }
       await chai
         .expect(safeApiKit.queue.addDelegate({ ...base, delegateAddress: '' }))
         .to.be.rejectedWith('Invalid Safe delegate address')
@@ -203,7 +210,8 @@ describe('Queue service endpoints', () => {
         delegateAddress,
         delegatorAddress,
         signer,
-        label: 'new label'
+        label: 'new label',
+        chainId
       }
       const signature = await signDelegate(signer, delegateAddress, chainId, 'edit', safeAddress)
 
@@ -223,7 +231,7 @@ describe('Queue service endpoints', () => {
     })
 
     it('removeDelegate', async () => {
-      const props: RemoveDelegateProps = { delegateAddress, delegatorAddress, signer }
+      const props: RemoveDelegateProps = { delegateAddress, delegatorAddress, signer, chainId }
       const signature = await signDelegate(signer, delegateAddress, chainId, 'delete')
 
       await chai.expect(safeApiKit.queue.removeDelegate(props)).to.be.fulfilled
@@ -245,7 +253,8 @@ describe('Queue service endpoints', () => {
         safeAddress: eip3770SafeAddress,
         delegateAddress: eip3770DelegateAddress,
         delegatorAddress,
-        signer
+        signer,
+        chainId
       }
       const signature = await signDelegate(signer, delegateAddress, chainId, 'delete', safeAddress)
 
@@ -264,7 +273,12 @@ describe('Queue service endpoints', () => {
     })
 
     it('removeDelegate every delegate of the delegator with the zero address', async () => {
-      const props: RemoveDelegateProps = { delegateAddress: zeroAddress, delegatorAddress, signer }
+      const props: RemoveDelegateProps = {
+        delegateAddress: zeroAddress,
+        delegatorAddress,
+        signer,
+        chainId
+      }
       const signature = await signDelegate(signer, zeroAddress, chainId, 'delete')
 
       await chai.expect(safeApiKit.queue.removeDelegate(props)).to.be.fulfilled
@@ -310,7 +324,8 @@ describe('Queue service endpoints', () => {
             signatures: signature,
             originName: 'Safe Core SDK',
             originUrl: 'https://safe.global',
-            notes: 'notes'
+            notes: 'notes',
+            chainId
           })
         )
         .to.be.eventually.deep.equals(OK)
@@ -337,7 +352,8 @@ describe('Queue service endpoints', () => {
           safeApiKit.queue.proposeTransaction({
             safeAddress: eip3770SafeAddress,
             safeTransactionData: await getTransactionData(),
-            signatures: [signature, '0x1234']
+            signatures: [signature, '0x1234'],
+            chainId
           })
         )
         .to.be.eventually.deep.equals(OK)
@@ -365,13 +381,19 @@ describe('Queue service endpoints', () => {
           safeApiKit.queue.proposeTransaction({
             safeAddress: '',
             safeTransactionData,
-            signatures: signature
+            signatures: signature,
+            chainId
           })
         )
         .to.be.rejectedWith('Invalid Safe address')
       await chai
         .expect(
-          safeApiKit.queue.proposeTransaction({ safeAddress, safeTransactionData, signatures: [] })
+          safeApiKit.queue.proposeTransaction({
+            safeAddress,
+            safeTransactionData,
+            signatures: [],
+            chainId
+          })
         )
         .to.be.rejectedWith('Invalid signatures')
       chai.expect(fetchData).not.to.have.been.called
@@ -403,7 +425,7 @@ describe('Queue service endpoints', () => {
 
     it('getPendingTransactions', async () => {
       await chai
-        .expect(safeApiKit.queue.getPendingTransactions(safeAddress))
+        .expect(safeApiKit.queue.getPendingTransactions(safeAddress, { chainId }))
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/multisig-transactions/queue?safes=${safeAddress}%3A${chainId}`,
@@ -417,7 +439,8 @@ describe('Queue service endpoints', () => {
           safeApiKit.queue.getPendingTransactions([eip3770SafeAddress, otherSafeAddress], {
             nonceOrder: 'desc',
             limit: 1,
-            offset: 1
+            offset: 1,
+            chainId
           })
         )
         .to.be.eventually.deep.equals(OK)
@@ -469,7 +492,8 @@ describe('Queue service endpoints', () => {
         safeApiKit.queue.deleteTransaction({
           safeTxHash,
           safeAddress: eip3770SafeAddress,
-          signer
+          signer,
+          chainId
         })
       ).to.be.fulfilled
       chai.expect(fetchData).to.have.been.calledWith({
@@ -478,10 +502,14 @@ describe('Queue service endpoints', () => {
         body: { signature }
       })
       await chai
-        .expect(safeApiKit.queue.deleteTransaction({ safeTxHash: '', safeAddress, signer }))
+        .expect(
+          safeApiKit.queue.deleteTransaction({ safeTxHash: '', safeAddress, signer, chainId })
+        )
         .to.be.rejectedWith('Invalid safeTxHash')
       await chai
-        .expect(safeApiKit.queue.deleteTransaction({ safeTxHash, safeAddress: '', signer }))
+        .expect(
+          safeApiKit.queue.deleteTransaction({ safeTxHash, safeAddress: '', signer, chainId })
+        )
         .to.be.rejectedWith('Invalid Safe address')
     })
 
@@ -542,7 +570,11 @@ describe('Queue service endpoints', () => {
     it('addMessage', async () => {
       await chai
         .expect(
-          safeApiKit.queue.addMessage(safeAddress, { message: 'message', signatures: '0x1234' })
+          safeApiKit.queue.addMessage(safeAddress, {
+            message: 'message',
+            signatures: '0x1234',
+            chainId
+          })
         )
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
@@ -565,7 +597,8 @@ describe('Queue service endpoints', () => {
             message: 'message',
             signatures: ['0x1234'],
             originName: 'Safe Core SDK',
-            originUrl: 'https://safe.global'
+            originUrl: 'https://safe.global',
+            chainId
           })
         )
         .to.be.eventually.deep.equals(OK)
@@ -587,7 +620,8 @@ describe('Queue service endpoints', () => {
         .expect(
           safeApiKit.queue.addMessage(eip3770SafeAddress, {
             message: 'message',
-            signatures: '0x1234'
+            signatures: '0x1234',
+            chainId
           })
         )
         .to.be.eventually.deep.equals(OK)
@@ -606,15 +640,25 @@ describe('Queue service endpoints', () => {
 
     it('addMessage validations', async () => {
       await chai
-        .expect(safeApiKit.queue.addMessage('0x123', { message: 'message', signatures: '0x1234' }))
+        .expect(
+          safeApiKit.queue.addMessage('0x123', {
+            message: 'message',
+            signatures: '0x1234',
+            chainId
+          })
+        )
         .to.be.rejectedWith('Invalid Safe address')
       await chai
-        .expect(safeApiKit.queue.addMessage(safeAddress, { message: 'message', signatures: '' }))
+        .expect(
+          safeApiKit.queue.addMessage(safeAddress, { message: 'message', signatures: '', chainId })
+        )
         .to.be.rejectedWith('Invalid signatures')
     })
 
     it('getMessages', async () => {
-      await chai.expect(safeApiKit.queue.getMessages(safeAddress)).to.be.eventually.deep.equals(OK)
+      await chai
+        .expect(safeApiKit.queue.getMessages(safeAddress, { chainId }))
+        .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages?chainId=${chainId}`,
         method: 'GET'
@@ -668,7 +712,6 @@ describe('Queue service endpoints', () => {
   describe('custom endpoint', () => {
     it('uses the custom queueServiceUrl', async () => {
       const apiKit = new SafeApiKit({
-        chainId,
         queueServiceUrl: 'http://my-custom-queue-service.com/api/'
       })
       await chai.expect(apiKit.queue.getTransaction(safeTxHash)).to.be.fulfilled

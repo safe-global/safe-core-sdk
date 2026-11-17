@@ -1,6 +1,7 @@
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import config from '../../utils/config'
 import { getApiKit } from '../../utils/setupKits'
 import { Address } from 'viem'
 import { getSafeWith4337Module, safeVersionDeployed } from 'tests/helpers/safe'
@@ -20,27 +21,32 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))('getPendingSafeOpera
   describe('should fail', () => {
     it('should fail if safeAddress is empty', async () => {
       await chai
-        .expect(safeApiKit.indexer.getPendingSafeOperations(''))
+        .expect(safeApiKit.indexer.getPendingSafeOperations('', { chainId: config.CHAIN_ID }))
         .to.be.rejectedWith('Safe address must not be empty')
     })
 
     it('should fail if safeAddress is invalid', async () => {
       await chai
-        .expect(safeApiKit.indexer.getPendingSafeOperations('0x123'))
+        .expect(safeApiKit.indexer.getPendingSafeOperations('0x123', { chainId: config.CHAIN_ID }))
         .to.be.rejectedWith('Invalid Ethereum address 0x123')
     })
   })
 
   it('should get pending safe operations', async () => {
-    const allSafeOperations = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS)
+    const allSafeOperations = await safeApiKit.indexer.getSafeOperationsByAddress(SAFE_ADDRESS, {
+      chainId: config.CHAIN_ID
+    })
 
     // Prepared 2 executed SafeOperations in the E2E Safe account
-    const pendingSafeOperations = await safeApiKit.indexer.getPendingSafeOperations(SAFE_ADDRESS)
+    const pendingSafeOperations = await safeApiKit.indexer.getPendingSafeOperations(SAFE_ADDRESS, {
+      chainId: config.CHAIN_ID
+    })
 
     const executedSafeOperations = await safeApiKit.indexer.getSafeOperationsByAddress(
       SAFE_ADDRESS,
       {
-        executed: true
+        executed: true,
+        chainId: config.CHAIN_ID
       }
     )
 

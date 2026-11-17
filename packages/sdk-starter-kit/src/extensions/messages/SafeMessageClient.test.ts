@@ -92,7 +92,8 @@ describe('SafeClient', () => {
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
       expect(apiKit.queue.addMessage).toHaveBeenCalledWith(SAFE_ADDRESS, {
         message: SAFE_MESSAGE.data,
-        signatures: SAFE_MESSAGE.encodedSignatures()
+        signatures: SAFE_MESSAGE.encodedSignatures(),
+        chainId: 1n
       })
 
       expect(result).toMatchObject({
@@ -115,7 +116,8 @@ describe('SafeClient', () => {
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
       expect(apiKit.queue.addMessage).toHaveBeenCalledWith(SAFE_ADDRESS, {
         message: SAFE_MESSAGE.data,
-        signatures: SAFE_MESSAGE.encodedSignatures()
+        signatures: SAFE_MESSAGE.encodedSignatures(),
+        chainId: 1n
       })
 
       expect(result).toMatchObject({
@@ -145,7 +147,8 @@ describe('SafeClient', () => {
       expect(protocolKit.signMessage).toHaveBeenCalledWith(SAFE_MESSAGE)
       expect(apiKit.queue.addMessage).toHaveBeenCalledWith(SAFE_ADDRESS, {
         message: SAFE_MESSAGE.data,
-        signatures: SAFE_MESSAGE.encodedSignatures()
+        signatures: SAFE_MESSAGE.encodedSignatures(),
+        chainId: 1n
       })
 
       expect(result).toMatchObject({
@@ -191,7 +194,7 @@ describe('SafeClient', () => {
 
       const result = await safeMessageClient.getPendingMessages()
 
-      expect(apiKit.queue.getMessages).toHaveBeenCalledWith(SAFE_ADDRESS, undefined)
+      expect(apiKit.queue.getMessages).toHaveBeenCalledWith(SAFE_ADDRESS, { chainId: 1n })
       expect(result).toBe(PENDING_MESSAGES)
     })
   })

@@ -8,6 +8,7 @@ import { SafeMessage, SigningMethod } from '@safe-global/types-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
+import config from '../../utils/config'
 import { getKits } from '../../utils/setupKits'
 import { getSafe, PRIVATE_KEY_1, PRIVATE_KEY_2, safeVersionDeployed } from '../../helpers/safe'
 import { describeif } from 'tests/utils/helpers'
@@ -64,7 +65,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(
         await chai.expect(
           safeApiKit.queue.addMessage(safeAddress, {
             message: rawMessage,
-            signatures: safeMessage.getSignature(signerAddress)?.data || '0x'
+            signatures: safeMessage.getSignature(signerAddress)?.data || '0x',
+            chainId: config.CHAIN_ID
           })
         ).to.be.fulfilled
 
@@ -104,7 +106,8 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(
         await chai.expect(
           safeApiKit.queue.addMessage(safeAddress, {
             message: rawMessage,
-            signatures: buildSignatureBytes([ethSig])
+            signatures: buildSignatureBytes([ethSig]),
+            chainId: config.CHAIN_ID
           })
         ).to.be.fulfilled
 

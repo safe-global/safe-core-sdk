@@ -10,7 +10,9 @@ const playgroundProtocolKitPaths = {
   'replicate-address': 'protocol-kit/replicate-address',
   'generate-safe-address': 'protocol-kit/generate-safe-address',
   'validate-signatures': 'protocol-kit/validate-signatures',
-  'estimate-gas': 'protocol-kit/estimate-gas'
+  'estimate-gas': 'protocol-kit/estimate-gas',
+  'verify-gas-schedule': 'protocol-kit/verify-gas-schedule',
+  'estimate-safe-tx-gas-glamsterdam': 'protocol-kit/estimate-safe-tx-gas-glamsterdam'
 }
 const playgroundApiKitPaths = {
   'propose-transaction': 'api-kit/propose-transaction',
@@ -69,4 +71,6 @@ if (!path) {
   process.exit()
 }
 
-execSync(`ts-node ./playground/${path}`, { stdio: 'inherit' })
+// Forward extra args (after the playground name) to the script, e.g. flags like `-v`.
+const extraArgs = process.argv.slice(3).join(' ')
+execSync(`ts-node ./playground/${path}${extraArgs ? ' ' + extraArgs : ''}`, { stdio: 'inherit' })

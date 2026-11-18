@@ -30,14 +30,122 @@ const CALL_DATA_ZERO_BYTE_GAS_COST = 4
 // Every byte != 00 -> 16 Gas cost (68 before Istanbul)
 const CALL_DATA_BYTE_GAS_COST = 16
 
-// Cold SLOAD surcharge (EIP-2929) — first access to a storage slot in a transaction
-const COLD_SLOAD_GAS_COST = 2_100
+// --- Per-chain gas schedule ------------------------------------------------------------------
+//
+// baseGas is built from fixed EVM costs (storage writes, account creation, cold accesses...). Some
+// chains and hard forks reprice them, so they are resolved per chain from a schedule. Anything not
+// overridden falls back to the Ethereum mainnet (Berlin / EIP-2929 + EIP-2200) values.
+type GasSchedule = {
+  // First (cold) SLOAD of a slot in the tx (EIP-2929)
+  coldSload: number
+  // Cold surcharge of the first SSTORE to a slot in the tx (EIP-2929)
+  coldSstore: number
+  // SSTORE 0 -> non-zero, without the cold surcharge (EIP-2200 SSTORE_SET_GAS)
+  storageSet: number
+  // SSTORE non-zero -> non-zero on a cold slot, cold surcharge included
+  coldStorageReset: number
+  // Creating a new account, e.g. sending ETH to a fresh address (EIP-161)
+  newAccount: number
+  // First (cold) touch of an address in the tx (EIP-2929)
+  coldAccountAccess: number
+  // Extra gas charged when CALL forwards a non-zero value
+  callValue: number
+  // Approximate ERC20 transfer to an existing holder / to a holder with no prior balance
+  erc20Transfer: number
+  erc20NewHolderTransfer: number
+}
 
-// gas cost initialization of a Safe (SSTORE 0→non-zero on a cold slot = 20 000 + 2 100 cold-load surcharge per EIP-2929)
-const INITIALIZATION_GAS_COST = 20_000 + COLD_SLOAD_GAS_COST
+const DEFAULT_GAS_SCHEDULE: GasSchedule = {
+  coldSload: 2_100,
+  coldSstore: 2_100,
+  storageSet: 20_000,
+  // The `cold + (RESET - cold)` invariant keeps this at 5_000
+  coldStorageReset: 5_000,
+  newAccount: 25_000,
+  coldAccountAccess: 2_600,
+  callValue: 9_000,
+  //  - existing token holder: cold token + dispatch + 2 SSTOREs + LOG3 + Safe wrapper (~21k)
+  //  - new token holder: extra ~17k from SSTORE 0->non-zero on receiver balance (EIP-2200)
+  erc20Transfer: 21_000,
+  erc20NewHolderTransfer: 38_000
+}
 
-// increment nonce gas cost
-const INCREMENT_NONCE_GAS_COST = 5_000
+// Polygon PoS — PIP-88 "Cold-Storage and Precompile Gas Repricing", activated by the "Chicago"
+// hard fork (mainnet block 87_218_600, 2026-05-21). It splits EIP-2929's single COLD_SLOAD_COST
+// into two independent constants and raises both:
+//   COLD_SLOAD_COST : 2_100 -> 5_460 (2.6x)
+//   COLD_SSTORE_COST: 2_100 -> 2_940 (1.4x)  => warm SSTORE reset = 5_000 - 2_940 = 2_060
+// The `cold + (RESET - cold) == 5_000` invariant is preserved, so the cold SSTORE reset stays
+// 5_000. Confirmed empirically via debug_traceTransaction on Polygon mainnet (see PLA-1651).
+const POLYGON_CHICAGO_GAS_SCHEDULE: Partial<GasSchedule> = {
+  coldSload: 5_460,
+  coldSstore: 2_940
+}
+
+// Ethereum Glamsterdam — gas repricings listed in EIP-8007. The ones that matter for baseGas:
+//   - EIP-8037: creating state is charged as "state gas" at CPSB = 1_530 gas per byte
+//       SSTORE 0 -> non-zero: 64 bytes  * 1_530 =  97_920 (was 20_000)
+//       new account:          120 bytes * 1_530 = 183_600 (was 25_000)
+//   - EIP-8038: accessing and writing state costs more
+//       STORAGE_WRITE (first write to a slot in the tx): 2_900 -> 10_000
+//       COLD_ACCOUNT_ACCESS:                             2_600 ->  3_000
+//       CALL_VALUE = ACCOUNT_WRITE + CALL_STIPEND:       9_000 -> 11_300
+//         (derived: the EIP gives ACCOUNT_WRITE 6_700 -> 9_000 and keeps the 2_300 stipend,
+//          it does not state the sum)
+//       COLD_STORAGE_ACCESS stays at 2_100
+// TODO: values derived from the EIP tables (still Draft). Confirm them on Sepolia with
+// `playground/protocol-kit/verify-gas-schedule.ts` before relying on them, especially the
+// non-zero -> non-zero reset and the ERC20 approximations.
+const GLAMSTERDAM_STORAGE_WRITE_GAS_COST = 10_000
+const GLAMSTERDAM_STATE_GAS_PER_STORAGE_SLOT = 97_920
+const GLAMSTERDAM_COLD_ACCOUNT_ACCESS_GAS_COST = 3_000
+// Two balance writes and the cold touch of the token contract get more expensive
+const GLAMSTERDAM_ERC20_TRANSFER_GAS_COST =
+  DEFAULT_GAS_SCHEDULE.erc20Transfer +
+  2 * (GLAMSTERDAM_STORAGE_WRITE_GAS_COST - 2_900) +
+  (GLAMSTERDAM_COLD_ACCOUNT_ACCESS_GAS_COST - DEFAULT_GAS_SCHEDULE.coldAccountAccess)
+const GLAMSTERDAM_GAS_SCHEDULE: Partial<GasSchedule> = {
+  storageSet: GLAMSTERDAM_STATE_GAS_PER_STORAGE_SLOT + GLAMSTERDAM_STORAGE_WRITE_GAS_COST,
+  coldStorageReset: DEFAULT_GAS_SCHEDULE.coldSstore + GLAMSTERDAM_STORAGE_WRITE_GAS_COST,
+  newAccount: 183_600,
+  coldAccountAccess: GLAMSTERDAM_COLD_ACCOUNT_ACCESS_GAS_COST,
+  callValue: 11_300,
+  erc20Transfer: GLAMSTERDAM_ERC20_TRANSFER_GAS_COST,
+  erc20NewHolderTransfer:
+    GLAMSTERDAM_ERC20_TRANSFER_GAS_COST + GLAMSTERDAM_STATE_GAS_PER_STORAGE_SLOT
+}
+
+// Chains that deviate from the default. Keyed by chainId (decimal string).
+// Glamsterdam is listed per chain once the fork is active there (mainnet '1' goes here on
+// activation). Note the lookup is by chain, not by block: a quote computed right before a fork
+// activates still uses the old schedule.
+const GAS_SCHEDULE_BY_CHAIN: Record<string, Partial<GasSchedule>> = {
+  '137': POLYGON_CHICAGO_GAS_SCHEDULE,
+  '11155111': GLAMSTERDAM_GAS_SCHEDULE // Sepolia, Glamsterdam active since 2026-10-06
+}
+
+export function getGasSchedule(chainId: bigint): GasSchedule {
+  return { ...DEFAULT_GAS_SCHEDULE, ...GAS_SCHEDULE_BY_CHAIN[chainId.toString()] }
+}
+
+// gas cost initialization of a Safe nonce slot: SSTORE 0->non-zero on a cold slot
+function getInitializationGasCost(schedule: GasSchedule): number {
+  return schedule.storageSet + schedule.coldSstore
+}
+// ----------------------------------------------------------------------------------------------
+
+// EIP-7825 per-tx gas cap (2^24).
+const TX_MAX_GAS_LIMIT = 16_777_216
+
+// Gas limit used for the simulate `eth_call`s that estimate safeTxGas.
+// With EIP-8037 (Glamsterdam) the gas above TX_MAX_GAS_LIMIT goes into a "state gas reservoir"
+// that GASLEFT does not report, and state creation (new storage slots, accounts) is paid from that
+// reservoir first. A plain `eth_call` runs with the block gas limit, so the reservoir is large and
+// `SimulateTxAccessor`, which measures with `gasleft()`, misses the state gas. A real relayed tx is
+// far below the cap, so there is no reservoir and the inner call pays that state gas out of
+// safeTxGas. At or below the cap there is no reservoir, so the simulation measures what the real
+// execution will pay.
+const SIMULATION_GAS_LIMIT = TX_MAX_GAS_LIMIT
 
 // Keccak gas cost for the hash of the Safe transaction
 const HASH_GENERATION_GAS_COST = 1_500
@@ -49,36 +157,28 @@ const ECRECOVER_GAS_COST = 3_100
 // Intrinsic transaction fee charged by the EVM (always paid by the relayer)
 const INTRINSIC_TX_GAS_COST = 21_000
 
-// Cold SLOADs always paid in execTransaction: `threshold` (in checkSignatures) + `getGuard()` slot
-const PRE_EXEC_STORAGE_GAS_COST = 2 * COLD_SLOAD_GAS_COST
+// Cold SLOADs always paid in execTransaction outside safeTxGas: `threshold` (in checkSignatures) +
+// `getGuard()` slot. Counted explicitly so they scale with the chain's cold SLOAD price. (The cold
+// `owners[signer]` lookups are counted per signature, see getGasCostPerSignature.)
+const PRE_EXEC_COLD_SLOAD_COUNT = 2
 
-// Headroom for SafeMath wrappers, memory expansion, and control-flow checks.
-// Rounded up to leave slack for dynamic signature types and misc.
+// Headroom for SafeMath wrappers, memory expansion and control-flow checks. Slack to leave room
+// for dynamic signature types and misc. (The cold SLOADs above are accounted for separately.)
 const MISC_OVERHEAD_GAS_COST = 900
 
 // Base operations always paid on top of the contract-counted gas (not in safeTxGas / refundGas / events)
-const EXTRA_BASE_GAS_COST =
-  INTRINSIC_TX_GAS_COST + PRE_EXEC_STORAGE_GAS_COST + MISC_OVERHEAD_GAS_COST
+function getExtraBaseGasCost(coldSloadGasCost: number): number {
+  return (
+    INTRINSIC_TX_GAS_COST + PRE_EXEC_COLD_SLOAD_COUNT * coldSloadGasCost + MISC_OVERHEAD_GAS_COST
+  )
+}
 
-// New account creation cost (EIP-161)
-const NEW_ACCOUNT_GAS_COST = 25_000
-
-// Cold address access (EIP-2929) — first touch of the refund receiver in this tx
-const COLD_ACCOUNT_ACCESS_GAS_COST = 2_600
-
-// SafeProxy to Safe Singleton delegatecall cost: cold SLOAD of the singleton slot
-// (2_100) + cold DELEGATECALL to the singleton address (full EIP-2929 cold access 2_600, since
+// SafeProxy to Safe Singleton delegatecall cost: cold SLOAD of the singleton slot (chain-aware)
+// + cold DELEGATECALL to the singleton address (full cold account access, chain-aware, since
 // the singleton is first touched here) + calldatacopy/returndatacopy/control-flow (~400).
-const PROXY_FALLBACK_GAS_COST = COLD_SLOAD_GAS_COST + COLD_ACCOUNT_ACCESS_GAS_COST + 400
-
-// Extra gas charged when CALL forwards a non-zero value
-const CALL_VALUE_GAS_COST = 9_000
-
-// Approximate ERC20 transfer gas:
-//  - existing token holder: cold token + dispatch + 2 SSTOREs + LOG3 + Safe wrapper (~21k)
-//  - new token holder: extra ~17k from SSTORE 0->non-zero on receiver balance (EIP-2200)
-const ERC20_TRANSFER_GAS_COST = 21_000
-const ERC20_NEW_HOLDER_TRANSFER_GAS_COST = 38_000
+function getProxyFallbackGasCost(schedule: GasSchedule): number {
+  return schedule.coldSload + schedule.coldAccountAccess + 400
+}
 
 // LOG opcode gas costs (yellow paper)
 const LOG_BASE_GAS_COST = 375
@@ -97,12 +197,15 @@ const L2_EVENT_ENCODING_GAS_COST = 354
 
 // Calculate gas for signatures
 // (array count (3 -> r, s, v) + ecrecover costs + cold owners[signer] SLOAD) * signature count
-// Each signer reads a distinct `owners` mapping slot in checkNSignatures (EIP-2929 cold)
-const GAS_COST_PER_SIGNATURE =
-  1 * CALL_DATA_BYTE_GAS_COST +
-  2 * 32 * CALL_DATA_BYTE_GAS_COST +
-  ECRECOVER_GAS_COST +
-  COLD_SLOAD_GAS_COST
+// Each signer reads a distinct `owners` mapping slot in checkNSignatures (EIP-2929 cold, chain-aware)
+function getGasCostPerSignature(coldSloadGasCost: number): number {
+  return (
+    1 * CALL_DATA_BYTE_GAS_COST +
+    2 * 32 * CALL_DATA_BYTE_GAS_COST +
+    ECRECOVER_GAS_COST +
+    coldSloadGasCost
+  )
+}
 
 function estimateDataGasCosts(data: string): number {
   const bytes = data.match(/.{2}/g) as string[]
@@ -236,6 +339,7 @@ async function probeErc20TransferGas(
  */
 async function calculateRefundGas(
   safeProvider: SafeProvider,
+  schedule: GasSchedule,
   gasPrice: string,
   gasToken: string,
   refundReceiver: string,
@@ -246,9 +350,9 @@ async function calculateRefundGas(
   }
 
   if (gasToken.toLowerCase() === ZERO_ADDRESS.toLowerCase()) {
-    let gas = COLD_ACCOUNT_ACCESS_GAS_COST + CALL_VALUE_GAS_COST
+    let gas = schedule.coldAccountAccess + schedule.callValue
     if (await isNewEthRefundReceiver(safeProvider, gasToken, refundReceiver)) {
-      gas += NEW_ACCOUNT_GAS_COST
+      gas += schedule.newAccount
     }
     return gas
   }
@@ -257,7 +361,7 @@ async function calculateRefundGas(
     hasExistingTokenBalance(safeProvider, gasToken, refundReceiver),
     probeErc20TransferGas(safeProvider, gasToken, safeAddress, refundReceiver)
   ])
-  const fallback = hasBalance ? ERC20_TRANSFER_GAS_COST : ERC20_NEW_HOLDER_TRANSFER_GAS_COST
+  const fallback = hasBalance ? schedule.erc20Transfer : schedule.erc20NewHolderTransfer
   return probe === undefined ? fallback : Math.max(probe, fallback)
 }
 
@@ -297,7 +401,8 @@ export async function estimateGas(
     to: safeAddress,
     value: '0',
     data: safeFunctionToEstimate,
-    from: safeAddress
+    from: safeAddress,
+    gasLimit: SIMULATION_GAS_LIMIT
   }
 
   try {
@@ -372,14 +477,23 @@ export async function estimateTxBaseGas(
 
   const safeAddress = await safe.getAddress()
 
-  const [safeThreshold, safeNonce, chainId, refundGas] = await Promise.all([
+  const [safeThreshold, safeNonce, chainId] = await Promise.all([
     safe.getThreshold(),
     safe.getNonce(),
-    safe.getChainId(),
-    calculateRefundGas(safeProvider, gasPrice, encodeGasToken, encodeRefundReceiver, safeAddress)
+    safe.getChainId()
   ])
 
-  const signaturesGasCost = safeThreshold * GAS_COST_PER_SIGNATURE
+  // Resolve the chain's gas schedule (mainnet default unless the chain reprices it).
+  const gasSchedule = getGasSchedule(chainId)
+
+  const refundGas = await calculateRefundGas(
+    safeProvider,
+    gasSchedule,
+    gasPrice,
+    encodeGasToken,
+    encodeRefundReceiver,
+    safeAddress
+  )
 
   // TODO: Account for transaction guard hooks (checkTransaction, checkAfterExecution)
   // when a guard is set on the Safe — cost depends on the guard implementation.
@@ -408,11 +522,15 @@ export async function estimateTxBaseGas(
     signatures
   ])
 
+  const coldSloadGasCost = gasSchedule.coldSload
+
+  const signaturesGasCost = safeThreshold * getGasCostPerSignature(coldSloadGasCost)
+
   // If nonce == 0, nonce storage has to be initialized
   const isSafeInitialized = safeNonce !== 0
   const incrementNonceGasCost = isSafeInitialized
-    ? INCREMENT_NONCE_GAS_COST
-    : INITIALIZATION_GAS_COST
+    ? gasSchedule.coldStorageReset
+    : getInitializationGasCost(gasSchedule)
 
   let baseGas =
     signaturesGasCost +
@@ -426,11 +544,11 @@ export async function estimateTxBaseGas(
   // Add events gas
   baseGas += calculateExecTransactionEventsGas(isL1SafeSingleton ?? false, data, safeThreshold)
 
-  // Extra costs
-  baseGas += EXTRA_BASE_GAS_COST
+  // Extra costs (chain-aware: cold SLOADs scale with the chain's COLD_SLOAD_COST)
+  baseGas += getExtraBaseGasCost(coldSloadGasCost)
 
   // SafeProxy fallback hop (not counted by the singleton's gasUsed)
-  baseGas += PROXY_FALLBACK_GAS_COST
+  baseGas += getProxyFallbackGasCost(gasSchedule)
 
   // Base gas encoding gas costs. Base gas was already encoded as `0` with `32 bytes (uint256)`, so we only need to add the data needed
   const baseGasUsedBytes = Math.ceil(baseGas.toString(16).length / 2)
@@ -536,7 +654,8 @@ async function estimateSafeTxGasWithRequiredTxGas(
     to,
     value: '0',
     data: transactionDataToEstimate,
-    from: safeAddress
+    from: safeAddress,
+    gasLimit: SIMULATION_GAS_LIMIT
   }
   try {
     const encodedResponse = await safeProvider.call(transactionToEstimateGas)
@@ -699,7 +818,8 @@ async function estimateSafeTxGasWithSimulate(
     to,
     value: '0',
     data: safeFunctionToEstimate,
-    from: safeAddress
+    from: safeAddress,
+    gasLimit: SIMULATION_GAS_LIMIT
   }
 
   try {

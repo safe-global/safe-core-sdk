@@ -62,8 +62,8 @@ export class QueueClient extends BaseClient {
   // Delegates
 
   /**
-   * Returns the list of delegates. At least one of `safeAddress`, `delegateAddress` or `delegatorAddress` is required.
-   * Without `chainId` the list includes the delegations of every chain; check the `chainId` of each result, `null` means all chains.
+   * Lists delegates. At least one of `safeAddress`, `delegateAddress` or `delegatorAddress` is required.
+   * Without `chainId` the delegations of every chain are returned (`chainId: null` in a result means all chains).
    *
    * @param options - Filters and pagination
    * @returns The list of delegates
@@ -191,8 +191,8 @@ export class QueueClient extends BaseClient {
   // Multisig transactions
 
   /**
-   * Proposes a multisig transaction. The first signature determines the proposer: a Safe owner,
-   * an authorized delegate or an owner of a Safe that owns this Safe.
+   * Proposes a multisig transaction. The first signature identifies the proposer: an owner,
+   * a delegate or an owner of a Safe that owns this Safe.
    *
    * @param props - The transaction, its signatures and the optional metadata
    * @returns The stored transaction, including its `safeTxHash`
@@ -270,9 +270,8 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the pending multisig transactions of one or several Safes:
-   * the ones not executed whose nonce is equal or higher than the current nonce of the Safe.
-   * Safes of different chains can be mixed using EIP-3770 prefixes.
+   * Lists the pending multisig transactions of one or several Safes: not executed and with a nonce
+   * equal or higher than the current one. Safes of different chains can be mixed using EIP-3770 prefixes.
    *
    * @param safeAddresses - One or several Safe addresses
    * @param options - Chain, sort and pagination
@@ -339,7 +338,7 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Deletes a pending multisig transaction. Only the EOA that proposed it (proposer, delegate or nested Safe owner) can delete it.
+   * Deletes a pending multisig transaction. Only the EOA that proposed it can delete it.
    *
    * @param props - The hash of the transaction, its Safe and the signer that proposed it
    * @throws "Invalid safeTxHash"
@@ -369,8 +368,8 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the multisig transactions of a Safe on the chain of the request, or on every chain
-   * without one or with `allChains`.
+   * Lists the multisig transactions of a Safe. Without a chain, or with `allChains`, the transactions
+   * of every chain are returned.
    *
    * @param safeAddress - The Safe address
    * @param options - Filters and pagination
@@ -465,8 +464,8 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the messages of a Safe, newest first, on the chain of the request, or on every chain
-   * without one or with `allChains`.
+   * Lists the messages of a Safe, newest first. Without a chain, or with `allChains`, the messages
+   * of every chain are returned.
    *
    * @param safeAddress - The Safe address
    * @param options - Pagination

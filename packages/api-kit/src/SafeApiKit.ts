@@ -27,12 +27,9 @@ export interface SafeApiKitConfig {
    */
   decoderServiceUrl?: string
   /**
-   * apiKey - The API key to access the Safe services.
-   * - Required to use a service whose URL is undefined, including the indexer of a chain without `indexerUrls` entry
-   * - Required to use a service whose URL contains "safe.global" or "5afe.dev"
-   * - Optional otherwise
-   *
-   * Each service is checked when its client is first used, so a missing configuration only affects that client.
+   * apiKey - The API key of the Safe hosted services. Required by every service without a custom URL
+   * (for `indexer`, every chain without an `indexerUrls` entry) and by the URLs of the "safe.global"
+   * and "5afe.dev" domains. Optional otherwise.
    */
   apiKey?: string
 }
@@ -60,9 +57,7 @@ const trimTrailingSlashes = (url: string): string => {
   return url.slice(0, end)
 }
 
-/**
- * Checks the API key requirements and returns the custom URL, or `undefined` for the Safe hosted service.
- */
+/** Returns the custom URL of a service, or `undefined` to use the Safe hosted one. Throws if the apiKey is missing */
 function resolveServiceUrl(
   name: ServiceUrlOption,
   url: string | undefined,
@@ -84,9 +79,8 @@ function resolveServiceUrl(
  * - `indexer`: Safe Transaction Service, the data indexed from the chain and the ERC-4337 SafeOperations
  * - `decoder`: Safe Decoder Service, transaction data decoding
  *
- * The clients are created independently the first time they are used, so a service that is not configured
- * (e.g. a self-hosted Transaction Service without an API key for the hosted Queue Service) does not prevent
- * using the others. A misconfigured service throws when its client is accessed.
+ * Each client is created the first time it is used and only checks its own configuration,
+ * so a service that is not configured does not prevent using the others.
  */
 class SafeApiKit {
   readonly #config: SafeApiKitConfig

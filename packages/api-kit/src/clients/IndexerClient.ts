@@ -48,9 +48,9 @@ export type IndexerClientConfig = Omit<ServiceClientConfig, 'baseUrl'> & {
 }
 
 /**
- * Client of the Safe Transaction Service, used for the data indexed from the chain
- * (Safe accounts, history, transfers, tokens) and for ERC-4337 SafeOperations. One method per endpoint of the service.
- * Each request goes to the service of its chain.
+ * Client of the Safe Transaction Service: the data indexed from the chain (Safe accounts, history, transfers, tokens)
+ * and the ERC-4337 SafeOperations. One method per endpoint. A service indexes a single chain, so each request
+ * goes to the service of its `chainId`.
  */
 export class IndexerClient extends BaseClient {
   readonly #urls: Map<bigint, string>
@@ -80,11 +80,7 @@ export class IndexerClient extends BaseClient {
     }
   }
 
-  /**
-   * Adds query parameters from an options object to a given URL.
-   * Converts parameter names to snake_case automatically. If a specific mapping exists in QUERY_PARAMS_MAP,
-   * it will be used instead of the converted name.
-   */
+  /** Adds the defined options as query parameters, named as in QUERY_PARAMS_MAP or in snake_case */
   #addUrlQueryParams<T extends QueryParamsOptions>(url: URL, options?: T): void {
     const camelToSnake = (str: string) => str.replace(/([A-Z])/g, '_$1').toLowerCase()
 
@@ -501,7 +497,7 @@ export class IndexerClient extends BaseClient {
       throw new Error('Signature must not be empty')
     }
 
-    // We are receiving the timestamp in seconds (block timestamp), but the API expects it in milliseconds
+    // Block timestamps are in seconds; the service expects ISO dates
     const getISOString = (date: number | undefined) =>
       !date ? null : new Date(date * 1000).toISOString()
 

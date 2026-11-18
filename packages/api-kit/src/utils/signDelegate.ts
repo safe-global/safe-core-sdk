@@ -7,10 +7,10 @@ export type DelegateAction = 'add' | 'edit' | 'delete'
  * Signs the EIP-712 typed data the Safe Queue Service requires from the delegator to add, edit or delete a delegate.
  *
  * @param walletClient - The delegator wallet client
- * @param delegateAddress - The delegate address, or the zero address to target every delegate of the delegator
- * @param chainId - The chain the delegation is scoped to
+ * @param delegateAddress - The delegate address, or the zero address for every delegate of the delegator
+ * @param chainId - The chain the delegation is scoped to (`0` for all chains)
  * @param action - The delegate action being signed
- * @param safeAddress - The Safe the delegation is scoped to. When omitted the delegation applies to all the Safes of the delegator
+ * @param safeAddress - The Safe the delegation is scoped to. Omitted, all the Safes of the delegator
  * @returns The signature
  */
 export async function signDelegate(

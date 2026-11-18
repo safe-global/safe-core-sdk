@@ -26,8 +26,9 @@ export class HttpError extends Error {
 type FieldError = { loc?: Array<string | number>; msg: string }
 
 /**
- * Builds the error message of a failed request.
- * The Safe Queue and Decoder services return `{ detail: string }` for rejected data and `{ detail: FieldError[] }` for malformed requests.
+ * Builds the error message of a failed request from the error payload of the service:
+ * `{ detail: string | FieldError[] }` in the Queue and Decoder services, `data`, `message`,
+ * `nonFieldErrors` or a field error in the Transaction Service.
  */
 function getErrorMessage(jsonResponse: any): string | undefined {
   const { detail } = jsonResponse ?? {}
@@ -41,8 +42,6 @@ function getErrorMessage(jsonResponse: any): string | undefined {
       .join('; ')
   }
 
-  // Error payloads of the Safe Transaction Service (data, message, nonFieldErrors and field errors)
-  // and of the Safe Queue and Decoder services (detail)
   for (const key of [
     'data',
     'detail',

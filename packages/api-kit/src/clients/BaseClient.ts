@@ -46,7 +46,7 @@ export abstract class BaseClient {
       try {
         return getChainIdFromEip3770NetworkPrefix(prefix)
       } catch {
-        // unknown prefix, rejected by the address validation
+        // Unknown prefix: the address validation rejects it later
       }
     }
     return undefined
@@ -62,9 +62,7 @@ export abstract class BaseClient {
     return resolvedChainId
   }
 
-  /**
-   * Validates an address that may carry an EIP-3770 chain prefix and returns it without the prefix.
-   */
+  /** Validates an address, plain or with an EIP-3770 prefix that must match the chain, and splits it */
   protected getEip3770Address(fullAddress: string, chainId?: bigint): Eip3770Address {
     const currentChainId = this.getChainId(chainId, fullAddress)
     if (currentChainId === undefined) {
@@ -78,9 +76,7 @@ export abstract class BaseClient {
     return this.getEip3770Address(fullAddress, chainId).address
   }
 
-  /**
-   * Adds the defined entries of a params object as query parameters, keeping the names as they are.
-   */
+  /** Adds the defined params as query parameters, keeping their names */
   protected addQueryParams(url: URL, params: QueryParams): void {
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined) {

@@ -96,6 +96,30 @@ const EQ_OR_GT_1_5_0 = '>=1.5.0'
 const EQ_OR_GT_1_4_1 = '>=1.4.1'
 const EQ_OR_GT_1_3_0 = '>=1.3.0'
 
+// ─── DACS-Standard Guardrail (§9.5.7 & §14.4) ─────────────────────────────
+export interface DacsMandateMeta {
+  dacsMandate?: string
+  dacsSessionId?: string
+  dacsMaxAmount?: string | bigint | number
+}
+
+export function assertDacsSpendMandate(
+  requestedValue: bigint,
+  meta?: DacsMandateMeta
+): void {
+  if (!meta || (!meta.dacsMandate && !meta.dacsSessionId)) {
+    return
+  }
+
+  if (meta.dacsMaxAmount !== undefined) {
+    const ceiling = BigInt(meta.dacsMaxAmount)
+    if (requestedValue > ceiling) {
+      throw new Error(
+        `[DACS-Standard §9.5.7] Safe transaction aborted: requested value (${requestedValue.toString()}) exceeds authorized mandate ceiling (${ceiling.toString()}).`
+      )
+    }
+  }
+}
 class Safe {
   #predictedSafe?: PredictedSafeProps
   #safeProvider!: SafeProvider
@@ -1663,9 +1687,9 @@ class Safe {
    * @throws "There are X signatures missing"
    * @throws "Cannot specify gas and gasLimit together in transaction options"
    */
-  async executeTransaction(
+async executeTransaction(
     safeTransaction: SafeTransaction | SafeMultisigTransactionResponse,
-    options?: TransactionOptions
+    options?: TransactionOptions & DacsMandateMeta
   ): Promise<TransactionResult> {
     if (!this.#contractManager.safeContract) {
       throw new Error('Safe is not deployed')
@@ -1679,11 +1703,16 @@ class Safe {
     await this.#isReadyToExecute(signedSafeTransaction)
 
     const value = BigInt(signedSafeTransaction.data.value)
+
+    // DACS-Standard (§9.5.7) Pre-Flight Mandate Enforcement
+    assertDacsSpendMandate(value, options)
+
     if (value !== 0n) {
       const balance = await this.getBalance()
       if (value > balance) {
         throw new Error('Not enough Ether funds')
       }
+    }
     }
 
     const signerAddress = await this.#safeProvider.getSignerAddress()

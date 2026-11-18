@@ -61,8 +61,6 @@ const apiKit = new SafeApiKit({
 
 Each client is created the first time it is used, so only the services you use need to be configured.
 
-The chain of a request is the `chainId` passed to the method or the EIP-3770 prefix of the address. It is required to write to the Queue Service (propose a transaction, add a message, manage delegates) and in every Transaction Service method, where an EIP-3770 prefix must match it. Without a chain, the Queue Service lists return every chain.
-
 ```js
 const apiKit = new SafeApiKit({ apiKey })
 

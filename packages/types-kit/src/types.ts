@@ -246,11 +246,8 @@ export type SafeMultisigTransactionResponse = {
   readonly chainId: string
   readonly safe: string
   readonly nonce: string
-  /** Address credited with the proposal: the signer for `OWNER`, the delegating owner for `DELEGATE`, the owner Safe for `NESTED_OWNER` */
   readonly proposer: string | null
-  /** How the proposal was authenticated */
   readonly proposedVia: ProposalRoute
-  /** Address that actually signed the proposal, set only when it differs from `proposer` (`DELEGATE` and `NESTED_OWNER`) */
   readonly proposedBy: string | null
   readonly to: string | null
   readonly value: string
@@ -265,7 +262,6 @@ export type SafeMultisigTransactionResponse = {
   readonly notes: string | null
   readonly originName: string | null
   readonly originUrl: string | null
-  /** Hash of the Ethereum transaction that executed the Safe transaction. `null` while it is not executed */
   readonly txHash: string | null
   readonly created: string
   readonly modified: string

@@ -70,12 +70,7 @@ const decoded = await apiKit.decoder.decodeData(data, to, { chainId: 11155111n }
 
 ### Multi-chain
 
-The Safe services are multi-chain, so one kit works with every chain. The kit has no chain; the chain of a request is, in order of precedence:
-
-1. The `chainId` passed to the method.
-2. The EIP-3770 prefix of the address (`eth:0x…`).
-
-When both are set they must match.
+The Safe services are multi-chain, so one kit works with every chain.
 
 ```js
 const apiKit = new SafeApiKit({ apiKey })

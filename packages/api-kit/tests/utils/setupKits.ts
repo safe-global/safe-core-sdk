@@ -6,7 +6,6 @@ import { custom, createWalletClient } from 'viem'
 import Safe, { SafeProviderConfig, Eip1193Provider } from '@safe-global/protocol-kit'
 import SafeApiKit from '@safe-global/api-kit/index'
 
-import config from './config'
 import path from 'path'
 
 dotenv.config({ path: path.join(__dirname, '../../.env') })
@@ -18,8 +17,6 @@ type GetKits = {
 
 type GetKitsOptions = {
   signer?: SafeProviderConfig['signer']
-  indexerServiceUrl?: string
-  chainId?: bigint
   safeAddress: string
 }
 
@@ -45,40 +42,20 @@ export function getEip1193Provider(): Eip1193Provider {
   }
 }
 
-export async function getProtocolKit({
-  signer,
-  safeAddress
-}: {
-  signer?: GetKitsOptions['signer']
-  safeAddress: GetKitsOptions['safeAddress']
-}): Promise<Safe> {
+export async function getProtocolKit({ signer, safeAddress }: GetKitsOptions): Promise<Safe> {
   const provider = getEip1193Provider()
   const protocolKit = await Safe.init({ provider, signer, safeAddress })
 
   return protocolKit
 }
 
-export function getApiKit(
-  indexerServiceUrl?: GetKitsOptions['indexerServiceUrl'],
-  chainId?: GetKitsOptions['chainId']
-): SafeApiKit {
-  const safeApiKit = new SafeApiKit({
-    apiKey: process.env.API_KEY || 'jwt-token',
-    indexerUrls: indexerServiceUrl
-      ? [{ chainId: chainId || config.CHAIN_ID, url: indexerServiceUrl }]
-      : undefined
-  })
-
-  return safeApiKit
+export function getApiKit(): SafeApiKit {
+  return new SafeApiKit({ apiKey: process.env.API_KEY || 'jwt-token' })
 }
 
-export async function getKits({
-  signer,
-  safeAddress,
-  indexerServiceUrl
-}: GetKitsOptions): Promise<GetKits> {
+export async function getKits({ signer, safeAddress }: GetKitsOptions): Promise<GetKits> {
   const protocolKit = await getProtocolKit({ signer, safeAddress })
-  const safeApiKit = getApiKit(indexerServiceUrl)
+  const safeApiKit = getApiKit()
 
   return { protocolKit, safeApiKit }
 }

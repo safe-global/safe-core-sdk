@@ -15,7 +15,7 @@ import semverSatisfies from 'semver/functions/satisfies.js'
 chai.use(chaiAsPromised)
 
 const PAYMASTER_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
-const BUNDLER_URL = 'https://api.pimlico.io/v2/sepolia/rpc?apikey=pim_Vjs7ohRqWdvsjUegngf9Bg'
+const BUNDLER_URL = `https://api.pimlico.io/v2/sepolia/rpc?apikey=${process.env.PIMLICO_API_KEY}`
 
 let safeApiKit: SafeApiKit
 let protocolKit: Safe

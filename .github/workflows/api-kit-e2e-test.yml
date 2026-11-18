@@ -39,6 +39,7 @@ jobs:
       - name: Test ethers - Safe ${{ matrix.safe-version }}
         env:
           API_KEY: ${{ secrets.API_KEY }}
+          PIMLICO_API_KEY: ${{ secrets.PIMLICO_API_KEY }}
         run: |
           cd packages/api-kit
           pnpm test:ci:ethers:${{ matrix.safe-version }}
@@ -46,6 +47,7 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           API_KEY: ${{ secrets.API_KEY }}
+          PIMLICO_API_KEY: ${{ secrets.PIMLICO_API_KEY }}
         run: |
           cd packages/api-kit
           pnpm test:ci:viem:${{ matrix.safe-version }}

@@ -14,7 +14,7 @@ import { DEFAULT_DEPLOYMENT_TYPE } from './constants'
  */
 export async function createSafeClient(config: SdkStarterKitConfig): Promise<SafeClient> {
   const protocolKit = await getProtocolKitInstance(config)
-  const apiKit = await getApiKitInstance(protocolKit, config)
+  const apiKit = getApiKitInstance(config)
 
   if (!protocolKit || !apiKit) throw new Error('Failed to create a kit instances')
 
@@ -94,17 +94,10 @@ async function getProtocolKitInstance(config: SdkStarterKitConfig): Promise<Safe
   }
 }
 
-async function getApiKitInstance(
-  protocolKit: Safe,
-  config: SdkStarterKitConfig
-): Promise<SafeApiKit> {
-  const { indexerServiceUrl } = config
-
+function getApiKitInstance(config: SdkStarterKitConfig): SafeApiKit {
   return new SafeApiKit({
     apiKey: config.apiKey,
-    indexerUrls: indexerServiceUrl
-      ? [{ chainId: await protocolKit.getChainId(), url: indexerServiceUrl }]
-      : [],
+    indexerUrls: config.indexerUrls,
     queueServiceUrl: config.queueServiceUrl,
     decoderServiceUrl: config.decoderServiceUrl
   })

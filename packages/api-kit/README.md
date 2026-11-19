@@ -34,7 +34,7 @@ npm install @safe-global/api-kit
 import SafeApiKit from '@safe-global/api-kit'
 
 const apiKit = new SafeApiKit({
-  // Required when using the Safe hosted services. Get your API key at https://developer.safe.global
+  // Required when using the Safe hosted services, and only sent to them. Get your API key at https://developer.safe.global
   apiKey: 'YOUR_API_KEY',
   // Optional. Transaction Service URL of some chains, including the `/api` path, for example for
   // self-hosted services or chains where Safe doesn't run them. The other chains use the Safe hosted service.
@@ -46,6 +46,8 @@ const apiKit = new SafeApiKit({
 ```
 
 The kit has no chain: each request carries its own, see [Multi-chain](#multi-chain). Each client is created the first time it is used, and only its own service has to be configured. For example, a self-hosted Transaction Service without an API key can be used through `apiKit.indexer`; `apiKit.queue` and `apiKit.decoder` throw when accessed until their service is configured.
+
+Note that proposals, confirmations, messages and delegates are handled by the Queue Service, and data decoding by the Decoder Service, not by the Transaction Service. A self-hosted Transaction Service alone only serves `apiKit.indexer`: to use `apiKit.queue` and `apiKit.decoder` you need the API key of the Safe hosted services or your own `queueServiceUrl` and `decoderServiceUrl`.
 
 The kit exposes one client per Safe service, with one method per endpoint:
 
@@ -70,7 +72,7 @@ const decoded = await apiKit.decoder.decodeData(data, to, { chainId: 11155111n }
 
 ### Multi-chain
 
-The Safe services are multi-chain, so one kit works with every chain.
+The Safe services are multi-chain, so one kit works with every chain. The chain of a request is the `chainId` passed to the method or, when there is none, the EIP-3770 prefix of the address (`eth:0x…`). When both are set they must match, otherwise the request throws.
 
 ```js
 const apiKit = new SafeApiKit({ apiKey })

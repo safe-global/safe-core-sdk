@@ -24,6 +24,8 @@ await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 1n })
 
 The chain of a request is the `chainId` passed to the method or the EIP-3770 prefix of the address (`eth:0x…`). When both are set they must match.
 
+The Queue Service and the Decoder Service are new dependencies. Proposals, confirmations, messages and delegates went to the Transaction Service and now go to the Queue Service, `decodeData` goes to the Decoder Service. A self-hosted Transaction Service alone only serves `apiKit.indexer`. `apiKit.queue` and `apiKit.decoder` need the `apiKey` of the Safe hosted services or a self-hosted service in `queueServiceUrl` and `decoderServiceUrl`, and throw when accessed otherwise.
+
 - `apiKit.queue`: Safe Queue Service (`https://api.safe.global/queue/api`, `queueServiceUrl`), the off-chain queue: `proposeTransaction`, `getTransaction`, `getTransactions` (several Safes), `getPendingTransactions`, `getTransactionsBatch`, `getSafeTransactions`, `confirmTransaction`, `deleteTransaction`, `addMessage`, `getMessages`, `getMessage`, `confirmMessage`, `getDelegates`, `addDelegate`, `updateDelegate`, `removeDelegate`, `getServiceInfo`.
   - `chainId` is required in `proposeTransaction`, `deleteTransaction` and `addMessage`. The delegates (`addDelegate`, `updateDelegate`, `removeDelegate`) take `chainId` or `allChains: true`.
   - `getSafeTransactions`, `getMessages` and `getPendingTransactions` accept `chainId`. Without a chain, `getSafeTransactions` and `getMessages` return every chain, and `getPendingTransactions` accepts Safes of several chains through their EIP-3770 prefixes.
@@ -36,7 +38,8 @@ The chain of a request is the `chainId` passed to the method or the EIP-3770 pre
 Configuration:
 
 - The `chainId` of the config is removed.
-- `indexerUrls: [{ chainId, url }]` replaces `txServiceUrl`. It sets the Transaction Service URL of some chains, for example self-hosted services; the other chains use the Safe hosted service, which requires the `apiKey`. More than one URL for the same chain throws.
+- `indexerUrls: [{ chainId, url }]` replaces `txServiceUrl`. It sets the Transaction Service URL of some chains, for example self-hosted services; the other chains use the Safe hosted service, which requires the `apiKey`. More than one URL for the same chain throws. The `chainId` can be a number or a string, as in a JSON config.
+- The `apiKey` is only sent to the Safe hosted services. A custom URL in `indexerUrls`, `queueServiceUrl` or `decoderServiceUrl` never receives it.
 - `apiKit.getIndexerUrls()` returns the Transaction Service URL of every chain the indexer can be used with: the `indexerUrls` entries and, with an `apiKey`, the Safe hosted service of the other chains.
 - Like the Transaction Service URLs, the new `queueServiceUrl` and `decoderServiceUrl` include the `/api` path and default to the Safe hosted services, which require the `apiKey`.
 - Each client is created the first time it is used and only checks its own service, so `new SafeApiKit()` no longer throws. A missing API key or service URL throws when `apiKit.queue` or `apiKit.decoder` is accessed, or when `apiKit.indexer` sends a request for a chain without a configured service; the other clients keep working.

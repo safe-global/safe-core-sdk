@@ -35,7 +35,7 @@ In the examples below, you can see `provider` and `signer` properties, which rep
 
 ### Initialize the Safe API Kit
 
-As stated in the introduction, the [Safe API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the Safe services. To start using this library, create a new instance of the `SafeApiKit` class, imported from `@safe-global/api-kit`, and pass your API key. The kit has no chain: each request carries its own.
+As stated in the introduction, the [Safe API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the Safe services. To start using this library, create a new instance of the `SafeApiKit` class, imported from `@safe-global/api-kit`, and pass your API key. The kit has no chain: each request carries its own, as the `chainId` passed to the method or as the EIP-3770 prefix of the address (`eth:0x…`). When both are set they must match.
 
 ```js
 import SafeApiKit from '@safe-global/api-kit'
@@ -49,7 +49,9 @@ The kit exposes one client per service, with one method per endpoint:
 - `apiKit.indexer`: the Safe Transaction Service, the data indexed from the chain (Safe accounts, history, transfers, tokens) and the ERC-4337 SafeOperations.
 - `apiKit.decoder`: the Safe Decoder Service, transaction data decoding.
 
-The API key is enough for chains where Safe runs its services. For those chains where Safe doesn't run a Transaction Service, or to use self-hosted services, use the `indexerUrls`, `queueServiceUrl` and `decoderServiceUrl` parameters to set the custom service endpoints, including their `/api` path. A Transaction Service indexes a single chain, so `indexerUrls` sets the URL of each chain; the other chains use the Safe hosted service. The Safe Queue Service and the Safe Decoder Service are multi-chain, so the same URL works for every chain.
+The API key is enough for chains where Safe runs its services. For those chains where Safe doesn't run a Transaction Service, or to use self-hosted services, use the `indexerUrls`, `queueServiceUrl` and `decoderServiceUrl` parameters to set the custom service endpoints, including their `/api` path. A Transaction Service indexes a single chain, so `indexerUrls` sets the URL of each chain; the other chains use the Safe hosted service. The Safe Queue Service and the Safe Decoder Service are multi-chain, so the same URL works for every chain. The API key is only sent to the Safe hosted services, never to a custom URL.
+
+Proposals, confirmations, messages and delegates are handled by the Queue Service, and data decoding by the Decoder Service, not by the Transaction Service. A self-hosted Transaction Service alone only serves `apiKit.indexer`: `apiKit.queue` and `apiKit.decoder` need the API key or their own service URL.
 
 ```js
 const apiKit = new SafeApiKit({

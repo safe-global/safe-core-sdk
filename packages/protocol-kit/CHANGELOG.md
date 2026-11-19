@@ -1,5 +1,11 @@
 # @safe-global/protocol-kit
 
+## 8.0.12
+
+### Patch Changes
+
+- chore: add GenLayer Testnet (genlayer-testnets) chain support and bump safe-deployments and safe-modules-deployments
+
 ## 8.0.11
 
 ### Patch Changes

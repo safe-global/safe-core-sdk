@@ -121,8 +121,6 @@ export type GetSafeTransactionsOptions = {
   executed?: boolean
   /** Nonce sort direction (default: `desc`) */
   nonceOrder?: NonceOrder
-  /** Return the transactions of every chain instead of only the chain of the request */
-  allChains?: boolean
 } & ChainOptions &
   ListOptions
 
@@ -180,8 +178,4 @@ export type AddMessageProps = {
   originUrl?: string
 } & RequiredChainOptions
 
-export type GetMessagesOptions = {
-  /** Return the messages of every chain instead of only the chain of the request */
-  allChains?: boolean
-} & ChainOptions &
-  ListOptions
+export type GetMessagesOptions = ChainOptions & ListOptions

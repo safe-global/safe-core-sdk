@@ -550,13 +550,12 @@ describe('Queue service endpoints', () => {
       chai.expect(fetchData).not.to.have.been.called
     })
 
-    it('getSafeTransactions with query params and all chains', async () => {
+    it('getSafeTransactions with query params, every chain', async () => {
       await chai
         .expect(
           safeApiKit.queue.getSafeTransactions(safeAddress, {
             executed: true,
             nonceOrder: 'asc',
-            allChains: true,
             limit: 10,
             offset: 2
           })
@@ -702,9 +701,9 @@ describe('Queue service endpoints', () => {
       })
     })
 
-    it('getMessages with query params and all chains', async () => {
+    it('getMessages with query params, every chain', async () => {
       await chai
-        .expect(safeApiKit.queue.getMessages(safeAddress, { allChains: true, limit: 5, offset: 1 }))
+        .expect(safeApiKit.queue.getMessages(safeAddress, { limit: 5, offset: 1 }))
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages?limit=5&offset=1`,

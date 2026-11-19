@@ -369,8 +369,7 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the multisig transactions of a Safe. Without a chain, or with `allChains`, the transactions
-   * of every chain are returned.
+   * Lists the multisig transactions of a Safe. Without a chain, the transactions of every chain are returned.
    *
    * @param safeAddress - The Safe address
    * @param options - Filters and pagination
@@ -379,7 +378,7 @@ export class QueueClient extends BaseClient {
    */
   async getSafeTransactions(
     safeAddress: string,
-    { executed, nonceOrder, allChains, chainId, limit, offset }: GetSafeTransactionsOptions = {}
+    { executed, nonceOrder, chainId, limit, offset }: GetSafeTransactionsOptions = {}
   ): Promise<TransactionListResponse> {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
@@ -388,7 +387,7 @@ export class QueueClient extends BaseClient {
       `${this.baseUrl}/v1/safes/${this.getAddress(safeAddress, chainId)}/multisig-transactions`
     )
     this.addQueryParams(url, {
-      chainId: allChains ? undefined : chainId,
+      chainId,
       executed,
       nonceOrder,
       limit,
@@ -464,8 +463,7 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the messages of a Safe, newest first. Without a chain, or with `allChains`, the messages
-   * of every chain are returned.
+   * Lists the messages of a Safe, newest first. Without a chain, the messages of every chain are returned.
    *
    * @param safeAddress - The Safe address
    * @param options - Pagination
@@ -474,12 +472,12 @@ export class QueueClient extends BaseClient {
    */
   async getMessages(
     safeAddress: string,
-    { allChains, chainId, limit, offset }: GetMessagesOptions = {}
+    { chainId, limit, offset }: GetMessagesOptions = {}
   ): Promise<MessageListResponse> {
     const safe = this.#getSafeAddress(safeAddress, chainId)
     const url = new URL(`${this.baseUrl}/v1/safes/${safe}/messages`)
     this.addQueryParams(url, {
-      chainId: allChains ? undefined : chainId,
+      chainId,
       limit,
       offset
     })

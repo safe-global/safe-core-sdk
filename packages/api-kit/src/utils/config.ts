@@ -4,6 +4,9 @@ export const DEFAULT_QUEUE_SERVICE_URL = 'https://api.safe.global/queue/api'
 
 export const DEFAULT_DECODER_SERVICE_URL = 'https://api.safe.global/decoder/api'
 
+export const isSafeHostedUrl = (url: string): boolean =>
+  url.includes('api.safe.global') || url.includes('api.5afe.dev')
+
 type NetworkShortName = {
   shortName: string
   chainId: bigint

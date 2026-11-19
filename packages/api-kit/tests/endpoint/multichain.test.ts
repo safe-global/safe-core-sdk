@@ -156,12 +156,15 @@ describe('Multi-chain requests', () => {
       ]
     })
 
-    it('should use the URL of the chain of the request', async () => {
+    it('should use the URL of the chain of the request, without the apiKey', async () => {
       await apiKit.indexer.getSafeInfo(safeAddress, { chainId: sepolia })
-      expect(fetchData).to.have.been.calledWith({
-        url: `${sepoliaIndexer}/v1/safes/${safeAddress}/`,
-        method: 'GET'
-      })
+      expect(fetchData).to.have.been.calledWith(
+        {
+          url: `${sepoliaIndexer}/v1/safes/${safeAddress}/`,
+          method: 'GET'
+        },
+        undefined
+      )
 
       await apiKit.indexer.getServiceInfo({ chainId: customChain })
       expect(fetchData).to.have.been.calledWith({
@@ -170,12 +173,36 @@ describe('Multi-chain requests', () => {
       })
     })
 
-    it('should use the hosted indexer for the chains without URL', async () => {
+    it('should use the hosted indexer for the chains without URL, with the apiKey', async () => {
       await apiKit.indexer.getSafeInfo(`eth:${safeAddress}`, { chainId: mainnet })
-      expect(fetchData).to.have.been.calledWith({
-        url: `${getTransactionServiceUrl(mainnet)}/v1/safes/${safeAddress}/`,
-        method: 'GET'
+      expect(fetchData).to.have.been.calledWith(
+        {
+          url: `${getTransactionServiceUrl(mainnet)}/v1/safes/${safeAddress}/`,
+          method: 'GET'
+        },
+        apiKey
+      )
+    })
+
+    it('should send the apiKey to the hosted queue and decoder, but not to custom URLs', async () => {
+      await apiKit.queue.getTransaction('0x1234')
+      expect(fetchData).to.have.been.calledWith(sinon.match({ method: 'GET' }), apiKey)
+
+      const customKit = new SafeApiKit({
+        apiKey,
+        queueServiceUrl: 'https://my-queue.example.com/api',
+        decoderServiceUrl: 'https://my-decoder.example.com/api'
       })
+      await customKit.queue.getTransaction('0x1234')
+      expect(fetchData).to.have.been.calledWith(
+        { url: 'https://my-queue.example.com/api/v1/multisig-transactions/0x1234', method: 'GET' },
+        undefined
+      )
+      await customKit.decoder.decodeData('0x1234')
+      expect(fetchData).to.have.been.calledWith(
+        sinon.match({ url: 'https://my-decoder.example.com/api/v1/data-decoder' }),
+        undefined
+      )
     })
 
     it('should not need an apiKey for the chains with URL', async () => {

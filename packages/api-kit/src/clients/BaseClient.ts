@@ -5,11 +5,12 @@ import {
 } from '@safe-global/protocol-kit'
 import { Eip3770Address } from '@safe-global/types-kit'
 import { HttpRequest, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
+import { isSafeHostedUrl } from '@safe-global/api-kit/utils/config'
 
 export type ServiceClientConfig = {
   /** Base URL of the service, without trailing slash */
   baseUrl: string
-  /** API key sent as a Bearer token */
+  /** API key of the Safe hosted services, sent as a Bearer token only to them */
   apiKey?: string
 }
 
@@ -32,8 +33,9 @@ export abstract class BaseClient {
     this.apiKey = apiKey
   }
 
+  /** Sends the request. The `apiKey` is only attached to the Safe hosted services, never to a custom URL */
   protected async api<T>(request: HttpRequest): Promise<T> {
-    return sendRequest(request, this.apiKey)
+    return sendRequest(request, isSafeHostedUrl(request.url) ? this.apiKey : undefined)
   }
 
   /** Chain of a request: the `chainId` of the method, then the EIP-3770 prefix of the address */

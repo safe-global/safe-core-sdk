@@ -80,6 +80,29 @@ describe('SafeApiKit', () => {
         `indexerUrls has more than one URL for chainId ${chainId}`
       )
     })
+
+    it('should accept a number or a string chainId, as in a JSON config', () => {
+      const apiKit = new SafeApiKit({
+        indexerUrls: [
+          { chainId: Number(chainId) as unknown as bigint, url: indexerUrl },
+          { chainId: '1' as unknown as bigint, url: 'https://other.example.com/api' }
+        ]
+      })
+      expect(apiKit.getIndexerUrls()).to.deep.equal([
+        { chainId, url: indexerUrl },
+        { chainId: 1n, url: 'https://other.example.com/api' }
+      ])
+    })
+
+    it('should reject the same chain as a number and as a bigint', () => {
+      const apiKit = new SafeApiKit({
+        indexerUrls: [
+          { chainId, url: indexerUrl },
+          { chainId: Number(chainId) as unknown as bigint, url: 'https://other.example.com/api' }
+        ]
+      })
+      expect(() => apiKit.indexer).to.throw('more than one URL')
+    })
   })
 
   describe('getIndexerUrls', () => {

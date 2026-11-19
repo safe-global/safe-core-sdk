@@ -5,6 +5,7 @@ import {
   DEFAULT_DECODER_SERVICE_URL,
   DEFAULT_QUEUE_SERVICE_URL,
   getTransactionServiceUrl,
+  isSafeHostedUrl,
   networks
 } from './utils/config'
 
@@ -29,7 +30,7 @@ export interface SafeApiKitConfig {
   /**
    * apiKey - The API key of the Safe hosted services. Required by every service without a custom URL
    * (for `indexer`, every chain without an `indexerUrls` entry) and by the URLs of the "safe.global"
-   * and "5afe.dev" domains. Optional otherwise.
+   * and "5afe.dev" domains. Optional otherwise. It is only sent to the Safe hosted services, never to a custom URL.
    */
   apiKey?: string
 }
@@ -37,9 +38,6 @@ export interface SafeApiKitConfig {
 type ServiceUrlOption = 'queueServiceUrl' | 'decoderServiceUrl'
 
 const API_KEY_HELP = 'Please obtain your API key at https://developer.safe.global.'
-
-const isSafeHostedUrl = (url: string) =>
-  url.includes('api.safe.global') || url.includes('api.5afe.dev')
 
 const checkHostedApiKey = (url: string, apiKey?: string): void => {
   if (isSafeHostedUrl(url) && !apiKey) {
@@ -135,7 +133,9 @@ class SafeApiKit {
     if (!this.#indexerUrls) {
       const { indexerUrls = [], apiKey } = this.#config
       const chainIds = new Set<bigint>()
-      this.#indexerUrls = indexerUrls.map(({ chainId, url }) => {
+      this.#indexerUrls = indexerUrls.map(({ chainId: rawChainId, url }) => {
+        // Accept a number or a string chainId from JavaScript or a JSON config
+        const chainId = BigInt(rawChainId)
         if (chainIds.has(chainId)) {
           throw new Error(`indexerUrls has more than one URL for chainId ${chainId}`)
         }

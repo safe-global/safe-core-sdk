@@ -57,7 +57,7 @@ export class IndexerClient extends BaseClient {
 
   constructor({ urls = [], apiKey }: IndexerClientConfig) {
     super({ baseUrl: '', apiKey })
-    this.#urls = new Map(urls.map(({ chainId, url }) => [chainId, url]))
+    this.#urls = new Map(urls.map(({ chainId, url }) => [BigInt(chainId), url]))
   }
 
   #getBaseUrl(requestChainId: bigint): string {

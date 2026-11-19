@@ -205,6 +205,26 @@ describe('Multi-chain requests', () => {
       )
     })
 
+    it('should not send the apiKey when the hosted hostname only appears in the path, the query or another host', async () => {
+      const proxyKit = new SafeApiKit({
+        apiKey,
+        queueServiceUrl: 'https://api.safe.global.my-proxy.com/api',
+        decoderServiceUrl: 'https://my-decoder.example.com/api.safe.global/api'
+      })
+      await proxyKit.queue.getDelegates({ safeAddress, label: 'api.safe.global' })
+      expect(fetchData).to.have.been.calledWith(
+        sinon.match({
+          url: sinon.match(/^https:\/\/api\.safe\.global\.my-proxy\.com\/.*label=api\.safe\.global/)
+        }),
+        undefined
+      )
+      await proxyKit.decoder.decodeData('0x1234')
+      expect(fetchData).to.have.been.calledWith(
+        sinon.match({ url: 'https://my-decoder.example.com/api.safe.global/api/v1/data-decoder' }),
+        undefined
+      )
+    })
+
     it('should not need an apiKey for the chains with URL', async () => {
       const selfHostedKit = new SafeApiKit({
         indexerUrls: [{ chainId: sepolia, url: sepoliaIndexer }]

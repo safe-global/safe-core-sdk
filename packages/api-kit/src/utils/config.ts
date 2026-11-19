@@ -4,8 +4,15 @@ export const DEFAULT_QUEUE_SERVICE_URL = 'https://api.safe.global/queue/api'
 
 export const DEFAULT_DECODER_SERVICE_URL = 'https://api.safe.global/decoder/api'
 
-export const isSafeHostedUrl = (url: string): boolean =>
-  url.includes('api.safe.global') || url.includes('api.5afe.dev')
+const SAFE_HOSTED_HOSTNAMES = ['api.safe.global', 'api.5afe.dev']
+
+export const isSafeHostedUrl = (url: string): boolean => {
+  try {
+    return SAFE_HOSTED_HOSTNAMES.includes(new URL(url).hostname)
+  } catch {
+    return false
+  }
+}
 
 type NetworkShortName = {
   shortName: string

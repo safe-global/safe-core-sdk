@@ -277,55 +277,45 @@ describe('Off-chain signatures', () => {
         contractNetworks
       })
       const safeServiceTransaction: SafeMultisigTransactionResponse = {
+        safeTxHash: '',
+        chainId: '1',
         safe: '',
+        nonce: (await safeSdk.getNonce()).toString(),
+        proposer: '0x',
+        proposedVia: 'OWNER',
+        proposedBy: null,
         to: account2.address,
         value: '500000000000000000', // 0.5 ETH
         data: '0x',
         operation: 1,
-        gasToken: '0x3333333333333333333333333333333333333333',
         safeTxGas: '666',
         baseGas: '111',
         gasPrice: '222',
+        gasToken: '0x3333333333333333333333333333333333333333',
         refundReceiver: '0x4444444444444444444444444444444444444444',
-        nonce: (await safeSdk.getNonce()).toString(),
-        executionDate: '',
-        submissionDate: '',
+        failed: null,
+        notes: null,
+        originName: null,
+        originUrl: null,
+        txHash: null,
+        created: '',
         modified: '',
-        blockNumber: 12345,
-        transactionHash: '',
-        safeTxHash: '',
-        executor: '',
-        isExecuted: false,
-        isSuccessful: false,
-        ethGasPrice: '',
-        maxFeePerGas: null,
-        maxPriorityFeePerGas: null,
-        gasUsed: 12345,
-        fee: '12345',
-        origin: '',
-        confirmationsRequired: 2,
-        proposer: '0x',
-        proposedByDelegate: null,
         confirmations: [
           {
             owner: '0x1111111111111111111111111111111111111111',
-            submissionDate: '',
-            transactionHash: '',
-            confirmationType: '',
             signature: '0x111111',
-            signatureType: 'EOA'
+            signatureType: 'EOA',
+            created: '',
+            modified: ''
           },
           {
             owner: '0x2222222222222222222222222222222222222222',
-            submissionDate: '',
-            transactionHash: '',
-            confirmationType: '',
             signature: '0x222222',
-            signatureType: 'EOA'
+            signatureType: 'EOA',
+            created: '',
+            modified: ''
           }
-        ],
-        trusted: true,
-        signatures: '0x111111222222'
+        ]
       }
       const signedTx = await safeSdk.signTransaction(safeServiceTransaction)
       chai.expect(safeServiceTransaction.confirmations?.length).to.be.eq(2)
@@ -334,7 +324,7 @@ describe('Off-chain signatures', () => {
       const signerSignature = signedTx.signatures.get(signerAddress!.toLowerCase())?.data
       chai
         .expect(signedTx.encodedSignatures())
-        .to.be.eq(safeServiceTransaction.signatures! + signerSignature!.slice(2))
+        .to.be.eq('0x111111222222' + signerSignature!.slice(2))
     })
   })
 })

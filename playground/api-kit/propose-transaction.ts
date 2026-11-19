@@ -24,7 +24,6 @@ async function main() {
 
   // Create Safe API Kit instance
   const apiKit = new SafeApiKit({
-    chainId: BigInt(CHAIN_ID),
     apiKey: API_KEY || ''
   })
 
@@ -43,17 +42,16 @@ async function main() {
   const safeTxHash = await protocolKit.getTransactionHash(safeTransaction)
   const signature = await protocolKit.signHash(safeTxHash)
 
-  // Propose transaction to the service
-  await apiKit.proposeTransaction({
+  // Propose the transaction to the Safe Queue Service. The proposer is derived from the signature
+  const proposedTransaction = await apiKit.queue.proposeTransaction({
     safeAddress: SAFE_ADDRESS,
     safeTransactionData: safeTransaction.data,
-    safeTxHash,
-    senderAddress: signerAddress,
-    senderSignature: signature.data
+    signatures: signature.data,
+    chainId: BigInt(CHAIN_ID)
   })
 
   console.log('Proposed a transaction with Safe:', SAFE_ADDRESS)
-  console.log('- safeTxHash:', safeTxHash)
+  console.log('- safeTxHash:', proposedTransaction.safeTxHash)
   console.log('- Sender:', signerAddress)
   console.log('- Sender signature:', signature.data)
 }

@@ -1,8 +1,4 @@
-import {
-  getChainIdFromEip3770NetworkPrefix,
-  validateEip3770Address,
-  validateEthereumAddress
-} from '@safe-global/protocol-kit'
+import { validateEip3770Address, validateEthereumAddress } from '@safe-global/protocol-kit'
 import { Eip3770Address } from '@safe-global/types-kit'
 import { HttpRequest, sendRequest } from '@safe-global/api-kit/utils/httpRequests'
 import { isSafeHostedUrl } from '@safe-global/api-kit/utils/config'
@@ -16,13 +12,10 @@ export type ServiceClientConfig = {
 
 export type QueryParams = Record<string, string | number | boolean | bigint | undefined>
 
-const getEip3770Prefix = (fullAddress: string): string => {
-  const parts = fullAddress.split(':')
-  return parts.length > 1 ? parts[0] : ''
-}
+const hasEip3770Prefix = (fullAddress: string): boolean => fullAddress.includes(':')
 
 /**
- * Shared plumbing of the service clients: HTTP requests, chain resolution, EIP-3770 addresses and query parameters.
+ * Shared plumbing of the service clients: HTTP requests, EIP-3770 addresses and query parameters.
  */
 export abstract class BaseClient {
   protected readonly baseUrl: string
@@ -38,40 +31,29 @@ export abstract class BaseClient {
     return sendRequest(request, isSafeHostedUrl(request.url) ? this.apiKey : undefined)
   }
 
-  /** Chain of a request: the `chainId` of the method, then the EIP-3770 prefix of the address */
-  protected getChainId(chainId?: bigint, fullAddress?: string): bigint | undefined {
-    if (chainId !== undefined) {
-      return chainId
+  /** Runtime guard for JavaScript callers: the types already require the `chainId` */
+  protected requireChainId(chainId?: bigint): bigint {
+    if (chainId === undefined) {
+      throw new Error('chainId is required')
     }
-    const prefix = fullAddress ? getEip3770Prefix(fullAddress) : ''
-    if (prefix) {
-      try {
-        return getChainIdFromEip3770NetworkPrefix(prefix)
-      } catch {
-        // Unknown prefix: the address validation rejects it later
-      }
-    }
-    return undefined
+    return chainId
   }
 
-  protected requireChainId(chainId?: bigint, fullAddress?: string): bigint {
-    const resolvedChainId = this.getChainId(chainId, fullAddress)
-    if (resolvedChainId === undefined) {
+  /**
+   * Validates an address and splits it. An EIP-3770 prefix is only accepted together with the `chainId`
+   * of the request, and must match it. Without `chainId` the address must be plain.
+   */
+  protected getEip3770Address(fullAddress: string, chainId?: bigint): Eip3770Address {
+    if (chainId !== undefined) {
+      return validateEip3770Address(fullAddress, chainId)
+    }
+    if (hasEip3770Prefix(fullAddress)) {
       throw new Error(
-        'chainId is required. Pass it to the method or use an EIP-3770 address (e.g. sep:0x...)'
+        'An EIP-3770 address requires chainId. Pass it to the method or remove the prefix'
       )
     }
-    return resolvedChainId
-  }
-
-  /** Validates an address, plain or with an EIP-3770 prefix that must match the chain, and splits it */
-  protected getEip3770Address(fullAddress: string, chainId?: bigint): Eip3770Address {
-    const currentChainId = this.getChainId(chainId, fullAddress)
-    if (currentChainId === undefined) {
-      validateEthereumAddress(fullAddress)
-      return { prefix: '', address: fullAddress }
-    }
-    return validateEip3770Address(fullAddress, currentChainId)
+    validateEthereumAddress(fullAddress)
+    return { prefix: '', address: fullAddress }
   }
 
   protected getAddress(fullAddress: string, chainId?: bigint): string {

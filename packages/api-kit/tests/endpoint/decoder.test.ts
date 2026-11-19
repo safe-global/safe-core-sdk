@@ -50,15 +50,22 @@ describe('Decoder service endpoints', () => {
     })
   })
 
-  it('decodeData with the receiving contract sends the chainId', async () => {
+  it('decodeData with the receiving contract and its chain', async () => {
     await chai
-      .expect(safeApiKit.decoder.decodeData(data, eip3770ContractAddress))
+      .expect(safeApiKit.decoder.decodeData(data, eip3770ContractAddress, { chainId }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/data-decoder`,
       method: 'POST',
       body: { data, to: contractAddress, chainId: Number(chainId) }
     })
+  })
+
+  it('decodeData with an EIP-3770 contract without chainId', async () => {
+    await chai
+      .expect(safeApiKit.decoder.decodeData(data, eip3770ContractAddress))
+      .to.be.rejectedWith('An EIP-3770 address requires chainId')
+    chai.expect(fetchData).not.to.have.been.called
   })
 
   it('decodeData with empty data', async () => {
@@ -90,7 +97,7 @@ describe('Decoder service endpoints', () => {
 
   it('getContract', async () => {
     await chai
-      .expect(safeApiKit.decoder.getContract(eip3770ContractAddress, { chainIds: [chainId] }))
+      .expect(safeApiKit.decoder.getContract(contractAddress, { chainIds: [chainId] }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
       url: `${baseUrl}/contracts/${contractAddress}?chain_ids=${chainId}`,

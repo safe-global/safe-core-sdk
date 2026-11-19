@@ -149,13 +149,15 @@ describe('removeSafeDelegate', () => {
     await safeApiKit.queue.addDelegate({ ...delegateConfig, label: 'Label' })
     const { results: initialDelegates } = await safeApiKit.queue.getDelegates({
       delegateAddress: eip3770DelegateAddress,
-      delegatorAddress: eip3770DelegatorAddress
+      delegatorAddress: eip3770DelegatorAddress,
+      chainId: config.CHAIN_ID
     })
     chai.expect(initialDelegates.length).to.be.eq(1)
     await safeApiKit.queue.removeDelegate(delegateConfig)
     const { results: finalDelegates } = await safeApiKit.queue.getDelegates({
       delegateAddress: eip3770DelegateAddress,
-      delegatorAddress: eip3770DelegatorAddress
+      delegatorAddress: eip3770DelegatorAddress,
+      chainId: config.CHAIN_ID
     })
     chai.expect(finalDelegates.length).to.be.eq(0)
   })

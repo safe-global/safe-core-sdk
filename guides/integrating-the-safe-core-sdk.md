@@ -35,7 +35,7 @@ In the examples below, you can see `provider` and `signer` properties, which rep
 
 ### Initialize the Safe API Kit
 
-As stated in the introduction, the [Safe API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the Safe services. To start using this library, create a new instance of the `SafeApiKit` class, imported from `@safe-global/api-kit`, and pass your API key. The kit has no chain: each request carries its own, as the `chainId` passed to the method or as the EIP-3770 prefix of the address (`eth:0x…`). When both are set they must match.
+As stated in the introduction, the [Safe API Kit](https://github.com/safe-global/safe-core-sdk/tree/main/packages/api-kit) consumes the Safe services. To start using this library, create a new instance of the `SafeApiKit` class, imported from `@safe-global/api-kit`, and pass your API key. The kit has no chain: each request carries its own. The chain of a request is the `chainId` passed to the method. An EIP-3770 prefix in an address (`eth:0x…`) is only accepted together with `chainId`, and must match it; without `chainId` the addresses are plain.
 
 ```js
 import SafeApiKit from '@safe-global/api-kit'
@@ -67,7 +67,7 @@ Each client is created the first time it is used, so only the services you use n
 const apiKit = new SafeApiKit({ apiKey })
 
 const safeInfo = await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 1n })
-const { results } = await apiKit.queue.getPendingTransactions(['eth:0x…', 'base:0x…'])
+const { results } = await apiKit.queue.getPendingTransactions(safeAddress, { chainId: 1n })
 ```
 
 ### Initialize the Protocol Kit

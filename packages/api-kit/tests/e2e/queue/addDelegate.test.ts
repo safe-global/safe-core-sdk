@@ -180,7 +180,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       chainId: config.CHAIN_ID
     }
     const { results: initialDelegates } = await safeApiKit.queue.getDelegates({
-      safeAddress: eip3770SafeAddress
+      safeAddress: eip3770SafeAddress,
+      chainId: config.CHAIN_ID
     })
 
     chai.expect(initialDelegates.length).to.be.eq(0)
@@ -192,7 +193,8 @@ describe(`[${version}] addSafeDelegate`, () => {
       .to.be.equal(delegatorAddress.toLowerCase())
     chai.expect(delegateResponse.label).to.be.equal(delegateConfig.label)
     const { results: finalDelegates } = await safeApiKit.queue.getDelegates({
-      safeAddress: eip3770SafeAddress
+      safeAddress: eip3770SafeAddress,
+      chainId: config.CHAIN_ID
     })
     chai.expect(finalDelegates.length).to.be.eq(1)
     await safeApiKit.queue.removeDelegate(delegateConfig)

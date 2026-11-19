@@ -46,7 +46,9 @@ describe('getMultisigTransactions', () => {
   it('should return the list of multisig transactions EIP-3770', async () => {
     const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with multisig transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
-    const { count, results } = await safeApiKit.queue.getSafeTransactions(eip3770SafeAddress)
+    const { count, results } = await safeApiKit.queue.getSafeTransactions(eip3770SafeAddress, {
+      chainId: config.CHAIN_ID
+    })
     chai.expect(count).to.be.greaterThanOrEqual(10)
     chai.expect(results.length).to.be.equal(Math.min(count, 50))
     results.map((transaction) => {

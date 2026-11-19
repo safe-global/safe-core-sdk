@@ -48,10 +48,9 @@ export class DecoderClient extends BaseClient {
 
     if (to) {
       // The service only accepts the chainId together with `to`
-      const requestChainId = this.getChainId(chainId, to)
-      body.to = this.getAddress(to, requestChainId)
-      if (requestChainId !== undefined) {
-        body.chainId = Number(requestChainId)
+      body.to = this.getAddress(to, chainId)
+      if (chainId !== undefined) {
+        body.chainId = Number(chainId)
       }
     }
 

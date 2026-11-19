@@ -36,15 +36,12 @@ const toArray = (signatures: Signatures): string[] =>
  * One method per endpoint of the service.
  */
 export class QueueClient extends BaseClient {
-  /**
-   * Validates a Safe address, plain or with an EIP-3770 prefix, and returns it without the prefix.
-   */
+  /** Validates a Safe address and returns it without the EIP-3770 prefix */
   #getSafeAddress(safeAddress: string, chainId?: bigint): string {
-    try {
-      return this.getAddress(safeAddress, chainId)
-    } catch {
+    if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
+    return this.getAddress(safeAddress, chainId)
   }
 
   /**
@@ -88,9 +85,9 @@ export class QueueClient extends BaseClient {
 
     this.addQueryParams(url, {
       chainId,
-      safe: safeAddress ? this.getAddress(safeAddress) : undefined,
-      delegate: delegateAddress ? this.getAddress(delegateAddress) : undefined,
-      delegator: delegatorAddress ? this.getAddress(delegatorAddress) : undefined,
+      safe: safeAddress ? this.getAddress(safeAddress, chainId) : undefined,
+      delegate: delegateAddress ? this.getAddress(delegateAddress, chainId) : undefined,
+      delegator: delegatorAddress ? this.getAddress(delegatorAddress, chainId) : undefined,
       label,
       limit,
       offset
@@ -124,7 +121,7 @@ export class QueueClient extends BaseClient {
     if (label === '') {
       throw new Error('Invalid label')
     }
-    const chainId = allChains ? null : this.requireChainId(requestChainId, safeAddress)
+    const chainId = allChains ? null : this.requireChainId(requestChainId)
     const addressChainId = chainId ?? undefined
     const safe = safeAddress ? this.getAddress(safeAddress, addressChainId) : null
     const delegate =
@@ -216,7 +213,7 @@ export class QueueClient extends BaseClient {
     if (signatureList.length === 0) {
       throw new Error('Invalid signatures')
     }
-    const requestChainId = this.requireChainId(chainId, safeAddress)
+    const requestChainId = this.requireChainId(chainId)
 
     return this.api({
       url: `${this.baseUrl}/v1/multisig-transactions`,
@@ -270,8 +267,9 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the pending multisig transactions of one or several Safes: not executed and with a nonce
-   * equal or higher than the current one. Safes of different chains can be mixed using EIP-3770 prefixes.
+   * Lists the pending multisig transactions of one or several Safes of a chain: not executed and with
+   * a nonce equal or higher than the current one. The service needs the chain of every Safe, so `chainId`
+   * is required. To mix chains use `getTransactions` with `executed: false`.
    *
    * @param safeAddresses - One or several Safe addresses
    * @param options - Chain, sort and pagination
@@ -280,16 +278,19 @@ export class QueueClient extends BaseClient {
    */
   async getPendingTransactions(
     safeAddresses: string | string[],
-    { chainId, nonceOrder, limit, offset }: GetPendingTransactionsOptions = {}
+    { chainId, nonceOrder, limit, offset }: GetPendingTransactionsOptions
   ): Promise<TransactionListResponse> {
     const addresses = Array.isArray(safeAddresses) ? safeAddresses : [safeAddresses]
     if (addresses.length === 0 || addresses.some((address) => address === '')) {
       throw new Error('Invalid Safe address')
     }
+    const requestChainId = this.requireChainId(chainId)
     const url = new URL(`${this.baseUrl}/v1/multisig-transactions/queue`)
     addresses.forEach((address) => {
-      const safeChainId = this.requireChainId(chainId, address)
-      url.searchParams.append('safes', `${this.getAddress(address, safeChainId)}:${safeChainId}`)
+      url.searchParams.append(
+        'safes',
+        `${this.getAddress(address, requestChainId)}:${requestChainId}`
+      )
     })
     this.addQueryParams(url, { nonceOrder, limit, offset })
 
@@ -356,7 +357,7 @@ export class QueueClient extends BaseClient {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const requestChainId = this.requireChainId(chainId, safeAddress)
+    const requestChainId = this.requireChainId(chainId)
     const safe = this.getAddress(safeAddress, requestChainId)
     const signature = await signDeleteTransaction(signer, safeTxHash, safe, requestChainId)
 
@@ -383,12 +384,11 @@ export class QueueClient extends BaseClient {
     if (safeAddress === '') {
       throw new Error('Invalid Safe address')
     }
-    const requestChainId = this.getChainId(chainId, safeAddress)
     const url = new URL(
-      `${this.baseUrl}/v1/safes/${this.getAddress(safeAddress, requestChainId)}/multisig-transactions`
+      `${this.baseUrl}/v1/safes/${this.getAddress(safeAddress, chainId)}/multisig-transactions`
     )
     this.addQueryParams(url, {
-      chainId: allChains ? undefined : requestChainId,
+      chainId: allChains ? undefined : chainId,
       executed,
       nonceOrder,
       limit,
@@ -448,7 +448,7 @@ export class QueueClient extends BaseClient {
     if (signatureList.length === 0) {
       throw new Error('Invalid signatures')
     }
-    const requestChainId = this.requireChainId(chainId, safeAddress)
+    const requestChainId = this.requireChainId(chainId)
 
     return this.api({
       url: `${this.baseUrl}/v1/safes/${safe}/messages`,
@@ -477,10 +477,9 @@ export class QueueClient extends BaseClient {
     { allChains, chainId, limit, offset }: GetMessagesOptions = {}
   ): Promise<MessageListResponse> {
     const safe = this.#getSafeAddress(safeAddress, chainId)
-    const requestChainId = this.getChainId(chainId, safeAddress)
     const url = new URL(`${this.baseUrl}/v1/safes/${safe}/messages`)
     this.addQueryParams(url, {
-      chainId: allChains ? undefined : requestChainId,
+      chainId: allChains ? undefined : chainId,
       limit,
       offset
     })

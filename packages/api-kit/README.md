@@ -72,7 +72,7 @@ const decoded = await apiKit.decoder.decodeData(data, to, { chainId: 11155111n }
 
 ### Multi-chain
 
-The Safe services are multi-chain, so one kit works with every chain. The chain of a request is the `chainId` passed to the method or, when there is none, the EIP-3770 prefix of the address (`eth:0x…`). When both are set they must match, otherwise the request throws.
+The Safe services are multi-chain, so one kit works with every chain. The chain of a request is the `chainId` passed to the method. An EIP-3770 prefix in an address (`eth:0x…`) is only accepted together with `chainId`, and must match it; without `chainId` the addresses are plain.
 
 ```js
 const apiKit = new SafeApiKit({ apiKey })
@@ -91,8 +91,17 @@ await apiKit.queue.addDelegate({
 
 // Queue reads: without a chain they return every chain
 await apiKit.queue.getSafeTransactions(safeAddress)
-await apiKit.queue.getSafeTransactions(safeAddress, { chainId: 1n })
-await apiKit.queue.getPendingTransactions(['eth:0x…', 'base:0x…'])
+await apiKit.queue.getSafeTransactions('eth:0x…', { chainId: 1n })
+await apiKit.queue.getSafeTransactions('eth:0x…') // throws: the prefix needs the chainId
+await apiKit.queue.getTransactions({
+  safes: [
+    { address: safeAddress, chainIds: [1n] },
+    { address: otherSafeAddress, chainIds: [8453n] }
+  ],
+  executed: false
+})
+// The pending transactions need the chain of every Safe
+await apiKit.queue.getPendingTransactions([safeAddress, otherSafeAddress], { chainId: 1n })
 
 // Indexer: `chainId` is required in every method. An EIP-3770 prefix must match it
 await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 8453n })

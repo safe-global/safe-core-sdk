@@ -147,7 +147,8 @@ describe('getSafeDelegates', () => {
     await safeApiKit.queue.addDelegate({ label: 'Label1', ...delegateConfig1 })
     await safeApiKit.queue.addDelegate({ label: 'Label2', ...delegateConfig2 })
     const safeDelegateListResponse = await safeApiKit.queue.getDelegates({
-      safeAddress: eip3770SafeAddress
+      safeAddress: eip3770SafeAddress,
+      chainId: config.CHAIN_ID
     })
     const { results } = safeDelegateListResponse
     results.sort(sortByDelegate)

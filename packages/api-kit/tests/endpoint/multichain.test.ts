@@ -82,8 +82,16 @@ describe('Multi-chain requests', () => {
       ).to.be.rejectedWith('The network prefix must match the current network')
     })
 
-    it('should take the chain of a read from the EIP-3770 prefix of the address', async () => {
-      await apiKit.queue.getSafeTransactions(`eth:${safeAddress}`)
+    it('should only verify an EIP-3770 prefix, never take the chain from it', async () => {
+      await expect(apiKit.queue.getSafeTransactions(`eth:${safeAddress}`)).to.be.rejectedWith(
+        'An EIP-3770 address requires chainId'
+      )
+      await expect(
+        apiKit.decoder.decodeData('0x1234', `eth:${contractAddress}`)
+      ).to.be.rejectedWith('An EIP-3770 address requires chainId')
+      expect(fetchData).not.to.have.been.called
+
+      await apiKit.queue.getSafeTransactions(`eth:${safeAddress}`, { chainId: mainnet })
       expect(fetchData).to.have.been.calledWith({
         url: `${queueUrl}/safes/${safeAddress}/multisig-transactions?chainId=1`,
         method: 'GET'
@@ -98,10 +106,26 @@ describe('Multi-chain requests', () => {
       })
     })
 
-    it('should mix Safes of several chains in the pending transactions', async () => {
-      await apiKit.queue.getPendingTransactions([`eth:${safeAddress}`, `sep:${otherSafeAddress}`])
+    it('should list the pending transactions of several Safes of one chain', async () => {
+      await apiKit.queue.getPendingTransactions([safeAddress, `eth:${otherSafeAddress}`], {
+        chainId: mainnet
+      })
       expect(fetchData).to.have.been.calledWith({
-        url: `${queueUrl}/multisig-transactions/queue?safes=${safeAddress}%3A1&safes=${otherSafeAddress}%3A11155111`,
+        url: `${queueUrl}/multisig-transactions/queue?safes=${safeAddress}%3A1&safes=${otherSafeAddress}%3A1`,
+        method: 'GET'
+      })
+    })
+
+    it('should mix Safes of several chains in the transactions list', async () => {
+      await apiKit.queue.getTransactions({
+        safes: [
+          { address: safeAddress, chainIds: [mainnet] },
+          { address: otherSafeAddress, chainIds: [sepolia] }
+        ],
+        executed: false
+      })
+      expect(fetchData).to.have.been.calledWith({
+        url: `${queueUrl}/multisig-transactions?safes=${safeAddress}%3A1&safes=${otherSafeAddress}%3A11155111&executed=false`,
         method: 'GET'
       })
     })

@@ -5,7 +5,11 @@ import sinonChai from 'sinon-chai'
 import { privateKeyToAccount } from 'viem/accounts'
 import { sepolia } from 'viem/chains'
 import { createWalletClient, http, zeroAddress } from 'viem'
-import SafeApiKit, { AddDelegateProps, RemoveDelegateProps } from '@safe-global/api-kit/index'
+import SafeApiKit, {
+  AddDelegateProps,
+  GetPendingTransactionsOptions,
+  RemoveDelegateProps
+} from '@safe-global/api-kit/index'
 import * as httpRequests from '@safe-global/api-kit/utils/httpRequests'
 import { signDelegate } from '@safe-global/api-kit/utils/signDelegate'
 import { signDeleteTransaction } from '@safe-global/api-kit/utils/signDeleteTransaction'
@@ -77,12 +81,19 @@ describe('Queue service endpoints', () => {
 
     it('getDelegates EIP-3770', async () => {
       await chai
-        .expect(safeApiKit.queue.getDelegates({ safeAddress: eip3770SafeAddress }))
+        .expect(safeApiKit.queue.getDelegates({ safeAddress: eip3770SafeAddress, chainId }))
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
-        url: `${baseUrl}/delegates?safe=${safeAddress}`,
+        url: `${baseUrl}/delegates?chainId=${chainId}&safe=${safeAddress}`,
         method: 'GET'
       })
+    })
+
+    it('getDelegates EIP-3770 without chainId', async () => {
+      await chai
+        .expect(safeApiKit.queue.getDelegates({ safeAddress: eip3770SafeAddress }))
+        .to.be.rejectedWith('An EIP-3770 address requires chainId')
+      chai.expect(fetchData).not.to.have.been.called
     })
 
     it('getDelegates with all the filters', async () => {
@@ -403,7 +414,7 @@ describe('Queue service endpoints', () => {
       await chai
         .expect(
           safeApiKit.queue.getTransactions({
-            safes: [eip3770SafeAddress, { address: otherSafeAddress, chainIds: [1n, 137n] }],
+            safes: [safeAddress, { address: otherSafeAddress, chainIds: [1n, 137n] }],
             executed: false,
             nonceOrder: 'asc',
             limit: 10,
@@ -452,11 +463,20 @@ describe('Queue service endpoints', () => {
 
     it('getPendingTransactions validations', async () => {
       await chai
-        .expect(safeApiKit.queue.getPendingTransactions(''))
+        .expect(safeApiKit.queue.getPendingTransactions('', { chainId }))
         .to.be.rejectedWith('Invalid Safe address')
       await chai
-        .expect(safeApiKit.queue.getPendingTransactions([]))
+        .expect(safeApiKit.queue.getPendingTransactions([], { chainId }))
         .to.be.rejectedWith('Invalid Safe address')
+      await chai
+        .expect(
+          safeApiKit.queue.getPendingTransactions(
+            safeAddress,
+            {} as unknown as GetPendingTransactionsOptions
+          )
+        )
+        .to.be.rejectedWith('chainId is required')
+      chai.expect(fetchData).not.to.have.been.called
     })
 
     it('getTransactionsBatch', async () => {
@@ -515,12 +535,19 @@ describe('Queue service endpoints', () => {
 
     it('getSafeTransactions', async () => {
       await chai
-        .expect(safeApiKit.queue.getSafeTransactions(eip3770SafeAddress))
+        .expect(safeApiKit.queue.getSafeTransactions(eip3770SafeAddress, { chainId }))
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/multisig-transactions?chainId=${chainId}`,
         method: 'GET'
       })
+    })
+
+    it('getSafeTransactions EIP-3770 without chainId', async () => {
+      await chai
+        .expect(safeApiKit.queue.getSafeTransactions(eip3770SafeAddress))
+        .to.be.rejectedWith('An EIP-3770 address requires chainId')
+      chai.expect(fetchData).not.to.have.been.called
     })
 
     it('getSafeTransactions with query params and all chains', async () => {
@@ -647,7 +674,7 @@ describe('Queue service endpoints', () => {
             chainId
           })
         )
-        .to.be.rejectedWith('Invalid Safe address')
+        .to.be.rejectedWith('Invalid Ethereum address 0x123')
       await chai
         .expect(
           safeApiKit.queue.addMessage(safeAddress, { message: 'message', signatures: '', chainId })
@@ -667,7 +694,7 @@ describe('Queue service endpoints', () => {
 
     it('getMessages EIP-3770', async () => {
       await chai
-        .expect(safeApiKit.queue.getMessages(eip3770SafeAddress))
+        .expect(safeApiKit.queue.getMessages(eip3770SafeAddress, { chainId }))
         .to.be.eventually.deep.equals(OK)
       chai.expect(fetchData).to.have.been.calledWith({
         url: `${baseUrl}/safes/${safeAddress}/messages?chainId=${chainId}`,

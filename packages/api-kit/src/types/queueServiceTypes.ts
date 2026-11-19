@@ -104,7 +104,7 @@ export type DeleteTransactionProps = {
   signer: Signer
 } & RequiredChainOptions
 
-/** A Safe address, optionally restricted to some chains. Without chains, every chain of the Safe is returned */
+/** A Safe address without EIP-3770 prefix, optionally restricted to some chains. Without chains, every chain of the Safe is returned */
 export type SafeFilter = string | { address: string; chainIds: bigint[] }
 
 export type GetTransactionsOptions = {
@@ -129,7 +129,7 @@ export type GetSafeTransactionsOptions = {
 export type GetPendingTransactionsOptions = {
   /** Nonce sort direction (default: `asc`) */
   nonceOrder?: NonceOrder
-} & ChainOptions &
+} & RequiredChainOptions &
   ListOptions
 
 export type TransactionListResponse = ListResponse<SafeMultisigTransactionResponse>

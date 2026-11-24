@@ -266,7 +266,8 @@ export class QueueClient extends BaseClient {
   /**
    * Lists the pending multisig transactions of one or several Safes of a chain: not executed and with
    * a nonce equal or higher than the current one. The service needs the chain of every Safe, so `chainId`
-   * is required. To mix chains use `getTransactions` with `executed: false`.
+   * is required: for a queue across chains call it once per chain. `getTransactions` with `executed: false`
+   * is not equivalent, it also returns the transactions replaced by another one with the same nonce.
    *
    * @param safeAddresses - One or several Safe addresses
    * @param options - Chain, sort and pagination

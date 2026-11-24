@@ -346,6 +346,16 @@ Optionally, the `isValidTransaction` method, that returns a boolean value, could
 const isValidTx = await protocolKit.isValidTransaction(safeTransaction)
 ```
 
+Once the transaction is executed, the Safe Transaction Service indexes it from the chain. Its execution data (`executionDate`, `blockNumber`, `transactionHash`, `gasUsed`, `fee`...) and the executed history of the Safe, including the transactions executed without an off-chain proposal, are read from the `indexer` client:
+
+```js
+const executedTx = await apiKit.indexer.getTransaction(safeTxHash, { chainId })
+const history = await apiKit.indexer.getMultisigTransactions(safeAddress, {
+  executed: true,
+  chainId
+})
+```
+
 ## <a name="interface-checks">9. Interface checks</a>
 
 During the process of collecting the signatures/executing transactions, some useful checks can be made in the interface to display or hide a button to confirm or execute the transaction depending on the current number of confirmations, the address of accounts that confirmed the transaction and the Safe threshold:

@@ -200,6 +200,17 @@ export type IndexerMultisigTransactionResponse = {
   readonly signatures: string | null
 }
 
+export type IndexerMultisigTransactionListResponse =
+  ListResponse<IndexerMultisigTransactionResponse>
+
+export type GetMultisigTransactionsOptions = {
+  executed?: boolean
+  nonce?: string
+  ordering?: string
+} & ListOptions &
+  RequiredChainOptions &
+  QueryParamsOptions
+
 export type SafeMultisigTransactionWithTransfersResponse = IndexerMultisigTransactionResponse & {
   readonly txType?: 'MULTISIG_TRANSACTION'
   readonly transfers: TransferResponse[]

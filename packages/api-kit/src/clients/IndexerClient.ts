@@ -14,9 +14,12 @@ import {
   AllTransactionsOptions,
   GetIncomingTransactionsOptions,
   GetModuleTransactionsOptions,
+  GetMultisigTransactionsOptions,
   GetPendingSafeOperationListOptions,
   GetSafeOperationListOptions,
   GetSafeOperationListResponse,
+  IndexerMultisigTransactionListResponse,
+  IndexerMultisigTransactionResponse,
   IndexerServiceInfoResponse,
   ModulesResponse,
   OwnerResponse,
@@ -299,6 +302,58 @@ export class IndexerClient extends BaseClient {
     }
     const url = new URL(
       `${this.#getBaseUrl(chainId)}/v1/safes/${this.getAddress(safeAddress, chainId)}/module-transactions/`
+    )
+    this.#addUrlQueryParams(url, options)
+
+    return this.api({
+      url: url.toString(),
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Returns a multisig transaction as indexed by the Transaction Service, with its execution data
+   * (`executionDate`, `blockNumber`, `transactionHash`, `gasUsed`, `fee`...). Unlike `queue.getTransaction`,
+   * it also returns the transactions executed on-chain without an off-chain proposal.
+   *
+   * @param safeTxHash - Hash of the Safe transaction
+   * @param options - Chain of the request
+   * @returns The information of the Safe transaction
+   * @throws "Invalid safeTxHash"
+   * @throws "Not found."
+   */
+  async getTransaction(
+    safeTxHash: string,
+    { chainId }: RequiredChainOptions
+  ): Promise<IndexerMultisigTransactionResponse> {
+    if (safeTxHash === '') {
+      throw new Error('Invalid safeTxHash')
+    }
+    return this.api({
+      url: `${this.#getBaseUrl(chainId)}/v2/multisig-transactions/${safeTxHash}/`,
+      method: HttpMethod.Get
+    })
+  }
+
+  /**
+   * Returns the history of multisig transactions of a Safe as indexed by the Transaction Service,
+   * including the ones executed on-chain without an off-chain proposal. Use `executed: true` for the executed history.
+   *
+   * @param safeAddress - The Safe address
+   * @param options - Optional parameters to filter or modify the response
+   * @returns The history of multisig transactions
+   * @throws "Invalid Safe address"
+   * @throws "Checksum address validation failed"
+   */
+  async getMultisigTransactions(
+    safeAddress: string,
+    { chainId, ...options }: GetMultisigTransactionsOptions
+  ): Promise<IndexerMultisigTransactionListResponse> {
+    if (safeAddress === '') {
+      throw new Error('Invalid Safe address')
+    }
+    const url = new URL(
+      `${this.#getBaseUrl(chainId)}/v2/safes/${this.getAddress(safeAddress, chainId)}/multisig-transactions/`
     )
     this.#addUrlQueryParams(url, options)
 

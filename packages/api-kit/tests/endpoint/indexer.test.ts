@@ -170,6 +170,52 @@ describe('Indexer (Transaction Service) endpoints', () => {
     })
   })
 
+  it('getTransaction', async () => {
+    const safeTxHash = '0x71eb4e7daac8a5461c6b946c95895c5732281de9cb9dad6efa139fc42a063229'
+    await chai
+      .expect(safeApiKit.indexer.getTransaction(safeTxHash, { chainId }))
+      .to.be.eventually.deep.equals(OK)
+    chai.expect(fetchData).to.have.been.calledWith({
+      url: `${baseUrl}/v2/multisig-transactions/${safeTxHash}/`,
+      method: 'GET'
+    })
+    await chai
+      .expect(safeApiKit.indexer.getTransaction('', { chainId }))
+      .to.be.rejectedWith('Invalid safeTxHash')
+  })
+
+  it('getMultisigTransactions', async () => {
+    await chai
+      .expect(safeApiKit.indexer.getMultisigTransactions(eip3770SafeAddress, { chainId }))
+      .to.be.eventually.deep.equals(OK)
+    chai.expect(fetchData).to.have.been.calledWith({
+      url: `${baseUrl}/v2/safes/${safeAddress}/multisig-transactions/`,
+      method: 'GET'
+    })
+    await chai
+      .expect(safeApiKit.indexer.getMultisigTransactions('', { chainId }))
+      .to.be.rejectedWith('Invalid Safe address')
+  })
+
+  it('getMultisigTransactions with query params', async () => {
+    await chai
+      .expect(
+        safeApiKit.indexer.getMultisigTransactions(safeAddress, {
+          executed: true,
+          nonce: '3',
+          ordering: 'nonce',
+          limit: 10,
+          offset: 20,
+          chainId
+        })
+      )
+      .to.be.eventually.deep.equals(OK)
+    chai.expect(fetchData).to.have.been.calledWith({
+      url: `${baseUrl}/v2/safes/${safeAddress}/multisig-transactions/?executed=true&nonce=3&ordering=nonce&limit=10&offset=20`,
+      method: 'GET'
+    })
+  })
+
   it('getAllTransactions', async () => {
     await chai
       .expect(safeApiKit.indexer.getAllTransactions(eip3770SafeAddress, { limit: 5, chainId }))

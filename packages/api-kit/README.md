@@ -52,8 +52,10 @@ Note that proposals, confirmations, messages and delegates are handled by the Qu
 The kit exposes one client per Safe service, with one method per endpoint:
 
 - `apiKit.queue`: the Safe Queue Service, the off-chain queue of multisig transactions, messages and delegates.
-- `apiKit.indexer`: the Safe Transaction Service, the data indexed from the chain (Safe accounts, history, transfers, tokens) and the ERC-4337 SafeOperations.
+- `apiKit.indexer`: the Safe Transaction Service, the data indexed from the chain (Safe accounts, executed history, transfers, tokens) and the ERC-4337 SafeOperations.
 - `apiKit.decoder`: the Safe Decoder Service, transaction data decoding and known contracts.
+
+The queue and the indexer both return multisig transactions. `apiKit.queue` is the off-chain queue: proposals, confirmations and the status of the transactions. `apiKit.indexer` is what has been indexed from the chain: `getTransaction` and `getMultisigTransactions` return the execution data (`executionDate`, `blockNumber`, `transactionHash`, `gasUsed`, `fee`...) and include the transactions executed without an off-chain proposal, which the queue has no record of.
 
 ```js
 // Propose a transaction and confirm it from another owner
@@ -107,6 +109,9 @@ await apiKit.queue.getPendingTransactions([safeAddress, otherSafeAddress], { cha
 await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 8453n })
 await apiKit.indexer.getSafeInfo('base:0x…', { chainId: 8453n })
 await apiKit.indexer.getServiceInfo({ chainId: 8453n })
+// Executed history, with the execution data of each transaction
+await apiKit.indexer.getMultisigTransactions(safeAddress, { executed: true, chainId: 8453n })
+await apiKit.indexer.getTransaction(safeTxHash, { chainId: 8453n })
 
 // Decoder: the chain is optional
 await apiKit.decoder.decodeData(data, to, { chainId: 1n })

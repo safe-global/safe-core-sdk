@@ -298,6 +298,7 @@ describe('Off-chain signatures', () => {
         originName: null,
         originUrl: null,
         txHash: null,
+        executor: null,
         created: '',
         modified: '',
         confirmations: [

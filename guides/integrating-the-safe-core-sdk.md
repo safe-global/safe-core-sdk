@@ -302,6 +302,7 @@ type SafeMultisigTransactionResponse = {
   originName: string | null
   originUrl: string | null
   txHash: string | null // hash of the Ethereum transaction once executed
+  executor: string | null // account that executed the transaction
   created: string
   modified: string
   confirmations: [

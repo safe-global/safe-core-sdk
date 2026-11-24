@@ -263,6 +263,7 @@ export type SafeMultisigTransactionResponse = {
   readonly originName: string | null
   readonly originUrl: string | null
   readonly txHash: string | null
+  readonly executor: string | null
   readonly created: string
   readonly modified: string
   readonly confirmations: SafeMultisigConfirmationResponse[]

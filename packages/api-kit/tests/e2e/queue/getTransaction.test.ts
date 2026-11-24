@@ -36,5 +36,7 @@ describe('getTransaction', () => {
     chai.expect(transaction.safeTxGas).to.be.a('string')
     chai.expect(transaction.baseGas).to.be.a('string')
     chai.expect(transaction.confirmations.length).to.be.equal(2)
+    chai.expect(transaction.txHash).to.be.a('string')
+    chai.expect(transaction.executor).to.be.a('string')
   })
 })

@@ -50,4 +50,4 @@ Other breaking changes:
 - Every method moves under its client.
 - `proposeTransaction` takes `signatures` instead of `safeTxHash`, `senderAddress`, `senderSignature` and `origin` (`originName`, `originUrl`, `notes` and `nestedTransaction` are added) and returns the stored transaction.
 - `getNextNonce` and `getTransactionConfirmations`, which combined or derived from other calls, are removed.
-- `SafeMultisigTransactionResponse` and `SafeMultisigConfirmationResponse` (types-kit) follow the queue schema; the shape indexed by the Transaction Service is now `IndexerMultisigTransactionResponse`.
+- `SafeMultisigTransactionResponse` and `SafeMultisigConfirmationResponse` (types-kit) follow the queue schema (an executed transaction has `txHash`, `failed` and `executor`); the shape indexed by the Transaction Service is now `IndexerMultisigTransactionResponse`.

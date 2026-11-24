@@ -336,8 +336,9 @@ export class IndexerClient extends BaseClient {
   }
 
   /**
-   * Returns the history of multisig transactions of a Safe as indexed by the Transaction Service,
-   * including the ones executed on-chain without an off-chain proposal. Use `executed: true` for the executed history.
+   * Returns the executed multisig transactions of a Safe as indexed by the Transaction Service, with their execution
+   * data and including the ones executed on-chain without an off-chain proposal. The pending transactions are in
+   * `queue.getPendingTransactions`.
    *
    * @param safeAddress - The Safe address
    * @param options - Optional parameters to filter or modify the response
@@ -355,7 +356,7 @@ export class IndexerClient extends BaseClient {
     const url = new URL(
       `${this.#getBaseUrl(chainId)}/v2/safes/${this.getAddress(safeAddress, chainId)}/multisig-transactions/`
     )
-    this.#addUrlQueryParams(url, options)
+    this.#addUrlQueryParams(url, { ...options, executed: true })
 
     return this.api({
       url: url.toString(),

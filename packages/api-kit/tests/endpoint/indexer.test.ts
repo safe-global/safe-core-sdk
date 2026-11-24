@@ -189,7 +189,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       .expect(safeApiKit.indexer.getMultisigTransactions(eip3770SafeAddress, { chainId }))
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
-      url: `${baseUrl}/v2/safes/${safeAddress}/multisig-transactions/`,
+      url: `${baseUrl}/v2/safes/${safeAddress}/multisig-transactions/?executed=true`,
       method: 'GET'
     })
     await chai
@@ -201,7 +201,6 @@ describe('Indexer (Transaction Service) endpoints', () => {
     await chai
       .expect(
         safeApiKit.indexer.getMultisigTransactions(safeAddress, {
-          executed: true,
           nonce: '3',
           ordering: 'nonce',
           limit: 10,
@@ -211,7 +210,7 @@ describe('Indexer (Transaction Service) endpoints', () => {
       )
       .to.be.eventually.deep.equals(OK)
     chai.expect(fetchData).to.have.been.calledWith({
-      url: `${baseUrl}/v2/safes/${safeAddress}/multisig-transactions/?executed=true&nonce=3&ordering=nonce&limit=10&offset=20`,
+      url: `${baseUrl}/v2/safes/${safeAddress}/multisig-transactions/?nonce=3&ordering=nonce&limit=10&offset=20&executed=true`,
       method: 'GET'
     })
   })

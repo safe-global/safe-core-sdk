@@ -37,7 +37,7 @@ describe('getMultisigTransactions', () => {
     chai.expect(safeMultisigTransactionListResponse.results.length).to.be.equal(0)
   })
 
-  it('should return the list of multisig transactions', async () => {
+  it('should return the executed multisig transactions', async () => {
     const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with multisig transactions
     const safeMultisigTransactionListResponse = await safeApiKit.indexer.getMultisigTransactions(
       safeAddress,
@@ -49,24 +49,13 @@ describe('getMultisigTransactions', () => {
       .to.be.equal(safeMultisigTransactionListResponse.count)
     safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.safe).to.be.equal(safeAddress)
-    })
-  })
-
-  it('should return the executed multisig transactions', async () => {
-    const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with multisig transactions
-    const safeMultisigTransactionListResponse = await safeApiKit.indexer.getMultisigTransactions(
-      safeAddress,
-      { executed: true, chainId: config.CHAIN_ID }
-    )
-    chai.expect(safeMultisigTransactionListResponse.results.length).to.be.greaterThan(0)
-    safeMultisigTransactionListResponse.results.map((transaction) => {
       chai.expect(transaction.isExecuted).to.be.true
       chai.expect(transaction.executionDate).to.be.a('string')
       chai.expect(transaction.transactionHash).to.be.a('string')
     })
   })
 
-  it('should return the list of multisig transactions EIP-3770', async () => {
+  it('should return the executed multisig transactions EIP-3770', async () => {
     const safeAddress = '0xCa2f5A815b642c79FC530B60BC15Aee4eF6252b3' // Safe with multisig transactions
     const eip3770SafeAddress = `${config.EIP_3770_PREFIX}:${safeAddress}`
     const safeMultisigTransactionListResponse = await safeApiKit.indexer.getMultisigTransactions(

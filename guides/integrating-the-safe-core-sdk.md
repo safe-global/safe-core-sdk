@@ -350,10 +350,7 @@ Once the transaction is executed, the Safe Transaction Service indexes it from t
 
 ```js
 const executedTx = await apiKit.indexer.getTransaction(safeTxHash, { chainId })
-const history = await apiKit.indexer.getMultisigTransactions(safeAddress, {
-  executed: true,
-  chainId
-})
+const history = await apiKit.indexer.getMultisigTransactions(safeAddress, { chainId })
 ```
 
 ## <a name="interface-checks">9. Interface checks</a>

@@ -204,7 +204,7 @@ export type IndexerMultisigTransactionListResponse =
   ListResponse<IndexerMultisigTransactionResponse>
 
 export type GetMultisigTransactionsOptions = {
-  executed?: boolean
+  executed?: never
   nonce?: string
   ordering?: string
 } & ListOptions &

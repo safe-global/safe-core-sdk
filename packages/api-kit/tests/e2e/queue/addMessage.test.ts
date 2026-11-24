@@ -50,7 +50,7 @@ describeif(semverSatisfies(safeVersionDeployed, '>=1.4.1'))(`[${version}] addMes
           chainId: config.CHAIN_ID
         })
       )
-      .to.be.rejectedWith('Invalid Safe address')
+      .to.be.rejectedWith('Invalid Ethereum address 0x123')
   })
 
   it('should allow to create a new off-chain message signed with EIP-191', async () => {

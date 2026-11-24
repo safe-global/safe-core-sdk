@@ -19,7 +19,7 @@ describe('getMessages', () => {
     await chai.expect(safeApiKit.queue.getMessages('')).to.be.rejectedWith('Invalid Safe address')
     await chai
       .expect(safeApiKit.queue.getMessages('0x123'))
-      .to.be.rejectedWith('Invalid Safe address')
+      .to.be.rejectedWith('Invalid Ethereum address 0x123')
   })
 
   it('should get the messages list', async () => {

@@ -101,11 +101,15 @@ await apiKit.queue.getTransactions({
     { address: otherSafeAddress, chainIds: [8453n] }
   ]
 })
-// The pending transactions need the chain of every Safe. For a queue across chains, call it once per chain.
+// The pending transactions need the chain of every Safe: the `chainId` of the request, or the chains of each Safe
+// to mix them in one list. The request fails as a whole when a Safe doesn't exist on one of its chains.
 // `getTransactions` with `executed: false` is not the pending list: it also returns the transactions
 // replaced by another one with the same nonce, which can never be executed
 await apiKit.queue.getPendingTransactions([safeAddress, otherSafeAddress], { chainId: 1n })
-await apiKit.queue.getPendingTransactions(safeAddress, { chainId: 8453n })
+await apiKit.queue.getPendingTransactions([
+  { address: safeAddress, chainIds: [1n, 137n] },
+  { address: otherSafeAddress, chainIds: [10n] }
+])
 
 // Indexer: `chainId` is required in every method. An EIP-3770 prefix must match it
 await apiKit.indexer.getSafeInfo(safeAddress, { chainId: 8453n })

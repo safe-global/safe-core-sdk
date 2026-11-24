@@ -86,4 +86,34 @@ describe('getPendingTransactions', () => {
     const nonces = results.map((transaction) => BigInt(transaction.nonce))
     chai.expect([...nonces].sort((a, b) => (a > b ? -1 : 1))).to.deep.equal(nonces)
   })
+
+  it('should merge the pending transactions of Safes on different chains', async () => {
+    const mainnetSafe = { address: '0x8675B754342754A30A2AeF474D114d8460bca19b', chainIds: [1n] }
+    const sepoliaSafe = {
+      address: '0xF8ef84392f7542576F6b9d1b140334144930Ac78',
+      chainIds: [config.CHAIN_ID]
+    }
+
+    const { count: mainnetCount } = await safeApiKit.queue.getPendingTransactions(mainnetSafe, {
+      limit: 1
+    })
+    const { count: sepoliaCount } = await safeApiKit.queue.getPendingTransactions(sepoliaSafe, {
+      limit: 1
+    })
+    const { count } = await safeApiKit.queue.getPendingTransactions([mainnetSafe, sepoliaSafe], {
+      limit: 1
+    })
+    chai.expect(count).to.be.equal(mainnetCount + sepoliaCount)
+  })
+
+  it('should fail as a whole if a Safe does not exist on one of its chains', async () => {
+    await chai
+      .expect(
+        safeApiKit.queue.getPendingTransactions({
+          address: '0xF8ef84392f7542576F6b9d1b140334144930Ac78', // Safe that only exists on Sepolia
+          chainIds: [config.CHAIN_ID, 1n]
+        })
+      )
+      .to.be.rejectedWith('does not exist on the selected chain')
+  })
 })

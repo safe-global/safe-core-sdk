@@ -12,6 +12,7 @@ import {
   DeleteTransactionProps,
   GetDelegatesOptions,
   GetMessagesOptions,
+  GetPendingTransactionsOfChainsOptions,
   GetPendingTransactionsOptions,
   GetSafeTransactionsOptions,
   GetTransactionsOptions,
@@ -21,6 +22,7 @@ import {
   ProposeTransactionProps,
   QueueServiceInfoResponse,
   RemoveDelegateProps,
+  SafeChains,
   SafeFilter,
   Signatures,
   TransactionListResponse,
@@ -264,30 +266,57 @@ export class QueueClient extends BaseClient {
   }
 
   /**
-   * Lists the pending multisig transactions of one or several Safes of a chain: not executed and with
-   * a nonce equal or higher than the current one. The service needs the chain of every Safe, so `chainId`
-   * is required: for a queue across chains call it once per chain. `getTransactions` with `executed: false`
-   * is not equivalent, it also returns the transactions replaced by another one with the same nonce.
+   * Lists the pending multisig transactions of one or several Safes, merged in one paginated list: not executed
+   * and with a nonce equal or higher than the current one. `getTransactions` with `executed: false` is not
+   * equivalent, it also returns the transactions replaced by another one with the same nonce.
    *
-   * @param safeAddresses - One or several Safe addresses
-   * @param options - Chain, sort and pagination
+   * The service needs the chain of every Safe. A Safe given as an address uses the `chainId` of the options;
+   * to mix chains give each Safe its own, as `{ address, chainIds }`. The request fails as a whole when a Safe
+   * doesn't exist on one of its chains.
+   *
+   * @param safes - One or several Safes: an address, or `{ address, chainIds }`
+   * @param options - Chain of the Safes given as an address, sort and pagination
    * @returns The list of pending transactions
    * @throws "Invalid Safe address"
+   * @throws "chainId is required"
+   * @throws "At least one chainId is required for each Safe"
    */
   async getPendingTransactions(
-    safeAddresses: string | string[],
-    { chainId, nonceOrder, limit, offset }: GetPendingTransactionsOptions
+    safes: SafeFilter | SafeFilter[],
+    options: GetPendingTransactionsOptions
+  ): Promise<TransactionListResponse>
+  async getPendingTransactions(
+    safes: SafeChains | SafeChains[],
+    options?: GetPendingTransactionsOfChainsOptions
+  ): Promise<TransactionListResponse>
+  async getPendingTransactions(
+    safes: SafeFilter | SafeFilter[],
+    { chainId, nonceOrder, limit, offset }: GetPendingTransactionsOfChainsOptions = {}
   ): Promise<TransactionListResponse> {
-    const addresses = Array.isArray(safeAddresses) ? safeAddresses : [safeAddresses]
-    if (addresses.length === 0 || addresses.some((address) => address === '')) {
+    const safeList = Array.isArray(safes) ? safes : [safes]
+    if (safeList.length === 0) {
       throw new Error('Invalid Safe address')
     }
-    const requestChainId = this.requireChainId(chainId)
     const url = new URL(`${this.baseUrl}/v1/multisig-transactions/queue`)
-    addresses.forEach((address) => {
+    safeList.forEach((safe) => {
+      const address = typeof safe === 'string' ? safe : safe.address
+      if (!address) {
+        throw new Error('Invalid Safe address')
+      }
+      if (typeof safe === 'string') {
+        const requestChainId = this.requireChainId(chainId)
+        url.searchParams.append(
+          'safes',
+          `${this.getAddress(address, requestChainId)}:${requestChainId}`
+        )
+        return
+      }
+      if (!safe.chainIds?.length) {
+        throw new Error('At least one chainId is required for each Safe')
+      }
       url.searchParams.append(
         'safes',
-        `${this.getAddress(address, requestChainId)}:${requestChainId}`
+        [this.getAddress(address), ...safe.chainIds.map(String)].join(':')
       )
     })
     this.addQueryParams(url, { nonceOrder, limit, offset })

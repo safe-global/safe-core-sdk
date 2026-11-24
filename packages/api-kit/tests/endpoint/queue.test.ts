@@ -520,7 +520,54 @@ describe('Queue service endpoints', () => {
           )
         )
         .to.be.rejectedWith('chainId is required')
+      await chai
+        .expect(safeApiKit.queue.getPendingTransactions({ address: safeAddress, chainIds: [] }))
+        .to.be.rejectedWith('At least one chainId is required for each Safe')
+      await chai
+        .expect(safeApiKit.queue.getPendingTransactions({ address: '', chainIds: [chainId] }))
+        .to.be.rejectedWith('Invalid Safe address')
+      await chai
+        .expect(
+          safeApiKit.queue.getPendingTransactions({
+            address: eip3770SafeAddress,
+            chainIds: [chainId]
+          })
+        )
+        .to.be.rejectedWith('An EIP-3770 address requires chainId')
       chai.expect(fetchData).not.to.have.been.called
+    })
+
+    it('getPendingTransactions of Safes with their own chains', async () => {
+      await chai
+        .expect(
+          safeApiKit.queue.getPendingTransactions(
+            [
+              { address: safeAddress, chainIds: [1n, 137n] },
+              { address: otherSafeAddress, chainIds: [10n] }
+            ],
+            { limit: 5 }
+          )
+        )
+        .to.be.eventually.deep.equals(OK)
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${baseUrl}/multisig-transactions/queue?safes=${safeAddress}%3A1%3A137&safes=${otherSafeAddress}%3A10&limit=5`,
+        method: 'GET'
+      })
+    })
+
+    it('getPendingTransactions mixing addresses and Safes with their own chains', async () => {
+      await chai
+        .expect(
+          safeApiKit.queue.getPendingTransactions(
+            [safeAddress, { address: otherSafeAddress, chainIds: [10n] }],
+            { chainId }
+          )
+        )
+        .to.be.eventually.deep.equals(OK)
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${baseUrl}/multisig-transactions/queue?safes=${safeAddress}%3A${chainId}&safes=${otherSafeAddress}%3A10`,
+        method: 'GET'
+      })
     })
 
     it('getTransactionsBatch', async () => {

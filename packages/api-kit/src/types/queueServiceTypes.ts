@@ -106,7 +106,10 @@ export type DeleteTransactionProps = {
 } & RequiredChainOptions
 
 /** A Safe address without EIP-3770 prefix, optionally restricted to some chains. Without chains, every chain of the Safe is returned */
-export type SafeFilter = string | { address: string; chainIds: bigint[] }
+export type SafeFilter = string | SafeChains
+
+/** A Safe address without EIP-3770 prefix and the chains to request it on */
+export type SafeChains = { address: string; chainIds: bigint[] }
 
 export type GetTransactionsOptions = {
   /** Safes to list, with optional chain restriction */
@@ -130,6 +133,10 @@ export type GetPendingTransactionsOptions = {
   nonceOrder?: NonceOrder
 } & RequiredChainOptions &
   ListOptions
+
+/** Options when every Safe carries its own `chainIds`, so the `chainId` of the request is not needed */
+export type GetPendingTransactionsOfChainsOptions = Omit<GetPendingTransactionsOptions, 'chainId'> &
+  ChainOptions
 
 export type TransactionListResponse = ListResponse<SafeMultisigTransactionResponse>
 

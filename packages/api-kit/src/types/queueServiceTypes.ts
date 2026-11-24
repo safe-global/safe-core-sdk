@@ -46,7 +46,8 @@ export type AddDelegateProps = {
   delegatorAddress: string
   /** The delegator wallet, used to sign the request */
   signer: Signer
-  label: string
+  /** Optional. In `updateDelegate`, an empty or omitted label removes the current one */
+  label?: string
 } & DelegateChainScope
 
 export type UpdateDelegateProps = AddDelegateProps

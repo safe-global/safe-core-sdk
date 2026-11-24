@@ -49,17 +49,16 @@ describe(`[${version}] addSafeDelegate`, () => {
   beforeEach(cleanup)
   afterEach(cleanup)
 
-  it('should fail if Label is empty', async () => {
+  it('should add a delegate without label', async () => {
     const delegateConfig: AddDelegateProps = {
       delegateAddress,
       delegatorAddress,
       signer,
-      label: '',
       chainId: config.CHAIN_ID
     }
-    await chai
-      .expect(safeApiKit.queue.addDelegate(delegateConfig))
-      .to.be.rejectedWith('Invalid label')
+    const delegateResponse = await safeApiKit.queue.addDelegate(delegateConfig)
+    chai.expect(delegateResponse.delegate.toLowerCase()).to.be.equal(delegateAddress.toLowerCase())
+    chai.expect(delegateResponse.label).to.be.null
   })
 
   it('should fail if Safe delegate address is empty', async () => {

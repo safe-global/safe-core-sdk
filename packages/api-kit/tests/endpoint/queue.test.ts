@@ -209,10 +209,54 @@ describe('Queue service endpoints', () => {
       await chai
         .expect(safeApiKit.queue.addDelegate({ ...base, delegatorAddress: '' }))
         .to.be.rejectedWith('Invalid Safe delegator address')
-      await chai
-        .expect(safeApiKit.queue.addDelegate({ ...base, label: '' }))
-        .to.be.rejectedWith('Invalid label')
       chai.expect(fetchData).not.to.have.been.called
+    })
+
+    it('addDelegate without label', async () => {
+      const signature = await signDelegate(signer, delegateAddress, chainId, 'add')
+
+      await chai
+        .expect(
+          safeApiKit.queue.addDelegate({ delegateAddress, delegatorAddress, signer, chainId })
+        )
+        .to.be.eventually.deep.equals(OK)
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${baseUrl}/delegates`,
+        method: 'POST',
+        body: {
+          chainId: Number(chainId),
+          safe: null,
+          delegate: delegateAddress,
+          delegator: delegatorAddress,
+          signature
+        }
+      })
+    })
+
+    it('updateDelegate removes the label when it is empty or omitted', async () => {
+      const props = { delegateAddress, delegatorAddress, signer, chainId }
+      const signature = await signDelegate(signer, delegateAddress, chainId, 'edit')
+      const body = {
+        chainId: Number(chainId),
+        safe: null,
+        delegate: delegateAddress,
+        delegator: delegatorAddress,
+        signature
+      }
+
+      await chai
+        .expect(safeApiKit.queue.updateDelegate({ ...props, label: '' }))
+        .to.be.eventually.deep.equals(OK)
+      chai.expect(fetchData).to.have.been.calledWith({
+        url: `${baseUrl}/delegates`,
+        method: 'PATCH',
+        body: { ...body, label: '' }
+      })
+
+      await chai.expect(safeApiKit.queue.updateDelegate(props)).to.be.eventually.deep.equals(OK)
+      chai
+        .expect(fetchData)
+        .to.have.been.calledWith({ url: `${baseUrl}/delegates`, method: 'PATCH', body })
     })
 
     it('updateDelegate', async () => {

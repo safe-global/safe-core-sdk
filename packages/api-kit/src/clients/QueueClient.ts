@@ -118,9 +118,6 @@ export class QueueClient extends BaseClient {
     if (delegatorAddress === '') {
       throw new Error('Invalid Safe delegator address')
     }
-    if (label === '') {
-      throw new Error('Invalid label')
-    }
     const chainId = allChains ? null : this.requireChainId(requestChainId)
     const addressChainId = chainId ?? undefined
     const safe = safeAddress ? this.getAddress(safeAddress, addressChainId) : null
@@ -157,7 +154,6 @@ export class QueueClient extends BaseClient {
    * @returns The created delegate
    * @throws "Invalid Safe delegate address"
    * @throws "Invalid Safe delegator address"
-   * @throws "Invalid label"
    */
   async addDelegate(props: AddDelegateProps): Promise<DelegateResponse> {
     return this.#sendDelegateRequest(HttpMethod.Post, 'add', props)
@@ -165,6 +161,7 @@ export class QueueClient extends BaseClient {
 
   /**
    * Updates the label of an existing delegate. The scope must match the one used when the delegate was added.
+   * An empty or omitted label removes the current one.
    *
    * @param props - The configuration of the delegate with the new label
    * @returns The updated delegate

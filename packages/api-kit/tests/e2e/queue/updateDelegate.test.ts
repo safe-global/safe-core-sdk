@@ -45,19 +45,25 @@ describe(`[${version}] updateSafeDelegate`, () => {
   beforeEach(cleanup)
   afterEach(cleanup)
 
-  it('should fail if Label is empty', async () => {
-    await chai
-      .expect(
-        safeApiKit.queue.updateDelegate({
-          safeAddress,
-          delegateAddress,
-          delegatorAddress,
-          signer,
-          label: '',
-          chainId: config.CHAIN_ID
-        })
-      )
-      .to.be.rejectedWith('Invalid label')
+  it('should remove the label with an empty or omitted label', async () => {
+    const delegateConfig = {
+      safeAddress,
+      delegateAddress,
+      delegatorAddress,
+      signer,
+      chainId: config.CHAIN_ID
+    }
+
+    await safeApiKit.queue.addDelegate({ ...delegateConfig, label: 'Label' })
+    const emptyLabelResponse = await safeApiKit.queue.updateDelegate({
+      ...delegateConfig,
+      label: ''
+    })
+    chai.expect(emptyLabelResponse.label).to.be.null
+
+    await safeApiKit.queue.updateDelegate({ ...delegateConfig, label: 'Label' })
+    const noLabelResponse = await safeApiKit.queue.updateDelegate(delegateConfig)
+    chai.expect(noLabelResponse.label).to.be.null
   })
 
   it('should fail if the delegate does not exist', async () => {

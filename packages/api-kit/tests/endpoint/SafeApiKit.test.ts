@@ -84,8 +84,8 @@ describe('SafeApiKit', () => {
     it('should accept a number or a string chainId, as in a JSON config', () => {
       const apiKit = new SafeApiKit({
         indexerUrls: [
-          { chainId: Number(chainId) as unknown as bigint, url: indexerUrl },
-          { chainId: '1' as unknown as bigint, url: 'https://other.example.com/api' }
+          { chainId: Number(chainId), url: indexerUrl },
+          { chainId: '1', url: 'https://other.example.com/api' }
         ]
       })
       expect(apiKit.getIndexerUrls()).to.deep.equal([
@@ -98,7 +98,7 @@ describe('SafeApiKit', () => {
       const apiKit = new SafeApiKit({
         indexerUrls: [
           { chainId, url: indexerUrl },
-          { chainId: Number(chainId) as unknown as bigint, url: 'https://other.example.com/api' }
+          { chainId: Number(chainId), url: 'https://other.example.com/api' }
         ]
       })
       expect(() => apiKit.indexer).to.throw('more than one URL')

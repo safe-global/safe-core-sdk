@@ -7,7 +7,7 @@ import {
   SafeVersion
 } from '@safe-global/types-kit'
 import { IFeeEstimator } from '@safe-global/relay-kit'
-import { IndexerUrl } from '@safe-global/api-kit'
+import { IndexerUrlConfig } from '@safe-global/api-kit'
 import { SafeClientTxStatus } from '@safe-global/sdk-starter-kit/constants'
 
 export type SendTransactionProps = {
@@ -64,7 +64,7 @@ export type SdkStarterKitRootConfig = {
   provider: SafeProvider['provider']
   signer?: SafeProvider['signer']
   apiKey?: string
-  indexerUrls?: IndexerUrl[]
+  indexerUrls?: IndexerUrlConfig[]
   queueServiceUrl?: string
   decoderServiceUrl?: string
 }

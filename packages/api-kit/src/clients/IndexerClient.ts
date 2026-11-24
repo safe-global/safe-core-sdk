@@ -45,9 +45,13 @@ export type IndexerUrl = {
   url: string
 }
 
+export type IndexerUrlConfig = Omit<IndexerUrl, 'chainId'> & {
+  chainId: bigint | number | string
+}
+
 export type IndexerClientConfig = Omit<ServiceClientConfig, 'baseUrl'> & {
   /** Custom service URLs. The chains without one use the Safe hosted service */
-  urls?: IndexerUrl[]
+  urls?: IndexerUrlConfig[]
 }
 
 /**

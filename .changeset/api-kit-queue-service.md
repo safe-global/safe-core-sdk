@@ -39,7 +39,7 @@ The Queue Service and the Decoder Service are new dependencies. Proposals, confi
 Configuration:
 
 - The `chainId` of the config is removed.
-- `indexerUrls: [{ chainId, url }]` replaces `txServiceUrl`. It sets the Transaction Service URL of some chains, for example self-hosted services; the other chains use the Safe hosted service, which requires the `apiKey`. More than one URL for the same chain throws. The `chainId` can be a number or a string, as in a JSON config.
+- `indexerUrls: [{ chainId, url }]` replaces `txServiceUrl`. It sets the Transaction Service URL of some chains, for example self-hosted services; the other chains use the Safe hosted service, which requires the `apiKey`. More than one URL for the same chain throws. The `chainId` is typed `bigint | number | string` (`IndexerUrlConfig`), so a JSON config works as it is. `getIndexerUrls()` always returns it as a `bigint` (`IndexerUrl`).
 - The `apiKey` is only sent to the Safe hosted services. A custom URL in `indexerUrls`, `queueServiceUrl` or `decoderServiceUrl` never receives it.
 - `apiKit.getIndexerUrls()` returns the Transaction Service URL of every chain the indexer can be used with: the `indexerUrls` entries and, with an `apiKey`, the Safe hosted service of the other chains.
 - Like the Transaction Service URLs, the new `queueServiceUrl` and `decoderServiceUrl` include the `/api` path and default to the Safe hosted services, which require the `apiKey`.

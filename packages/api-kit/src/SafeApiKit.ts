@@ -1,5 +1,5 @@
 import { DecoderClient } from './clients/DecoderClient'
-import { IndexerClient, IndexerUrl } from './clients/IndexerClient'
+import { IndexerClient, IndexerUrl, IndexerUrlConfig } from './clients/IndexerClient'
 import { QueueClient } from './clients/QueueClient'
 import {
   DEFAULT_DECODER_SERVICE_URL,
@@ -15,7 +15,7 @@ export interface SafeApiKitConfig {
    * (e.g. `[{ chainId: 11155111n, url: 'https://my-indexer.example.com/api' }]`).
    * The chains without one use the Safe hosted service.
    */
-  indexerUrls?: IndexerUrl[]
+  indexerUrls?: IndexerUrlConfig[]
   /**
    * queueServiceUrl - Safe Queue Service URL, used by `queue`, including the `/api` path
    * (e.g. `https://api.safe.global/queue/api`). The service is multi-chain, so the same URL works for every chain.
@@ -134,7 +134,6 @@ class SafeApiKit {
       const { indexerUrls = [], apiKey } = this.#config
       const chainIds = new Set<bigint>()
       this.#indexerUrls = indexerUrls.map(({ chainId: rawChainId, url }) => {
-        // Accept a number or a string chainId from JavaScript or a JSON config
         const chainId = BigInt(rawChainId)
         if (chainIds.has(chainId)) {
           throw new Error(`indexerUrls has more than one URL for chainId ${chainId}`)

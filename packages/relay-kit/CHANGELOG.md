@@ -1,5 +1,13 @@
 # @safe-global/relay-kit
 
+## 6.1.6
+
+### Patch Changes
+
+- chore: add GenLayer Testnet (genlayer-testnets) chain support and bump safe-deployments and safe-modules-deployments
+- Updated dependencies
+  - @safe-global/protocol-kit@8.0.12
+
 ## 6.1.5
 
 ### Patch Changes

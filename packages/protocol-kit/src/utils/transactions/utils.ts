@@ -195,7 +195,7 @@ export function decodeMultiSendData(encodedData: string): MetaTransactionData[] 
 export function isSafeMultisigTransactionResponse(
   safeTransaction: SafeTransaction | SafeMultisigTransactionResponse
 ): safeTransaction is SafeMultisigTransactionResponse {
-  return (safeTransaction as SafeMultisigTransactionResponse).isExecuted !== undefined
+  return (safeTransaction as SafeMultisigTransactionResponse).safeTxHash !== undefined
 }
 
 type PasskeyParam = { passkey: PasskeyArgType }

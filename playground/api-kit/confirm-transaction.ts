@@ -6,7 +6,6 @@ dotenv.config({ path: './playground/api-kit/.env' })
 // Load environment variables from ./.env file
 // Follow .env-sample as an example to create your own file
 const {
-  CHAIN_ID = 11155111,
   RPC_URL = '',
   API_KEY = '',
   SIGNER_ADDRESS_PRIVATE_KEY = '',
@@ -24,22 +23,21 @@ async function main() {
 
   // Create Safe API Kit instance
   const apiKit = new SafeApiKit({
-    chainId: BigInt(CHAIN_ID),
     apiKey: API_KEY
   })
 
   // Get the transaction
-  const safeTransaction = await apiKit.getTransaction(SAFE_TX_HASH || '')
+  const safeTransaction = await apiKit.queue.getTransaction(SAFE_TX_HASH || '')
   const safeTxHash = safeTransaction.safeTxHash
   const signature = await protocolKit.signHash(safeTxHash)
 
   // Confirm the Safe transaction
-  const signatureResponse = await apiKit.confirmTransaction(safeTxHash, signature.data)
+  const [confirmation] = await apiKit.queue.confirmTransaction(safeTxHash, signature.data)
 
   const signerAddress = await protocolKit.getSafeProvider().getSignerAddress()
-  console.log('Added a new signature to transaction with safeTxGas:', SAFE_TX_HASH)
+  console.log('Added a new signature to transaction with safeTxHash:', SAFE_TX_HASH)
   console.log('- Signer:', signerAddress)
-  console.log('- Signer signature:', signatureResponse.signature)
+  console.log('- Signer signature:', confirmation.signature)
 }
 
 main()

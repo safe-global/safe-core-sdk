@@ -22,7 +22,6 @@ const { API_KEY } = process.env
 
 async function main() {
   const apiKit = new SafeApiKit({
-    chainId: BigInt(CHAIN_ID),
     apiKey: API_KEY || ''
   })
 
@@ -59,9 +58,11 @@ async function main() {
 
   console.log('Signed by first owner:', signature1)
 
-  await apiKit.addSafeOperation(safeOpSignedByOwner1)
+  await apiKit.indexer.addSafeOperation(safeOpSignedByOwner1)
 
-  const addedSafeOperation = await apiKit.getSafeOperation(safeOperationHash)
+  const addedSafeOperation = await apiKit.indexer.getSafeOperation(safeOperationHash, {
+    chainId: BigInt(CHAIN_ID)
+  })
   console.log('Added to the Transaction service')
 
   safe4337Pack = await Safe4337Pack.init({
@@ -85,9 +86,13 @@ async function main() {
   console.log('Signed by second owner:', signature2)
 
   // Confirm the safe operation with the second owner
-  await apiKit.confirmSafeOperation(safeOperationHash, signature2)
+  await apiKit.indexer.confirmSafeOperation(safeOperationHash, signature2, {
+    chainId: BigInt(CHAIN_ID)
+  })
 
-  const confirmedSafeOperation = await apiKit.getSafeOperation(safeOperationHash)
+  const confirmedSafeOperation = await apiKit.indexer.getSafeOperation(safeOperationHash, {
+    chainId: BigInt(CHAIN_ID)
+  })
   console.log('Confirmed to the Transaction service')
 
   const userOperationHash = await safe4337Pack.executeTransaction({

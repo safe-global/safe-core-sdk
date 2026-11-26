@@ -306,7 +306,7 @@ class SafeContract_v1_1_1
       })
 
       return txResult.result
-    } catch (error) {
+    } catch {
       return false
     }
   }

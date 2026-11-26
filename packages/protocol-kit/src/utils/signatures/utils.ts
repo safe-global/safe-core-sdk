@@ -38,7 +38,7 @@ export async function isTxHashSignedWithPrefix(
     })
 
     hasPrefix = !sameString(recoveredAddress, ownerAddress)
-  } catch (e) {
+  } catch {
     hasPrefix = true
   }
   return hasPrefix

@@ -109,7 +109,7 @@ export class SafeMessageClient {
         protocolKit: this.protocolKit
       })
       await this.#updateProtocolKitWithDeployedSafe()
-    } catch (error) {
+    } catch {
       throw new Error('Could not deploy the Safe account')
     }
 
@@ -126,7 +126,7 @@ export class SafeMessageClient {
         deploymentTxHash,
         messageHash: messages?.messageHash
       })
-    } catch (error) {
+    } catch {
       throw new Error('Could not add a new off-chain message to the Safe account')
     }
   }
@@ -150,7 +150,7 @@ export class SafeMessageClient {
         message: safeMessage.data,
         signature: signedMessage.encodedSignatures()
       })
-    } catch (error) {
+    } catch {
       throw new Error('Could not add a new off-chain message to the Safe account')
     }
 

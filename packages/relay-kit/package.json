@@ -44,6 +44,9 @@
   },
   "author": "Safe (https://safe.global)",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "bugs": {
     "url": "https://github.com/safe-global/safe-core-sdk/issues"
   },
@@ -55,7 +58,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@gelatonetwork/relay-sdk": "^5.6.0",
     "@safe-global/protocol-kit": "workspace:^",
     "@safe-global/safe-modules-deployments": "^3.0.14",
     "@safe-global/types-kit": "workspace:^",
@@ -68,6 +70,6 @@
     "abitype": "^1.2.3",
     "dotenv": "^16.4.7",
     "jest": "^29.7.0",
-    "ts-jest": "^29.2.5"
+    "ts-jest": "^29.4.15"
   }
 }

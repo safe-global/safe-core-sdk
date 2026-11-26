@@ -45,7 +45,7 @@ class ContractManager {
       try {
         // We try to fetch the version of the Safe from the blockchain
         safeVersion = await getSafeContractVersion(safeProvider, safeAddress as string)
-      } catch (e) {
+      } catch {
         // if contract is not deployed we use the default version
         safeVersion = DEFAULT_SAFE_VERSION
       }

@@ -34,6 +34,9 @@
   },
   "author": "Safe (https://safe.global)",
   "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "bugs": {
     "url": "https://github.com/safe-global/safe-core-sdk/issues"
   },

@@ -9,7 +9,7 @@ import {
 import semverSatisfies from 'semver/functions/satisfies.js'
 import { sameString } from '../address'
 import { EthSafeSignature } from './SafeSignature'
-import { getEip712MessageTypes, getEip712TxTypes } from '../eip-712'
+import { getEip712MessageTypes, getEip712TxTypes, generateTypedData } from '../eip-712'
 import { hashTypedData } from '../eip-712'
 import { encodeTypedData } from '../eip-712/encode'
 import { asHash, asHex } from '../types'
@@ -128,10 +128,25 @@ export async function generateEIP712Signature(
   }
 
   //@ts-expect-error: Evaluate removal of methodVersion and use v4
-  let signature = await safeProvider.signTypedData(safeEIP712Args, methodVersion)
+  const signature = await safeProvider.signTypedData(safeEIP712Args, methodVersion)
 
-  signature = await adjustVInSignature(SigningMethod.ETH_SIGN_TYPED_DATA, signature)
-  return new EthSafeSignature(signerAddress, signature)
+  // Delegated EOAs can have code and still return ordinary ECDSA signatures.
+  if (/^0x[0-9a-f]{128}(00|01|1b|1c)$/i.test(signature)) {
+    const adjustedSignature = await adjustVInSignature(SigningMethod.ETH_SIGN_TYPED_DATA, signature)
+    const typedData = generateTypedData(safeEIP712Args)
+    const hash = hashTypedData({ ...typedData, types: { ...typedData.types } })
+
+    if (!(await isTxHashSignedWithPrefix(hash, adjustedSignature, signerAddress))) {
+      return new EthSafeSignature(signerAddress, adjustedSignature)
+    }
+  }
+
+  if (await safeProvider.isContractDeployed(signerAddress)) {
+    return new EthSafeSignature(signerAddress, signature, true)
+  }
+
+  const adjustedSignature = await adjustVInSignature(SigningMethod.ETH_SIGN_TYPED_DATA, signature)
+  return new EthSafeSignature(signerAddress, adjustedSignature)
 }
 
 export const buildContractSignature = async (

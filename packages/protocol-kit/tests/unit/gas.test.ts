@@ -1,7 +1,8 @@
 import { OperationType, SafeTransaction } from '@safe-global/types-kit'
-import { estimateTxBaseGas } from '@safe-global/protocol-kit/utils'
+import { estimateSafeTxGas, estimateTxBaseGas } from '@safe-global/protocol-kit/utils'
 import { ZERO_ADDRESS } from '@safe-global/protocol-kit/utils/constants'
 import * as safeDeploymentContracts from '@safe-global/protocol-kit/contracts/safeDeploymentContracts'
+import * as safeVersions from '@safe-global/protocol-kit/utils/safeVersions'
 import chai from 'chai'
 import sinon from 'sinon'
 
@@ -274,5 +275,206 @@ describe('estimateTxBaseGas', () => {
     )
 
     chai.expect(Number(lowProbeBaseGas) - Number(flooredBaseGas)).to.eq(0)
+  })
+
+  // Polygon PoS (137) raises COLD_SLOAD_COST 2_100 -> 5_460 and COLD_SSTORE_COST 2_100 -> 2_940
+  // (PIP-88 / Chicago hard fork). baseGas must scale the cold SLOADs/SSTOREs it counts.
+  function buildSafeOnChain(chainId: bigint, overrides = {}) {
+    const safe = buildSafe(overrides)
+    safe.getChainId = sinon.stub().resolves(chainId)
+    return safe
+  }
+
+  it('scales the cold SLOADs counted in baseGas for Polygon (PIP-88) vs an EIP-2929 chain', async () => {
+    // Initialized Safe (nonce != 0): the only per-chain difference is the cold SLOAD price,
+    // applied to 4 cold SLOADs: threshold + getGuard (EXTRA_BASE), owners[signer] (1 signature)
+    // and the proxy's singleton slot (proxy fallback).
+    const ethereumSafe = buildSafeOnChain(1n)
+    const polygonSafe = buildSafeOnChain(137n)
+
+    const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
+    const polygonBaseGas = await estimateTxBaseGas(polygonSafe, buildTransaction())
+
+    // 4 cold SLOADs * (5_460 - 2_100) = 4 * 3_360 = 13_440
+    chai.expect(Number(polygonBaseGas) - Number(ethereumBaseGas)).to.eq(13_440)
+  })
+
+  it('scales the cold SSTORE nonce initialization for Polygon when the Safe is uninitialized', async () => {
+    // Uninitialized Safe (nonce == 0): adds the cold SSTORE set surcharge difference on top of
+    // the 4 cold SLOAD difference.
+    const ethereumSafe = buildSafeOnChain(1n)
+    const polygonSafe = buildSafeOnChain(137n)
+    ethereumSafe.getNonce = sinon.stub().resolves(0)
+    polygonSafe.getNonce = sinon.stub().resolves(0)
+
+    const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
+    const polygonBaseGas = await estimateTxBaseGas(polygonSafe, buildTransaction())
+
+    // cold SLOAD delta (13_440) + cold SSTORE set delta (2_940 - 2_100 = 840) = 14_280
+    chai.expect(Number(polygonBaseGas) - Number(ethereumBaseGas)).to.eq(14_280)
+  })
+
+  it('uses the EIP-2929 default for chains without a repricing entry', async () => {
+    // A chain with no entry in the lookup must behave exactly like Ethereum mainnet.
+    const ethereumSafe = buildSafeOnChain(1n)
+    const arbitrumSafe = buildSafeOnChain(42161n)
+
+    const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
+    const arbitrumBaseGas = await estimateTxBaseGas(arbitrumSafe, buildTransaction())
+
+    chai.expect(Number(arbitrumBaseGas)).to.eq(Number(ethereumBaseGas))
+  })
+
+  // Sepolia runs Glamsterdam (EIP-8007): creating state is charged as EIP-8037 state gas, and
+  // EIP-8038 reprices the first write to a slot (10_000), a cold account access (3_000) and a
+  // value-forwarding CALL (11_300).
+  // Every tx here refunds in ETH, so the same three account costs sit in each Sepolia estimate:
+  //   proxy delegatecall to the singleton, cold: 3_000 - 2_600 =   400
+  //   refund receiver, cold:                     3_000 - 2_600 =   400
+  //   refund CALL with value:                   11_300 - 9_000 = 2_300
+  const GLAMSTERDAM_ACCOUNT_COSTS_DELTA = 400 + 400 + 2_300
+  const EXISTING_RECEIVER_STATE = { contractCode: '0x1234', nonce: 1, balance: 1n }
+
+  it('uses the Glamsterdam costs for the nonce increment and the ETH refund on Sepolia', async () => {
+    // Existing refund receiver, so the new-account cost (also repriced) does not count here
+    const ethereumSafe = buildSafeOnChain(1n, EXISTING_RECEIVER_STATE)
+    const sepoliaSafe = buildSafeOnChain(11155111n, EXISTING_RECEIVER_STATE)
+
+    const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
+    const sepoliaBaseGas = await estimateTxBaseGas(sepoliaSafe, buildTransaction())
+
+    // cold reset: (2_100 + 10_000) - 5_000 = 7_100
+    chai
+      .expect(Number(sepoliaBaseGas) - Number(ethereumBaseGas))
+      .to.eq(7_100 + GLAMSTERDAM_ACCOUNT_COSTS_DELTA)
+  })
+
+  it('uses the Glamsterdam state gas for the nonce initialization on Sepolia', async () => {
+    // Existing refund receiver, so the new-account cost (also repriced) does not count here
+    const ethereumSafe = buildSafeOnChain(1n, EXISTING_RECEIVER_STATE)
+    const sepoliaSafe = buildSafeOnChain(11155111n, EXISTING_RECEIVER_STATE)
+    ethereumSafe.getNonce = sinon.stub().resolves(0)
+    sepoliaSafe.getNonce = sinon.stub().resolves(0)
+
+    const ethereumBaseGas = await estimateTxBaseGas(ethereumSafe, buildTransaction())
+    const sepoliaBaseGas = await estimateTxBaseGas(sepoliaSafe, buildTransaction())
+
+    // (97_920 + 10_000 + 2_100) - (20_000 + 2_100) = 87_920
+    chai
+      .expect(Number(sepoliaBaseGas) - Number(ethereumBaseGas))
+      .to.eq(87_920 + GLAMSTERDAM_ACCOUNT_COSTS_DELTA)
+  })
+
+  it('uses the Glamsterdam state gas for a fresh ETH refund receiver on Sepolia', async () => {
+    const existingSafe = buildSafeOnChain(11155111n, EXISTING_RECEIVER_STATE)
+    const newAccountSafe = buildSafeOnChain(11155111n)
+
+    const existingRefundBaseGas = await estimateTxBaseGas(existingSafe, buildTransaction())
+    const newRefundBaseGas = await estimateTxBaseGas(
+      newAccountSafe,
+      buildTransaction({ refundReceiver: NEW_REFUND_RECEIVER })
+    )
+
+    // 120 bytes * CPSB 1_530
+    chai.expect(Number(newRefundBaseGas) - Number(existingRefundBaseGas)).to.eq(183_600)
+  })
+})
+
+describe('estimateSafeTxGas', () => {
+  const SAFE_ADDRESS = '0x5000000000000000000000000000000000000005'
+
+  beforeEach(() => {
+    const contractStub = {
+      encode: sinon.stub().returns('0x1234'),
+      getAddress: sinon.stub().returns(SAFE_ADDRESS)
+    }
+    sinon.stub(safeDeploymentContracts, 'getSafeContract').resolves(contractStub as any)
+    sinon
+      .stub(safeDeploymentContracts, 'getSimulateTxAccessorContract')
+      .resolves(contractStub as any)
+    sinon
+      .stub(safeVersions, 'isSafeContractCompatibleWithSimulateAndRevert')
+      .resolves(contractStub as any)
+    sinon
+      .stub(safeVersions, 'isSafeContractCompatibleWithRequiredTxGas')
+      .resolves(contractStub as any)
+  })
+
+  afterEach(() => {
+    sinon.restore()
+  })
+
+  // Shape of the `simulateAndRevert` response that `decodeSafeTxGas` reads the estimate from
+  function encodeSimulateResponse(gas: number): string {
+    return '0x' + '0'.repeat(182) + gas.toString(16).padStart(10, '0') + '0'.repeat(64)
+  }
+
+  function buildSafe(simulatedGas: number, safeVersion = '1.4.1') {
+    const safeProvider = {
+      call: sinon.stub().resolves(encodeSimulateResponse(simulatedGas))
+    }
+
+    return {
+      safeProvider,
+      safe: {
+        isSafeDeployed: sinon.stub().resolves(true),
+        getAddress: sinon.stub().resolves(SAFE_ADDRESS),
+        getContractVersion: sinon.stub().returns(safeVersion),
+        getSafeProvider: sinon.stub().returns(safeProvider),
+        getContractManager: sinon
+          .stub()
+          .returns({ isL1SafeSingleton: false, contractNetworks: {} }),
+        getChainId: sinon.stub().resolves(11155111n)
+      } as any
+    }
+  }
+
+  function buildTransaction(operation = OperationType.Call): SafeTransaction {
+    return {
+      data: {
+        to: '0x4000000000000000000000000000000000000004',
+        value: '0',
+        data: '0x',
+        operation,
+        safeTxGas: '0',
+        baseGas: '0',
+        gasPrice: '0',
+        gasToken: ZERO_ADDRESS,
+        refundReceiver: ZERO_ADDRESS,
+        nonce: 1
+      }
+    } as any
+  }
+
+  it('runs the simulation below the per-tx gas cap so state gas is measured', async () => {
+    const { safe, safeProvider } = buildSafe(50_000)
+
+    await estimateSafeTxGas(safe, buildTransaction())
+
+    chai.expect(safeProvider.call.firstCall.args[0].gasLimit).to.eq(16_777_216)
+  })
+
+  it('also caps the simulation gas for DelegateCall', async () => {
+    const { safe, safeProvider } = buildSafe(50_000)
+
+    await estimateSafeTxGas(safe, buildTransaction(OperationType.DelegateCall))
+
+    chai.expect(safeProvider.call.firstCall.args[0].gasLimit).to.eq(16_777_216)
+  })
+
+  it('returns the simulated gas plus the 5% safety margin', async () => {
+    const { safe } = buildSafe(120_000)
+
+    const safeTxGas = await estimateSafeTxGas(safe, buildTransaction())
+
+    chai.expect(safeTxGas).to.eq('126000')
+  })
+
+  it('also caps the requiredTxGas simulation for Safes < 1.3.0', async () => {
+    const { safe, safeProvider } = buildSafe(50_000, '1.1.1')
+
+    await estimateSafeTxGas(safe, buildTransaction())
+
+    chai.expect(safeProvider.call.firstCall.args[0].gasLimit).to.eq(16_777_216)
   })
 })

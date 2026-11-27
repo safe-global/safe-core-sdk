@@ -38,8 +38,8 @@ export class EthSafeSignature implements SafeSignature {
    */
   dynamicPart() {
     if (this.isContractSignature) {
-      const dynamicPartLength = (this.data.slice(2).length / 2).toString(16).padStart(64, '0')
-      return `${dynamicPartLength}${this.data.slice(2)}`
+      // NOTE: Assuming single EIP-191 signaures from constructor
+      return `${this.data.slice(-1 * (130 + 64))}`
     }
 
     return ''

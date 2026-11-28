@@ -2,6 +2,7 @@ import {
   OperationType,
   SafeMultisigTransactionResponse,
   SafeMultisigConfirmationResponse,
+  SignatureTypes,
   SafeSignature,
   SafeTransaction,
   SafeTransactionDataPartial,
@@ -62,7 +63,8 @@ import {
   preimageSafeMessageHash,
   preimageSafeTransactionHash,
   adjustVInSignature,
-  extractPasskeyData
+  extractPasskeyData,
+  extractContractSignatureData
 } from './utils'
 import EthSafeTransaction from './utils/transactions/SafeTransaction'
 import { SafeTransactionOptionalProps } from './utils/transactions/types'
@@ -1600,7 +1602,15 @@ class Safe {
     })
     serviceTransactionResponse.confirmations?.map(
       (confirmation: SafeMultisigConfirmationResponse) => {
-        const signature = new EthSafeSignature(confirmation.owner, confirmation.signature)
+        const signatureData =
+          confirmation.signatureType === SignatureTypes.CONTRACT_SIGNATURE
+            ? extractContractSignatureData(confirmation.signature)
+            : confirmation.signature
+        const signature = new EthSafeSignature(
+          confirmation.owner,
+          signatureData,
+          confirmation.signatureType === SignatureTypes.CONTRACT_SIGNATURE
+        )
         safeTransaction.addSignature(signature)
       }
     )
